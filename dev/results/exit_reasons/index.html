@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../simple/">
+        <link rel="prev" href="../handlers/">
       
       
-        <link rel="next" href="../context/">
+        <link rel="next" href="../../optimizer_setup/key_concepts/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Utility Functions - ropt Documentation</title>
+        <title>Exit Reasons - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#utility-functions" class="md-skip">
+        <a href="#exit-reasons" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Utility Functions
+              Exit Reasons
             
           </span>
         </div>
@@ -280,11 +280,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../results/results/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../results/" class="md-tabs__link">
           
   
   
@@ -370,13 +372,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../simple/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../reference/simple/" class="md-tabs__link">
           
   
   
@@ -928,28 +928,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -967,7 +970,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -985,7 +988,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../results/results/" class="md-nav__link">
+      <a href="../results/" class="md-nav__link">
         
   
   
@@ -1013,7 +1016,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../results/handlers/" class="md-nav__link">
+      <a href="../handlers/" class="md-nav__link">
         
   
   
@@ -1038,10 +1041,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../results/exit_reasons/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exit Reasons
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1057,6 +1087,59 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-each-kind-of-run-reports" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What each kind of run reports
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#an-exit-reason-is-not-a-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        An exit reason is not a result
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#work-that-has-no-result-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Work that has no result object
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1940,31 +2023,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
         
           
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
             
   
   
@@ -1982,7 +2062,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             
@@ -2000,7 +2080,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../simple/" class="md-nav__link">
+      <a href="../../reference/simple/" class="md-nav__link">
         
   
   
@@ -2025,37 +2105,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Utility Functions
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../reference/utils/" class="md-nav__link">
         
   
   
@@ -2071,76 +2124,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.utils" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        utils
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="utils">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.validate_backend_options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        validate_backend_options
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.scales_and_offsets_from_bounds" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        scales_and_offsets_from_bounds
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.restore_keyboard_interrupt" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        restore_keyboard_interrupt
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -2159,13 +2142,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -2174,7 +2154,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_3" >
         
           
-          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="0">
             
   
   
@@ -2210,7 +2190,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../context/" class="md-nav__link">
+      <a href="../../reference/context/" class="md-nav__link">
         
   
   
@@ -2238,7 +2218,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../config/" class="md-nav__link">
+      <a href="../../reference/config/" class="md-nav__link">
         
   
   
@@ -2280,13 +2260,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -2295,7 +2272,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_4" >
         
           
-          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="0">
             
   
   
@@ -2331,7 +2308,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../results/" class="md-nav__link">
+      <a href="../../reference/results/" class="md-nav__link">
         
   
   
@@ -2359,7 +2336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../events/" class="md-nav__link">
+      <a href="../../reference/events/" class="md-nav__link">
         
   
   
@@ -2401,13 +2378,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -2416,7 +2390,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_5" >
         
           
-          <label class="md-nav__link" for="__nav_8_5" id="__nav_8_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_5" id="__nav_8_5_label" tabindex="0">
             
   
   
@@ -2452,7 +2426,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../core/" class="md-nav__link">
+      <a href="../../reference/core/" class="md-nav__link">
         
   
   
@@ -2480,7 +2454,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../evaluation/" class="md-nav__link">
+      <a href="../../reference/evaluation/" class="md-nav__link">
         
   
   
@@ -2522,13 +2496,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -2537,7 +2508,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_6" >
         
           
-          <label class="md-nav__link" for="__nav_8_6" id="__nav_8_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_6" id="__nav_8_6_label" tabindex="0">
             
   
   
@@ -2573,7 +2544,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../function_estimator/" class="md-nav__link">
+      <a href="../../reference/function_estimator/" class="md-nav__link">
         
   
   
@@ -2601,7 +2572,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../realization_filter/" class="md-nav__link">
+      <a href="../../reference/realization_filter/" class="md-nav__link">
         
   
   
@@ -2629,7 +2600,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../backend/" class="md-nav__link">
+      <a href="../../reference/backend/" class="md-nav__link">
         
   
   
@@ -2657,7 +2628,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sampler/" class="md-nav__link">
+      <a href="../../reference/sampler/" class="md-nav__link">
         
   
   
@@ -2699,13 +2670,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -2714,7 +2682,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_7" >
         
           
-          <label class="md-nav__link" for="__nav_8_7" id="__nav_8_7_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_7" id="__nav_8_7_label" tabindex="0">
             
   
   
@@ -2750,7 +2718,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../components_compute_steps/" class="md-nav__link">
+      <a href="../../reference/components_compute_steps/" class="md-nav__link">
         
   
   
@@ -2778,7 +2746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../components_event_handlers/" class="md-nav__link">
+      <a href="../../reference/components_event_handlers/" class="md-nav__link">
         
   
   
@@ -2806,7 +2774,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../components_evaluators/" class="md-nav__link">
+      <a href="../../reference/components_evaluators/" class="md-nav__link">
         
   
   
@@ -2834,7 +2802,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../components_executors/" class="md-nav__link">
+      <a href="../../reference/components_executors/" class="md-nav__link">
         
   
   
@@ -2862,7 +2830,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../components_utils/" class="md-nav__link">
+      <a href="../../reference/components_utils/" class="md-nav__link">
         
   
   
@@ -2898,7 +2866,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../plugin_manager/" class="md-nav__link">
+      <a href="../../reference/plugin_manager/" class="md-nav__link">
         
   
   
@@ -2926,7 +2894,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../enums/" class="md-nav__link">
+      <a href="../../reference/enums/" class="md-nav__link">
         
   
   
@@ -2954,7 +2922,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../exceptions/" class="md-nav__link">
+      <a href="../../reference/exceptions/" class="md-nav__link">
         
   
   
@@ -3009,52 +2977,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.utils" class="md-nav__link">
+  <a href="#what-each-kind-of-run-reports" class="md-nav__link">
     <span class="md-ellipsis">
       
-        utils
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="utils">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.validate_backend_options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        validate_backend_options
+        What each kind of run reports
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.scales_and_offsets_from_bounds" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#an-exit-reason-is-not-a-result" class="md-nav__link">
     <span class="md-ellipsis">
       
-        scales_and_offsets_from_bounds
+        An exit reason is not a result
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.restore_keyboard_interrupt" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#work-that-has-no-result-object" class="md-nav__link">
     <span class="md-ellipsis">
       
-        restore_keyboard_interrupt
+        Work that has no result object
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -3078,325 +3029,90 @@
   
 
 
-<h1 id="utility-functions">Utility Functions</h1>
-
-
-<div class="doc doc-object doc-module">
-
-
-
-<h2 id="ropt.utils" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.utils</span>
-
-
-</h2>
-
-    <div class="doc doc-contents first">
-
-        <p>Optional helpers for scripts and applications that use <code>ropt</code>.</p>
-<p>Nothing in <code>ropt</code> calls anything here. Three kinds of helper live here: a check
-on the options a backend accepts, for code that builds configurations
-dynamically or checks them before starting a long run; a converter from variable
-bounds to the scales and offsets that a configuration expects; and escape
-hatches for problems that come from outside the library.</p>
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.utils.validate_backend_options" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">validate_backend_options</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">validate_backend_options</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<h1 id="exit-reasons">Exit Reasons</h1>
+<p>Every run reports why it ended. The reason is an
+<a class="autorefs autorefs-internal" title="            ExitReason" href="../../reference/enums/#ropt.enums.ExitReason"><code>ExitReason</code></a>, carried on the object the run returns
+rather than raised:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">exit_reason</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Validate the optimizer-specific options for a given method.</p>
-<p><code>method</code> is either <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>; see
-<a href="../../advanced/plugin_discovery/">Plugin Discovery</a> for both forms.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>method</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The specific optimization method name.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>options</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The dictionary or a list of strings of options.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the options are not valid for the method.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.utils.scales_and_offsets_from_bounds" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">scales_and_offsets_from_bounds</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">scales_and_offsets_from_bounds</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">lower_bounds</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">upper_bounds</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">target_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Derive variable scales and offsets that map bounds onto a target range.</p>
-<p>The scales and offsets returned here can be passed straight to the <code>scales</code>
-and <code>offsets</code> fields of a
-<a class="autorefs autorefs-internal" title="            VariablesConfig" href="../config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> object. They define the map
-<span class="arithmatex">\(y = (x - o)/s\)</span> that sends <code>lower_bounds</code> to the start of <code>target_range</code> and
-<code>upper_bounds</code> to its end, which puts variables of wildly different
-magnitudes on a common footing for the optimizer.</p>
-<p>The bounds must be finite and the ranges must not be empty, since a variable
-that cannot vary has no scale.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>lower_bounds</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The lower bounds of the variables.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>upper_bounds</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The upper bounds of the variables.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>target_range</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#float">float</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#float">float</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The range to map the bounds onto (default: 0 to 1).</p>
-              </div>
-            </td>
-            <td>
-                  <code>(0.0, 1.0)</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The scales and the offsets.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the bounds are not finite, or if either range is empty.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.utils.restore_keyboard_interrupt" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">restore_keyboard_interrupt</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">restore_keyboard_interrupt</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Make Ctrl-C interrupt a waiting program again.</p>
-<p>Some third-party extension modules set the process-wide <code>SA_RESTART</code> flag
-on <code>SIGINT</code> when they are imported, after which Ctrl-C no longer breaks
-into a program that is waiting. This clears the flag, and is a no-op on
-platforms that do not have one.</p>
-<p>Entirely optional: call it at the top of a script, after the imports, only
-if Ctrl-C stops working. See
-<a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a>.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
+<p>A run either <strong>stops</strong> or is <strong>aborted</strong>, and the reason indicates which. It
+stops when a condition on the run is met — the optimizer converged, a budget ran
+out, a <a href="../../running/running/#stopping-early-from-the-callback"><code>report</code> callback</a>
+returned <code>True</code> — so it ends at a point someone declared acceptable. It is
+aborted when something cuts it off without consulting the run at all, and what
+comes back is then whatever it had reached rather than a chosen endpoint.</p>
+<table>
+<thead>
+<tr>
+<th>Exit reason</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>FINISHED</code></td>
+<td>The run terminated normally. For an optimization this means the backend ended it, by converging or on a limit of its own such as <code>max_iterations</code>.</td>
+</tr>
+<tr>
+<td><code>MAX_FUNCTIONS_REACHED</code></td>
+<td>The configured maximum number of function evaluations was reached.</td>
+</tr>
+<tr>
+<td><code>MAX_BATCHES_REACHED</code></td>
+<td>The configured maximum number of evaluation batches was reached.</td>
+</tr>
+<tr>
+<td><code>STOPPED</code></td>
+<td>A <code>report</code> callback returned <code>True</code>, ending the run at the next evaluation boundary.</td>
+</tr>
+<tr>
+<td><code>TOO_FEW_REALIZATIONS</code></td>
+<td>Too few realizations were evaluated successfully to form an aggregate.</td>
+</tr>
+<tr>
+<td><code>ABORTED</code></td>
+<td><a href="../../running/running/#stopping-from-outside"><code>Session.abort</code></a> cut the run off.</td>
+</tr>
+<tr>
+<td><code>ABORTED_ON_ERROR</code></td>
+<td>Another run on the same session raised, and brought this one down with it.</td>
+</tr>
+<tr>
+<td><code>EXECUTOR_SHUT_DOWN</code></td>
+<td>The pool the run was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it.</td>
+</tr>
+</tbody>
+</table>
+<p>The first five are stops, the last three aborts. <code>TOO_FEW_REALIZATIONS</code> ends a
+run at an evaluation boundary like the other stops, but unlike them it follows
+from a failure: one failed realization is enough to trigger it unless
+<a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
+is lowered.</p>
+<h2 id="what-each-kind-of-run-reports">What each kind of run reports</h2>
+<p>An <strong>optimization</strong> can end for any of the reasons above.</p>
+<p>An <strong>evaluation</strong> is a single batch with no optimizer loop around it, so it
+reports only <code>FINISHED</code>, <code>ABORTED</code> or <code>ABORTED_ON_ERROR</code>. It is also all or
+nothing: either every vector was evaluated, or the batch was abandoned and
+<code>results</code> is empty. An abort that arrives once the batch has finished costs it
+nothing, and the evaluation reports <code>FINISHED</code>.</p>
+<h2 id="an-exit-reason-is-not-a-result">An exit reason is not a result</h2>
+<p>The two are independent. <code>results</code> is <code>None</code> when no feasible result was ever
+recorded, whatever the reason the run ended, and a run that ends early still
+returns the best result it had reached before that. A run can therefore report
+<code>FINISHED</code> and still have nothing on <code>results</code>, because only a result satisfying
+every constraint to within <code>constraint_tolerance</code> can be returned as the best
+one — <code>1e-10</code> unless you pass another, and it applies to the bounds and the
+linear constraints as well as the nonlinear ones. See
+<a href="../../running/running/#when-something-goes-wrong">When something goes wrong</a>.</p>
+<h2 id="work-that-has-no-result-object">Work that has no result object</h2>
+<p><a class="autorefs autorefs-internal" title="            offload" href="../../reference/simple/#ropt.simple.WorkerPool.offload"><code>WorkerPool.offload</code></a> returns whatever its
+callables return, so there is nowhere to carry a reason. A call abandoned by an
+abort raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead, whose
+<code>exit_reason</code> attribute distinguishes an abort that was asked for from one
+another run caused.</p>
 
 
 
@@ -3432,7 +3148,7 @@ if Ctrl-C stops working. See
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../simple/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Simple API">
+          <a href="../handlers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Result Handlers">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3442,20 +3158,20 @@ if Ctrl-C stops working. See
                 Previous
               </span>
               <div class="md-ellipsis">
-                Simple API
+                Result Handlers
               </div>
             </div>
           </a>
         
         
           
-          <a href="../context/" class="md-footer__link md-footer__link--next" aria-label="Next: Context Class">
+          <a href="../../optimizer_setup/key_concepts/" class="md-footer__link md-footer__link--next" aria-label="Next: Key Concepts">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Context Class
+                Key Concepts
               </div>
             </div>
             <div class="md-footer__button md-icon">
