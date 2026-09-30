@@ -3389,7 +3389,12 @@ make still reach the <a href="../handlers/">handlers</a> attached to it.</p>
 <p><strong>Exceptions from your own evaluation function</strong> are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process
   — and are re-raised from the <code>optimize</code> call. Return <code>float("nan")</code> instead
-  if a failed realization should be tolerated rather than fatal.</p>
+  if a failed realization should be tolerated rather than fatal. With
+  <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> there is no single exception to
+  re-raise, so the call raises
+  <a class="autorefs autorefs-internal" title="            RunsFailedError" href="../../reference/exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a> carrying what every run
+  raised or reached; see
+  <a href="../parallel/#failure-in-one-run">Failure in one run</a>.</p>
 </li>
 </ul>
 <p>Catching <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> catches all of <code>ropt</code>'s own

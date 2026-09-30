@@ -2862,6 +2862,34 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.exceptions.RunsFailedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RunsFailedError
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RunsFailedError">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.RunsFailedError.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.exceptions.OptimizerStop" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3015,6 +3043,34 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.exceptions.RunsFailedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RunsFailedError
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RunsFailedError">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.RunsFailedError.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.exceptions.OptimizerStop" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3116,6 +3172,10 @@
 
 
 <div class="doc doc-children">
+
+
+
+
 
 
 
@@ -3276,6 +3336,154 @@ or the selected plugin does not support the requested method.</p>
 
 
 
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.RunsFailedError" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RunsFailedError</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            RoptError (ropt.exceptions.RoptError)" href="#ropt.exceptions.RoptError">RoptError</a></code></p>
+
+
+
+        <p>One of several concurrent runs raised.</p>
+<p>Several runs produce several outcomes, so there is neither a single
+exception to re-raise nor a single set of results to return. This carries
+both, so the work the other runs did is not thrown away with the one that
+failed. The first exception is chained, so a traceback still shows what
+went wrong.</p>
+<p>The runs that did not fail were cut off when this one did and ended with
+<code>ExitCode.ABORTED_ON_ERROR</code>, unless they were started with
+<code>keep_going=True</code>. Either way their results are the best each had reached.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exceptions.RunsFailedError.outcomes">outcomes</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Per run, in the order the runs were given, its
+      <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
+
+
+  
+      dataclass
+  " href="../simple/#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a> or the
+      exception it raised.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.exceptions.RunsFailedError.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">outcomes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">OptimizationResult</span> <span class="o">|</span> <span class="ne">Exception</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the error.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>outcomes</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
+
+
+  
+      dataclass
+  " href="../simple/#ropt.simple.OptimizationResult">OptimizationResult</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#Exception">Exception</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Per run, its result or the exception it raised.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
 
     </div>
 
