@@ -86,19 +86,6 @@ class ComputeStep(ABC, Generic[_ResultT]):
         self._stop_requested = True
 
     @property
-    def should_end(self) -> bool:
-        """Whether this run should end at the next safe point.
-
-        True for either reason a run ends early, which end it with different
-        exit reasons: `stop` was called since the run started, or the step's
-        [`AbortSignal`][ropt.components.concurrency.AbortSignal] is aborting.
-
-        Returns:
-            `True` if the run should end.
-        """
-        return self._stop_requested or self._aborting
-
-    @property
     def _aborting(self) -> bool:
         return self._abort_signal is not None and self._abort_signal.aborting
 
