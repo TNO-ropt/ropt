@@ -106,6 +106,9 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     keep_going: bool | None,
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None,
 ) -> tuple[OptimizationResult, ...]:
+    # Refused here rather than per run: a closed session makes the call invalid,
+    # and leaving it to the runs would report it as every one of them failing.
+    session._require_open()  # ruff: ignore[private-member-access]
     runs = broadcast_runs(config, x0, function)
     reports = broadcast_reports(report, len(runs))
     metadatas = broadcast_metadata(metadata, len(runs))
