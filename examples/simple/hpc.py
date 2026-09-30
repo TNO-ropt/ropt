@@ -1,20 +1,19 @@
 """Ensemble optimization on an HPC cluster with the high-level `ropt.simple` API.
 
-An `HPCExecutor` submits evaluations to a cluster queue (through `pysqa`), so an
-`optimize` call given one runs its ensemble evaluations as cluster jobs. This
-is what the example does by default; it needs the `ropt[hpc]` extra and a
-reachable cluster. The cluster and queue come from the `pysqa` configuration
-of the `ropt` installation unless `--queue` names one; other cluster parameters
-(such as `cluster` and `cores`) can be passed to `HPCExecutor` when needed.
+An HPC pool submits evaluations to a cluster queue (through `pysqa`), so a run
+started on one evaluates its ensemble as cluster jobs. This is what the example
+does by default; it needs the `ropt[hpc]` extra and a reachable cluster. The
+cluster and queue come from the `pysqa` configuration of the `ropt`
+installation unless `--queue` names one; other cluster parameters (such as
+`cluster` and `cores`) can be passed to `hpc_pool` when needed.
 
 If you have no cluster available, pass `--local` to run the identical
-optimization on a `LocalJobExecutor` instead. That executor runs each evaluation
-as its own process, exactly as a cluster job does, so it is the local stand-in
-for `HPCExecutor` and lets the example be exercised anywhere.
+optimization on a local pool instead. That pool runs each evaluation as its own
+process, exactly as a cluster job does, so it is the local stand-in for an HPC
+pool and lets the example be exercised anywhere.
 
-Both executors send the evaluation function to a separate interpreter that
-cannot import this script, so this example needs the `ropt[cloudpickle]`
-extra.
+Both pools send the evaluation function to a separate interpreter that cannot
+import this script, so this example needs the `ropt[cloudpickle]` extra.
 """
 
 import argparse

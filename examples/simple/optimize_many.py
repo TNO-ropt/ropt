@@ -1,7 +1,7 @@
 """Run several optimizations concurrently with `optimize_many`.
 
 `optimize_many` runs a batch of optimizations on driver threads that all
-evaluate on the executor it is given. Any of `config`/`x0`/`objective` may be a
+evaluate on the pool it is called on. Any of `config`/`x0`/`objective` may be a
 single value (broadcast to every run) or a per-run sequence; here a matrix of
 start vectors sets the number of runs while the config and objective are re-used
 by all runs. Each run is tagged with a `metadata` dictionary (`run_id`) that

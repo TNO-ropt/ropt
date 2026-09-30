@@ -1,8 +1,8 @@
-"""Run one optimization with parallel evaluation on an executor.
+"""Run one optimization with parallel evaluation on a pool.
 
-Passing an executor to `optimize` makes that call evaluate its realizations and
-gradient perturbations on it. Pass `-m`/`--multiprocessing` to use a process
-executor instead of a thread executor.
+Starting a run on a pool makes it evaluate its realizations and gradient
+perturbations there. Pass `-m`/`--multiprocessing` to use a process pool
+instead of a thread pool.
 """
 
 from __future__ import annotations

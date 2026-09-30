@@ -1,12 +1,11 @@
-"""Nested optimization: an inner run per outer evaluation, on its own executor.
+"""Nested optimization: an inner run per outer evaluation, on its own pool.
 
 Each evaluation of the outer optimization runs an inner optimization over the
-remaining variables. The two layers use **different** executors, which is what
-makes this safe: the outer evaluations run on a thread executor, so each stays
-in this process and can reach the inner executor, and the inner evaluations run
-on a process executor of their own. Handing the inner run the executor it is
-already running on would instead be refused, since it would wait for the workers
-it occupies.
+remaining variables. The two layers use **different** pools, which is what
+makes this safe: the outer evaluations run on a thread pool, so each stays in
+this process and can reach the inner pool, and the inner evaluations run on a
+process pool of their own. Handing the inner run the pool it is already running
+on would instead be refused, since it would wait for the workers it occupies.
 
 The inner runs all feed one `DataFrameHandler`. They overlap, which the handler
 allows: `handle_event` serializes its own calls, so a second run waits for the
@@ -81,7 +80,7 @@ def rosenbrock(
     """The Rosenbrock objective for one realization of the inner problem.
 
     Defined at module level, and closing over nothing, so it can be pickled
-    into the inner process executor.
+    into the inner process pool.
 
     Args:
         variables: The variable vector to evaluate.
@@ -212,7 +211,7 @@ def main() -> None:
     assert best["Objective"] < 1.0
 
     # Every inner result carries the outer evaluation that produced it, and the
-    # inner runs share one executor, so their batch IDs never collide.
+    # inner runs share one pool, so their batch IDs never collide.
     assert frame.height > 0
     assert frame["Inner-batch"].n_unique() == frame.height
     assert frame["Outer-batch"].null_count() == 0
