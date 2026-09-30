@@ -1724,10 +1724,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#exit-codes" class="md-nav__link">
+  <a href="#exit-reasons" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Exit codes
+        Exit reasons
       
     </span>
   </a>
@@ -3076,10 +3076,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#exit-codes" class="md-nav__link">
+  <a href="#exit-reasons" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Exit codes
+        Exit reasons
       
     </span>
   </a>
@@ -3531,22 +3531,22 @@ batch and produces a tuple of
   Emitted after the entire compute step, including result emission, is
   finished.</li>
 </ul>
-<h3 id="exit-codes">Exit codes</h3>
+<h3 id="exit-reasons">Exit reasons</h3>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>'s
-<code>run()</code> method returns an <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> indicating why the
-optimizer finished; the
+<code>run()</code> method returns an <a class="autorefs autorefs-internal" title="            ExitReason" href="../../reference/enums/#ropt.enums.ExitReason"><code>ExitReason</code></a> indicating why
+the optimizer finished; the
 <a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.EvaluationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.EvaluationStep"><code>EvaluationStep</code></a>'s <code>run()</code>
 returns nothing:</p>
 <table>
 <thead>
 <tr>
-<th>Exit code</th>
+<th>Exit reason</th>
 <th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>OPTIMIZER_FINISHED</code></td>
+<td><code>FINISHED</code></td>
 <td>The optimizer terminated normally.</td>
 </tr>
 <tr>
@@ -3571,7 +3571,7 @@ returns nothing:</p>
 </tr>
 <tr>
 <td><code>ABORTED_ON_ERROR</code></td>
-<td>The step's signal was set with this code, which <code>ropt.simple</code> uses when another run raised.</td>
+<td>The step's signal was set with this reason, which <code>ropt.simple</code> uses when another run raised.</td>
 </tr>
 <tr>
 <td><code>EXECUTOR_SHUT_DOWN</code></td>
@@ -3579,9 +3579,9 @@ returns nothing:</p>
 </tr>
 </tbody>
 </table>
-<p>A run either <strong>stops</strong> or is <strong>aborted</strong>, and the exit code says which. It
+<p>A run either <strong>stops</strong> or is <strong>aborted</strong>, and the exit reason says which. It
 stops when a condition on the optimization is met, so it ends where someone
-decided it should; the first four codes above are all of that kind. It is
+decided it should; the first four reasons above are all of that kind. It is
 aborted when something cuts it off without consulting the optimization, and
 what comes back is then whatever it had reached.</p>
 <p>An event handler can stop its own optimization by calling <code>event.source.stop()</code>

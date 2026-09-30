@@ -3169,8 +3169,8 @@ which defaults to <em>all</em> of them — so a single <code>NaN</code> ends the
 which carries two things:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span>  <span class="c1"># why the run stopped (an ropt.enums.ExitCode)</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">result</span><span class="o">.</span><span class="n">results</span>    <span class="c1"># the best evaluation, or None if none was valid</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">result</span><span class="o">.</span><span class="n">exit_reason</span>  <span class="c1"># why the run stopped (an ropt.enums.ExitReason)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">result</span><span class="o">.</span><span class="n">results</span>      <span class="c1"># the best evaluation, or None if none was valid</span>
 </span></code></pre></div>
 <p><code>results</code> is a <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
@@ -3211,9 +3211,9 @@ optimizer chose it, so this is how you follow the path a run takes.</p>
 <h3 id="stopping-early-from-the-callback">Stopping early from the callback</h3>
 <p>The <code>report</code> callback doubles as a <strong>user-defined stopping criterion</strong>: return
 <code>True</code> and the optimization stops gracefully after the current evaluation, with
-exit code <code>STOPPED</code>. Any other return value (including <code>None</code>) lets it
+exit reason <code>STOPPED</code>. Any other return value (including <code>None</code>) lets it
 continue.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitReason</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
@@ -3223,7 +3223,7 @@ continue.</p>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_reason</span> <span class="ow">is</span> <span class="n">ExitReason</span><span class="o">.</span><span class="n">STOPPED</span>
 </span></code></pre></div>
 <p>With <a href="../parallel/#many-optimizations-at-once"><code>optimize_many</code></a> this stops only the run
 whose callback returned <code>True</code>; the other runs continue.</p>
@@ -3249,11 +3249,11 @@ reached.</p>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">abort</span><span class="p">())</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">ABORTED</span><span class="p">:</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_reason</span> <span class="ow">is</span> <span class="n">ExitReason</span><span class="o">.</span><span class="n">ABORTED</span><span class="p">:</span>
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"cut off early, best so far:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The two are not the same kind of ending, which is why they have different exit
-codes. A <code>report</code> callback stops the run <em>on a criterion</em>, at a point it chose.
+reasons. A <code>report</code> callback stops the run <em>on a criterion</em>, at a point it chose.
 Aborting consults nothing: the result is whatever the run had reached.</p>
 <p>A run is cut off at its next evaluation boundary, so the evaluations already in
 flight are still carried out and their workers are free only once they return.</p>
@@ -3321,25 +3321,46 @@ optimizer. Use <a class="autorefs autorefs-internal" title="            ropt.sim
 <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_batch" href="../../reference/simple/#ropt.simple.evaluate_batch"><code>evaluate_batch</code></a> for several:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">evaluate_batch</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>             <span class="c1"># one FunctionResults</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_batch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>    <span class="c1"># one per row of the matrix</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_batch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">single</span><span class="o">.</span><span class="n">results</span>  <span class="c1"># one FunctionResults, or None if the evaluation was cut off</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">batch</span><span class="o">.</span><span class="n">results</span>   <span class="c1"># one per row of the matrix, empty if the batch was cut off</span>
 </span></code></pre></div>
-<p>Both return <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+<p>Both return an <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects, the
-same kind <code>optimize</code> puts on <code>results</code> and a handler receives, so everything is
-read the same way wherever it came from. Here <code>result.variables</code> is just the
-point you supplied; it is only informative in a <code>report</code> callback, where the
-optimizer chose the point.</p>
+  " href="../../reference/simple/#ropt.simple.EvaluationResult"><code>EvaluationResult</code></a>, shaped like
+the <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
+
+
+  
+      dataclass
+  " href="../../reference/simple/#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a> that <code>optimize</code>
+returns: <code>exit_reason</code> says why the evaluation ended and <code>results</code> holds what it
+produced. What is on <code>results</code> is a
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>, the same kind a handler
+receives, so everything is read the same way wherever it came from. Here
+<code>result.variables</code> is just the point you supplied; it is only informative in a
+<code>report</code> callback, where the optimizer chose the point.</p>
+<p>An evaluation is a single batch, so it produces either every result or none.
+That is why <code>exit_reason</code> can only be <code>FINISHED</code>, or <code>ABORTED</code> and
+<code>ABORTED_ON_ERROR</code> when <a href="#stopping-from-outside"><code>Session.abort</code></a> or a failing
+run on the same session cut it off. An abort that arrives after the batch has
+finished costs it nothing, and the evaluation reports <code>FINISHED</code>.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/evaluate.py">examples/simple/evaluate.py</a>,
 which evaluates a single vector and then a matrix of them.</p>
 <h2 id="when-something-goes-wrong">When something goes wrong</h2>
 <p>Not every problem is an exception. An optimization that cannot make progress
-still returns normally, and indicates why in <code>result.exit_code</code>:
+still returns normally, and indicates why in <code>result.exit_reason</code>:
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value,
 <code>EXECUTOR_SHUT_DOWN</code> when the pool it was evaluating on could no longer run
 the work, which in practice means the interpreter was shutting down under it,
@@ -3349,10 +3370,8 @@ one down with it (see
 <a href="../parallel/#failure-in-one-run">Failure in one run</a>).
 <code>result.results</code> is <code>None</code> when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
-result it had reached before that. A plain <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a>
-has no <code>exit_code</code>, and always returns a result object; there, <code>functions</code> being
-<code>None</code> means that no usable result was produced.</p>
-<p>A run can also end with <code>OPTIMIZER_FINISHED</code> and still leave those fields
+result it had reached before that.</p>
+<p>A run can also end with <code>FINISHED</code> and still leave those fields
 <code>None</code>. Only a result that satisfies every constraint to within
 <code>constraint_tolerance</code> can be returned as the best one, and that tolerance —
 <code>1e-10</code> unless you pass another — applies to the bounds and the linear
@@ -3404,9 +3423,9 @@ function stay whatever you raised.</p>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations, such as
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> for integer variables and
-<a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> for <code>result.exit_code</code>. These are <strong>not</strong> part
-of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
+<a class="autorefs autorefs-internal" title="            ExitReason" href="../../reference/enums/#ropt.enums.ExitReason"><code>ExitReason</code></a> for <code>result.exit_reason</code>. These are
+<strong>not</strong> part of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitReason</span><span class="p">,</span> <span class="n">VariableType</span>
 </span></code></pre></div>
 
 

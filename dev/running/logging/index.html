@@ -2998,10 +2998,10 @@ failed realization; how many failures a run tolerates is set by
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>.</p>
 <p><strong>A new best objective</strong> is reported each time the run improves on what it had.</p>
 <p><strong>The reason for stopping</strong> is stated before the run ends, and the closing line
-names the <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> it finished with — the same one
-<code>result.exit_code</code> reports. See
+names the <a class="autorefs autorefs-internal" title="            ExitReason" href="../../reference/enums/#ropt.enums.ExitReason"><code>ExitReason</code></a> it finished with — the same one
+<code>result.exit_reason</code> reports. See
 <a href="../running/#when-something-goes-wrong">When something goes wrong</a> for what each
-code means.</p>
+reason means.</p>
 <p>The name at the start of each line identifies the part of <code>ropt</code> that produced
 it. That is what a bug report needs; leave
 <code>%(name)s</code> out of the format string if it is in the way.</p>

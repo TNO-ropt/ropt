@@ -4021,7 +4021,7 @@ raised:</p>
 </span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
 </span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> raised: </span><span class="si">{</span><span class="n">outcome</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> ended with </span><span class="si">{</span><span class="n">outcome</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> ended with </span><span class="si">{</span><span class="n">outcome</span><span class="o">.</span><span class="n">exit_reason</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Without this the work the other runs did would be thrown away along with the run
 that failed, which matters more now that they are cut off deliberately. The
@@ -4041,8 +4041,8 @@ session, which a single run can still override with <code>keep_going=False</code
 aborts the others if it fails itself, and its exception still reaches its
 caller, so opting out cannot turn a failure into silence.
 <a href="../running/#stopping-from-outside"><code>Session.abort</code></a> reaches every run whatever
-the flag says, and those end with <code>ABORTED</code> instead: the exit code distinguishes
-an abort that was asked for from one another run caused.</p>
+the flag says, and those end with <code>ABORTED</code> instead: the exit reason
+distinguishes an abort that was asked for from one another run caused.</p>
 <h2 id="external-backend">Running the optimizer in a separate process</h2>
 <p>Prefix the method with <code>external/</code> to run the optimization algorithm in a
 process of its own:</p>

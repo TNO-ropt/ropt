@@ -2772,10 +2772,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.concurrency.StopSignal.exit_code" class="md-nav__link">
+  <a href="#ropt.components.concurrency.StopSignal.exit_reason" class="md-nav__link">
     <span class="md-ellipsis">
       
-        exit_code
+        exit_reason
       
     </span>
   </a>
@@ -3011,10 +3011,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.concurrency.StopSignal.exit_code" class="md-nav__link">
+  <a href="#ropt.components.concurrency.StopSignal.exit_reason" class="md-nav__link">
     <span class="md-ellipsis">
       
-        exit_code
+        exit_reason
       
     </span>
   </a>
@@ -3303,14 +3303,14 @@ than left waiting for work it is about to abandon.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">stop</span><span class="p">(</span><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span> <span class="o">=</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">ABORTED</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">stop</span><span class="p">(</span><span class="n">exit_reason</span><span class="p">:</span> <span class="n">ExitReason</span> <span class="o">=</span> <span class="n">ExitReason</span><span class="o">.</span><span class="n">ABORTED</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Request that everything observing this signal stops.</p>
 <p>Calling this more than once has no further effect: the first call
-decides the exit code, so a later stop for another reason cannot
+decides the exit reason, so a later stop for another reason cannot
 overwrite the reason a run is already stopping for.</p>
 
 
@@ -3327,14 +3327,14 @@ overwrite the reason a run is already stopping for.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>exit_code</code>
+                <code>exit_reason</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The code the steps stopping on this signal end with.</p>
+                <p>The reason the steps stopping on this signal end with.</p>
               </div>
             </td>
             <td>
@@ -3344,7 +3344,7 @@ overwrite the reason a run is already stopping for.</p>
   
       class-attribute
       instance-attribute
-   (ropt.enums.ExitCode.ABORTED)" href="../enums/#ropt.enums.ExitCode.ABORTED">ABORTED</a></code>
+   (ropt.enums.ExitReason.ABORTED)" href="../enums/#ropt.enums.ExitReason.ABORTED">ABORTED</a></code>
             </td>
           </tr>
       </tbody>
@@ -3364,8 +3364,8 @@ overwrite the reason a run is already stopping for.</p>
 
 
 
-<h3 id="ropt.components.concurrency.StopSignal.exit_code" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">exit_code</span>
+<h3 id="ropt.components.concurrency.StopSignal.exit_reason" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">exit_reason</span>
 
 
   <span class="doc doc-labels">
@@ -3373,12 +3373,12 @@ overwrite the reason a run is already stopping for.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">exit_reason</span><span class="p">:</span> <span class="n">ExitReason</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>The exit code a step stopping on this signal ends with.</p>
+        <p>The reason a step stopping on this signal ends with.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -3392,11 +3392,11 @@ overwrite the reason a run is already stopping for.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The code passed to the first <code>stop</code> call.</p>
+                <p>The reason passed to the first <code>stop</code> call.</p>
               </div>
             </td>
           </tr>

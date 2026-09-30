@@ -3232,7 +3232,7 @@ step that emitted it, so calling <code>event.source.stop()</code> ends that run 
 <code>STOPPED</code> — the <a href="../running/#stopping-early-from-the-callback"><code>report</code></a>
 callback above is a convenience wrapper around this. Only the run that owns the
 emitting step is affected, so concurrent runs continue. See
-<a href="../../advanced/workflows/#exit-codes">Optimization Workflows</a>.</p>
+<a href="../../advanced/workflows/#exit-reasons">Optimization Workflows</a>.</p>
 <h2 id="handlers-and-the-process-boundary">Handlers and the process boundary</h2>
 <p>On a thread pool (or with no pool) your objective and your handlers run
 in the <strong>same process</strong> and share memory: a handler can see anything the

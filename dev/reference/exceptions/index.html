@@ -3370,8 +3370,9 @@ both, so the work the other runs did is not thrown away with the one that
 failed. The first exception is chained, so a traceback still shows what
 went wrong.</p>
 <p>The runs that did not fail were cut off when this one did and ended with
-<code>ExitCode.ABORTED_ON_ERROR</code>, unless they were started with
-<code>keep_going=True</code>. Either way their results are the best each had reached.</p>
+<code>ExitReason.ABORTED_ON_ERROR</code>, unless they were started with
+<code>keep_going=True</code>. Each kept whatever its completed batches had produced;
+one cut off during its first batch has no result.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3511,10 +3512,10 @@ went wrong.</p>
 
 
 
-        <p>Raised internally to stop an optimization with a specific exit code.</p>
+        <p>Raised internally to stop an optimization with a specific exit reason.</p>
 <p>Used only within the optimizer core to unwind the backend optimization loop
 (for example when a function or batch budget is reached). It carries the
-<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> the optimization terminates with.</p>
+<a class="autorefs autorefs-internal" title="            ExitReason" href="../enums/#ropt.enums.ExitReason"><code>ExitReason</code></a> the optimization terminates with.</p>
 
 
 
@@ -3542,7 +3543,7 @@ went wrong.</p>
 
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">exit_reason</span><span class="p">:</span> <span class="n">ExitReason</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3563,14 +3564,14 @@ went wrong.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>exit_code</code>
+                <code>exit_reason</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The exit code the optimization terminates with.</p>
+                <p>The reason the optimization terminates with.</p>
               </div>
             </td>
             <td>

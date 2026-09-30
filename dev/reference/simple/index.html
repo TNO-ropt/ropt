@@ -2636,6 +2636,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.simple.EvaluationResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationResult
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#callback-types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4270,6 +4281,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.simple.EvaluationResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationResult
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#callback-types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4359,8 +4381,9 @@
 directly, for example <code>from ropt.simple import optimize, session</code>. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 <p>Enumerations used in the configuration and results (for example
-<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> and <a class="autorefs autorefs-internal" title="            VariableType" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a>)
-are not re-exported here; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../enums/#ropt.enums"><code>ropt.enums</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            ExitReason" href="../enums/#ropt.enums.ExitReason"><code>ExitReason</code></a> and
+<a class="autorefs autorefs-internal" title="            VariableType" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a>) are not re-exported here; import them
+from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../enums/#ropt.enums"><code>ropt.enums</code></a>.</p>
 <p>Nothing about a run depends on where it is called from. What it is started on
 says where its evaluations happen and which session it belongs to: a module
 function runs in-process and belongs to nothing, a
@@ -4852,7 +4875,7 @@ the evaluations workers.</p>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionResults</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4988,16 +5011,46 @@ the evaluations workers.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a></code>
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+  " href="#ropt.simple.EvaluationResult"><code>EvaluationResult</code></a> whose <code>results</code> is</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -5053,7 +5106,7 @@ the evaluations workers.</p>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -5190,16 +5243,46 @@ order. See <a href="../../running/running/">Running Optimizations</a> for a walk
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]</code>
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>One <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+  " href="#ropt.simple.EvaluationResult"><code>EvaluationResult</code></a> whose <code>results</code></p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>holds one <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -5745,14 +5828,18 @@ interface — calls to bring them down.</p>
     <div class="doc doc-contents ">
 
         <p>Cut off the runs that belong to this session.</p>
-<p>Each ends with <code>ExitCode.ABORTED</code>, keeping the best result it had
-reached. Nothing about the state of an optimization is consulted, so
-what comes back is whatever the run had got to and not a point it
-chose to stop at; a handler's own criterion ends a run with
-<code>ExitCode.STOPPED</code> instead.</p>
-<p>A run is cut off at its next evaluation boundary, so the evaluations
-already in flight are still carried out and their workers are only free
-once they return.</p>
+<p>Each ends with <code>ExitReason.ABORTED</code>. Nothing about the state of an
+optimization is consulted, so what comes back is whatever the run had
+got to and not a point it chose to stop at; a handler's own criterion
+ends a run with <code>ExitReason.STOPPED</code> instead.</p>
+<p>The evaluation batch in flight is abandoned rather than waited for, so a
+run keeps only what earlier batches produced. A run aborted during its
+first batch has no result at all, and so has an
+<a class="autorefs autorefs-internal" title="            evaluate" href="#ropt.simple.Session.evaluate"><code>evaluate</code></a> call, which is a single
+batch. Evaluations already running are not killed, since a thread cannot
+be interrupted, and their workers are free only once they return. An
+abort that arrives once every one of them has returned costs the batch
+nothing, and it reports <code>ExitReason.FINISHED</code>.</p>
 <p>This reaches every run, <code>keep_going</code> or not: that flag exempts a run
 from the abort a failing run triggers, not from one that was asked for.</p>
 <p>Only the runs registered at the moment of the call are reached. A run
@@ -6258,7 +6345,7 @@ walkthrough.</p>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionResults</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -6394,21 +6481,71 @@ walkthrough.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a></code>
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> for the vector.</p>
+  " href="#ropt.simple.EvaluationResult"><code>EvaluationResult</code></a> whose</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>results</code> is the <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a></p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>for the vector, or <code>None</code> if the evaluation was cut off.</p>
               </div>
             </td>
           </tr>
@@ -6464,7 +6601,7 @@ walkthrough.</p>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -6602,21 +6739,91 @@ walkthrough.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]</code>
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>One <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> per vector.</p>
+  " href="#ropt.simple.EvaluationResult"><code>EvaluationResult</code></a> whose</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>results</code> holds one</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> per vector, and is</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>empty if the batch was cut off.</p>
               </div>
             </td>
           </tr>
@@ -8089,7 +8296,7 @@ walkthrough.</p>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionResults</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -8241,21 +8448,71 @@ walkthrough.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a></code>
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> for the vector.</p>
+  " href="#ropt.simple.EvaluationResult"><code>EvaluationResult</code></a> whose</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>results</code> is the <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a></p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>for the vector, or <code>None</code> if the evaluation was cut off.</p>
               </div>
             </td>
           </tr>
@@ -8322,7 +8579,7 @@ walkthrough.</p>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -8476,21 +8733,91 @@ walkthrough.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]</code>
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>One <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> per vector.</p>
+  " href="#ropt.simple.EvaluationResult"><code>EvaluationResult</code></a> whose</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>results</code> holds one</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> per vector, and is</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluationResult)" href="#ropt.simple.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>empty if the batch was cut off.</p>
               </div>
             </td>
           </tr>
@@ -10237,13 +10564,13 @@ carried unchanged on <code>results</code>. See
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizationResult.exit_code">exit_code</span></code></td>
+            <td><code><span title="ropt.simple.OptimizationResult.exit_reason">exit_reason</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The exit code describing how the optimization terminated.</p>
+                <p>Why the optimization terminated.</p>
               </div>
             </td>
           </tr>
@@ -10260,6 +10587,98 @@ carried unchanged on <code>results</code>. See
             <td>
               <div class="doc-md-description">
                 <p>The best evaluation, or <code>None</code> if there was no valid result.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.simple.EvaluationResult" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.EvaluationResult</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.simple._result._T">_T</span>]</code></p>
+
+
+
+        <p>The outcome of a single evaluation run.</p>
+<p>What <code>results</code> holds depends on which method produced it: one
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> from
+<a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="#ropt.simple.evaluate"><code>evaluate</code></a>, or <code>None</code> if the evaluation was cut off;
+one per vector from <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_batch" href="#ropt.simple.evaluate_batch"><code>evaluate_batch</code></a>, or an
+empty tuple. An evaluation is a single batch, so it produces either every
+result or none.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.EvaluationResult.exit_reason">exit_reason</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Why the evaluation ended.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.EvaluationResult.results">results</span></code></td>
+            <td>
+                  <code><span title="ropt.simple._result._T">_T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>What the evaluation produced.</p>
               </div>
             </td>
           </tr>

@@ -3459,7 +3459,7 @@ guard that a step instance may only have one active run at a time, raising a
         <p>Request that this run stop gracefully at the next safe point.</p>
 <p>Intended for an event handler that decides, after inspecting an event,
 that its optimization should stop; the run then ends with
-<code>ExitCode.STOPPED</code>. Setting the request is thread-safe, so a handler
+<code>ExitReason.STOPPED</code>. Setting the request is thread-safe, so a handler
 attached to several steps at once may call it too. A new <code>run</code> clears
 any earlier request.</p>
 
@@ -3820,7 +3820,7 @@ for the full event lifecycle description.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep (ropt.components.compute_steps.base.ComputeStep)" href="#ropt.components.compute_steps.ComputeStep">ComputeStep</a>[<a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a>]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep (ropt.components.compute_steps.base.ComputeStep)" href="#ropt.components.compute_steps.ComputeStep">ComputeStep</a>[<a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a>]</code></p>
 
 
 
