@@ -5841,7 +5841,11 @@ be interrupted, and their workers are free only once they return. An
 abort that arrives once every one of them has returned costs the batch
 nothing, and it reports <code>ExitReason.FINISHED</code>.</p>
 <p>This reaches every run, <code>keep_going</code> or not: that flag exempts a run
-from the abort a failing run triggers, not from one that was asked for.</p>
+from the abort a failing run triggers, not from one that was asked for.
+It reaches an <a class="autorefs autorefs-internal" title="            offload" href="#ropt.simple.WorkerPool.offload"><code>offload</code></a> in flight too:
+a call it abandons makes that <code>offload</code> raise
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, since there is no result
+object to report a reason on.</p>
 <p>Only the runs registered at the moment of the call are reached. A run
 started afterwards is unaffected, so a loop that abandons one attempt
 and starts another keeps working. Closing the session aborts its runs
@@ -8957,6 +8961,16 @@ must be picklable for a process or job pool.</p>
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="AbortedError">AbortedError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If an abort abandoned one of the calls.</p>
+              </div>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td>
                   <code><span title="ExecutionError">ExecutionError</span></code>

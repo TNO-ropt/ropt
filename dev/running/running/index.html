@@ -3402,7 +3402,8 @@ make still reach the <a href="../handlers/">handlers</a> attached to it.</p>
   <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> when the machinery that
   runs your evaluations, or a call handed to
   <a class="autorefs autorefs-internal" title="            offload" href="../../reference/simple/#ropt.simple.WorkerPool.offload"><code>WorkerPool.offload</code></a>, cannot start or breaks
-  down.</p>
+  down, and <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> when an abort
+  abandoned an offloaded call.</p>
 </li>
 <li>
 <p><strong>Exceptions from your own evaluation function</strong> are not caught. They travel

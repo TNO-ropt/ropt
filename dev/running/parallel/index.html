@@ -4114,6 +4114,14 @@ functions:</p>
 <p>As with the evaluation function on a process, local, or HPC pool, the
 callables and their arguments are <strong>copied to the workers</strong>, since they run in
 separate processes.</p>
+<p>An offload belongs to its pool's session like a run does, so
+<a href="../running/#stopping-from-outside"><code>Session.abort</code></a>, a closing session, and a
+failing run on the same session all reach it. <code>offload</code> returns whatever its
+callables return and so has nowhere to report a reason: a call that was
+abandoned raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
+<code>exit_reason</code> distinguishes an abort that was asked for from one another run
+caused. Calls already on a worker run to their end, so an abort that costs the
+batch nothing lets it return its results.</p>
 <div class="admonition warning">
 <p class="admonition-title">Offloaded work coordinates with nothing</p>
 <p>An offloaded callable runs wherever its pool puts it, and on a process,

@@ -2862,6 +2862,34 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.exceptions.AbortedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AbortedError
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AbortedError">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.AbortedError.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.exceptions.RunsFailedError" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3039,6 +3067,34 @@
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.AbortedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AbortedError
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AbortedError">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.AbortedError.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -3336,6 +3392,136 @@ or the selected plugin does not support the requested method.</p>
 
 
 
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.AbortedError" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">AbortedError</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            RoptError (ropt.exceptions.RoptError)" href="#ropt.exceptions.RoptError">RoptError</a></code></p>
+
+
+
+        <p>Work was cut off before it could finish.</p>
+<p>Raised by <a class="autorefs autorefs-internal" title="            offload" href="../simple/#ropt.simple.WorkerPool.offload"><code>WorkerPool.offload</code></a>, which
+returns whatever its callables return and so has nowhere to report a reason.
+An optimization or an evaluation carries its reason on the result object it
+returns instead, and does not raise this.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exceptions.AbortedError.exit_reason">exit_reason</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Why the work was cut off.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.exceptions.AbortedError.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">exit_reason</span><span class="p">:</span> <span class="n">ExitReason</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the error.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>exit_reason</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Why the work was cut off.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
 
     </div>
 
