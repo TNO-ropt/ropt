@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from ._aborted import Aborted
 from ._session import session
 
 if TYPE_CHECKING:
@@ -147,7 +148,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         ValueError: If `variables` is not a single vector.
     """  # ruff: ignore[docstring-extraneous-exception]
     with session() as opened:
-        return opened.evaluate(
+        results = opened.evaluate(
             config,
             variables,
             function,
@@ -155,6 +156,9 @@ def evaluate(  # ruff: ignore[too-many-arguments]
             report=report,
             metadata=metadata,
         )
+    # Nothing else holds this session, so nothing could have aborted the run.
+    assert not isinstance(results, Aborted)
+    return results
 
 
 def evaluate_batch(  # ruff: ignore[too-many-arguments]
@@ -186,7 +190,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         ValueError: If `variables` is not a 2-D matrix.
     """  # ruff: ignore[docstring-extraneous-exception]
     with session() as opened:
-        return opened.evaluate_batch(
+        results = opened.evaluate_batch(
             config,
             variables,
             function,
@@ -194,3 +198,6 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
             report=report,
             metadata=metadata,
         )
+    # Nothing else holds this session, so nothing could have aborted the run.
+    assert not isinstance(results, Aborted)
+    return results

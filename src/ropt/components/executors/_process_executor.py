@@ -115,30 +115,46 @@ class ProcessExecutor(ExecutorBase):
         try:
             while pending or futures:
                 if stop is not None and stop.stopping:
-                    break
-                # Waiting is safe only with nothing in flight: the slots this
-                # batch holds are given back further down, by this same loop.
-                while pending and self._payload_limit.acquire(blocking=not futures):
-                    index, bundle = pending.popleft()
-                    try:
-                        future = self._submit(bundle)
-                    except BaseException:
-                        self._payload_limit.release()
-                        raise
-                    futures[future] = index
-                    future.add_done_callback(done.put)
+                    # Work not yet sent is dropped here; work already with a
+                    # worker is collected below, since it runs whether or not
+                    # anyone is still waiting for it.
+                    pending.clear()
+                self._submit_pending(pending, futures, done)
+                if not futures:
+                    continue
                 item = done.get()
                 if item is None:
-                    break
+                    for future in list(futures):
+                        future.cancel()
+                    continue
                 index = futures.pop(item)
                 self._payload_limit.release()
-                store(index, _bundle_result(item))
+                if not item.cancelled():
+                    store(index, _bundle_result(item))
         finally:
             if stop is not None:
                 stop.remove_callback(wake)
             for future in futures:
                 future.cancel()
                 self._payload_limit.release()
+
+    def _submit_pending(
+        self,
+        pending: deque[tuple[int, list[WorkItem]]],
+        futures: dict[Future[tuple[bool, bytes]], int],
+        done: queue.SimpleQueue[Future[tuple[bool, bytes]] | None],
+    ) -> None:
+        # Waiting for a slot is safe only with nothing in flight: the slots this
+        # batch holds are given back by the loop that calls this.
+        while pending and self._payload_limit.acquire(blocking=not futures):
+            index, bundle = pending.popleft()
+            try:
+                future = self._submit(bundle)
+            except BaseException:
+                self._payload_limit.release()
+                raise
+            futures[future] = index
+            future.add_done_callback(done.put)
 
     def _submit(self, bundle: list[WorkItem]) -> Future[tuple[bool, bytes]]:
         # The payload is built here rather than in a worker, so that `ropt`'s

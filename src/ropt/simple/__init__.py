@@ -32,6 +32,7 @@ from ropt.components.event_handlers import (
     ResultsHandler,
 )
 
+from ._aborted import ABORTED, Aborted
 from ._function import EvaluationFunction
 from ._functions import evaluate, evaluate_batch, optimize, optimize_many
 from ._pool import WorkerPool
@@ -40,6 +41,8 @@ from ._result import OptimizationResult
 from ._session import Session, session
 
 __all__ = [
+    "ABORTED",
+    "Aborted",
     "DataFrameHandler",
     "EvaluationFunction",
     "EvaluationFunctionContext",

@@ -39,6 +39,7 @@ if TYPE_CHECKING:
     from ropt.components.executors import Executor
     from ropt.results import FunctionResults
 
+    from ._aborted import Aborted
     from ._function import EvaluationFunction
     from ._report import ReportCallback
     from ._result import OptimizationResult
@@ -117,15 +118,16 @@ class Session:
     def abort(self) -> None:
         """Cut off the runs that belong to this session.
 
-        Each ends with `ExitCode.ABORTED`, keeping the best result it had
-        reached. Nothing about the state of an optimization is consulted, so
-        what comes back is whatever the run had got to and not a point it
-        chose to stop at; a handler's own criterion ends a run with
-        `ExitCode.STOPPED` instead.
+        Each ends with `ExitCode.ABORTED`. Nothing about the state of an
+        optimization is consulted, so what comes back is whatever the run had
+        got to and not a point it chose to stop at; a handler's own criterion
+        ends a run with `ExitCode.STOPPED` instead.
 
-        A run is cut off at its next evaluation boundary, so the evaluations
-        already in flight are still carried out and their workers are only free
-        once they return.
+        The evaluation batch in flight is abandoned rather than waited for, so a
+        run keeps only what earlier batches produced. A run aborted during its
+        first batch has no result at all. Evaluations already running are not
+        killed, since a thread cannot be interrupted, and their workers are free
+        only once they return.
 
         This reaches every run, `keep_going` or not: that flag exempts a run
         from the abort a failing run triggers, not from one that was asked for.
@@ -274,7 +276,7 @@ class Session:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> FunctionResults:
+    ) -> FunctionResults | Aborted:
         """Evaluate a single variable vector in-process, without optimizing.
 
         See [Running Optimizations](../running/running.md) for a walkthrough.
@@ -288,7 +290,8 @@ class Session:
             metadata:  Optional dictionary attached to the results.
 
         Returns:
-            The [`FunctionResults`][ropt.results.FunctionResults] for the vector.
+            The [`FunctionResults`][ropt.results.FunctionResults] for the vector,
+            or [`ABORTED`][ropt.simple.ABORTED] if it was cut off.
 
         Raises:
             ValueError: If `variables` is not a single vector.
@@ -314,7 +317,7 @@ class Session:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> tuple[FunctionResults, ...]:
+    ) -> tuple[FunctionResults, ...] | Aborted:
         """Evaluate a batch of variable vectors in-process, without optimizing.
 
         Each row of `variables` is one vector, and the results come back in the
@@ -330,7 +333,8 @@ class Session:
             metadata:  Optional dictionary attached to every result.
 
         Returns:
-            One [`FunctionResults`][ropt.results.FunctionResults] per vector.
+            One [`FunctionResults`][ropt.results.FunctionResults] per vector, or
+            [`ABORTED`][ropt.simple.ABORTED] if the batch was cut off.
 
         Raises:
             ValueError: If `variables` is not a 2-D matrix.

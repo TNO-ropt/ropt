@@ -9,7 +9,7 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt.components.executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import ExecutionError, WorkflowError
+from ropt.exceptions import ExecutionError, OptimizerStop, WorkflowError
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from ropt.components.concurrency import StopSignal
     from ropt.components.executors import Executor
 
 _logger = get_logger(__name__)
@@ -43,6 +44,7 @@ class ParallelEvaluator(Evaluator):
         executor: Executor,
         batch_id_callback: Callable[[], int] | None = None,
         bundle_size: int | None = None,
+        stop_signal: StopSignal | None = None,
     ) -> None:
         """Initialize the ParallelEvaluator.
 
@@ -51,11 +53,13 @@ class ParallelEvaluator(Evaluator):
             executor:          The executor to dispatch evaluations to.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
             bundle_size:       Evaluations per worker task, `None` for the executor's own.
+            stop_signal:       An optional signal that abandons a running batch.
         """
         super().__init__()
         self._function = function
         self._executor = executor
         self._bundle_size = bundle_size
+        self._stop_signal = stop_signal
         self._batch_id_callback = (
             batch_id_callback if batch_id_callback is not None else BatchIdCounter()
         )
@@ -79,6 +83,9 @@ class ParallelEvaluator(Evaluator):
 
         Returns:
             The result of calling the wrapped evaluator function.
+
+        Raises:
+            OptimizerStop: If the stop signal abandoned the batch.
         """
         batch_id = self._batch_id_callback()
 
@@ -103,7 +110,14 @@ class ParallelEvaluator(Evaluator):
                 for eval_idx, run_context in active
             ],
             bundle_size=self._bundle_size,
+            stop=self._stop_signal,
         )
+        # Work is only left unrun when the signal abandoned the batch, so the
+        # rows that did come back describe a batch nobody is waiting for.
+        if self._stop_signal is not None and any(
+            isinstance(value, WorkNotRun) for value in values
+        ):
+            raise OptimizerStop(self._stop_signal.exit_code)
         for (eval_idx, _), value in zip(active, values, strict=True):
             _handle_result(eval_idx, value, results, metadata, no)
 

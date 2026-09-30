@@ -10,6 +10,7 @@ from ._batch_ids import next_batch_id
 from ._function import adapt_function
 
 if TYPE_CHECKING:
+    from ropt.components.concurrency import StopSignal
     from ropt.components.evaluators import Evaluator
     from ropt.components.executors import Executor
     from ropt.context import EnOptContext
@@ -22,6 +23,7 @@ def make_evaluator(
     function: EvaluationFunction,
     executor: Executor | None,
     bundle_size: int | None = None,
+    stop_signal: StopSignal | None = None,
 ) -> Evaluator:
     """Wire an evaluator for a validated configuration.
 
@@ -38,6 +40,7 @@ def make_evaluator(
         function:    The user-supplied evaluation function.
         executor:    The executor the evaluations run on, or `None`.
         bundle_size: Evaluations per worker task, `None` for the executor's own.
+        stop_signal: An optional signal that abandons a running batch.
 
     Returns:
         The evaluator to run with.
@@ -56,4 +59,5 @@ def make_evaluator(
         executor=executor,
         batch_id_callback=next_batch_id,
         bundle_size=bundle_size,
+        stop_signal=stop_signal,
     )

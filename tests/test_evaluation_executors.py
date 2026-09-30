@@ -1354,15 +1354,22 @@ def test_a_returned_exception_is_a_result_rather_than_a_failure() -> None:
 
 def test_a_stop_wakes_a_blocked_executor() -> None:
     # The first call holds the only worker, so the other two are still queued
-    # when the stop arrives and `run` must come back without waiting for it.
+    # when the stop arrives and must be dropped rather than run. A thread
+    # cannot be interrupted, so the first one is waited out and kept.
     signal = StopSignal()
     started = threading.Event()
     release = threading.Event()
+    ran: list[int] = []
     executor = ThreadExecutor(workers=1)
+
+    def _record(value: int) -> int:
+        ran.append(value)
+        return value
+
     items = [
         WorkItem(function=_blocked_work, args=(started, release)),
-        WorkItem(function=_function, args=(1,)),
-        WorkItem(function=_function, args=(2,)),
+        WorkItem(function=_record, args=(1,)),
+        WorkItem(function=_record, args=(2,)),
     ]
     results: list[Any] = []
 
@@ -1374,13 +1381,53 @@ def test_a_stop_wakes_a_blocked_executor() -> None:
         driver.start()
         assert started.wait(timeout=4.0)
         signal.stop()
+        # Still blocked, so nothing below can be explained by the batch ending.
+        assert not release.is_set()
+        release.set()
         driver.join(timeout=4.0)
         assert not driver.is_alive()
-        # Still blocked, so the call above did not wait for it to finish.
-        assert not release.is_set()
-        assert all(isinstance(value, WorkNotRun) for value in results)
     finally:
         release.set()
+
+    assert not ran
+    assert not isinstance(results[0], WorkNotRun)
+    assert all(isinstance(value, WorkNotRun) for value in results[1:])
+
+
+def test_a_stop_keeps_the_error_of_work_already_running() -> None:
+    # Discarding a running work item would lose what it raised, and a run that
+    # is aborted while its own evaluation fails would report only the abort.
+    signal = StopSignal()
+    started = threading.Event()
+    stopped = threading.Event()
+
+    def _fail_once_stopped() -> int:
+        started.set()
+        assert stopped.wait(timeout=30)
+        msg = "boom"
+        raise ValueError(msg)
+
+    executor = ThreadExecutor(workers=1)
+    items = [
+        WorkItem(function=_fail_once_stopped),
+        WorkItem(function=_function, args=(1,)),
+    ]
+    raised: list[BaseException] = []
+
+    def _drive() -> None:
+        try:
+            executor.run(items, stop=signal)
+        except ValueError as exc:
+            raised.append(exc)
+
+    driver = threading.Thread(target=_drive)
+    driver.start()
+    assert started.wait(timeout=4.0)
+    signal.stop()
+    stopped.set()
+    driver.join(timeout=10.0)
+    assert not driver.is_alive()
+    assert [str(exc) for exc in raised] == ["boom"]
 
 
 @pytest.mark.parametrize(

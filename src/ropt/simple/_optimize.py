@@ -61,11 +61,11 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None,
 ) -> OptimizationResult:
     context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(context, function, executor, bundle_size)
+    signal = StopSignal()
+    evaluator = make_evaluator(context, function, executor, bundle_size, signal)
     # This run's own handler, tracking the result the call returns; it is added
     # directly, so it stays out of the handlers the caller manages.
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
-    signal = StopSignal()
     step = OptimizationStep(evaluator=evaluator, stop_signal=signal)
     step.add_event_handler(result_handler)
     attach_handlers(step, handlers, report)

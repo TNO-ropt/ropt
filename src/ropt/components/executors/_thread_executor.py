@@ -69,11 +69,19 @@ class ThreadExecutor(ExecutorBase):
                 future = self._submit(bundle)
                 futures[future] = index
                 future.add_done_callback(done.put)
-            for _ in range(len(futures)):
+            while futures:
                 item = done.get()
                 if item is None:
-                    break
-                store(futures.pop(item), item.result())
+                    # Dropping a bundle that is still queued is what a stop can
+                    # do here. One already on a worker cannot be interrupted, so
+                    # it is waited for and its outcome kept: discarding it would
+                    # lose whatever it raised.
+                    for future in list(futures):
+                        future.cancel()
+                    continue
+                index = futures.pop(item)
+                if not item.cancelled():
+                    store(index, item.result())
         finally:
             if stop is not None:
                 stop.remove_callback(wake)

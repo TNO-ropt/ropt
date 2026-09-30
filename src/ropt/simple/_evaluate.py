@@ -17,6 +17,7 @@ from ropt.components.concurrency import StopSignal
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
 
+from ._aborted import ABORTED, Aborted
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
 
@@ -53,11 +54,11 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     bundle_size: int | None,
     metadata: dict[str, Any] | None,
-) -> FunctionResults:
+) -> FunctionResults | Aborted:
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 1:
         raise ValueError(_ONE_VECTOR)
-    return _run_evaluation(
+    results = _run_evaluation(
         session,
         executor,
         config,
@@ -67,7 +68,8 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         report=report,
         bundle_size=bundle_size,
         metadata=metadata,
-    )[0]
+    )
+    return results if isinstance(results, Aborted) else results[0]
 
 
 def _evaluate_batch(  # ruff: ignore[too-many-arguments]
@@ -81,22 +83,20 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     bundle_size: int | None,
     metadata: dict[str, Any] | None,
-) -> tuple[FunctionResults, ...]:
+) -> tuple[FunctionResults, ...] | Aborted:
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 2:  # ruff: ignore[magic-value-comparison]
         raise ValueError(_A_MATRIX)
-    return tuple(
-        _run_evaluation(
-            session,
-            executor,
-            config,
-            array,
-            function,
-            handlers=handlers,
-            report=report,
-            bundle_size=bundle_size,
-            metadata=metadata,
-        )
+    return _run_evaluation(
+        session,
+        executor,
+        config,
+        array,
+        function,
+        handlers=handlers,
+        report=report,
+        bundle_size=bundle_size,
+        metadata=metadata,
     )
 
 
@@ -111,13 +111,13 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     bundle_size: int | None,
     metadata: dict[str, Any] | None,
-) -> tuple[FunctionResults, ...]:
+) -> tuple[FunctionResults, ...] | Aborted:
     context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(context, function, executor, bundle_size)
+    signal = StopSignal()
+    evaluator = make_evaluator(context, function, executor, bundle_size, signal)
     # The results are collected by this run's own handler, in the order the
     # vectors were given, which is the order they are returned in.
     history = HistoryHandler()
-    signal = StopSignal()
     step = EvaluationStep(evaluator=evaluator, stop_signal=signal)
     step.add_event_handler(history)
     attach_handlers(step, handlers, report)
@@ -133,4 +133,6 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]
-    return history["results"] or ()
+    if signal.stopping:
+        return ABORTED
+    return tuple(history["results"] or ())

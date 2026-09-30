@@ -27,6 +27,7 @@ from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import ExecutionError, RunsFailedError, WorkflowError
 from ropt.results import FunctionResults
 from ropt.simple import (
+    Aborted,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     HistoryHandler,
@@ -699,6 +700,7 @@ def test_evaluate_batch_with_a_thread_pool(
 ) -> None:
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
     results = pools(workers=2).evaluate_batch(config, matrix, test_functions[0])
+    assert not isinstance(results, Aborted)
     for result, expected in zip(results, [0.66, 0.75], strict=True):
         assert result.target_objective == pytest.approx(expected)
 
@@ -707,6 +709,7 @@ def test_evaluate_with_a_thread_pool(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     result = pools(workers=2).evaluate(config, initial_values, test_functions[0])
+    assert not isinstance(result, Aborted)
     assert result.target_objective == pytest.approx(0.66)
 
 
@@ -843,6 +846,7 @@ def test_thread_pool_bundles_a_whole_batch_onto_one_thread(
         _record_thread,
         bundle_size=0,
     )
+    assert not isinstance(results, Aborted)
     assert results.functions is not None
     assert len(threads) == 1
 
@@ -866,6 +870,7 @@ def test_thread_pool_runs_unbundled_calls_at_once(
         _wait_for_all,
         bundle_size=1,
     )
+    assert not isinstance(results, Aborted)
     assert results.functions is not None
 
 
@@ -1131,6 +1136,7 @@ def test_evaluate_without_cloudpickle(
         pickle.dumps,
     )
     result = pools(ProcessExecutor, workers=2).evaluate(config, initial_values, _sphere)
+    assert not isinstance(result, Aborted)
     assert result.target_objective == pytest.approx(0.01)
 
 
@@ -1483,6 +1489,7 @@ def test_hpc_evaluates_through_the_simple_api(
     result = pools(HPCExecutor, workers=2, workdir=tmp_path, template="").evaluate(
         config, initial_values, test_functions[0]
     )
+    assert not isinstance(result, Aborted)
     assert result.target_objective is not None
 
 
@@ -1494,6 +1501,7 @@ def test_local_jobs_evaluate_through_the_simple_api(
     result = pools(LocalJobExecutor, workers=2, workdir=tmp_path).evaluate(
         config, initial_values, test_functions[0]
     )
+    assert not isinstance(result, Aborted)
     assert result.target_objective is not None
 
 

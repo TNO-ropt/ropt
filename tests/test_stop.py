@@ -18,6 +18,7 @@ from ropt.simple import session
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+    from ropt.results import FunctionResults
     from ropt.simple import EvaluationFunctionContext, OptimizationResult
 
 _INITIAL = np.array([0.0, 0.0, 0.1])
@@ -80,24 +81,75 @@ def _fails_at(barrier: threading.Barrier) -> Any:
 
 
 @pytest.mark.timeout(60)
-def test_session_abort_cuts_off_a_run_keeping_its_best_result() -> None:
+def test_session_abort_keeps_the_results_of_completed_batches() -> None:
+    # Aborting from the report callback lands after a batch has finished, so
+    # that batch's results survive while the next one is abandoned.
+    with session() as opened:
+        pool = opened.thread_pool(workers=1)
+
+        def _abort_on_first_result(_: FunctionResults) -> None:
+            opened.abort()
+
+        result = pool.optimize(
+            _CONFIG, _INITIAL, _sphere, report=_abort_on_first_result
+        )
+
+    assert result.exit_code == ExitCode.ABORTED
+    assert result.results is not None
+
+
+@pytest.mark.timeout(60)
+def test_session_abort_abandons_the_batch_in_flight() -> None:
+    # Aborted from inside the first evaluation. What the run keeps depends on
+    # which batches had finished, but the call count is what shows the rest of
+    # the work was dropped rather than run out.
     with session() as opened:
         pool = opened.thread_pool(workers=1)
         calls = 0
+        lock = threading.Lock()
 
         def objective(
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
             nonlocal calls
-            calls += 1
-            if calls == 1:
+            with lock:
+                calls += 1
+                first = calls == 1
+            if first:
                 opened.abort()
             return _sphere(variables, context)
 
         result = pool.optimize(_CONFIG, _INITIAL, objective)
 
     assert result.exit_code == ExitCode.ABORTED
-    assert result.results is not None
+    # A run that was let alone evaluates the vector and a perturbation per
+    # variable, many times over; this one stopped almost immediately.
+    with lock:
+        assert calls <= _INITIAL.size
+
+
+@pytest.mark.timeout(60)
+def test_a_nested_run_that_fails_does_not_abort_the_run_that_started_it() -> None:
+    # The outer run is not a sibling: it receives the exception itself, and
+    # aborting it here would arrive first and be all it could report.
+    with session() as opened:
+        outer = opened.thread_pool(workers=1)
+        inner = opened.thread_pool(workers=1)
+
+        def _nested(
+            _variables: NDArray[np.float64], _context: EvaluationFunctionContext
+        ) -> float:
+            msg = "boom"
+            raise ValueError(msg)
+
+        def objective(
+            variables: NDArray[np.float64], context: EvaluationFunctionContext
+        ) -> float:
+            inner.optimize(_CONFIG, _INITIAL, _nested)
+            return _sphere(variables, context)
+
+        with pytest.raises(ValueError, match="boom"):
+            outer.optimize(_CONFIG, _INITIAL, objective)
 
 
 @pytest.mark.timeout(60)
@@ -223,7 +275,6 @@ def _run_beside_a_failure(
 def test_a_failing_run_aborts_the_others_on_its_session() -> None:
     result = _run_beside_a_failure(keep_going=None)
     assert result.exit_code == ExitCode.ABORTED_ON_ERROR
-    assert result.results is not None
 
 
 @pytest.mark.timeout(60)
