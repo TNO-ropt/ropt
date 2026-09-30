@@ -35,6 +35,7 @@
 ## Result objects
 
 ::: ropt.simple.OptimizationResult
+::: ropt.simple.EvaluationResult
 
 ## Callback types
 

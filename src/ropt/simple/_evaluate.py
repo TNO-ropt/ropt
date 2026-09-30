@@ -16,10 +16,11 @@ from ropt.components.compute_steps import EvaluationStep
 from ropt.components.concurrency import StopSignal
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
+from ropt.enums import ExitReason
 
-from ._aborted import ABORTED, Aborted
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
+from ._result import EvaluationResult
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -54,11 +55,11 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     bundle_size: int | None,
     metadata: dict[str, Any] | None,
-) -> FunctionResults | Aborted:
+) -> EvaluationResult[FunctionResults | None]:
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 1:
         raise ValueError(_ONE_VECTOR)
-    results = _run_evaluation(
+    outcome = _run_evaluation(
         session,
         executor,
         config,
@@ -69,7 +70,10 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         bundle_size=bundle_size,
         metadata=metadata,
     )
-    return results if isinstance(results, Aborted) else results[0]
+    return EvaluationResult(
+        exit_reason=outcome.exit_reason,
+        results=outcome.results[0] if outcome.results else None,
+    )
 
 
 def _evaluate_batch(  # ruff: ignore[too-many-arguments]
@@ -83,7 +87,7 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     bundle_size: int | None,
     metadata: dict[str, Any] | None,
-) -> tuple[FunctionResults, ...] | Aborted:
+) -> EvaluationResult[tuple[FunctionResults, ...]]:
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 2:  # ruff: ignore[magic-value-comparison]
         raise ValueError(_A_MATRIX)
@@ -111,7 +115,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     bundle_size: int | None,
     metadata: dict[str, Any] | None,
-) -> tuple[FunctionResults, ...] | Aborted:
+) -> EvaluationResult[tuple[FunctionResults, ...]]:
     context = EnOptContext.model_validate(config)
     signal = StopSignal()
     evaluator = make_evaluator(context, function, executor, bundle_size, signal)
@@ -133,6 +137,9 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]
-    if signal.stopping:
-        return ABORTED
-    return tuple(history["results"] or ())
+    results = tuple(history["results"] or ())
+    # An abort that arrived too late to cost the batch anything did not abort
+    # it: the step reports its results either way.
+    if signal.stopping and not results:
+        return EvaluationResult(exit_reason=signal.exit_reason, results=())
+    return EvaluationResult(exit_reason=ExitReason.FINISHED, results=results)

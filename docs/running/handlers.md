@@ -220,7 +220,7 @@ step that emitted it, so calling `event.source.stop()` ends that run with
 `STOPPED` — the [`report`](running.md#stopping-early-from-the-callback)
 callback above is a convenience wrapper around this. Only the run that owns the
 emitting step is affected, so concurrent runs continue. See
-[Optimization Workflows](../advanced/workflows.md#exit-codes).
+[Optimization Workflows](../advanced/workflows.md#exit-reasons).
 
 ## Handlers and the process boundary
 

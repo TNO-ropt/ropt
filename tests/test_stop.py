@@ -129,6 +129,47 @@ def test_session_abort_abandons_the_batch_in_flight() -> None:
 
 
 @pytest.mark.timeout(60)
+def test_session_abort_leaves_an_evaluation_batch_without_results() -> None:
+    # One worker and one vector per bundle, so the two rows behind the one that
+    # aborts are still queued and are dropped. A batch is all or nothing, so
+    # the row that did run is not reported either.
+    matrix = np.array([_INITIAL, np.zeros(_INITIAL.size), np.ones(_INITIAL.size)])
+
+    with session() as opened:
+        pool = opened.thread_pool(workers=1)
+
+        def objective(
+            variables: NDArray[np.float64], context: EvaluationFunctionContext
+        ) -> float:
+            opened.abort()
+            return _sphere(variables, context)
+
+        outcome = pool.evaluate_batch(_CONFIG, matrix, objective, bundle_size=1)
+
+    assert outcome.exit_reason == ExitReason.ABORTED
+    assert outcome.results == ()
+
+
+@pytest.mark.timeout(60)
+def test_an_evaluation_that_completes_despite_an_abort_reports_its_results() -> None:
+    # The single vector is already on a worker when the abort arrives, and a
+    # worker cannot be interrupted, so nothing was lost and nothing is dropped.
+    with session() as opened:
+        pool = opened.thread_pool(workers=1)
+
+        def objective(
+            variables: NDArray[np.float64], context: EvaluationFunctionContext
+        ) -> float:
+            opened.abort()
+            return _sphere(variables, context)
+
+        outcome = pool.evaluate(_CONFIG, _INITIAL, objective)
+
+    assert outcome.exit_reason == ExitReason.FINISHED
+    assert outcome.results is not None
+
+
+@pytest.mark.timeout(60)
 def test_a_nested_run_that_fails_does_not_abort_the_run_that_started_it() -> None:
     # The outer run is not a sibling: it receives the exception itself, and
     # aborting it here would arrive first and be all it could report.

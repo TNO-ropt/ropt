@@ -272,15 +272,27 @@ optimizer. Use [`evaluate`][ropt.simple.evaluate] for one point and
 ```python
 from ropt.simple import evaluate, evaluate_batch
 
-single = evaluate(config, x, objective)             # one FunctionResults
-batch = evaluate_batch(config, matrix, objective)    # one per row of the matrix
+single = evaluate(config, x, objective)
+batch = evaluate_batch(config, matrix, objective)
+
+single.results  # one FunctionResults, or None if the evaluation was cut off
+batch.results   # one per row of the matrix, empty if the batch was cut off
 ```
 
-Both return [`FunctionResults`][ropt.results.FunctionResults] objects, the
-same kind `optimize` puts on `results` and a handler receives, so everything is
-read the same way wherever it came from. Here `result.variables` is just the
-point you supplied; it is only informative in a `report` callback, where the
-optimizer chose the point.
+Both return an [`EvaluationResult`][ropt.simple.EvaluationResult], shaped like
+the [`OptimizationResult`][ropt.simple.OptimizationResult] that `optimize`
+returns: `exit_reason` says why the evaluation ended and `results` holds what it
+produced. What is on `results` is a
+[`FunctionResults`][ropt.results.FunctionResults], the same kind a handler
+receives, so everything is read the same way wherever it came from. Here
+`result.variables` is just the point you supplied; it is only informative in a
+`report` callback, where the optimizer chose the point.
+
+An evaluation is a single batch, so it produces either every result or none.
+That is why `exit_reason` can only be `FINISHED`, or `ABORTED` and
+`ABORTED_ON_ERROR` when [`Session.abort`](#stopping-from-outside) or a failing
+run on the same session cut it off. An abort that arrives after the batch has
+finished costs it nothing, and the evaluation reports `FINISHED`.
 
 The runnable script is
 [examples/simple/evaluate.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/evaluate.py),
@@ -299,9 +311,7 @@ one down with it (see
 [Failure in one run](parallel.md#failure-in-one-run)).
 `result.results` is `None` when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
-result it had reached before that. A plain [`evaluate`][ropt.simple.evaluate]
-has no `exit_reason`, and always returns a result object; there, `functions`
-being `None` means that no usable result was produced.
+result it had reached before that.
 
 A run can also end with `FINISHED` and still leave those fields
 `None`. Only a result that satisfies every constraint to within

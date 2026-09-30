@@ -709,8 +709,8 @@ The flag decides only whether a run is *aborted*. A run that keeps going still
 aborts the others if it fails itself, and its exception still reaches its
 caller, so opting out cannot turn a failure into silence.
 [`Session.abort`](running.md#stopping-from-outside) reaches every run whatever
-the flag says, and those end with `ABORTED` instead: the exit code distinguishes
-an abort that was asked for from one another run caused.
+the flag says, and those end with `ABORTED` instead: the exit reason
+distinguishes an abort that was asked for from one another run caused.
 
 ## Running the optimizer in a separate process { #external-backend }
 

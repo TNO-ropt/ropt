@@ -27,7 +27,6 @@ from ropt.enums import EnOptEventType, ExitReason
 from ropt.exceptions import ExecutionError, RunsFailedError, WorkflowError
 from ropt.results import FunctionResults
 from ropt.simple import (
-    Aborted,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     HistoryHandler,
@@ -381,7 +380,9 @@ def test_adapt_function_splits_objectives_and_constraints() -> None:
 
 
 def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
-    result = evaluate(config, initial_values, test_functions[0])
+    outcome = evaluate(config, initial_values, test_functions[0])
+    assert outcome.exit_reason is ExitReason.FINISHED
+    result = outcome.results
     assert isinstance(result, FunctionResults)
     assert result.target_objective is not None
     assert result.target_objective == pytest.approx(0.66)
@@ -392,8 +393,8 @@ def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
 
 
 def test_evaluate_reports_the_evaluated_point(config: Any, test_functions: Any) -> None:
-    result = evaluate(config, initial_values, test_functions[0])
-    assert result.variables is not None
+    result = evaluate(config, initial_values, test_functions[0]).results
+    assert result is not None
     assert np.array_equal(result.variables, initial_values)
 
 
@@ -452,8 +453,9 @@ def test_evaluate_report_return_value_ignored(config: Any, test_functions: Any) 
         reported.append(result)
         return True
 
-    result = evaluate(config, initial_values, test_functions[0], report=_stop)
+    result = evaluate(config, initial_values, test_functions[0], report=_stop).results
     assert len(reported) == 1
+    assert result is not None
     assert result.target_objective == pytest.approx(0.66)
 
 
@@ -470,7 +472,7 @@ def test_evaluate_batch_report_return_value_ignored(
         return True
 
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    results = evaluate_batch(config, matrix, test_functions[0], report=_stop)
+    results = evaluate_batch(config, matrix, test_functions[0], report=_stop).results
     assert len(reported) == 1
     assert len(results) == 2
 
@@ -485,7 +487,7 @@ def test_evaluate_batch_returns_result_per_row(
     config: Any, test_functions: Any
 ) -> None:
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    results = evaluate_batch(config, matrix, test_functions[0])
+    results = evaluate_batch(config, matrix, test_functions[0]).results
     assert len(results) == 2
     assert all(isinstance(result, FunctionResults) for result in results)
     # Squared distance to [0.5, 0.5, 0.5]: row 0 = 0.5^2+0.5^2+0.4^2, row 1 = 3*0.5^2.
@@ -494,7 +496,9 @@ def test_evaluate_batch_returns_result_per_row(
 
 
 def test_evaluate_batch_single_row(config: Any, test_functions: Any) -> None:
-    results = evaluate_batch(config, initial_values.reshape(1, -1), test_functions[0])
+    results = evaluate_batch(
+        config, initial_values.reshape(1, -1), test_functions[0]
+    ).results
     assert len(results) == 1
     assert results[0].target_objective == pytest.approx(0.66)
 
@@ -506,7 +510,8 @@ def test_evaluate_batch_rejects_vector(config: Any, test_functions: Any) -> None
 
 def test_evaluate_multiple_objectives(config: Any, eval_func: Any) -> None:
     config["objectives"] = {"weights": [0.75, 0.25]}
-    result = evaluate(config, initial_values, eval_func())
+    result = evaluate(config, initial_values, eval_func()).results
+    assert result is not None
     assert result.functions is not None
     assert result.functions.objectives.shape == (2,)
     assert result.functions.constraints is None
@@ -517,7 +522,8 @@ def test_evaluate_attaches_metadata_to_results(
 ) -> None:
     result = evaluate(
         config, initial_values, test_functions[0], metadata={"tag": "eval"}
-    )
+    ).results
+    assert result is not None
     assert result.metadata["tag"] == "eval"
 
 
@@ -527,7 +533,7 @@ def test_evaluate_batch_attaches_metadata_to_every_result(
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
     results = evaluate_batch(
         config, matrix, test_functions[0], metadata={"tag": "eval"}
-    )
+    ).results
     assert len(results) == 2
     for result in results:
         assert result.metadata["tag"] == "eval"
@@ -699,18 +705,17 @@ def test_evaluate_batch_with_a_thread_pool(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    results = pools(workers=2).evaluate_batch(config, matrix, test_functions[0])
-    assert not isinstance(results, Aborted)
-    for result, expected in zip(results, [0.66, 0.75], strict=True):
+    outcome = pools(workers=2).evaluate_batch(config, matrix, test_functions[0])
+    for result, expected in zip(outcome.results, [0.66, 0.75], strict=True):
         assert result.target_objective == pytest.approx(expected)
 
 
 def test_evaluate_with_a_thread_pool(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
-    result = pools(workers=2).evaluate(config, initial_values, test_functions[0])
-    assert not isinstance(result, Aborted)
-    assert result.target_objective == pytest.approx(0.66)
+    outcome = pools(workers=2).evaluate(config, initial_values, test_functions[0])
+    assert outcome.results is not None
+    assert outcome.results.target_objective == pytest.approx(0.66)
 
 
 _INNER_CONFIG: dict[str, Any] = {
@@ -846,8 +851,8 @@ def test_thread_pool_bundles_a_whole_batch_onto_one_thread(
         _record_thread,
         bundle_size=0,
     )
-    assert not isinstance(results, Aborted)
-    assert results.functions is not None
+    assert results.results is not None
+    assert results.results.functions is not None
     assert len(threads) == 1
 
 
@@ -870,8 +875,8 @@ def test_thread_pool_runs_unbundled_calls_at_once(
         _wait_for_all,
         bundle_size=1,
     )
-    assert not isinstance(results, Aborted)
-    assert results.functions is not None
+    assert results.results is not None
+    assert results.results.functions is not None
 
 
 def test_bundle_size_sequence_length_must_match_runs(
@@ -1136,8 +1141,8 @@ def test_evaluate_without_cloudpickle(
         pickle.dumps,
     )
     result = pools(ProcessExecutor, workers=2).evaluate(config, initial_values, _sphere)
-    assert not isinstance(result, Aborted)
-    assert result.target_objective == pytest.approx(0.01)
+    assert result.results is not None
+    assert result.results.target_objective == pytest.approx(0.01)
 
 
 def test_optimize_many_broadcasts_config_and_objective(
@@ -1489,8 +1494,8 @@ def test_hpc_evaluates_through_the_simple_api(
     result = pools(HPCExecutor, workers=2, workdir=tmp_path, template="").evaluate(
         config, initial_values, test_functions[0]
     )
-    assert not isinstance(result, Aborted)
-    assert result.target_objective is not None
+    assert result.results is not None
+    assert result.results.target_objective is not None
 
 
 @pytest.mark.slow
@@ -1501,8 +1506,8 @@ def test_local_jobs_evaluate_through_the_simple_api(
     result = pools(LocalJobExecutor, workers=2, workdir=tmp_path).evaluate(
         config, initial_values, test_functions[0]
     )
-    assert not isinstance(result, Aborted)
-    assert result.target_objective is not None
+    assert result.results is not None
+    assert result.results.target_objective is not None
 
 
 _DYING_WORKER_CONFIG: dict[str, Any] = {

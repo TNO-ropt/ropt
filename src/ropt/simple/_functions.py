@@ -13,7 +13,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ._aborted import Aborted
 from ._session import session
 
 if TYPE_CHECKING:
@@ -26,7 +25,7 @@ if TYPE_CHECKING:
 
     from ._function import EvaluationFunction
     from ._report import ReportCallback
-    from ._result import OptimizationResult
+    from ._result import EvaluationResult, OptimizationResult
 
 
 def optimize(  # ruff: ignore[too-many-arguments]
@@ -128,7 +127,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     metadata: dict[str, Any] | None = None,
-) -> FunctionResults:
+) -> EvaluationResult[FunctionResults | None]:
     """Evaluate a single variable vector in-process, without optimizing.
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
@@ -142,13 +141,14 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         metadata:  Optional dictionary attached to the results.
 
     Returns:
-        The [`FunctionResults`][ropt.results.FunctionResults] for the vector.
+        An [`EvaluationResult`][ropt.simple.EvaluationResult] whose `results` is
+        the [`FunctionResults`][ropt.results.FunctionResults] for the vector.
 
     Raises:
         ValueError: If `variables` is not a single vector.
     """  # ruff: ignore[docstring-extraneous-exception]
     with session() as opened:
-        results = opened.evaluate(
+        return opened.evaluate(
             config,
             variables,
             function,
@@ -156,9 +156,6 @@ def evaluate(  # ruff: ignore[too-many-arguments]
             report=report,
             metadata=metadata,
         )
-    # Nothing else holds this session, so nothing could have aborted the run.
-    assert not isinstance(results, Aborted)
-    return results
 
 
 def evaluate_batch(  # ruff: ignore[too-many-arguments]
@@ -169,7 +166,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     metadata: dict[str, Any] | None = None,
-) -> tuple[FunctionResults, ...]:
+) -> EvaluationResult[tuple[FunctionResults, ...]]:
     """Evaluate a batch of variable vectors in-process, without optimizing.
 
     Each row of `variables` is one vector, and the results come back in the same
@@ -184,13 +181,14 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         metadata:  Optional dictionary attached to every result.
 
     Returns:
-        One [`FunctionResults`][ropt.results.FunctionResults] per vector.
+        An [`EvaluationResult`][ropt.simple.EvaluationResult] whose `results`
+        holds one [`FunctionResults`][ropt.results.FunctionResults] per vector.
 
     Raises:
         ValueError: If `variables` is not a 2-D matrix.
     """  # ruff: ignore[docstring-extraneous-exception]
     with session() as opened:
-        results = opened.evaluate_batch(
+        return opened.evaluate_batch(
             config,
             variables,
             function,
@@ -198,6 +196,3 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
             report=report,
             metadata=metadata,
         )
-    # Nothing else holds this session, so nothing could have aborted the run.
-    assert not isinstance(results, Aborted)
-    return results

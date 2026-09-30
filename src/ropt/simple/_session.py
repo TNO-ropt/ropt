@@ -39,10 +39,9 @@ if TYPE_CHECKING:
     from ropt.components.executors import Executor
     from ropt.results import FunctionResults
 
-    from ._aborted import Aborted
     from ._function import EvaluationFunction
     from ._report import ReportCallback
-    from ._result import OptimizationResult
+    from ._result import EvaluationResult, OptimizationResult
 
 _CLOSED = (
     "This session is not open; build pools and start runs inside its `with` "
@@ -125,9 +124,12 @@ class Session:
 
         The evaluation batch in flight is abandoned rather than waited for, so a
         run keeps only what earlier batches produced. A run aborted during its
-        first batch has no result at all. Evaluations already running are not
-        killed, since a thread cannot be interrupted, and their workers are free
-        only once they return.
+        first batch has no result at all, and so has an
+        [`evaluate`][ropt.simple.Session.evaluate] call, which is a single
+        batch. Evaluations already running are not killed, since a thread cannot
+        be interrupted, and their workers are free only once they return. An
+        abort that arrives once every one of them has returned costs the batch
+        nothing, and it reports `ExitReason.FINISHED`.
 
         This reaches every run, `keep_going` or not: that flag exempts a run
         from the abort a failing run triggers, not from one that was asked for.
@@ -276,7 +278,7 @@ class Session:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> FunctionResults | Aborted:
+    ) -> EvaluationResult[FunctionResults | None]:
         """Evaluate a single variable vector in-process, without optimizing.
 
         See [Running Optimizations](../running/running.md) for a walkthrough.
@@ -290,8 +292,9 @@ class Session:
             metadata:  Optional dictionary attached to the results.
 
         Returns:
-            The [`FunctionResults`][ropt.results.FunctionResults] for the vector,
-            or [`ABORTED`][ropt.simple.ABORTED] if it was cut off.
+            An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
+            `results` is the [`FunctionResults`][ropt.results.FunctionResults]
+            for the vector, or `None` if the evaluation was cut off.
 
         Raises:
             ValueError: If `variables` is not a single vector.
@@ -317,7 +320,7 @@ class Session:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> tuple[FunctionResults, ...] | Aborted:
+    ) -> EvaluationResult[tuple[FunctionResults, ...]]:
         """Evaluate a batch of variable vectors in-process, without optimizing.
 
         Each row of `variables` is one vector, and the results come back in the
@@ -333,8 +336,10 @@ class Session:
             metadata:  Optional dictionary attached to every result.
 
         Returns:
-            One [`FunctionResults`][ropt.results.FunctionResults] per vector, or
-            [`ABORTED`][ropt.simple.ABORTED] if the batch was cut off.
+            An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
+            `results` holds one
+            [`FunctionResults`][ropt.results.FunctionResults] per vector, and is
+            empty if the batch was cut off.
 
         Raises:
             ValueError: If `variables` is not a 2-D matrix.

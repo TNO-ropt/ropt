@@ -28,10 +28,9 @@ if TYPE_CHECKING:
     from ropt.components.executors import Executor
     from ropt.results import FunctionResults
 
-    from ._aborted import Aborted
     from ._function import EvaluationFunction
     from ._report import ReportCallback
-    from ._result import OptimizationResult
+    from ._result import EvaluationResult, OptimizationResult
     from ._session import Session
 
 _T = TypeVar("_T")
@@ -191,7 +190,7 @@ class WorkerPool:
         report: ReportCallback | None = None,
         bundle_size: int | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> FunctionResults | Aborted:
+    ) -> EvaluationResult[FunctionResults | None]:
         """Evaluate a single variable vector on this pool, without optimizing.
 
         See [Running Optimizations](../running/running.md) for a walkthrough.
@@ -206,8 +205,9 @@ class WorkerPool:
             metadata:    Optional dictionary attached to the results.
 
         Returns:
-            The [`FunctionResults`][ropt.results.FunctionResults] for the vector,
-            or [`ABORTED`][ropt.simple.ABORTED] if it was cut off.
+            An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
+            `results` is the [`FunctionResults`][ropt.results.FunctionResults]
+            for the vector, or `None` if the evaluation was cut off.
 
         Raises:
             ValueError:    If `variables` is not a single vector.
@@ -235,7 +235,7 @@ class WorkerPool:
         report: ReportCallback | None = None,
         bundle_size: int | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> tuple[FunctionResults, ...] | Aborted:
+    ) -> EvaluationResult[tuple[FunctionResults, ...]]:
         """Evaluate a batch of variable vectors on this pool, without optimizing.
 
         Each row of `variables` is one vector, and the results come back in the
@@ -252,8 +252,10 @@ class WorkerPool:
             metadata:    Optional dictionary attached to every result.
 
         Returns:
-            One [`FunctionResults`][ropt.results.FunctionResults] per vector, or
-            [`ABORTED`][ropt.simple.ABORTED] if the batch was cut off.
+            An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
+            `results` holds one
+            [`FunctionResults`][ropt.results.FunctionResults] per vector, and is
+            empty if the batch was cut off.
 
         Raises:
             ValueError:    If `variables` is not a 2-D matrix.

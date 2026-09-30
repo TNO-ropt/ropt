@@ -41,13 +41,14 @@ def rosenbrock(
 
 def main() -> None:
     """Evaluate a single vector and a batch of vectors."""
-    single = evaluate(CONFIG, np.ones(DIM), rosenbrock)
+    single = evaluate(CONFIG, np.ones(DIM), rosenbrock).results
+    assert single is not None
     print(f"objective at the optimum: {single.target_objective}")
     assert single.target_objective is not None
     assert np.isclose(single.target_objective, 0.0)
 
     matrix = np.array([np.zeros(DIM), np.ones(DIM), 2 * np.arange(DIM) / DIM + 0.5])
-    batch = evaluate_batch(CONFIG, matrix, rosenbrock)
+    batch = evaluate_batch(CONFIG, matrix, rosenbrock).results
     for vector, result in zip(matrix, batch, strict=True):
         print(f"objective at {vector}: {result.target_objective}")
     assert all(result.target_objective is not None for result in batch)
