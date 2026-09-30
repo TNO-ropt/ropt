@@ -14,7 +14,7 @@ from .base import ExecutorBase, WorkItem, _calls, _run_bundle, _stopped
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from ropt.components.concurrency import StopSignal
+    from ropt.components.concurrency import AbortSignal
 
 _logger = get_logger(__name__)
 
@@ -51,7 +51,7 @@ class ThreadExecutor(ExecutorBase):
         self,
         bundles: list[list[WorkItem]],
         store: Callable[[int, Any], None],
-        stop: StopSignal | None,
+        abort_signal: AbortSignal | None,
     ) -> None:
         # Finished bundles arrive here rather than through
         # `concurrent.futures.wait`, which would block forever on a future
@@ -60,11 +60,11 @@ class ThreadExecutor(ExecutorBase):
         futures: dict[Future[list[Any]], int] = {}
         # The sentinel is what releases `done.get()` below; nothing else can.
         wake = partial(done.put, None)
-        if stop is not None:
-            stop.add_callback(wake)
+        if abort_signal is not None:
+            abort_signal.add_callback(wake)
         try:
             for index, bundle in enumerate(bundles):
-                if stop is not None and stop.stopping:
+                if abort_signal is not None and abort_signal.aborting:
                     break
                 future = self._submit(bundle)
                 futures[future] = index
@@ -83,8 +83,8 @@ class ThreadExecutor(ExecutorBase):
                 if not item.cancelled():
                     store(index, item.result())
         finally:
-            if stop is not None:
-                stop.remove_callback(wake)
+            if abort_signal is not None:
+                abort_signal.remove_callback(wake)
             for future in futures:
                 future.cancel()
 

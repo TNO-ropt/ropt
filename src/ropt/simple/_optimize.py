@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 
 from ropt.components.compute_steps import OptimizationStep
-from ropt.components.concurrency import StopSignal, run_concurrent
+from ropt.components.concurrency import AbortSignal, run_concurrent
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
 from ropt.exceptions import RunsFailedError
@@ -61,12 +61,12 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None,
 ) -> OptimizationResult:
     context = EnOptContext.model_validate(config)
-    signal = StopSignal()
+    signal = AbortSignal()
     evaluator = make_evaluator(context, function, executor, bundle_size, signal)
     # This run's own handler, tracking the result the call returns; it is added
     # directly, so it stays out of the handlers the caller manages.
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
-    step = OptimizationStep(evaluator=evaluator, stop_signal=signal)
+    step = OptimizationStep(evaluator=evaluator, abort_signal=signal)
     step.add_event_handler(result_handler)
     attach_handlers(step, handlers, report)
     session._register(  # ruff: ignore[private-member-access]

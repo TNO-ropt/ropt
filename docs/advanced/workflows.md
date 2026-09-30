@@ -204,7 +204,7 @@ returns nothing:
 | `MAX_FUNCTIONS_REACHED`      | Maximum number of function evaluations was reached.           |
 | `MAX_BATCHES_REACHED`        | Maximum number of evaluation batches was reached.             |
 | `STOPPED`                    | An event handler asked the run to stop via `event.source.stop()`. |
-| `ABORTED`                    | The step's [`StopSignal`][ropt.components.concurrency.StopSignal] was set. |
+| `ABORTED`                    | The step's [`AbortSignal`][ropt.components.concurrency.AbortSignal] was set. |
 | `ABORTED_ON_ERROR`           | The step's signal was set with this reason, which `ropt.simple` uses when another run raised. |
 | `EXECUTOR_SHUT_DOWN`         | The executor could no longer run the work, which in practice means the interpreter was shutting down. |
 
@@ -226,18 +226,18 @@ to call from a handler attached to several steps at once.
 
 `stop()` reaches one step, and only at a point that step chose. To cut a set of
 them off, construct them with the same
-[`StopSignal`][ropt.components.concurrency.StopSignal]:
+[`AbortSignal`][ropt.components.concurrency.AbortSignal]:
 
 ```python
-signal = StopSignal()
-steps = [OptimizationStep(evaluator=evaluator, stop_signal=signal) for ...]
+signal = AbortSignal()
+steps = [OptimizationStep(evaluator=evaluator, abort_signal=signal) for ...]
 ...
-signal.stop()
+signal.abort()
 ```
 
-A step polls its signal wherever it polls `stop()`, and ends with the code the
-signal carries, which is `ABORTED` unless `stop` was given another one. The
-first `stop` fixes the code, so a second one for another reason cannot
+A step polls its signal wherever it polls `stop()`, and ends with the reason the
+signal carries, which is `ABORTED` unless `abort` was given another one. The
+first `abort` fixes the reason, so a second one for another reason cannot
 overwrite the reason a run is already ending for.
 
 A signal cannot be reset. `run()` clears the step's own stop request, so a step

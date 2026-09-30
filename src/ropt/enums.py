@@ -147,7 +147,7 @@ class ExitReason(IntEnum):
 
     ABORTED = 7
     """Returned when the run was cut off through a
-    [`StopSignal`][ropt.components.concurrency.StopSignal], without regard to
+    [`AbortSignal`][ropt.components.concurrency.AbortSignal], without regard to
     where it had got to."""
 
     ABORTED_ON_ERROR = 8

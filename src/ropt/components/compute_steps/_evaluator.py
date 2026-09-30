@@ -20,7 +20,7 @@ from .base import ComputeStep
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
-    from ropt.components.concurrency import StopSignal
+    from ropt.components.concurrency import AbortSignal
     from ropt.components.evaluators import Evaluator
     from ropt.context import EnOptContext
     from ropt.results import Results
@@ -43,15 +43,15 @@ class EvaluationStep(ComputeStep[None]):
     """
 
     def __init__(
-        self, *, evaluator: Evaluator, stop_signal: StopSignal | None = None
+        self, *, evaluator: Evaluator, abort_signal: AbortSignal | None = None
     ) -> None:
         """Initialize a default evaluator.
 
         Args:
             evaluator:   The evaluator object to run function evaluations.
-            stop_signal: An optional signal to stop on, besides `stop`.
+            abort_signal: An optional signal that cuts this step off.
         """
-        super().__init__(stop_signal=stop_signal)
+        super().__init__(abort_signal=abort_signal)
         self._evaluator = evaluator
 
     def _run(

@@ -19,7 +19,7 @@ from .base import ComputeStep
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-    from ropt.components.concurrency import StopSignal
+    from ropt.components.concurrency import AbortSignal
     from ropt.components.evaluators import Evaluator
     from ropt.context import EnOptContext
     from ropt.results import Results
@@ -42,15 +42,15 @@ class OptimizationStep(ComputeStep[ExitReason]):
     """
 
     def __init__(
-        self, *, evaluator: Evaluator, stop_signal: StopSignal | None = None
+        self, *, evaluator: Evaluator, abort_signal: AbortSignal | None = None
     ) -> None:
         """Initialize a default optimizer.
 
         Args:
             evaluator:   The evaluator object to run function evaluations.
-            stop_signal: An optional signal to stop on, besides `stop`.
+            abort_signal: An optional signal that cuts this step off.
         """
-        super().__init__(stop_signal=stop_signal)
+        super().__init__(abort_signal=abort_signal)
         self._evaluator = evaluator
 
     def _run(
@@ -144,6 +144,6 @@ class OptimizationStep(ComputeStep[ExitReason]):
         # Poll on the optimizer stack so a handler's stop() becomes a clean exit.
         if self._stop_requested:
             raise OptimizerStop(ExitReason.STOPPED)
-        if self._signalled:
-            assert self._stop_signal is not None
-            raise OptimizerStop(self._stop_signal.exit_reason)
+        if self._aborting:
+            assert self._abort_signal is not None
+            raise OptimizerStop(self._abort_signal.exit_reason)

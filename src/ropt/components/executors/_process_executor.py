@@ -28,7 +28,7 @@ from .base import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from ropt.components.concurrency import StopSignal
+    from ropt.components.concurrency import AbortSignal
 
 _logger = get_logger(__name__)
 
@@ -100,7 +100,7 @@ class ProcessExecutor(ExecutorBase):
         self,
         bundles: list[list[WorkItem]],
         store: Callable[[int, Any], None],
-        stop: StopSignal | None,
+        abort_signal: AbortSignal | None,
     ) -> None:
         pending = deque(enumerate(bundles))
         # Finished bundles arrive here rather than through
@@ -110,11 +110,11 @@ class ProcessExecutor(ExecutorBase):
         futures: dict[Future[tuple[bool, bytes]], int] = {}
         # The sentinel is what releases `done.get()` below; nothing else can.
         wake = partial(done.put, None)
-        if stop is not None:
-            stop.add_callback(wake)
+        if abort_signal is not None:
+            abort_signal.add_callback(wake)
         try:
             while pending or futures:
-                if stop is not None and stop.stopping:
+                if abort_signal is not None and abort_signal.aborting:
                     # Work not yet sent is dropped here; work already with a
                     # worker is collected below, since it runs whether or not
                     # anyone is still waiting for it.
@@ -132,8 +132,8 @@ class ProcessExecutor(ExecutorBase):
                 if not item.cancelled():
                     store(index, _bundle_result(item))
         finally:
-            if stop is not None:
-                stop.remove_callback(wake)
+            if abort_signal is not None:
+                abort_signal.remove_callback(wake)
             for future in futures:
                 future.cancel()
                 self._payload_limit.release()

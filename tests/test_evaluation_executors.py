@@ -30,7 +30,7 @@ import pytest
 
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.components.compute_steps import OptimizationStep
-from ropt.components.concurrency import StopSignal
+from ropt.components.concurrency import AbortSignal
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -1221,10 +1221,10 @@ class _RecordingExecutor(ThreadExecutor):
         self,
         bundles: list[list[WorkItem]],
         store: Callable[[int, Any], None],
-        stop: StopSignal | None = None,
+        abort_signal: AbortSignal | None = None,
     ) -> None:
         self.sizes.extend(len(bundle) for bundle in bundles)
-        super()._run_bundles(bundles, store, stop)
+        super()._run_bundles(bundles, store, abort_signal)
 
 
 @pytest.mark.parametrize("bundle_size", [1, 2, 4, 0])
@@ -1356,7 +1356,7 @@ def test_a_stop_wakes_a_blocked_executor() -> None:
     # The first call holds the only worker, so the other two are still queued
     # when the stop arrives and must be dropped rather than run. A thread
     # cannot be interrupted, so the first one is waited out and kept.
-    signal = StopSignal()
+    signal = AbortSignal()
     started = threading.Event()
     release = threading.Event()
     ran: list[int] = []
@@ -1374,13 +1374,13 @@ def test_a_stop_wakes_a_blocked_executor() -> None:
     results: list[Any] = []
 
     def _drive() -> None:
-        results.extend(executor.run(items, stop=signal))
+        results.extend(executor.run(items, abort_signal=signal))
 
     driver = threading.Thread(target=_drive)
     try:
         driver.start()
         assert started.wait(timeout=4.0)
-        signal.stop()
+        signal.abort()
         # Still blocked, so nothing below can be explained by the batch ending.
         assert not release.is_set()
         release.set()
@@ -1397,7 +1397,7 @@ def test_a_stop_wakes_a_blocked_executor() -> None:
 def test_a_stop_keeps_the_error_of_work_already_running() -> None:
     # Discarding a running work item would lose what it raised, and a run that
     # is aborted while its own evaluation fails would report only the abort.
-    signal = StopSignal()
+    signal = AbortSignal()
     started = threading.Event()
     stopped = threading.Event()
 
@@ -1416,14 +1416,14 @@ def test_a_stop_keeps_the_error_of_work_already_running() -> None:
 
     def _drive() -> None:
         try:
-            executor.run(items, stop=signal)
+            executor.run(items, abort_signal=signal)
         except ValueError as exc:
             raised.append(exc)
 
     driver = threading.Thread(target=_drive)
     driver.start()
     assert started.wait(timeout=4.0)
-    signal.stop()
+    signal.abort()
     stopped.set()
     driver.join(timeout=10.0)
     assert not driver.is_alive()
@@ -1440,9 +1440,11 @@ def test_a_stop_keeps_the_error_of_work_already_running() -> None:
 def test_a_stopped_signal_abandons_a_batch_before_it_starts(
     build: Callable[[], ExecutorBase],
 ) -> None:
-    signal = StopSignal()
-    signal.stop()
-    results = build().run([WorkItem(function=_function, args=(0,))], stop=signal)
+    signal = AbortSignal()
+    signal.abort()
+    results = build().run(
+        [WorkItem(function=_function, args=(0,))], abort_signal=signal
+    )
     assert isinstance(results[0], WorkNotRun)
 
 

@@ -6,4 +6,4 @@
 
 ::: ropt.components.concurrency.run_concurrent
 
-::: ropt.components.concurrency.StopSignal
+::: ropt.components.concurrency.AbortSignal

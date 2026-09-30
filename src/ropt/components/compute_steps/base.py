@@ -12,7 +12,7 @@ from ropt.exceptions import WorkflowError
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-    from ropt.components.concurrency import StopSignal
+    from ropt.components.concurrency import AbortSignal
     from ropt.context import EnOptContext
     from ropt.events import EnOptEvent
 
@@ -30,18 +30,18 @@ class ComputeStep(ABC, Generic[_ResultT]):
     The type parameter is what `run` returns.
     """
 
-    def __init__(self, *, stop_signal: StopSignal | None = None) -> None:
+    def __init__(self, *, abort_signal: AbortSignal | None = None) -> None:
         """Initialize the ComputeStep.
 
         Args:
-            stop_signal: An optional signal to stop on, besides `stop`.
+            abort_signal: An optional signal that cuts this step off.
         """
         self._event_handlers: list[EventHandler] = []
         self._running = False
         self._run_lock = threading.Lock()
         # Set once and read; assignment is atomic, so no lock of its own.
         self._stop_requested = False
-        self._stop_signal = stop_signal
+        self._abort_signal = abort_signal
 
     def add_event_handler(self, handler: EventHandler) -> None:
         """Attach an event handler to receive this step's events.
@@ -86,18 +86,21 @@ class ComputeStep(ABC, Generic[_ResultT]):
         self._stop_requested = True
 
     @property
-    def stopped(self) -> bool:
-        """Whether a stop has been requested for the current run.
+    def should_end(self) -> bool:
+        """Whether this run should end at the next safe point.
+
+        True for either reason a run ends early, which end it with different
+        exit reasons: `stop` was called since the run started, or the step's
+        [`AbortSignal`][ropt.components.concurrency.AbortSignal] is aborting.
 
         Returns:
-            `True` if `stop` was called since the run started, or the step's
-            [`StopSignal`][ropt.components.concurrency.StopSignal] is stopping.
+            `True` if the run should end.
         """
-        return self._stop_requested or self._signalled
+        return self._stop_requested or self._aborting
 
     @property
-    def _signalled(self) -> bool:
-        return self._stop_signal is not None and self._stop_signal.stopping
+    def _aborting(self) -> bool:
+        return self._abort_signal is not None and self._abort_signal.aborting
 
     @abstractmethod
     def _run(

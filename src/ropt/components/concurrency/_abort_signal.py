@@ -1,4 +1,4 @@
-"""A stop request shared by whatever observes it."""
+"""An abort request shared by whatever observes it."""
 
 from __future__ import annotations
 
@@ -12,14 +12,16 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 
-class StopSignal:
-    """A stop request that compute steps can be told to observe.
+class AbortSignal:
+    """An abort request that compute steps can be told to observe.
 
     A step is given one at construction and polls it at the same points it
     polls its own [`stop`][ropt.components.compute_steps.ComputeStep.stop]
-    request, so one signal stops any number of steps at once. Unlike `stop`,
-    which is cleared by the next `run`, a signal keeps its state: a step that
-    starts while the signal is stopping is stopped from the outset.
+    request, so one signal reaches any number of steps at once. The two differ
+    in kind: `stop` ends a run on a criterion it was given, while a signal cuts
+    it off without consulting it. They also differ in lifetime, since `stop` is
+    cleared by the next `run` and a signal is not: a step that starts while the
+    signal is aborting is cut off from the outset.
 
     Code that cannot poll registers a callback instead, which is how a blocked
     [`Executor.run`][ropt.components.executors.Executor.run] is woken rather
@@ -29,65 +31,65 @@ class StopSignal:
     """
 
     def __init__(self) -> None:
-        """Initialize a signal that is not stopping."""
+        """Initialize a signal that is not aborting."""
         self._lock = threading.Lock()
-        self._stopping = False
+        self._aborting = False
         self._callbacks: list[Callable[[], None]] = []
         self._exit_reason = ExitReason.ABORTED
 
-    def stop(self, exit_reason: ExitReason = ExitReason.ABORTED) -> None:
-        """Request that everything observing this signal stops.
+    def abort(self, exit_reason: ExitReason = ExitReason.ABORTED) -> None:
+        """Cut off everything observing this signal.
 
         Calling this more than once has no further effect: the first call
-        decides the exit reason, so a later stop for another reason cannot
-        overwrite the reason a run is already stopping for.
+        decides the exit reason, so a later abort for another reason cannot
+        overwrite the reason a run is already ending for.
 
         Args:
-            exit_reason: The reason the steps stopping on this signal end with.
+            exit_reason: The reason the steps on this signal end with.
         """
         with self._lock:
-            if self._stopping:
+            if self._aborting:
                 return
             self._exit_reason = exit_reason
-            self._stopping = True
+            self._aborting = True
             callbacks = list(self._callbacks)
         for callback in callbacks:
             callback()
 
     @property
     def exit_reason(self) -> ExitReason:
-        """The reason a step stopping on this signal ends with.
+        """The reason a step on this signal ends with.
 
         Returns:
-            The reason passed to the first `stop` call.
+            The reason passed to the first `abort` call.
         """
         with self._lock:
             return self._exit_reason
 
     @property
-    def stopping(self) -> bool:
-        """Whether a stop has been requested.
+    def aborting(self) -> bool:
+        """Whether an abort has been requested.
 
         Returns:
-            `True` once `stop` has been called.
+            `True` once `abort` has been called.
         """
         with self._lock:
-            return self._stopping
+            return self._aborting
 
     def add_callback(self, callback: Callable[[], None]) -> None:
-        """Register a callback to run when this signal stops.
+        """Register a callback to run when this signal aborts.
 
-        A signal that is already stopping runs the callback immediately, so a
+        A signal that is already aborting runs the callback immediately, so a
         caller that registers late is not left waiting.
 
-        The callback runs on the thread that calls `stop`, so it must return
+        The callback runs on the thread that calls `abort`, so it must return
         promptly and must not raise.
 
         Args:
             callback: The zero-argument callable to run.
         """
         with self._lock:
-            if not self._stopping:
+            if not self._aborting:
                 self._callbacks.append(callback)
                 return
         callback()

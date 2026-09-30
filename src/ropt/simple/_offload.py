@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
-from ropt.components.concurrency import StopSignal
+from ropt.components.concurrency import AbortSignal
 from ropt.components.executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt.exceptions import AbortedError, ExecutionError
 
@@ -33,7 +33,7 @@ def _offload(
     executor: Executor,
     work: Callable[[], _T] | Sequence[Callable[[], _T]],
 ) -> _T | tuple[_T, ...]:
-    signal = StopSignal()
+    signal = AbortSignal()
     session._register(signal, keep_going=False)  # ruff: ignore[private-member-access]
     try:
         if callable(work):
@@ -44,7 +44,7 @@ def _offload(
         return tuple(_run(executor, functions, signal))
     except Exception:
         # Being cut off is not a failure, so it must not cut off anything else.
-        if not signal.stopping:
+        if not signal.aborting:
             session._fail()  # ruff: ignore[private-member-access]
         raise
     finally:
@@ -52,18 +52,18 @@ def _offload(
 
 
 def _run(
-    executor: Executor, functions: list[Callable[[], Any]], signal: StopSignal
+    executor: Executor, functions: list[Callable[[], Any]], signal: AbortSignal
 ) -> list[Any]:
     # A sequence of offloaded callables is documented to run concurrently, so
     # they must not be bundled onto one worker.
     values = executor.run(
         [WorkItem(function=function) for function in functions],
         bundle_size=1,
-        stop=signal,
+        abort_signal=signal,
     )
     abandoned = any(isinstance(value, WorkNotRun) for value in values)
     # An abort that arrived too late to cost a call anything did not abort it.
-    if abandoned and signal.stopping:
+    if abandoned and signal.aborting:
         raise AbortedError(signal.exit_reason)
     for value in values:
         if isinstance(value, (ExecutorFailure, WorkNotRun)):

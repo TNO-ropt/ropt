@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike
 
-    from ropt.components.concurrency import StopSignal
+    from ropt.components.concurrency import AbortSignal
     from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
     from ropt.results import FunctionResults
@@ -88,7 +88,7 @@ class Session:
         self._pools: list[WorkerPool] | None = None
         self._entered = False
         self._keep_going = keep_going
-        self._signals: dict[StopSignal, bool] = {}
+        self._signals: dict[AbortSignal, bool] = {}
 
     def __enter__(self) -> Self:
         """Open the session.
@@ -148,7 +148,7 @@ class Session:
         with self._lock:
             signals = list(self._signals)
         for signal in signals:
-            signal.stop()
+            signal.abort()
 
     def _fail(self) -> None:
         # A run that failed brings down the rest, which is what makes a script
@@ -159,18 +159,18 @@ class Session:
                 signal for signal, keep_going in self._signals.items() if not keep_going
             ]
         for signal in signals:
-            signal.stop(ExitReason.ABORTED_ON_ERROR)
+            signal.abort(ExitReason.ABORTED_ON_ERROR)
 
     def _resolve_keep_going(self, *, keep_going: bool | None) -> bool:
         return self._keep_going if keep_going is None else keep_going
 
-    def _register(self, signal: StopSignal, *, keep_going: bool) -> None:
+    def _register(self, signal: AbortSignal, *, keep_going: bool) -> None:
         with self._lock:
             if self._pools is None:
                 raise WorkflowError(_CLOSED)
             self._signals[signal] = keep_going
 
-    def _deregister(self, signal: StopSignal) -> None:
+    def _deregister(self, signal: AbortSignal) -> None:
         with self._lock:
             self._signals.pop(signal, None)
 

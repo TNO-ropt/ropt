@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from ropt.components.compute_steps import EvaluationStep
-from ropt.components.concurrency import StopSignal
+from ropt.components.concurrency import AbortSignal
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
 from ropt.enums import ExitReason
@@ -117,12 +117,12 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     context = EnOptContext.model_validate(config)
-    signal = StopSignal()
+    signal = AbortSignal()
     evaluator = make_evaluator(context, function, executor, bundle_size, signal)
     # The results are collected by this run's own handler, in the order the
     # vectors were given, which is the order they are returned in.
     history = HistoryHandler()
-    step = EvaluationStep(evaluator=evaluator, stop_signal=signal)
+    step = EvaluationStep(evaluator=evaluator, abort_signal=signal)
     step.add_event_handler(history)
     attach_handlers(step, handlers, report)
     session._register(signal, keep_going=False)  # ruff: ignore[private-member-access]
@@ -140,6 +140,6 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     results = tuple(history["results"] or ())
     # An abort that arrived too late to cost the batch anything did not abort
     # it: the step reports its results either way.
-    if signal.stopping and not results:
+    if signal.aborting and not results:
         return EvaluationResult(exit_reason=signal.exit_reason, results=())
     return EvaluationResult(exit_reason=ExitReason.FINISHED, results=results)

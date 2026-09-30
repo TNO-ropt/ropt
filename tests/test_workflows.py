@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from ropt.components.compute_steps import EvaluationStep, OptimizationStep
-from ropt.components.concurrency import StopSignal
+from ropt.components.concurrency import AbortSignal
 from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
@@ -806,14 +806,14 @@ def test_stop_request_cleared_between_runs(config: Any, evaluator: Any) -> None:
     assert second != ExitReason.STOPPED
 
 
-def test_stop_signal_aborts_every_step_that_observes_it(
+def test_abort_signal_aborts_every_step_that_observes_it(
     config: Any, evaluator: Any
 ) -> None:
-    signal = StopSignal()
+    signal = AbortSignal()
     steps = [
-        OptimizationStep(evaluator=evaluator(), stop_signal=signal) for _ in range(2)
+        OptimizationStep(evaluator=evaluator(), abort_signal=signal) for _ in range(2)
     ]
-    signal.stop()
+    signal.abort()
     exit_reasons = [
         step.run(variables=initial_values, context=EnOptContext.model_validate(config))
         for step in steps
@@ -821,13 +821,13 @@ def test_stop_signal_aborts_every_step_that_observes_it(
     assert exit_reasons == [ExitReason.ABORTED, ExitReason.ABORTED]
 
 
-def test_stop_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -> None:
-    signal = StopSignal()
-    step = OptimizationStep(evaluator=evaluator(), stop_signal=signal)
+def test_abort_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -> None:
+    signal = AbortSignal()
+    step = OptimizationStep(evaluator=evaluator(), abort_signal=signal)
     first = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    signal.stop()
+    signal.abort()
     second = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
@@ -839,44 +839,44 @@ def test_stop_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) ->
     assert third == ExitReason.ABORTED
 
 
-def test_stop_signal_carries_the_exit_reason_its_steps_end_with(
+def test_abort_signal_carries_the_exit_reason_its_steps_end_with(
     config: Any, evaluator: Any
 ) -> None:
-    signal = StopSignal()
-    step = OptimizationStep(evaluator=evaluator(), stop_signal=signal)
-    signal.stop(ExitReason.ABORTED_ON_ERROR)
+    signal = AbortSignal()
+    step = OptimizationStep(evaluator=evaluator(), abort_signal=signal)
+    signal.abort(ExitReason.ABORTED_ON_ERROR)
     exit_reason = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
     assert exit_reason == ExitReason.ABORTED_ON_ERROR
 
 
-def test_stop_signal_keeps_the_exit_reason_of_the_first_stop() -> None:
-    # The reason a run is already stopping for is not overwritten by a later
-    # stop for another reason.
-    signal = StopSignal()
-    signal.stop(ExitReason.ABORTED_ON_ERROR)
-    signal.stop(ExitReason.ABORTED)
+def test_abort_signal_keeps_the_exit_reason_of_the_first_abort() -> None:
+    # The reason a run is already ending for is not overwritten by a later
+    # abort for another reason.
+    signal = AbortSignal()
+    signal.abort(ExitReason.ABORTED_ON_ERROR)
+    signal.abort(ExitReason.ABORTED)
     assert signal.exit_reason == ExitReason.ABORTED_ON_ERROR
 
 
-def test_stop_signal_runs_a_late_callback_at_once() -> None:
-    # A caller that registers after the stop must not be left waiting for a
+def test_abort_signal_runs_a_late_callback_at_once() -> None:
+    # A caller that registers after the abort must not be left waiting for a
     # notification that has already been sent.
-    signal = StopSignal()
-    signal.stop()
+    signal = AbortSignal()
+    signal.abort()
     calls: list[int] = []
     signal.add_callback(partial(calls.append, 1))
     assert calls == [1]
 
 
-def test_stop_signal_does_not_run_a_removed_callback() -> None:
-    signal = StopSignal()
+def test_abort_signal_does_not_run_a_removed_callback() -> None:
+    signal = AbortSignal()
     calls: list[int] = []
     callback = partial(calls.append, 1)
     signal.add_callback(callback)
     signal.remove_callback(callback)
-    signal.stop()
+    signal.abort()
     assert calls == []
 
 

@@ -31,7 +31,7 @@ from ._picklable import picklable_exception
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from ropt.components.concurrency import StopSignal
+    from ropt.components.concurrency import AbortSignal
 
 _ON_WORKER = (
     "This executor cannot be used from work that is already running on it: the "
@@ -147,7 +147,7 @@ class Executor(ABC):
         *,
         bundle_size: int | None = None,
         collect_errors: bool = False,
-        stop: StopSignal | None = None,
+        abort_signal: AbortSignal | None = None,
     ) -> list[Any]:
         """Run the calls and return their results, in the order they were given.
 
@@ -160,10 +160,10 @@ class Executor(ABC):
         waiting for the rest of the batch. With `collect_errors` it is placed in
         the call's position instead, and every call keeps its place.
 
-        A `stop` that fires abandons the batch: queued calls are never started,
-        started ones are cancelled where the mechanism allows it, and each
-        abandoned call gets a `WorkNotRun`. Calls already running on a worker
-        thread or process run to their end.
+        An `abort_signal` that fires abandons the batch: queued calls are never
+        started, started ones are cancelled where the mechanism allows it, and
+        each abandoned call gets a `WorkNotRun`. Calls already running on a
+        worker thread or process run to their end.
 
         May be called from any thread, except one of the executor's own workers:
         that caller would wait for workers it is itself occupying, so it is
@@ -176,7 +176,7 @@ class Executor(ABC):
             calls:          The work items to run.
             bundle_size:    Calls per worker task, `0` for all of them.
             collect_errors: Whether an exception is returned instead of raised.
-            stop:           An optional signal that abandons the batch.
+            abort_signal:   An optional signal that abandons the batch.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -226,7 +226,7 @@ class ExecutorBase(Executor):
         *,
         bundle_size: int | None = None,
         collect_errors: bool = False,
-        stop: StopSignal | None = None,
+        abort_signal: AbortSignal | None = None,
     ) -> list[Any]:
         """Run the calls and return their results, in the order they were given.
 
@@ -234,7 +234,7 @@ class ExecutorBase(Executor):
             calls:          The work items to run.
             bundle_size:    Calls per worker task, `0` for all of them.
             collect_errors: Whether an exception is returned instead of raised.
-            stop:           An optional signal that abandons the batch.
+            abort_signal:   An optional signal that abandons the batch.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -262,7 +262,7 @@ class ExecutorBase(Executor):
                 collect_errors=collect_errors,
             )
 
-        self._run_bundles(bundles, store, stop)
+        self._run_bundles(bundles, store, abort_signal)
         # A batch that was abandoned leaves its remaining slots empty, and an
         # empty slot is indistinguishable from a call that returned None.
         for index, bundle in enumerate(bundles):
@@ -287,7 +287,7 @@ class ExecutorBase(Executor):
         self,
         bundles: list[list[WorkItem]],
         store: Callable[[int, Any], None],
-        stop: StopSignal | None,
+        abort_signal: AbortSignal | None,
     ) -> None:
         """Run the bundles, passing each one's result to `store` as it arrives.
 
@@ -298,13 +298,13 @@ class ExecutorBase(Executor):
         the caller: whatever this batch started must be released before that
         exception leaves.
 
-        A `stop` that fires must bring this call back promptly, leaving the
-        bundles it did not store for the caller to mark as not run.
+        An `abort_signal` that fires must bring this call back promptly, leaving
+        the bundles it did not store for the caller to mark as not run.
 
         Args:
-            bundles: The bundles to run.
-            store:   Callback taking a bundle index and that bundle's result.
-            stop:    An optional signal that abandons the batch.
+            bundles:      The bundles to run.
+            store:        Callback taking a bundle index and its result.
+            abort_signal: An optional signal that abandons the batch.
         """
 
 
