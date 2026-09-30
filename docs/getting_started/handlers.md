@@ -59,4 +59,4 @@ which [Restarting from the Best Point](../running/restart.md) walks through.
 - **[`DataFrameHandler`][ropt.simple.DataFrameHandler]** — collects results into a `pandas` or `polars` table.
 
 See [Result handlers](../results/handlers.md) for the full
-list, and how to write your own.
+list, and for what a handler shared between concurrent runs guarantees.

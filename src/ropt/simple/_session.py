@@ -239,7 +239,7 @@ class Session:
         thread, so `function` is called by several threads at once and must
         tolerate that. Start them on one of this session's pools to give the
         evaluations workers instead. See
-        [Parallel Execution and Many Runs](../running/parallel.md) for a
+        [Evaluating in Parallel](../running/parallel.md) for a
         walkthrough.
 
         Args:

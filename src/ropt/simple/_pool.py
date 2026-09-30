@@ -142,7 +142,7 @@ class WorkerPool:
 
         Each of `config`, `x0` and `function` is either one value used by every
         run, or a sequence with one per run. See
-        [Parallel Execution and Many Runs](../running/parallel.md) for a
+        [Evaluating in Parallel](../running/parallel.md) for a
         walkthrough.
 
         Args:

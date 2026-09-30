@@ -85,7 +85,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
 
     The runs overlap on driver threads, but each evaluates on its own thread, so
     `function` is called by several threads at once and must tolerate that. See
-    [Parallel Execution and Many Runs](../running/parallel.md) for a
+    [Evaluating in Parallel](../running/parallel.md) for a
     walkthrough, and
     [`WorkerPool.optimize_many`][ropt.simple.WorkerPool.optimize_many] to give
     the evaluations workers.

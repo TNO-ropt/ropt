@@ -162,7 +162,7 @@ result = optimize(config, x0, objective, report=report)
 assert result.exit_reason is ExitReason.STOPPED
 ```
 
-With [`optimize_many`](parallel.md#many-optimizations-at-once) this stops only the run
+With [`optimize_many`](many_runs.md) this stops only the run
 whose callback returned `True`; the other runs continue.
 
 The runnable script is
@@ -229,7 +229,7 @@ You can attach arbitrary **metadata** to a run, from two sources:
   `context.metadata` — useful when the evaluation needs to know which run it is
   part of. With `optimize_many`, this is how runs are told apart:
   give one dict (shared by all runs) or a list with one dict per run; see
-  [Give each run an ID](parallel.md#many-optimizations-at-once).
+  [Give each run an ID](many_runs.md).
 
 - **Per evaluation** — return an
   [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
@@ -307,7 +307,7 @@ still returns normally, and indicates why in `result.exit_reason` —
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value, for
 instance, or `ABORTED_ON_ERROR` when another run on the same session raised and
 brought this one down with it (see
-[Failure in one run](parallel.md#failure-in-one-run)).
+[Failure in one run](many_runs.md#failure-in-one-run)).
 [Exit Reasons](../results/exit_reasons.md) lists them all, and explains why a
 reason and a result are independent: `result.results` is `None` when no feasible
 result was ever recorded, whatever the reason the run ended, and a run that fails
@@ -348,7 +348,7 @@ What *is* raised falls into three groups:
   re-raise, so the call raises
   [`RunsFailedError`][ropt.exceptions.RunsFailedError] carrying what every run
   raised or reached; see
-  [Failure in one run](parallel.md#failure-in-one-run).
+  [Failure in one run](many_runs.md#failure-in-one-run).
 
 Catching [`RoptError`][ropt.exceptions.RoptError] catches all of `ropt`'s own
 errors at once. It deliberately does not cover the first and third groups:

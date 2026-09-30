@@ -478,7 +478,7 @@ to the terminal as usual.
 !!! warning "Capture is for one run at a time"
     Capturing rewires process-global state, so only one optimization at a time
     can do it. A second run that tries while another holds it — a concurrent run
-    of [`optimize_many`](../running/parallel.md#many-optimizations-at-once), or
+    of [`optimize_many`](../running/many_runs.md), or
     an optimization started from inside an evaluation callback — raises
     [`WorkflowError`][ropt.exceptions.WorkflowError]. Leave `stdout` and
     `stderr` unset on runs that overlap.
@@ -553,7 +553,7 @@ configuration has already been written.
 
 A backend can also be run in a process of its own, by prefixing the method with
 `external/`; see [Running the optimizer in a separate
-process](../running/parallel.md#external-backend).
+process](optimizer.md#external-backend).
 
 ## `gradient` { #gradient }
 

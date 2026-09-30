@@ -321,7 +321,7 @@ Jobs are described either by a `pysqa` configuration or by a `template`, and the
 two are mutually exclusive; combining them raises a `ValueError` at
 construction. Selecting a queue or a cluster, asking for resources and writing a
 template are covered in
-[Parallel Execution and Many Runs](../running/parallel.md#running-on-an-hpc-cluster).
+[Evaluating in Parallel](../running/parallel.md#running-on-an-hpc-cluster).
 What follows is the executor's own behaviour, and the layout of a configuration
 directory.
 

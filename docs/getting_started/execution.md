@@ -66,10 +66,10 @@ started the run.
     an HPC pool runs each evaluation as a job on a cluster, which is the
     same arrangement spread over more machines.
 
-## The four choices
+## Where evaluations run
 
-The module-level [`optimize`][ropt.simple.optimize] evaluates in place, so there
-are four:
+The module-level [`optimize`][ropt.simple.optimize] evaluates in place, so a
+pool is a choice between five arrangements:
 
 | Pool | Evaluations run | Data | Applies when |
 | --- | --- | --- | --- |
@@ -82,7 +82,7 @@ are four:
 A pool costs something to set up and to hand work to. Below a certain
 evaluation cost, that setup is all it adds.
 
-[Parallel Execution and Many Runs](../running/parallel.md) covers each of these
+[Evaluating in Parallel](../running/parallel.md) covers each of these
 in full — how many workers to ask for, which functions can be sent where, what
 stopping does, and how to choose between them.
 
@@ -120,7 +120,7 @@ results = optimize_many(config, start_points, objective)   # one run per start p
 The runs are concurrent, and there is more to it than this call shows: how many
 run at a time, which pool their evaluations share, and how to collect
 results from runs that overlap are all covered in
-[Parallel Execution and Many Runs](../running/parallel.md#many-optimizations-at-once).
+[Many Runs at Once](../running/many_runs.md).
 
 !!! warning "Your objective is now called from several threads at once"
 

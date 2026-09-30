@@ -199,7 +199,7 @@ same backend.
 
 The `backend` field accepts one further form, `"external/..."`, which runs the
 named backend in a separate process; see [Running the optimizer in a separate
-process](../running/parallel.md#external-backend).
+process](optimizer.md#external-backend).
 
 ### Immutability
 

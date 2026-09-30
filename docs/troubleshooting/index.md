@@ -85,7 +85,7 @@ the worker finishes. Return what you need instead; see
 concurrently. Given a pool, their evaluations go there; given none, each run
 evaluates on its own driver thread, so your evaluation function is called from
 several threads at once and has to tolerate that. See
-[Many optimizations at once](../running/parallel.md#many-optimizations-at-once).
+[Many Runs at Once](../running/many_runs.md).
 
 **Metadata is copied with `copy.deepcopy`.** Every result gets its own copy of
 the `metadata` you passed, so keep it to plain data — numbers, strings, lists,
@@ -153,7 +153,7 @@ Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 **Not every optimizer can run beside another.** A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its
 library cannot run concurrently in one process; select it as
-[`external/...`](../running/parallel.md#external-backend) to give it a
+[`external/...`](../optimizer_setup/optimizer.md#external-backend) to give it a
 process of its own. Optimizer output capture is likewise for one run at a time.
 
 | What you see | Most likely cause |
@@ -161,7 +161,7 @@ process of its own. Optimizer output capture is likewise for one run at a time.
 | Results from a shared `report=` callback are jumbled or lost | The callback is called from every run's thread at once. Collect the results in a [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) instead, or use one callback per run. |
 | A run started from a handler raises `WorkflowError` about the call stack, or hangs | Its handler list reaches a handler that is already running; see [Result Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs). |
 | Many runs are slower than expected while the executor sits idle | A shared handler is serializing them. Make it cheaper. |
-| A second concurrent run raises `WorkflowError` about output capture | Only one run at a time may set `stdout` or `stderr`; see [Many optimizations at once](../running/parallel.md#many-optimizations-at-once). |
+| A second concurrent run raises `WorkflowError` about output capture | Only one run at a time may set `stdout` or `stderr`; see [Many Runs at Once](../running/many_runs.md). |
 
 ## Configuration
 

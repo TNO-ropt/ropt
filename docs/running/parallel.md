@@ -1,8 +1,7 @@
-# Parallel Execution and Many Runs
+# Evaluating in Parallel
 
-Evaluations within one optimization can run in parallel, whole optimizations
-can run at once, and work of your own can be offloaded the same way. All three
-go through a **pool**.
+Evaluations within one optimization can run in parallel, and work of your own
+can be offloaded the same way. Both go through a **pool**.
 
 ## Running in parallel
 
@@ -305,135 +304,9 @@ with or without a cluster to hand.
 
 A job is nothing more than a submission script with your evaluation command in
 it, and there are **two mutually exclusive ways** to say what that script should
-be: a `pysqa` configuration, or a `template` you write yourself.
-
-#### Using an installed configuration
-
-This is the usual case. The configuration already describes the clusters and
-their queues, so all you do is pick one and say how much of it you want:
-
-```python
-pool = s.hpc_pool(workers=10, workdir="/scratch/my-run", queue="long", cores=4)
-```
-
-`queue` names a queue **defined in the configuration**, which is not necessarily
-your scheduler's partition name — it selects a configured entry, and that
-entry's script determines which partition the job lands on. Ask your site which
-queues exist, or read them off the configuration.
-
-When the configuration defines several clusters, `cluster` picks one:
-
-- Give `cluster` to select it directly; adding `queue` requires that queue to
-  exist on it.
-- Give only `queue` and the cluster providing it is found automatically, which
-  needs exactly one cluster to provide it — no match, or several, is an error.
-- Give neither and the configuration's own defaults apply.
-
-`config_path` points at a configuration other than the installed one. See
-[HPCExecutor](../advanced/parallel.md#hpcexecutor) for how such a directory is
-laid out and where the installed one lives.
-
-#### Asking for resources
-
-`cores`, `memory_max` and `run_time_max` are passed to the submission script,
-and `submit_options` carries anything else that script declares:
-
-```python
-pool = s.hpc_pool(
-    workers=10,
-    workdir="/scratch/my-run",
-    queue="long",
-    cores=4,
-    memory_max=16,
-    run_time_max=7200,
-    submit_options={"account": "my-project"},
-)
-```
-
-For `account` to have any effect the script must reference it. A variable a
-script never mentions is ignored, and one the script mentions but nobody
-supplies renders as empty — so a misspelling on either side drops the directive
-silently rather than failing. Entries that are `None` are dropped, so omitting a
-key and passing `None` mean the same thing. A name the pool sets itself,
-such as `cores` or `queue`, is rejected rather than allowed to override it.
-
-With a configuration, resource requests are **clamped** to the selected queue's
-limits rather than rejected: asking for more cores than the queue allows quietly
-gets you the queue's maximum. `cores` is held to the queue's minimum and
-maximum, `run_time_max` to its maximum — and takes that maximum when you give no
-value at all — and `memory_max` to its maximum, but only when you pass a number.
-A memory string such as `"4G"` is passed to the submission script unchanged.
-
-#### Submitting with your own template
-
-A `template` is the script that gets run on the cluster, written by you
-instead of taken from a configuration. Since there is no configuration to say
-what kind of cluster this is, `scheduler` names the queueing system to
-submit to — that is what determines whether it runs `sbatch` or `bsub`. It defaults
-to `"slurm"`.
-
-Nothing else is resolved for you: **the queue is not an argument here**, it has
-to be written into the script, along with everything else the scheduler needs.
-For Slurm that looks like this — other systems use entirely different
-directives:
-
-```python
-TEMPLATE = """\
-#!/bin/bash
-#SBATCH --partition=long
-#SBATCH --job-name={{job_name}}
-#SBATCH --output={{output}}
-#SBATCH --chdir={{working_directory}}
-#SBATCH --ntasks={{cores}}
-{%- if memory_max %}
-#SBATCH --mem={{memory_max}}G
-{%- endif %}
-
-{{command}}
-"""
-
-pool = s.hpc_pool(
-    workers=10,
-    workdir="/scratch/my-run",
-    template=TEMPLATE,
-    scheduler="slurm",
-    cores=4,
-)
-```
-
-The script is a [Jinja](https://jinja.palletsprojects.com/en/stable/templates/)
-template, rendered by `pysqa` through the `jinja2` package. `{{name}}`
-inserts a value and `{% if name %}...{% endif %}` leaves a line out when none was
-given, which is how the memory directive above disappears unless `memory_max` is
-set. The values available are the arguments described above — `job_name`,
-`output`, `working_directory`, `cores`, `memory_max`, `run_time_max`, `command`
-— plus whatever you pass in `submit_options`.
-
-Two of them carry the run: `{{command}}` is your evaluation and the
-script does nothing without it, and `{{output}}` is the file ropt reads back to
-explain a failed job. A script that omits `--output={{output}}` still runs, but a
-job that dies takes the only explanation with it.
-
-Because a template submits without a configuration, it **cannot be combined**
-with `config_path`, `cluster` or `queue`; passing them together raises a
-`ValueError` when the pool is created.
-
-[`hpc_pool`][ropt.simple.Session.hpc_pool] accepts the following parameters:
-
-| Parameter     | Description                                                                |
-| ------------- | ------------------------------------------------------------------------- |
-| `workers`     | Maximum number of concurrent cluster jobs (default: 1).                   |
-| `cores`       | Number of CPUs per job (default: 1).                                      |
-| `cluster`     | Cluster name, when the `pysqa` config defines several.                    |
-| `queue`       | Name of a queue defined in the configuration.                             |
-| `workdir`     | Shared-filesystem working directory; required, and must exist. |
-| `config_path` | The `pysqa` configuration directory.                                      |
-| `template`    | A submission-script template, used instead of a configuration.            |
-| `scheduler`   | The queueing system a `template` is written for; only meaningful with one. |
-| `memory_max`  | Memory per job.                                                           |
-| `run_time_max` | Run time per job, typically in seconds.                                  |
-| `submit_options` | Extra variables for the submission script. `None` entries are dropped. |
-| `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |
+be: a `pysqa` configuration, or a `template` you write yourself. Both of those,
+and the resources a job asks for, are set out in
+[Configuring an HPC pool](#configuring-an-hpc-pool) at the end of this page.
 
 ### Which pool should I use? { #which-pool }
 
@@ -558,214 +431,6 @@ started may still be alive afterwards.
     tested there. Free-threaded (no-GIL) builds of Python are untested and
     unsupported.
 
-## Many optimizations at once
-
-To run several optimizations together, use
-[`optimize_many`][ropt.simple.optimize_many]. Any of `config`, `x0`, or
-`objective` may be a single value (used for every run) or a list (one per run):
-
-```python
-from ropt.simple import session
-
-with session() as s:
-    # One run per start point.
-    results = s.thread_pool(workers=4).optimize_many(
-        config, start_points, objective
-    )
-```
-
-!!! tip "Give each run an ID"
-    Pass a per-run `metadata` list to tag every run with a user-defined
-    identifier that travels with its results (and shows up in a
-    [`DataFrameHandler`](../results/handlers.md#dataframehandler)'s tables):
-
-    ```python
-    labels = ["low", "mid", "high"]
-    results = optimize_many(
-        config, start_points, objective, metadata=[{"run_id": x} for x in labels]
-    )
-    for result in results:
-        print(result.results.metadata["run_id"])
-    ```
-
-    See [Attaching metadata](running.md#attaching-metadata) for details.
-
-There are two independent levels of concurrency here:
-
-- **The optimizations** always run concurrently, each on its own driver thread.
-  This is built into `optimize_many` and does not depend on the pool;
-  the `limit` argument caps how many run at the same time.
-- **The function evaluations** inside those runs all happen on the one pool
-  the call was started on, and the pool determines how they are parallelized. With
-  `thread_pool(workers=1)` the runs still progress together, but their
-  evaluations are executed one at a time. A larger pool —
-  `thread_pool(workers=n)`, or a process, local or HPC pool — runs several
-  evaluations at once.
-
-One pool is one budget: `workers=10` means ten evaluations at a time across
-the whole batch of runs, not ten per run. Batch IDs stay distinct whatever you
-pass, since every run in the program draws them from one counter.
-
-[examples/simple/optimize_many.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/optimize_many.py)
-runs one optimization per start vector, capping how many go at once and tagging
-each with its own metadata:
-
-```python
---8<-- "examples/simple/optimize_many.py:run"
-```
-
-The two callback arguments differ in the same way. `report=` is **per run**: one
-callback receives the results of every run, or pass a list with one callback per
-run. `handlers=` is **shared**: one list of handlers that all runs feed
-together — see [Sharing a handler across concurrent
-runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
-
-!!! warning "One `report=` callback is called by every run at once"
-    A single callback is wired into each run separately, and each run calls it
-    on its own thread. Nothing serializes those calls, so a callback that
-    appends to a list, updates a counter, or writes a file needs a lock of its
-    own. Give each run its own callback when they must stay apart, or pass a
-    [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) in
-    `handlers=`, which takes a lock around every call for you.
-
-!!! warning "A shared handler makes the runs wait for each other"
-    That lock is not free. A run that emits a result waits until the handler
-    has finished with it, and a second run waits for the first. A slow handler
-    therefore throttles the whole batch, once per result produced.
-
-    So keep a shared handler cheap. A handler that must do slow work — writing
-    a file, talking to a database — holds up every run feeding it.
-
-!!! warning "Without a pool the driver threads do the evaluating"
-    `optimize_many` needs no pool. Without one, the runs still execute
-    concurrently, but each evaluates in-process on its own driver thread — so
-    your evaluation function is called by several threads at once and must
-    tolerate that. Give the call a pool when it must not be.
-
-!!! warning "Not every backend can take part"
-    An optimizer that needs a working directory of its own, writes to a file
-    whose name is fixed, or keeps state inside its library between calls cannot
-    run while anything else is running in the same process — another run of its
-    own kind included. Each backend documents whether this applies to it.
-    Select it as
-    [`external/...`](#external-backend) and
-    it gets a process of its own, where none of that is shared.
-
-    Optimizer output capture is likewise for one run at a time. If more than
-    one of these runs sets
-    [`stdout` or `stderr`](../optimizer_setup/configuration_sections.md#optimizer), the
-    second to start raises [`WorkflowError`][ropt.exceptions.WorkflowError].
-    Leave both unset here, and set [`verbose=False`](../optimizer_setup/configuration_sections.md#backend)
-    unless you want the runs' reports interleaved on the terminal.
-
-### Failure in one run
-
-A run that raises aborts the other runs on its session. Each of those ends at
-its next evaluation boundary with `ABORTED_ON_ERROR`, keeping the best result it
-had reached. This is the default because most runs are started from a script
-with nobody watching: a problem should end the script rather than leave the rest
-of the work grinding on towards output that will not be used.
-
-The call then raises
-[`RunsFailedError`][ropt.exceptions.RunsFailedError]. With several runs there is
-no single exception to re-raise and no single set of results to return, so the
-error carries both. `outcomes` has one entry per run, in the order the runs were
-given, holding either that run's
-[`OptimizationResult`][ropt.simple.OptimizationResult] or the exception it
-raised:
-
-```python
-try:
-    results = pool.optimize_many(config, start_points, objective)
-except RunsFailedError as failure:
-    for index, outcome in enumerate(failure.outcomes):
-        if isinstance(outcome, Exception):
-            print(f"run {index} raised: {outcome}")
-        else:
-            print(f"run {index} ended with {outcome.exit_reason.name}")
-```
-
-Without this the work the other runs did would be thrown away along with the run
-that failed, which matters more now that they are cut off deliberately. The
-first exception is chained, so a traceback still shows what went wrong, and a
-`KeyboardInterrupt` or `SystemExit` travels on untouched rather than into the
-carrier — that is the program going down, not a run reporting a problem.
-
-The reach is the session, not the call, so a failure also aborts runs that were
-started separately on the same session. A run started with the module-level
-[`optimize_many`][ropt.simple.optimize_many] has a session of its own, holding
-only the runs of that call.
-
-Pass `keep_going=True` to let a run finish anyway:
-
-```python
-results = pool.optimize_many(config, start_points, objective, keep_going=True)
-```
-
-or `session(keep_going=True)` to make that the default for everything on the
-session, which a single run can still override with `keep_going=False`.
-
-The flag decides only whether a run is *aborted*. A run that keeps going still
-aborts the others if it fails itself, and its exception still reaches its
-caller, so opting out cannot turn a failure into silence.
-[`Session.abort`](running.md#stopping-from-outside) reaches every run whatever
-the flag says, and those end with `ABORTED` instead: the exit reason
-distinguishes an abort that was asked for from one another run caused.
-
-## Running the optimizer in a separate process { #external-backend }
-
-Prefix the method with `external/` to run the optimization algorithm in a
-process of its own:
-
-```python
-"backend": {"method": "external/scipy/slsqp"}
-```
-
-`ropt` spawns a child process, creates the named backend there, and lets it
-drive the optimization. The function and gradient evaluations still happen in
-the original process: the child sends each set of variables back, the parent
-evaluates it as usual, and the values are passed to the child. An error raised
-in the child is re-raised in the parent.
-
-This is useful when a backend cannot safely share a process with the rest of
-your program — for example one that crashes the interpreter, leaks memory,
-keeps state between runs, or links against native libraries that clash with
-your other dependencies.
-
-It is also the answer for a backend that **cannot run concurrently in-process**.
-Some optimizers need a working directory of their own, write to a file whose
-name is fixed, or keep state inside the library that a second simultaneous run
-corrupts. What such a backend rules out is not merely a second run of its own
-kind: changing the working directory applies to the whole process, so it breaks
-another run's relative output path, and any file your evaluation function opens
-by relative name, just as surely. Each backend states in its own documentation
-whether this applies to it; where it does, `external/` is what lets it run
-alongside anything else, because the state it needs is then its own. This
-matters as soon as runs overlap — see [Many optimizations at
-once](#many-optimizations-at-once).
-
-Two details differ from the other backends:
-
-- The method must name the delegate in full, as `external/plugin/method` or
-  `external/method`. The `external/` prefix is removed and the rest is resolved
-  like any other method string. `external` is never selected implicitly, so it
-  is used only when you ask for it by name.
-- The problem is sent to the child process, so everything describing it must be
-  serializable. The built-in plugins are, and so is any plugin class defined in
-  a module that can be imported. Only if you pass a plugin instance of a class
-  defined inside a function or a notebook do you need the optional
-  `cloudpickle` extra (see
-  [Installation](../getting_started/installation.md#optional-extras)). Without
-  it the two differ in *where* they fail: a class defined inside a function
-  cannot be sent at all, and is refused here with an
-  [`ExecutionError`][ropt.exceptions.ExecutionError]; a class defined in a
-  notebook is sent by name, and the failure arrives from the child, which
-  reports the name it could not find. Your objective function is never
-  affected: it stays in this process.
-
-This has nothing to do with evaluating in parallel; for that see [Running in
-Parallel](../getting_started/execution.md).
-
 ## Offloading your own work
 
 You can hand **your own** functions to a pool with
@@ -818,7 +483,7 @@ batch nothing lets it return its results.
       inside one sees only that call's results and cannot be brought back:
       handlers refuse to cross a process boundary, so the return value is all
       that comes back. Following several concurrent pieces of work in one place
-      is something [`optimize_many`](#many-optimizations-at-once) can do and
+      is something [`optimize_many`](many_runs.md) can do and
       `offload` cannot.
     - **Worker budgets multiply, with no way around it.** A pool cannot be
       carried into a worker process, so a callable that needs one builds its
@@ -850,3 +515,141 @@ batch nothing lets it return its results.
 
     Work offloaded from the evaluation function runs without that lock held,
     so it does not make the other runs wait.
+
+## Configuring an HPC pool
+
+Everything below applies only to
+[`hpc_pool`][ropt.simple.Session.hpc_pool]. A job is a submission script with
+your evaluation command in it, and that script comes either from an installed
+`pysqa` configuration or from a `template` you write; the two cannot be
+combined.
+
+### Using an installed configuration
+
+This is the usual case. The configuration already describes the clusters and
+their queues, so all you do is pick one and say how much of it you want:
+
+```python
+pool = s.hpc_pool(workers=10, workdir="/scratch/my-run", queue="long", cores=4)
+```
+
+`queue` names a queue **defined in the configuration**, which is not necessarily
+your scheduler's partition name — it selects a configured entry, and that
+entry's script determines which partition the job lands on. Ask your site which
+queues exist, or read them off the configuration.
+
+When the configuration defines several clusters, `cluster` picks one:
+
+- Give `cluster` to select it directly; adding `queue` requires that queue to
+  exist on it.
+- Give only `queue` and the cluster providing it is found automatically, which
+  needs exactly one cluster to provide it — no match, or several, is an error.
+- Give neither and the configuration's own defaults apply.
+
+`config_path` points at a configuration other than the installed one. See
+[HPCExecutor](../advanced/parallel.md#hpcexecutor) for how such a directory is
+laid out and where the installed one lives.
+
+### Asking for resources
+
+`cores`, `memory_max` and `run_time_max` are passed to the submission script,
+and `submit_options` carries anything else that script declares:
+
+```python
+pool = s.hpc_pool(
+    workers=10,
+    workdir="/scratch/my-run",
+    queue="long",
+    cores=4,
+    memory_max=16,
+    run_time_max=7200,
+    submit_options={"account": "my-project"},
+)
+```
+
+For `account` to have any effect the script must reference it. A variable a
+script never mentions is ignored, and one the script mentions but nobody
+supplies renders as empty — so a misspelling on either side drops the directive
+silently rather than failing. Entries that are `None` are dropped, so omitting a
+key and passing `None` mean the same thing. A name the pool sets itself,
+such as `cores` or `queue`, is rejected rather than allowed to override it.
+
+With a configuration, resource requests are **clamped** to the selected queue's
+limits rather than rejected: asking for more cores than the queue allows quietly
+gets you the queue's maximum. `cores` is held to the queue's minimum and
+maximum, `run_time_max` to its maximum — and takes that maximum when you give no
+value at all — and `memory_max` to its maximum, but only when you pass a number.
+A memory string such as `"4G"` is passed to the submission script unchanged.
+
+### Submitting with your own template
+
+A `template` is the script that gets run on the cluster, written by you
+instead of taken from a configuration. Since there is no configuration to say
+what kind of cluster this is, `scheduler` names the queueing system to
+submit to — that is what determines whether it runs `sbatch` or `bsub`. It defaults
+to `"slurm"`.
+
+Nothing else is resolved for you: **the queue is not an argument here**, it has
+to be written into the script, along with everything else the scheduler needs.
+For Slurm that looks like this — other systems use entirely different
+directives:
+
+```python
+TEMPLATE = """\
+#!/bin/bash
+#SBATCH --partition=long
+#SBATCH --job-name={{job_name}}
+#SBATCH --output={{output}}
+#SBATCH --chdir={{working_directory}}
+#SBATCH --ntasks={{cores}}
+{%- if memory_max %}
+#SBATCH --mem={{memory_max}}G
+{%- endif %}
+
+{{command}}
+"""
+
+pool = s.hpc_pool(
+    workers=10,
+    workdir="/scratch/my-run",
+    template=TEMPLATE,
+    scheduler="slurm",
+    cores=4,
+)
+```
+
+The script is a [Jinja](https://jinja.palletsprojects.com/en/stable/templates/)
+template, rendered by `pysqa` through the `jinja2` package. `{{name}}`
+inserts a value and `{% if name %}...{% endif %}` leaves a line out when none was
+given, which is how the memory directive above disappears unless `memory_max` is
+set. The values available are the arguments described above — `job_name`,
+`output`, `working_directory`, `cores`, `memory_max`, `run_time_max`, `command`
+— plus whatever you pass in `submit_options`.
+
+Two of them carry the run: `{{command}}` is your evaluation and the
+script does nothing without it, and `{{output}}` is the file ropt reads back to
+explain a failed job. A script that omits `--output={{output}}` still runs, but a
+job that dies takes the only explanation with it.
+
+Because a template submits without a configuration, it **cannot be combined**
+with `config_path`, `cluster` or `queue`; passing them together raises a
+`ValueError` when the pool is created.
+
+### Parameters
+
+[`hpc_pool`][ropt.simple.Session.hpc_pool] accepts the following parameters:
+
+| Parameter     | Description                                                                |
+| ------------- | ------------------------------------------------------------------------- |
+| `workers`     | Maximum number of concurrent cluster jobs (default: 1).                   |
+| `cores`       | Number of CPUs per job (default: 1).                                      |
+| `cluster`     | Cluster name, when the `pysqa` config defines several.                    |
+| `queue`       | Name of a queue defined in the configuration.                             |
+| `workdir`     | Shared-filesystem working directory; required, and must exist. |
+| `config_path` | The `pysqa` configuration directory.                                      |
+| `template`    | A submission-script template, used instead of a configuration.            |
+| `scheduler`   | The queueing system a `template` is written for; only meaningful with one. |
+| `memory_max`  | Memory per job.                                                           |
+| `run_time_max` | Run time per job, typically in seconds.                                  |
+| `submit_options` | Extra variables for the submission script. `None` entries are dropped. |
+| `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |

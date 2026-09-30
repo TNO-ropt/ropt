@@ -39,7 +39,7 @@ Handlers that store results expose them through `handler["results"]` (and, for
 ## Sharing a handler across concurrent runs
 
 The same handler may also be given to runs that execute **concurrently** — the
-runs of an [`optimize_many`](../running/parallel.md#many-optimizations-at-once), or runs
+runs of an [`optimize_many`](../running/many_runs.md), or runs
 you start on threads of your own. A handler's
 [`handle_event`][ropt.components.event_handlers.EventHandler.handle_event]
 takes a lock around each call, so a second run waits for the first to finish
