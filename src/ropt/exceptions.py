@@ -50,6 +50,29 @@ class UnsupportedError(RoptError):
     """
 
 
+class AbortedError(RoptError):
+    """Work was cut off before it could finish.
+
+    Raised by [`WorkerPool.offload`][ropt.simple.WorkerPool.offload], which
+    returns whatever its callables return and so has nowhere to report a reason.
+    An optimization or an evaluation carries its reason on the result object it
+    returns instead, and does not raise this.
+
+    Attributes:
+        exit_reason: Why the work was cut off.
+    """
+
+    def __init__(self, exit_reason: ExitReason) -> None:
+        """Initialize the error.
+
+        Args:
+            exit_reason: Why the work was cut off.
+        """
+        self.exit_reason = exit_reason
+        msg = f"The work was cut off before it could finish: {exit_reason.name}."
+        super().__init__(msg)
+
+
 class RunsFailedError(RoptError):
     """One of several concurrent runs raised.
 

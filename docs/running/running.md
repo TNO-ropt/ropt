@@ -343,7 +343,8 @@ What *is* raised falls into three groups:
   [`ExecutionError`][ropt.exceptions.ExecutionError] when the machinery that
   runs your evaluations, or a call handed to
   [`WorkerPool.offload`][ropt.simple.WorkerPool.offload], cannot start or breaks
-  down.
+  down, and [`AbortedError`][ropt.exceptions.AbortedError] when an abort
+  abandoned an offloaded call.
 
 - **Exceptions from your own evaluation function** are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process

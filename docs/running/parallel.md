@@ -800,6 +800,15 @@ As with the evaluation function on a process, local, or HPC pool, the
 callables and their arguments are **copied to the workers**, since they run in
 separate processes.
 
+An offload belongs to its pool's session like a run does, so
+[`Session.abort`](running.md#stopping-from-outside), a closing session, and a
+failing run on the same session all reach it. `offload` returns whatever its
+callables return and so has nowhere to report a reason: a call that was
+abandoned raises [`AbortedError`][ropt.exceptions.AbortedError], whose
+`exit_reason` distinguishes an abort that was asked for from one another run
+caused. Calls already on a worker run to their end, so an abort that costs the
+batch nothing lets it return its results.
+
 !!! warning "Offloaded work coordinates with nothing"
     An offloaded callable runs wherever its pool puts it, and on a process,
     local, or HPC pool that is somewhere else. It may create handlers and

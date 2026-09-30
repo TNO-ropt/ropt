@@ -133,6 +133,10 @@ class Session:
 
         This reaches every run, `keep_going` or not: that flag exempts a run
         from the abort a failing run triggers, not from one that was asked for.
+        It reaches an [`offload`][ropt.simple.WorkerPool.offload] in flight too:
+        a call it abandons makes that `offload` raise
+        [`AbortedError`][ropt.exceptions.AbortedError], since there is no result
+        object to report a reason on.
 
         Only the runs registered at the moment of the call are reached. A run
         started afterwards is unaffected, so a loop that abandons one attempt

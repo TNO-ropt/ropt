@@ -13,11 +13,13 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt.components.concurrency import StopSignal
 from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
-from ropt.enums import EnOptEventType
-from ropt.exceptions import ExecutionError
+from ropt.enums import EnOptEventType, ExitReason
+from ropt.exceptions import AbortedError, ExecutionError
 from ropt.simple import session
+from ropt.simple._offload import _run
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -196,3 +198,32 @@ def test_handler_can_offload(pools: Callable[..., WorkerPool]) -> None:
         handlers=[handler],
     )
     assert handler.outcome == 16
+
+
+@pytest.mark.timeout(60)
+def test_an_offload_that_completes_despite_an_abort_returns_its_results() -> None:
+    # The call is already on a worker when the abort arrives, and a worker
+    # cannot be interrupted, so nothing was lost and nothing is dropped.
+    with session() as opened:
+        pool = opened.thread_pool(workers=1)
+
+        def _abort_then_return() -> int:
+            opened.abort()
+            return 7
+
+        assert pool.offload(_abort_then_return) == 7
+
+
+@pytest.mark.parametrize("reason", [ExitReason.ABORTED, ExitReason.ABORTED_ON_ERROR])
+def test_an_abandoned_offload_call_carries_why_it_was_cut_off(
+    reason: ExitReason,
+) -> None:
+    # A signal that is already stopping abandons every call before it starts,
+    # which is what an abort arriving mid-batch leaves behind. Driving `_run`
+    # directly is what makes the ordering certain: through `offload` the worker
+    # may drain the queue before the collecting thread is scheduled to drop it.
+    signal = StopSignal()
+    signal.stop(reason)
+    with pytest.raises(AbortedError) as exc_info:
+        _run(ThreadExecutor(workers=1), [partial(_square, 2)], signal)
+    assert exc_info.value.exit_reason == reason

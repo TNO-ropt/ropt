@@ -298,6 +298,7 @@ class WorkerPool:
             The single result, or a tuple of results in the order of `work`.
 
         Raises:
+            AbortedError:   If an abort abandoned one of the calls.
             ExecutionError: If the machinery could not run a call.
             WorkflowError:  If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]

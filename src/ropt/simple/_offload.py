@@ -14,8 +14,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
+from ropt.components.concurrency import StopSignal
 from ropt.components.executors import ExecutorFailure, WorkItem, WorkNotRun
-from ropt.exceptions import ExecutionError
+from ropt.exceptions import AbortedError, ExecutionError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -32,24 +33,38 @@ def _offload(
     executor: Executor,
     work: Callable[[], _T] | Sequence[Callable[[], _T]],
 ) -> _T | tuple[_T, ...]:
+    signal = StopSignal()
+    session._register(signal, keep_going=False)  # ruff: ignore[private-member-access]
     try:
         if callable(work):
-            return cast("_T", _run(executor, [work])[0])
+            return cast("_T", _run(executor, [work], signal)[0])
         functions = list(work)
         if not functions:
             return ()
-        return tuple(_run(executor, functions))
+        return tuple(_run(executor, functions, signal))
     except Exception:
-        session._fail()  # ruff: ignore[private-member-access]
+        # Being cut off is not a failure, so it must not cut off anything else.
+        if not signal.stopping:
+            session._fail()  # ruff: ignore[private-member-access]
         raise
+    finally:
+        session._deregister(signal)  # ruff: ignore[private-member-access]
 
 
-def _run(executor: Executor, functions: list[Callable[[], Any]]) -> list[Any]:
+def _run(
+    executor: Executor, functions: list[Callable[[], Any]], signal: StopSignal
+) -> list[Any]:
     # A sequence of offloaded callables is documented to run concurrently, so
     # they must not be bundled onto one worker.
     values = executor.run(
-        [WorkItem(function=function) for function in functions], bundle_size=1
+        [WorkItem(function=function) for function in functions],
+        bundle_size=1,
+        stop=signal,
     )
+    abandoned = any(isinstance(value, WorkNotRun) for value in values)
+    # An abort that arrived too late to cost a call anything did not abort it.
+    if abandoned and signal.stopping:
+        raise AbortedError(signal.exit_reason)
     for value in values:
         if isinstance(value, (ExecutorFailure, WorkNotRun)):
             msg = f"An offloaded call could not be run: {value.message}"
