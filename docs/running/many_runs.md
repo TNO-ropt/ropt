@@ -108,10 +108,11 @@ runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 A run that raises aborts the other runs on its session. Each of those ends at
 its next evaluation boundary with `ABORTED_ON_ERROR`, keeping the best result it
 had reached. A run still queued behind `limit` is cut off before its first
-evaluation, and reports `ABORTED_ON_ERROR` with no result at all. This is the
-default because most runs are started from a script with nobody watching: a
-problem ends the script rather than the remaining runs continuing towards output
-that will not be used.
+evaluation, and reports `ABORTED_ON_ERROR` with no result at all. Nothing is
+built for such a run, so an invalid configuration in one is never reported. This
+is the default because most runs are started from a script with nobody watching:
+a problem ends the script rather than the remaining runs continuing towards
+output that will not be used.
 
 The call then raises
 [`RunsFailedError`][ropt.exceptions.RunsFailedError]. With several runs there is

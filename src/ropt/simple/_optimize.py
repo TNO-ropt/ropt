@@ -66,6 +66,10 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None,
     parent_signal: AbortSignal | None,
 ) -> OptimizationResult:
+    if parent_signal is not None and parent_signal.aborting:
+        # Cut off before anything is built, so an invalid config in a run that
+        # never starts is not reported beside the failure that stopped it.
+        return OptimizationResult(exit_reason=parent_signal.exit_reason, results=None)
     context = EnOptContext.model_validate(config)
     signal = AbortSignal()
     evaluator = make_evaluator(context, function, executor, bundle_size, signal)

@@ -1358,6 +1358,29 @@ def test_optimize_many_cuts_off_queued_runs_when_one_fails(
 
 
 @pytest.mark.timeout(60)
+def test_optimize_many_cuts_off_a_queued_run_before_validating_its_config(
+    pools: Callable[..., WorkerPool], config: Any
+) -> None:
+    def boom(_v: Any, _c: Any) -> float:
+        msg = "boom"
+        raise ValueError(msg)
+
+    broken = {**config, "objectives": {"weights": [0.75, -0.25]}}
+
+    # One at a time, so the first run fails before the other two are admitted.
+    starts = np.tile(initial_values, (3, 1))
+    pool = pools(workers=2)
+    with pytest.raises(RunsFailedError) as raised:
+        pool.optimize_many([config, broken, broken], starts, boom, limit=1)
+
+    outcomes = raised.value.outcomes
+    assert isinstance(outcomes[0], ValueError)
+    for outcome in outcomes[1:]:
+        assert isinstance(outcome, OptimizationResult)
+        assert outcome.exit_reason == ExitReason.ABORTED_ON_ERROR
+
+
+@pytest.mark.timeout(60)
 def test_optimize_many_with_keep_going_starts_queued_runs_when_one_fails(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
