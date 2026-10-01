@@ -171,7 +171,7 @@ nav:
         - "Event Handlers": reference/components_event_handlers.md
         - "Evaluators": reference/components_evaluators.md
         - "Executors": reference/components_executors.md
-        - "Utilities": reference/components_utils.md
+        - "Concurrency": reference/components_concurrency.md
       - "Plugin System": reference/plugin_manager.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
