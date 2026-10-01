@@ -6,10 +6,13 @@ import contextlib
 import threading
 from typing import TYPE_CHECKING
 
+from ropt._logging import get_logger
 from ropt.enums import ExitReason
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+_logger = get_logger(__name__)
 
 
 class AbortSignal:
@@ -54,7 +57,12 @@ class AbortSignal:
             self._aborting = True
             callbacks = list(self._callbacks)
         for callback in callbacks:
-            callback()
+            try:
+                callback()
+            except Exception:
+                # One observer's callback must not withhold the abort from the
+                # observers after it.
+                _logger.exception("An abort callback raised")
 
     @property
     def exit_reason(self) -> ExitReason:
@@ -83,7 +91,8 @@ class AbortSignal:
         caller that registers late is not left waiting.
 
         The callback runs on the thread that calls `abort`, so it must return
-        promptly and must not raise.
+        promptly. One that raises is logged, and the callbacks after it still
+        run.
 
         Args:
             callback: The zero-argument callable to run.

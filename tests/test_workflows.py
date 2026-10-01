@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import pickle  # ruff: ignore[suspicious-pickle-import]
 import threading
 from copy import deepcopy
@@ -878,6 +879,25 @@ def test_abort_signal_does_not_run_a_removed_callback() -> None:
     signal.remove_callback(callback)
     signal.abort()
     assert calls == []
+
+
+def test_abort_signal_runs_the_callbacks_after_one_that_raises(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    signal = AbortSignal()
+    calls: list[int] = []
+
+    def _raises() -> None:
+        calls.append(1)
+        msg = "boom"
+        raise ValueError(msg)
+
+    signal.add_callback(_raises)
+    signal.add_callback(partial(calls.append, 2))
+    with caplog.at_level(logging.ERROR):
+        signal.abort()
+    assert calls == [1, 2]
+    assert "boom" in caplog.text
 
 
 _EVALUATION_EVENTS = {
