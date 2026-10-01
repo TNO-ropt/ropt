@@ -9,7 +9,15 @@ from typing import TYPE_CHECKING, Any
 
 from ropt._logging import get_logger
 
-from .base import ExecutorBase, WorkItem, _calls, _run_bundle, _stopped
+from .base import (
+    _NOT_RUN,
+    ExecutorBase,
+    WorkItem,
+    WorkNotRun,
+    _calls,
+    _run_bundle,
+    _stopped,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -56,8 +64,10 @@ class ThreadExecutor(ExecutorBase):
         # Finished bundles arrive here rather than through
         # `concurrent.futures.wait`, which would block forever on a future
         # cancelled before a worker picked it up; a done callback still fires.
-        done: queue.SimpleQueue[Future[list[Any]] | None] = queue.SimpleQueue()
-        futures: dict[Future[list[Any]], int] = {}
+        done: queue.SimpleQueue[Future[list[Any] | WorkNotRun] | None] = (
+            queue.SimpleQueue()
+        )
+        futures: dict[Future[list[Any] | WorkNotRun], int] = {}
         # The sentinel is what releases `done.get()` below; nothing else can.
         wake = partial(done.put, None)
         if abort_signal is not None:
@@ -66,7 +76,7 @@ class ThreadExecutor(ExecutorBase):
             for index, bundle in enumerate(bundles):
                 if abort_signal is not None and abort_signal.aborting:
                     break
-                future = self._submit(bundle)
+                future = self._submit(bundle, abort_signal)
                 futures[future] = index
                 future.add_done_callback(done.put)
             while futures:
@@ -88,9 +98,13 @@ class ThreadExecutor(ExecutorBase):
             for future in futures:
                 future.cancel()
 
-    def _submit(self, bundle: list[WorkItem]) -> Future[list[Any]]:
+    def _submit(
+        self, bundle: list[WorkItem], abort_signal: AbortSignal | None
+    ) -> Future[list[Any] | WorkNotRun]:
         try:
-            return self._pool.submit(partial(self._run_tracked, _calls(bundle)))
+            return self._pool.submit(
+                partial(self._run_tracked, _calls(bundle), abort_signal)
+            )
         except RuntimeError:
             # The pool is gone, which at interpreter shutdown is how a caller
             # that outlived its program is released rather than left waiting.
@@ -99,7 +113,12 @@ class ThreadExecutor(ExecutorBase):
     def _run_tracked(
         self,
         calls: Sequence[tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]],
-    ) -> list[Any]:
+        abort_signal: AbortSignal | None,
+    ) -> list[Any] | WorkNotRun:
+        # A worker can take the next task before `_run_bundles` cancels it, so
+        # whether a bundle starts is decided here rather than there.
+        if abort_signal is not None and abort_signal.aborting:
+            return WorkNotRun(_NOT_RUN)
         # Runs on the pool thread, so it marks that thread, not the submitter.
         self._thread_state.running_work_item = True
         try:
