@@ -1328,7 +1328,7 @@ def test_optimize_many_carries_the_outcome_of_every_run_when_one_fails(
 
 
 @pytest.mark.timeout(60)
-def test_optimize_many_starts_every_run_after_one_fails(
+def test_optimize_many_cuts_off_queued_runs_when_one_fails(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
     calls = 0
@@ -1341,13 +1341,40 @@ def test_optimize_many_starts_every_run_after_one_fails(
         msg = "boom"
         raise ValueError(msg)
 
-    # One at a time, so the first run fails before any other is admitted. A
-    # failing run no longer closes the gate behind it: the four that follow are
-    # still let through, each reaching its first evaluation.
+    # One at a time, so the first run fails before any other is admitted.
+    starts = np.tile(initial_values, (5, 1))
+    pool = pools(workers=2)
+    with pytest.raises(RunsFailedError) as raised:
+        pool.optimize_many(config, starts, boom, limit=1)
+
+    outcomes = raised.value.outcomes
+    assert isinstance(outcomes[0], ValueError)
+    for outcome in outcomes[1:]:
+        assert isinstance(outcome, OptimizationResult)
+        assert outcome.exit_reason == ExitReason.ABORTED_ON_ERROR
+        assert outcome.results is None
+    with lock:
+        assert calls == 1
+
+
+@pytest.mark.timeout(60)
+def test_optimize_many_with_keep_going_starts_queued_runs_when_one_fails(
+    pools: Callable[..., WorkerPool], config: Any
+) -> None:
+    calls = 0
+    lock = threading.Lock()
+
+    def boom(_v: Any, _c: Any) -> float:
+        nonlocal calls
+        with lock:
+            calls += 1
+        msg = "boom"
+        raise ValueError(msg)
+
     starts = np.tile(initial_values, (5, 1))
     pool = pools(workers=2)
     with pytest.raises(RunsFailedError):
-        pool.optimize_many(config, starts, boom, limit=1)
+        pool.optimize_many(config, starts, boom, limit=1, keep_going=True)
     with lock:
         assert calls == 5
 

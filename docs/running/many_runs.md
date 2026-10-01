@@ -107,9 +107,11 @@ runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 A run that raises aborts the other runs on its session. Each of those ends at
 its next evaluation boundary with `ABORTED_ON_ERROR`, keeping the best result it
-had reached. This is the default because most runs are started from a script
-with nobody watching: a problem should end the script rather than leave the rest
-of the work grinding on towards output that will not be used.
+had reached. A run still queued behind `limit` is cut off before its first
+evaluation, and reports `ABORTED_ON_ERROR` with no result at all. This is the
+default because most runs are started from a script with nobody watching: a
+problem ends the script rather than the remaining runs continuing towards output
+that will not be used.
 
 The call then raises
 [`RunsFailedError`][ropt.exceptions.RunsFailedError]. With several runs there is
@@ -144,7 +146,8 @@ started separately on the same session. A run started with the module-level
 [`optimize_many`][ropt.simple.optimize_many] has a session of its own, holding
 only the runs of that call.
 
-Pass `keep_going=True` to let a run finish anyway:
+Pass `keep_going=True` to let a run finish anyway, which also lets the runs
+queued behind `limit` start:
 
 ```python
 results = pool.optimize_many(config, start_points, objective, keep_going=True)

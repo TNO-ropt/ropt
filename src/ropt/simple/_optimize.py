@@ -46,6 +46,11 @@ if TYPE_CHECKING:
     from ._session import Session
 
 
+def _cut_off(signal: AbortSignal, parent_signal: AbortSignal) -> None:
+    # Registered before the parent aborts, so the reason is read when it fires.
+    signal.abort(parent_signal.exit_reason)
+
+
 def _optimize(  # ruff: ignore[too-many-arguments]
     session: Session,
     executor: Executor | None,
@@ -74,11 +79,12 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         signal,
         keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
     )
+    cut_off = None
     if parent_signal is not None:
         # Runs at once when the parent is already aborting, which is what cuts
-        # off a run that was still queued when the abort arrived. Only an abort
-        # of the whole call reaches the parent, so its reason is the default.
-        parent_signal.add_callback(signal.abort)
+        # off a run that was still queued when the abort arrived.
+        cut_off = partial(_cut_off, signal, parent_signal)
+        parent_signal.add_callback(cut_off)
     try:
         exit_reason = step.run(
             context=context,
@@ -92,8 +98,8 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]
-        if parent_signal is not None:
-            parent_signal.remove_callback(signal.abort)
+        if parent_signal is not None and cut_off is not None:
+            parent_signal.remove_callback(cut_off)
     results = result_handler["results"]
     return OptimizationResult(
         exit_reason=exit_reason,
@@ -124,10 +130,13 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     metadatas = broadcast_metadata(metadata, len(runs))
     bundle_sizes = broadcast_bundle_sizes(bundle_size, len(runs))
     # One signal for the whole call, so an abort reaches the runs that have not
-    # started yet. `keep_going` is what keeps `_fail` away from it: a run that
-    # fails must not strand the siblings still queued behind `limit`.
+    # started yet. It carries the call's own `keep_going`, so a failure cuts off
+    # a run still queued behind `limit` as it cuts off one already running.
     parent_signal = AbortSignal()
-    session._register(parent_signal, keep_going=True)  # ruff: ignore[private-member-access]
+    session._register(  # ruff: ignore[private-member-access]
+        parent_signal,
+        keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
+    )
     jobs: list[Callable[[], OptimizationResult]] = [
         partial(
             _optimize,
