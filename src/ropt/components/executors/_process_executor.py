@@ -273,12 +273,17 @@ class _PayloadGate:
         self, *, blocking: bool, abort_signal: AbortSignal | None = None
     ) -> bool:
         with self._condition:
-            while self._free == 0:
-                if not blocking or (abort_signal is not None and abort_signal.aborting):
+            while True:
+                # Tested before the slot, so a waiter woken by a freed slot
+                # rather than by the abort does not take it.
+                if abort_signal is not None and abort_signal.aborting:
+                    return False
+                if self._free > 0:
+                    self._free -= 1
+                    return True
+                if not blocking:
                     return False
                 self._condition.wait()
-            self._free -= 1
-            return True
 
     def release(self) -> None:
         with self._condition:

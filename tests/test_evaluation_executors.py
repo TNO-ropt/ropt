@@ -1497,6 +1497,29 @@ def test_the_payload_gate_refuses_a_waiter_once_the_signal_aborts() -> None:
     assert acquired == [False]
 
 
+def test_the_payload_gate_refuses_a_waiter_when_a_slot_frees_after_the_abort() -> None:
+    signal = AbortSignal()
+    gate = _PayloadGate(1)
+    assert gate.acquire(blocking=True)
+    waiting = threading.Event()
+    acquired: list[bool] = []
+
+    def _wait_for_the_slot() -> None:
+        waiting.set()
+        acquired.append(gate.acquire(blocking=True, abort_signal=signal))
+
+    waiter = threading.Thread(target=_wait_for_the_slot)
+    waiter.start()
+    assert waiting.wait(timeout=4.0)
+    # Released rather than woken, so the waiter finds a free slot and leaves the
+    # loop without the abort ever being tested for it.
+    signal.abort()
+    gate.release()
+    waiter.join(timeout=4.0)
+    assert not waiter.is_alive()
+    assert acquired == [False]
+
+
 @pytest.mark.parametrize(
     "build",
     [
