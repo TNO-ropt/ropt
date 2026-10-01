@@ -314,7 +314,7 @@ and the resources a job asks for, are set out in
 rules choices *out*: whether your objective touches anything beyond its
 arguments and its return value. If it does, stay with threads or with no
 pool, because the others work on a copy. Once that is settled, the choice is
-about speed:
+about speed, and about what [stopping a run](#stopping-a-run) can do:
 
 | Pool | Where evaluations run | Data | Speeds up heavy Python? | Use when |
 | --- | --- | --- | --- | --- |
@@ -405,7 +405,7 @@ to them differs:
 | `local_pool` | each evaluation **and everything it launched** is killed |
 | `hpc_pool` | the jobs are **deleted from the queue** |
 
-Two consequences follow.
+Three consequences follow.
 
 **A thread pool cannot be hurried.** Python provides no way to interrupt a
 running thread from outside, so a long evaluation on a thread pool ends
@@ -417,6 +417,11 @@ everything is signalled to end and not waited for. A program that ignores the
 request, or that is stuck inside the operating system, keeps running. The run
 exits promptly instead of waiting out the current batch, but processes it
 started may still be alive afterwards.
+
+**A process pool also finishes one evaluation it had not started.** It keeps one
+more evaluation submitted than it has workers, and a submitted evaluation can no
+longer be cancelled, so that one runs too before the run ends. It is one
+evaluation however many are left to do.
 
 !!! tip "If Ctrl-C seems to do nothing at all"
     Some third-party packages change a process-wide setting when imported that

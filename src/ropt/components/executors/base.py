@@ -163,7 +163,10 @@ class Executor(ABC):
         An `abort_signal` that fires abandons the batch: queued calls are never
         started, started ones are cancelled where the mechanism allows it, and
         each abandoned call gets a `WorkNotRun`. Calls already running on a
-        worker thread or process run to their end.
+        worker thread or process run to their end, and so does a call the
+        mechanism has handed to a worker but can no longer withdraw, which gets
+        its result rather than a `WorkNotRun`. See
+        [Releasing a batch](../advanced/parallel.md#releasing-a-batch).
 
         May be called from any thread, except one of the executor's own workers:
         that caller would wait for workers it is itself occupying, so it is

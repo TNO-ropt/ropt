@@ -45,6 +45,12 @@ class ProcessExecutor(ExecutorBase):
         started itself keeps running, without an error being raised. Use
         [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] where
         an evaluation launches external programs.
+
+    Note:
+        An abort also runs one bundle that was submitted but not yet started:
+        the pool marks a bundle as running when it moves it towards a worker,
+        so it can no longer be withdrawn. See
+        [Releasing a batch](../advanced/parallel.md#releasing-a-batch).
     """
 
     def __init__(
