@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # ruff: file-ignore[unused-function-argument, unused-method-argument, unused-lambda-argument, no-self-use, mutable-class-default, private-member-access, subprocess-without-shell-equals-true]
 import collections
+import contextlib
 import gc
 import importlib
 import inspect
@@ -54,7 +55,11 @@ from ropt.components.executors._job_executor import (
     _StateUpdate,
 )
 from ropt.components.executors._picklable import picklable_exception
-from ropt.components.executors._process_executor import _run_payload, _terminate_workers
+from ropt.components.executors._process_executor import (
+    _PayloadGate,
+    _run_payload,
+    _terminate_workers,
+)
 from ropt.context import EnOptContext
 from ropt.exceptions import ExecutionError, WorkflowError
 
@@ -1428,6 +1433,68 @@ def test_a_stop_keeps_the_error_of_work_already_running() -> None:
     driver.join(timeout=10.0)
     assert not driver.is_alive()
     assert [str(exc) for exc in raised] == ["boom"]
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(60)
+def test_a_stop_wakes_a_run_waiting_for_a_payload_slot(tmp_path: Path) -> None:
+    # One worker gives two payload slots, and the first run holds both: one with
+    # the worker, one queued behind it. The second run has nothing in flight, so
+    # it waits on the slots rather than on a result of its own, and only the
+    # abort can bring it back.
+    listener = Listener(str(tmp_path / "worker"))
+    executor = ProcessExecutor(workers=1)
+    signal = AbortSignal()
+    results: list[Any] = []
+    connection = None
+
+    def _hold_both_slots() -> None:
+        item = WorkItem(function=_block_until_disconnected, args=(listener.address,))
+        # Ends when the test closes the connection, which is not a failure here.
+        with contextlib.suppress(Exception):
+            executor.run([item, item])
+
+    def _wait_for_a_slot() -> None:
+        results.extend(
+            executor.run([WorkItem(function=_function, args=(0,))], abort_signal=signal)
+        )
+
+    holder = threading.Thread(target=_hold_both_slots, daemon=True)
+    waiter = threading.Thread(target=_wait_for_a_slot, daemon=True)
+    try:
+        holder.start()
+        connection = listener.accept()
+        waiter.start()
+        signal.abort()
+        waiter.join(timeout=30.0)
+        assert not waiter.is_alive()
+        assert isinstance(results[0], WorkNotRun)
+    finally:
+        if connection is not None:
+            connection.close()
+        listener.close()
+        holder.join(timeout=30.0)
+
+
+def test_the_payload_gate_refuses_a_waiter_once_the_signal_aborts() -> None:
+    signal = AbortSignal()
+    gate = _PayloadGate(1)
+    assert gate.acquire(blocking=True)
+    waiting = threading.Event()
+    acquired: list[bool] = []
+
+    def _wait_for_the_slot() -> None:
+        waiting.set()
+        acquired.append(gate.acquire(blocking=True, abort_signal=signal))
+
+    waiter = threading.Thread(target=_wait_for_the_slot)
+    waiter.start()
+    assert waiting.wait(timeout=4.0)
+    signal.abort()
+    gate.wake()
+    waiter.join(timeout=4.0)
+    assert not waiter.is_alive()
+    assert acquired == [False]
 
 
 @pytest.mark.parametrize(

@@ -81,7 +81,7 @@ class ProcessExecutor(ExecutorBase):
         # comes back, so this caps how many are submitted at once: one for each
         # worker, plus one so a worker that finishes finds the next bundle
         # already waiting.
-        self._payload_limit = threading.Semaphore(workers + 1)
+        self._payload_gate = _PayloadGate(workers + 1)
         self._check_worker_startup()
         _logger.debug("Started process executor with %d worker(s)", workers)
 
@@ -108,10 +108,12 @@ class ProcessExecutor(ExecutorBase):
         # cancelled before the pool dispatched it; a done callback still fires.
         done: queue.SimpleQueue[Future[tuple[bool, bytes]] | None] = queue.SimpleQueue()
         futures: dict[Future[tuple[bool, bytes]], int] = {}
-        # The sentinel is what releases `done.get()` below; nothing else can.
+        # The waits this call can be parked on are the result queue and the
+        # payload gate; an abort has to break both.
         wake = partial(done.put, None)
         if abort_signal is not None:
             abort_signal.add_callback(wake)
+            abort_signal.add_callback(self._payload_gate.wake)
         try:
             while pending or futures:
                 if abort_signal is not None and abort_signal.aborting:
@@ -119,7 +121,7 @@ class ProcessExecutor(ExecutorBase):
                     # worker is collected below, since it runs whether or not
                     # anyone is still waiting for it.
                     pending.clear()
-                self._submit_pending(pending, futures, done)
+                self._submit_pending(pending, futures, done, abort_signal)
                 if not futures:
                     continue
                 item = done.get()
@@ -128,30 +130,34 @@ class ProcessExecutor(ExecutorBase):
                         future.cancel()
                     continue
                 index = futures.pop(item)
-                self._payload_limit.release()
+                self._payload_gate.release()
                 if not item.cancelled():
                     store(index, _bundle_result(item))
         finally:
             if abort_signal is not None:
                 abort_signal.remove_callback(wake)
+                abort_signal.remove_callback(self._payload_gate.wake)
             for future in futures:
                 future.cancel()
-                self._payload_limit.release()
+                self._payload_gate.release()
 
     def _submit_pending(
         self,
         pending: deque[tuple[int, list[WorkItem]]],
         futures: dict[Future[tuple[bool, bytes]], int],
         done: queue.SimpleQueue[Future[tuple[bool, bytes]] | None],
+        abort_signal: AbortSignal | None,
     ) -> None:
         # Waiting for a slot is safe only with nothing in flight: the slots this
         # batch holds are given back by the loop that calls this.
-        while pending and self._payload_limit.acquire(blocking=not futures):
+        while pending and self._payload_gate.acquire(
+            blocking=not futures, abort_signal=abort_signal
+        ):
             index, bundle = pending.popleft()
             try:
                 future = self._submit(bundle)
             except BaseException:
-                self._payload_limit.release()
+                self._payload_gate.release()
                 raise
             futures[future] = index
             future.add_done_callback(done.put)
@@ -246,3 +252,33 @@ def _run_payload(payload: bytes) -> tuple[bool, bytes]:
 
 def _dummy() -> None:
     pass
+
+
+class _PayloadGate:
+    # The slots are shared by every concurrent caller of one executor, so a
+    # caller with nothing in flight waits here for work that is not its own. A
+    # semaphore has no way back out of that wait, hence the condition.
+
+    def __init__(self, slots: int) -> None:
+        self._condition = threading.Condition()
+        self._free = slots
+
+    def acquire(
+        self, *, blocking: bool, abort_signal: AbortSignal | None = None
+    ) -> bool:
+        with self._condition:
+            while self._free == 0:
+                if not blocking or (abort_signal is not None and abort_signal.aborting):
+                    return False
+                self._condition.wait()
+            self._free -= 1
+            return True
+
+    def release(self) -> None:
+        with self._condition:
+            self._free += 1
+            self._condition.notify()
+
+    def wake(self) -> None:
+        with self._condition:
+            self._condition.notify_all()
