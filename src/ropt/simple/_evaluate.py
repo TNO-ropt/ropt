@@ -108,6 +108,27 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     )
 
 
+def _build_evaluation(  # ruff: ignore[too-many-arguments]
+    executor: Executor | None,
+    config: dict[str, Any],
+    function: EvaluationFunction,
+    *,
+    handlers: Sequence[EventHandler] | None,
+    report: ReportCallback | None,
+    bundle_size: int | None,
+    signal: AbortSignal,
+) -> tuple[EnOptContext, EvaluationStep, HistoryHandler]:
+    context = EnOptContext.model_validate(config)
+    evaluator = make_evaluator(context, function, executor, bundle_size, signal)
+    # The results are collected by this run's own handler, in the order the
+    # vectors were given, which is the order they are returned in.
+    history = HistoryHandler()
+    step = EvaluationStep(evaluator=evaluator, abort_signal=signal)
+    step.add_event_handler(history)
+    attach_handlers(step, handlers, report)
+    return context, step, history
+
+
 def _run_evaluation(  # ruff: ignore[too-many-arguments]
     session: Session,
     executor: Executor | None,
@@ -121,15 +142,23 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
-    context = EnOptContext.model_validate(config)
     signal = AbortSignal()
-    evaluator = make_evaluator(context, function, executor, bundle_size, signal)
-    # The results are collected by this run's own handler, in the order the
-    # vectors were given, which is the order they are returned in.
-    history = HistoryHandler()
-    step = EvaluationStep(evaluator=evaluator, abort_signal=signal)
-    step.add_event_handler(history)
-    attach_handlers(step, handlers, report)
+    try:
+        context, step, history = _build_evaluation(
+            executor,
+            config,
+            function,
+            handlers=handlers,
+            report=report,
+            bundle_size=bundle_size,
+            signal=signal,
+        )
+    except Exception:
+        # No abort can reach a run being built, so this needs no exemption.
+        session._fail()  # ruff: ignore[private-member-access]
+        raise
+    # Left outside the guard above: a refusal here means the session is
+    # closing, not that this run failed.
     session._register(  # ruff: ignore[private-member-access]
         signal,
         keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]

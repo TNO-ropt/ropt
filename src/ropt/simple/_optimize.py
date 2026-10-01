@@ -51,6 +51,28 @@ def _cut_off(signal: AbortSignal, parent_signal: AbortSignal) -> None:
     signal.abort(parent_signal.exit_reason)
 
 
+def _build_optimization(  # ruff: ignore[too-many-arguments]
+    executor: Executor | None,
+    config: dict[str, Any],
+    function: EvaluationFunction,
+    *,
+    handlers: Sequence[EventHandler] | None,
+    report: ReportCallback | None,
+    constraint_tolerance: float,
+    bundle_size: int | None,
+    signal: AbortSignal,
+) -> tuple[EnOptContext, OptimizationStep, ResultsHandler]:
+    context = EnOptContext.model_validate(config)
+    evaluator = make_evaluator(context, function, executor, bundle_size, signal)
+    # This run's own handler, tracking the result the call returns; it is added
+    # directly, so it stays out of the handlers the caller manages.
+    result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
+    step = OptimizationStep(evaluator=evaluator, abort_signal=signal)
+    step.add_event_handler(result_handler)
+    attach_handlers(step, handlers, report)
+    return context, step, result_handler
+
+
 def _optimize(  # ruff: ignore[too-many-arguments]
     session: Session,
     executor: Executor | None,
@@ -70,15 +92,24 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         # Cut off before anything is built, so an invalid config in a run that
         # never starts is not reported beside the failure that stopped it.
         return OptimizationResult(exit_reason=parent_signal.exit_reason, results=None)
-    context = EnOptContext.model_validate(config)
     signal = AbortSignal()
-    evaluator = make_evaluator(context, function, executor, bundle_size, signal)
-    # This run's own handler, tracking the result the call returns; it is added
-    # directly, so it stays out of the handlers the caller manages.
-    result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
-    step = OptimizationStep(evaluator=evaluator, abort_signal=signal)
-    step.add_event_handler(result_handler)
-    attach_handlers(step, handlers, report)
+    try:
+        context, step, result_handler = _build_optimization(
+            executor,
+            config,
+            function,
+            handlers=handlers,
+            report=report,
+            constraint_tolerance=constraint_tolerance,
+            bundle_size=bundle_size,
+            signal=signal,
+        )
+    except Exception:
+        # No abort can reach a run being built, so this needs no exemption.
+        session._fail()  # ruff: ignore[private-member-access]
+        raise
+    # Left outside the guard above: a refusal here means the session is
+    # closing, not that this run failed.
     session._register(  # ruff: ignore[private-member-access]
         signal,
         keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
