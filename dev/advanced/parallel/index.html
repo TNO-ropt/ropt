@@ -3083,14 +3083,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/components_utils/" class="md-nav__link">
+      <a href="../../reference/components_concurrency/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Utilities
+    Concurrency
   
 
     
@@ -3524,7 +3524,7 @@ given. A compute step calls it on the thread it is already on.</p>
 <p>Several compute steps can share one executor. Each blocks in its own <code>run()</code>
 call on its own thread, and each gets back the results of its own batch. Running
 several optimizations at once is therefore a matter of starting a thread per
-optimization — <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_utils/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a>
+optimization — <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_concurrency/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a>
 does that, and is what <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> is built
 on.</p>
 <h2 id="parallelevaluator">ParallelEvaluator</h2>
@@ -3655,7 +3655,7 @@ C/Fortran).</p>
 <p>The thread pool is private for a reason: a shared one would also hold the
 threads that concurrent compute steps block on, and filling it with evaluations
 would starve the steps waiting on them. That is the deadlock
-<a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_utils/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a> exists to avoid.</p>
+<a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_concurrency/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a> exists to avoid.</p>
 <p>Threads are not a lesser form of parallelism here. Python runs one thread's
 <em>bytecode</em> at a time, but a thread that is <strong>waiting</strong> holds nothing: the GIL is
 released around blocking calls, and extension code may release it too. So
@@ -4255,7 +4255,7 @@ created." Concretely:</p>
 <li><strong>Across threads (allowed).</strong> A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
   driven on a thread started by
-  <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_utils/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a> or on a
+  <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_concurrency/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a> or on a
   <a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a> worker, while
   handlers created on the main thread collect its events. Event handling keeps
   working because memory is shared.</li>
