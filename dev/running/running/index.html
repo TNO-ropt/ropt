@@ -3395,11 +3395,14 @@ reasons. A <code>report</code> callback stops the run <em>on a criterion</em>, a
 Aborting consults nothing: the result is whatever the run had reached.</p>
 <p>A run is cut off at its next evaluation boundary, so the evaluations already in
 flight are still carried out and their workers are free only once they return.</p>
-<p><code>abort()</code> reaches the runs that are registered at the moment of the call, and
+<p><code>abort()</code> reaches the runs that are under way at the moment of the call, and
 nothing more: it is not a latch. A run started afterwards is unaffected, so a
-loop that abandons one attempt and starts another keeps working. Leaving the
-session's <code>with</code> block aborts its runs as well, and then releases its pools,
-which is what refuses a run started after that.</p>
+loop that abandons one attempt and starts another keeps working. An
+<a class="autorefs autorefs-internal" title="            optimize_many" href="../../reference/simple/#ropt.simple.Session.optimize_many"><code>optimize_many</code></a> counts as one run here: a
+run it has queued behind its <code>limit</code> is cut off as well, and reports <code>ABORTED</code>
+without evaluating anything. Leaving the session's <code>with</code> block aborts its runs
+as well, and then releases its pools, which is what refuses a run started after
+that.</p>
 <p>A run started with the module-level <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> belongs
 to no session you hold and cannot be aborted this way. It evaluates on the
 calling thread, which is the thread that would have to call <code>abort()</code>. Start it

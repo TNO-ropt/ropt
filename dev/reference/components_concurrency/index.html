@@ -3271,17 +3271,24 @@ scripts and applications, see <a class="autorefs autorefs-internal" title="     
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_concurrent</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">jobs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">_T</span> <span class="o">|</span> <span class="ne">BaseException</span><span class="p">]</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">interrupt</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">_T</span> <span class="o">|</span> <span class="ne">BaseException</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
 
         <p>Run blocking jobs concurrently on dedicated threads and collect outcomes.</p>
-<p>Each job runs on its own thread, so the number of jobs that run at once is
-not capped by any shared thread pool; <code>limit</code> optionally bounds how many
-run simultaneously. A job that raises does not affect its siblings: every
-job is run, and the exception it raised is returned in its place. What a
-failure means is left to the caller.</p>
+<p>The threads are this call's own, so a job never waits for work queued
+behind it in a thread pool it shares. <code>limit</code> bounds how many jobs run at
+once, and bounds the thread count with it: a job awaiting its turn holds no
+thread. A job that raises does not affect its siblings: every job is run,
+and the exception it raised is returned in its place. What a failure means
+is left to the caller.</p>
+<p>An interrupt that breaks the wait abandons the jobs still running. Pass
+<code>interrupt</code> to be called at that point: the jobs are then waited for, which
+takes as long as they take to observe it, and a second interrupt abandons
+them after all.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3321,6 +3328,22 @@ failure means is left to the caller.</p>
             <td>
               <div class="doc-md-description">
                 <p>The maximum number to run at once, or <code>None</code> for no limit.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>interrupt</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], None] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Called to stop the jobs when an interrupt breaks the wait.</p>
               </div>
             </td>
             <td>
