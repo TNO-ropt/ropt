@@ -646,6 +646,80 @@ def test_an_evaluation_that_cannot_be_built_aborts_the_runs_beside_it() -> None:
 
 
 @pytest.mark.timeout(60)
+def test_an_optimize_many_whose_arguments_disagree_aborts_the_runs_beside_it() -> None:
+    # The failure is in the setup of the call, before any run is created, so
+    # this thread is the barrier's second party rather than the failing call.
+    started = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    starts = np.array([_INITIAL, np.zeros(_INITIAL.size)])
+    outcome: list[OptimizationResult] = []
+
+    with session() as opened:
+        surviving = opened.thread_pool(workers=1)
+        failing = opened.thread_pool(workers=1)
+
+        def _survivor() -> None:
+            outcome.append(
+                surviving.optimize(
+                    _CONFIG, _INITIAL, _waits_then_holds(started, release)
+                )
+            )
+
+        driver = threading.Thread(target=_survivor)
+        driver.start()
+        try:
+            started.wait(timeout=30)
+            with pytest.raises(ValueError, match="same length"):
+                failing.optimize_many(_CONFIG, starts, [_sphere, _sphere, _sphere])
+        finally:
+            release.set()
+            driver.join(timeout=30)
+
+    assert not driver.is_alive()
+    assert outcome[0].exit_reason == ExitReason.ABORTED_ON_ERROR
+
+
+@pytest.mark.parametrize(
+    ("call", "variables", "message"),
+    [
+        pytest.param("evaluate", np.zeros((2, 3)), "single vector", id="evaluate"),
+        pytest.param("evaluate_batch", _INITIAL, "2-D matrix", id="evaluate_batch"),
+    ],
+)
+@pytest.mark.timeout(60)
+def test_an_evaluation_of_the_wrong_shape_aborts_the_runs_beside_it(
+    call: str, variables: Any, message: str
+) -> None:
+    started = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    outcome: list[OptimizationResult] = []
+
+    with session() as opened:
+        surviving = opened.thread_pool(workers=1)
+        failing = opened.thread_pool(workers=1)
+
+        def _survivor() -> None:
+            outcome.append(
+                surviving.optimize(
+                    _CONFIG, _INITIAL, _waits_then_holds(started, release)
+                )
+            )
+
+        driver = threading.Thread(target=_survivor)
+        driver.start()
+        try:
+            started.wait(timeout=30)
+            with pytest.raises(ValueError, match=message):
+                getattr(failing, call)(_CONFIG, variables, _sphere)
+        finally:
+            release.set()
+            driver.join(timeout=30)
+
+    assert not driver.is_alive()
+    assert outcome[0].exit_reason == ExitReason.ABORTED_ON_ERROR
+
+
+@pytest.mark.timeout(60)
 def test_an_offload_takes_keep_going_from_its_session() -> None:
     # The second call is still queued behind the single worker when the other
     # run fails, which is what `keep_going` has to exempt it from.

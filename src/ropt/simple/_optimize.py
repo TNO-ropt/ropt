@@ -160,10 +160,16 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     # Refused here rather than per run: a closed session makes the call invalid,
     # and leaving it to the runs would report it as every one of them failing.
     session._require_open()  # ruff: ignore[private-member-access]
-    runs = broadcast_runs(config, x0, function)
-    reports = broadcast_reports(report, len(runs))
-    metadatas = broadcast_metadata(metadata, len(runs))
-    bundle_sizes = broadcast_bundle_sizes(bundle_size, len(runs))
+    try:
+        runs = broadcast_runs(config, x0, function)
+        reports = broadcast_reports(report, len(runs))
+        metadatas = broadcast_metadata(metadata, len(runs))
+        bundle_sizes = broadcast_bundle_sizes(bundle_size, len(runs))
+    except Exception:
+        # Arguments that do not agree are a failed call, and stop the rest of
+        # the session as a failed run does.
+        session._fail()  # ruff: ignore[private-member-access]
+        raise
     # One signal for the whole call, so an abort reaches the runs that have not
     # started yet. It carries the call's own `keep_going`, so a failure cuts off
     # a run still queued behind `limit` as it cuts off one already running.

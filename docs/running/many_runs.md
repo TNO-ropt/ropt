@@ -114,6 +114,14 @@ is the default because most runs are started from a script with nobody watching:
 a problem ends the script rather than the remaining runs continuing towards
 output that will not be used.
 
+A call that fails before it creates any run stops them too. `optimize_many`
+broadcasts its arguments first, so lists whose lengths disagree raise
+`ValueError`; `evaluate` and `evaluate_batch` raise on a vector of the wrong
+shape. Each aborts the other runs on the session before raising.
+`RunsFailedError` is not raised in those cases, since no run exists to carry an
+outcome. A closed session is not a failure: the call is refused and nothing is
+aborted.
+
 The call then raises
 [`RunsFailedError`][ropt.exceptions.RunsFailedError]. With several runs there is
 no single exception to re-raise and no single set of results to return, so the

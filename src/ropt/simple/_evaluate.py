@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Any
 
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
 
     from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
@@ -44,6 +44,20 @@ _A_MATRIX = (
 )
 
 
+def _as_vector(variables: ArrayLike) -> NDArray[np.float64]:
+    array = np.asarray(variables, dtype=np.float64)
+    if array.ndim != 1:
+        raise ValueError(_ONE_VECTOR)
+    return array
+
+
+def _as_matrix(variables: ArrayLike) -> NDArray[np.float64]:
+    array = np.asarray(variables, dtype=np.float64)
+    if array.ndim != 2:  # ruff: ignore[magic-value-comparison]
+        raise ValueError(_A_MATRIX)
+    return array
+
+
 def _evaluate(  # ruff: ignore[too-many-arguments]
     session: Session,
     executor: Executor | None,
@@ -57,9 +71,13 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[FunctionResults | None]:
-    array = np.asarray(variables, dtype=np.float64)
-    if array.ndim != 1:
-        raise ValueError(_ONE_VECTOR)
+    try:
+        array = _as_vector(variables)
+    except Exception:
+        # Arguments that do not fit are a failed call, and stop the rest of the
+        # session as a failed run does.
+        session._fail()  # ruff: ignore[private-member-access]
+        raise
     outcome = _run_evaluation(
         session,
         executor,
@@ -91,9 +109,13 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
-    array = np.asarray(variables, dtype=np.float64)
-    if array.ndim != 2:  # ruff: ignore[magic-value-comparison]
-        raise ValueError(_A_MATRIX)
+    try:
+        array = _as_matrix(variables)
+    except Exception:
+        # Arguments that do not fit are a failed call, and stop the rest of the
+        # session as a failed run does.
+        session._fail()  # ruff: ignore[private-member-access]
+        raise
     return _run_evaluation(
         session,
         executor,
