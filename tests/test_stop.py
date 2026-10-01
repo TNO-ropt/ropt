@@ -6,20 +6,28 @@
 
 from __future__ import annotations
 
+import contextlib
 import threading
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
 
 from ropt.enums import ExitReason
+from ropt.exceptions import AbortedError
 from ropt.simple import session
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.results import FunctionResults
-    from ropt.simple import EvaluationFunctionContext, OptimizationResult
+    from ropt.simple import (
+        EvaluationFunctionContext,
+        EvaluationResult,
+        OptimizationResult,
+        Session,
+    )
 
 _INITIAL = np.array([0.0, 0.0, 0.1])
 
@@ -78,6 +86,36 @@ def _fails_at(barrier: threading.Barrier) -> Any:
         raise ValueError(msg)
 
     return objective
+
+
+def _waits_then_raises(barrier: threading.Barrier, release: threading.Event) -> Any:
+    # Raises only once the abort has landed, so what it raises is a consequence
+    # of being cut off rather than a failure of its own.
+    waited = False
+
+    def objective(
+        _variables: NDArray[np.float64], _context: EvaluationFunctionContext
+    ) -> float:
+        nonlocal waited
+        if not waited:
+            waited = True
+            barrier.wait(timeout=30)
+            assert release.wait(timeout=30)
+            msg = "boom"
+            raise ValueError(msg)
+        return 0.0
+
+    return objective
+
+
+def _hold_at(barrier: threading.Barrier, release: threading.Event) -> int:
+    barrier.wait(timeout=30)
+    assert release.wait(timeout=30)
+    return 0
+
+
+def _one() -> int:
+    return 1
 
 
 @pytest.mark.timeout(60)
@@ -148,6 +186,30 @@ def test_session_abort_leaves_an_evaluation_batch_without_results() -> None:
 
     assert outcome.exit_reason == ExitReason.ABORTED
     assert outcome.results == ()
+
+
+@pytest.mark.timeout(60)
+def test_an_in_process_evaluation_batch_is_cut_off_between_its_rows() -> None:
+    # Without a pool the rows are evaluated one after another on the calling
+    # thread, so that loop is the only place the abort can be observed.
+    matrix = np.array([_INITIAL, np.zeros(_INITIAL.size), np.ones(_INITIAL.size)])
+    calls = 0
+
+    with session() as opened:
+
+        def objective(
+            variables: NDArray[np.float64], context: EvaluationFunctionContext
+        ) -> float:
+            nonlocal calls
+            calls += 1
+            opened.abort()
+            return _sphere(variables, context)
+
+        outcome = opened.evaluate_batch(_CONFIG, matrix, objective)
+
+    assert outcome.exit_reason == ExitReason.ABORTED
+    assert outcome.results == ()
+    assert calls == 1
 
 
 @pytest.mark.timeout(60)
@@ -418,3 +480,161 @@ def test_session_abort_reaches_a_run_that_keeps_going() -> None:
         driver.join(timeout=30)
 
     assert outcome[0].exit_reason == ExitReason.ABORTED
+
+
+@pytest.mark.timeout(60)
+def test_session_abort_cuts_off_the_runs_queued_behind_the_limit() -> None:
+    # One at a time, so the four behind the first are still queued when the
+    # abort arrives. Each run counts its own evaluations, which is what shows
+    # that none of the four reached one.
+    lock = threading.Lock()
+    calls = [0] * 5
+
+    def _counts(index: int, opened: Session) -> Any:
+        def objective(
+            variables: NDArray[np.float64], context: EvaluationFunctionContext
+        ) -> float:
+            with lock:
+                calls[index] += 1
+            if index == 0:
+                opened.abort()
+            return _sphere(variables, context)
+
+        return objective
+
+    with session() as opened:
+        pool = opened.thread_pool(workers=1)
+        outcomes = pool.optimize_many(
+            _CONFIG,
+            np.tile(_INITIAL, (5, 1)),
+            [_counts(index, opened) for index in range(5)],
+            limit=1,
+        )
+
+    assert [outcome.exit_reason for outcome in outcomes] == [ExitReason.ABORTED] * 5
+    with lock:
+        assert calls[0] >= 1
+        assert calls[1:] == [0, 0, 0, 0]
+
+
+@pytest.mark.timeout(60)
+def test_a_run_cut_off_by_an_abort_does_not_report_a_failure() -> None:
+    # The evaluation raises because its run was cut off. Reporting that as a
+    # failure would abort a run that started after the abort and is innocent.
+    cut_off = threading.Barrier(2, timeout=30)
+    running = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    outcome: list[OptimizationResult] = []
+    raised: list[BaseException] = []
+
+    with session() as opened:
+        aborted_pool = opened.thread_pool(workers=1)
+        fresh_pool = opened.thread_pool(workers=1)
+
+        def _aborted_run() -> None:
+            try:
+                aborted_pool.optimize(
+                    _CONFIG, _INITIAL, _waits_then_raises(cut_off, release)
+                )
+            except ValueError as exc:
+                raised.append(exc)
+
+        def _fresh_run() -> None:
+            outcome.append(fresh_pool.optimize(_CONFIG, _INITIAL, _waits_once(running)))
+
+        aborted_driver = threading.Thread(target=_aborted_run)
+        aborted_driver.start()
+        cut_off.wait(timeout=30)
+        opened.abort()
+        fresh_driver = threading.Thread(target=_fresh_run)
+        fresh_driver.start()
+        running.wait(timeout=30)
+        release.set()
+        aborted_driver.join(timeout=30)
+        fresh_driver.join(timeout=30)
+
+    assert [str(exc) for exc in raised] == ["boom"]
+    assert outcome[0].exit_reason == ExitReason.FINISHED
+
+
+def _evaluate_beside_a_failure(
+    *, session_keep_going: bool, keep_going: bool | None
+) -> EvaluationResult[tuple[FunctionResults, ...]]:
+    # One worker and one vector per bundle, so the second row is still queued
+    # when the other run fails; each run has a pool of its own so that the two
+    # can overlap on one worker each.
+    started = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    matrix = np.array([_INITIAL, np.zeros(_INITIAL.size)])
+    outcome: list[EvaluationResult[tuple[FunctionResults, ...]]] = []
+
+    with session(keep_going=session_keep_going) as opened:
+        evaluating = opened.thread_pool(workers=1)
+        failing = opened.thread_pool(workers=1)
+
+        def _survivor() -> None:
+            outcome.append(
+                evaluating.evaluate_batch(
+                    _CONFIG,
+                    matrix,
+                    _waits_then_holds(started, release),
+                    bundle_size=1,
+                    keep_going=keep_going,
+                )
+            )
+
+        driver = threading.Thread(target=_survivor)
+        driver.start()
+        try:
+            with pytest.raises(ValueError, match="boom"):
+                failing.optimize(_CONFIG, _INITIAL, _fails_at(started))
+        finally:
+            release.set()
+            driver.join(timeout=30)
+
+    assert not driver.is_alive()
+    return outcome[0]
+
+
+@pytest.mark.timeout(60)
+def test_an_evaluation_takes_keep_going_from_its_session() -> None:
+    outcome = _evaluate_beside_a_failure(session_keep_going=True, keep_going=None)
+    assert outcome.exit_reason == ExitReason.FINISHED
+    assert len(outcome.results) == 2
+
+
+@pytest.mark.timeout(60)
+def test_keep_going_on_an_evaluation_overrides_its_session() -> None:
+    outcome = _evaluate_beside_a_failure(session_keep_going=True, keep_going=False)
+    assert outcome.exit_reason == ExitReason.ABORTED_ON_ERROR
+    assert outcome.results == ()
+
+
+@pytest.mark.timeout(60)
+def test_an_offload_takes_keep_going_from_its_session() -> None:
+    # The second call is still queued behind the single worker when the other
+    # run fails, which is what `keep_going` has to exempt it from.
+    started = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    values: list[tuple[int, ...]] = []
+
+    with session(keep_going=True) as opened:
+        offloading = opened.thread_pool(workers=1)
+        failing = opened.thread_pool(workers=1)
+
+        def _survivor() -> None:
+            with contextlib.suppress(AbortedError):
+                values.append(
+                    offloading.offload([partial(_hold_at, started, release), _one])
+                )
+
+        driver = threading.Thread(target=_survivor)
+        driver.start()
+        try:
+            with pytest.raises(ValueError, match="boom"):
+                failing.optimize(_CONFIG, _INITIAL, _fails_at(started))
+        finally:
+            release.set()
+            driver.join(timeout=30)
+
+    assert values == [(0, 1)]

@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt.components.concurrency import AbortSignal
 from ropt.exceptions import ExecutionError, WorkflowError
 from ropt.simple import HistoryHandler, session
 
@@ -135,6 +136,27 @@ def test_run_on_a_closed_session_refused(
         pass
     with pytest.raises(WorkflowError, match="not open"):
         entry_point(closing)
+
+
+def test_run_starting_while_a_session_closes_refused() -> None:
+    # The callback fires from inside the close, which is the one instant at
+    # which a run could slip past both the refusal and the abort.
+    outcomes: list[str] = []
+    closing = session()
+    signal = AbortSignal()
+
+    def _start_a_run() -> None:
+        try:
+            closing.optimize(_CONFIG, _INITIAL, _sphere)
+        except WorkflowError:
+            outcomes.append("refused")
+        else:
+            outcomes.append("ran")
+
+    signal.add_callback(_start_a_run)
+    with closing:
+        closing._register(signal, keep_going=False)  # ruff: ignore[private-member-access]
+    assert outcomes == ["refused"]
 
 
 def _offload_again(pool: WorkerPool) -> int:

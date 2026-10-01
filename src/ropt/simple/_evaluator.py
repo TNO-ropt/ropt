@@ -36,10 +36,10 @@ def make_evaluator(
     this process land on the same ID.
 
     Args:
-        context:     The validated optimizer context.
-        function:    The user-supplied evaluation function.
-        executor:    The executor the evaluations run on, or `None`.
-        bundle_size: Evaluations per worker task, `None` for the executor's own.
+        context:      The validated optimizer context.
+        function:     The user-supplied evaluation function.
+        executor:     The executor the evaluations run on, or `None`.
+        bundle_size:  Evaluations per worker task, `None` for the executor's own.
         abort_signal: An optional signal that abandons a running batch.
 
     Returns:
@@ -53,7 +53,11 @@ def make_evaluator(
     )
     callback = adapt_function(function, n_obj, n_con)
     if executor is None:
-        return FunctionEvaluator(function=callback, batch_id_callback=next_batch_id)
+        return FunctionEvaluator(
+            function=callback,
+            batch_id_callback=next_batch_id,
+            abort_signal=abort_signal,
+        )
     return ParallelEvaluator(
         function=callback,
         executor=executor,

@@ -108,9 +108,14 @@ class Session:
 
     def __exit__(self, *_exc: object) -> None:
         """Close the session, aborting its runs and releasing every pool."""
-        self.abort()
+        # Closing and taking the snapshot are one step: a run that registers
+        # between them would be neither refused as late nor reached by the
+        # abort, and would outlive the session.
         with self._lock:
             pools, self._pools = self._pools, None
+            signals = list(self._signals)
+        for signal in signals:
+            signal.abort()
         for pool in pools or ():
             pool._release()  # ruff: ignore[private-member-access]
 
@@ -138,10 +143,14 @@ class Session:
         [`AbortedError`][ropt.exceptions.AbortedError], since there is no result
         object to report a reason on.
 
-        Only the runs registered at the moment of the call are reached. A run
+        Only the runs under way at the moment of the call are reached. A run
         started afterwards is unaffected, so a loop that abandons one attempt
-        and starts another keeps working. Closing the session aborts its runs
-        too, and then releases its pools, which is what refuses a later run.
+        and starts another keeps working. An
+        [`optimize_many`][ropt.simple.Session.optimize_many] counts as one run
+        here: a run it has queued behind its `limit` is cut off as well, and
+        reports `ExitReason.ABORTED` without evaluating anything. Closing the
+        session aborts its runs too, and then releases its pools, which is what
+        refuses a later run.
 
         Calling this is thread-safe, and safe on a session that has no runs.
         """
@@ -218,6 +227,7 @@ class Session:
             bundle_size=None,
             keep_going=keep_going,
             metadata=metadata,
+            parent_signal=None,
         )
 
     def optimize_many(  # ruff: ignore[too-many-arguments]
@@ -281,6 +291,7 @@ class Session:
         *,
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
+        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[FunctionResults | None]:
         """Evaluate a single variable vector in-process, without optimizing.
@@ -288,12 +299,14 @@ class Session:
         See [Running Optimizations](../running/running.md) for a walkthrough.
 
         Args:
-            config:    The optimization configuration.
-            variables: The variable vector to evaluate.
-            function:  The per-realization evaluation function.
-            handlers:  Optional handlers, called in the order listed.
-            report:    Optional callback invoked with the results.
-            metadata:  Optional dictionary attached to the results.
+            config:     The optimization configuration.
+            variables:  The variable vector to evaluate.
+            function:   The per-realization evaluation function.
+            handlers:   Optional handlers, called in the order listed.
+            report:     Optional callback invoked with the results.
+            keep_going: Whether to run on when another run in this session
+                        fails, `None` for the session's own.
+            metadata:   Optional dictionary attached to the results.
 
         Returns:
             An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
@@ -312,6 +325,7 @@ class Session:
             handlers=handlers,
             report=report,
             bundle_size=None,
+            keep_going=keep_going,
             metadata=metadata,
         )
 
@@ -323,6 +337,7 @@ class Session:
         *,
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
+        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[tuple[FunctionResults, ...]]:
         """Evaluate a batch of variable vectors in-process, without optimizing.
@@ -332,12 +347,14 @@ class Session:
         walkthrough.
 
         Args:
-            config:    The optimization configuration.
-            variables: The variable vectors to evaluate, one per row.
-            function:  The per-realization evaluation function.
-            handlers:  Optional handlers, called in the order listed.
-            report:    Optional callback invoked with each evaluation.
-            metadata:  Optional dictionary attached to every result.
+            config:     The optimization configuration.
+            variables:  The variable vectors to evaluate, one per row.
+            function:   The per-realization evaluation function.
+            handlers:   Optional handlers, called in the order listed.
+            report:     Optional callback invoked with each evaluation.
+            keep_going: Whether to run on when another run in this session
+                        fails, `None` for the session's own.
+            metadata:   Optional dictionary attached to every result.
 
         Returns:
             An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
@@ -357,6 +374,7 @@ class Session:
             handlers=handlers,
             report=report,
             bundle_size=None,
+            keep_going=keep_going,
             metadata=metadata,
         )
 

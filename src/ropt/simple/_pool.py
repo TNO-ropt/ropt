@@ -122,6 +122,7 @@ class WorkerPool:
             bundle_size=bundle_size,
             keep_going=keep_going,
             metadata=metadata,
+            parent_signal=None,
         )
 
     def optimize_many(  # ruff: ignore[too-many-arguments]
@@ -189,6 +190,7 @@ class WorkerPool:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         bundle_size: int | None = None,
+        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[FunctionResults | None]:
         """Evaluate a single variable vector on this pool, without optimizing.
@@ -202,6 +204,8 @@ class WorkerPool:
             handlers:    Optional handlers, called in the order listed.
             report:      Optional callback invoked with the results.
             bundle_size: Evaluations per worker task, `None` for the pool's own.
+            keep_going:  Whether to run on when another run in this session
+                         fails, `None` for the session's own.
             metadata:    Optional dictionary attached to the results.
 
         Returns:
@@ -222,6 +226,7 @@ class WorkerPool:
             handlers=handlers,
             report=report,
             bundle_size=bundle_size,
+            keep_going=keep_going,
             metadata=metadata,
         )
 
@@ -234,6 +239,7 @@ class WorkerPool:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         bundle_size: int | None = None,
+        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[tuple[FunctionResults, ...]]:
         """Evaluate a batch of variable vectors on this pool, without optimizing.
@@ -249,6 +255,8 @@ class WorkerPool:
             handlers:    Optional handlers, called in the order listed.
             report:      Optional callback invoked with each evaluation.
             bundle_size: Evaluations per worker task, `None` for the pool's own.
+            keep_going:  Whether to run on when another run in this session
+                         fails, `None` for the session's own.
             metadata:    Optional dictionary attached to every result.
 
         Returns:
@@ -270,17 +278,25 @@ class WorkerPool:
             handlers=handlers,
             report=report,
             bundle_size=bundle_size,
+            keep_going=keep_going,
             metadata=metadata,
         )
 
     @overload
-    def offload(self, work: Callable[[], _T]) -> _T: ...
+    def offload(
+        self, work: Callable[[], _T], *, keep_going: bool | None = None
+    ) -> _T: ...
 
     @overload
-    def offload(self, work: Sequence[Callable[[], _T]]) -> tuple[_T, ...]: ...
+    def offload(
+        self, work: Sequence[Callable[[], _T]], *, keep_going: bool | None = None
+    ) -> tuple[_T, ...]: ...
 
     def offload(
-        self, work: Callable[[], _T] | Sequence[Callable[[], _T]]
+        self,
+        work: Callable[[], _T] | Sequence[Callable[[], _T]],
+        *,
+        keep_going: bool | None = None,
     ) -> _T | tuple[_T, ...]:
         """Run one or more arbitrary callables on this pool's workers.
 
@@ -292,7 +308,9 @@ class WorkerPool:
         See [Running Optimizations](../running/running.md) for a walkthrough.
 
         Args:
-            work: A single zero-argument callable, or a sequence of them.
+            work:       A single zero-argument callable, or a sequence of them.
+            keep_going: Whether to run on when another run in this session
+                        fails, `None` for the session's own.
 
         Returns:
             The single result, or a tuple of results in the order of `work`.
@@ -302,4 +320,4 @@ class WorkerPool:
             ExecutionError: If the machinery could not run a call.
             WorkflowError:  If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
-        return _offload(self._session, self._live_executor, work)
+        return _offload(self._session, self._live_executor, work, keep_going=keep_going)

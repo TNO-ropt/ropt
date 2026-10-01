@@ -134,7 +134,10 @@ Without this the work the other runs did would be thrown away along with the run
 that failed, which matters more now that they are cut off deliberately. The
 first exception is chained, so a traceback still shows what went wrong, and a
 `KeyboardInterrupt` or `SystemExit` travels on untouched rather than into the
-carrier — that is the program going down, not a run reporting a problem.
+carrier — that is the program going down, not a run reporting a problem. The
+interrupt also aborts the runs that are still going and waits for them, so they
+end at their next evaluation boundary instead of carrying on unwatched; a second
+interrupt abandons them.
 
 The reach is the session, not the call, so a failure also aborts runs that were
 started separately on the same session. A run started with the module-level

@@ -59,6 +59,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     bundle_size: int | None,
     keep_going: bool | None,
     metadata: dict[str, Any] | None,
+    parent_signal: AbortSignal | None,
 ) -> OptimizationResult:
     context = EnOptContext.model_validate(config)
     signal = AbortSignal()
@@ -73,6 +74,11 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         signal,
         keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
     )
+    if parent_signal is not None:
+        # Runs at once when the parent is already aborting, which is what cuts
+        # off a run that was still queued when the abort arrived. Only an abort
+        # of the whole call reaches the parent, so its reason is the default.
+        parent_signal.add_callback(signal.abort)
     try:
         exit_reason = step.run(
             context=context,
@@ -80,10 +86,14 @@ def _optimize(  # ruff: ignore[too-many-arguments]
             metadata=metadata,
         )
     except Exception:
-        session._fail()  # ruff: ignore[private-member-access]
+        # Being cut off is not a failure, so it must not cut off anything else.
+        if not signal.aborting:
+            session._fail()  # ruff: ignore[private-member-access]
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]
+        if parent_signal is not None:
+            parent_signal.remove_callback(signal.abort)
     results = result_handler["results"]
     return OptimizationResult(
         exit_reason=exit_reason,
@@ -113,6 +123,11 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     reports = broadcast_reports(report, len(runs))
     metadatas = broadcast_metadata(metadata, len(runs))
     bundle_sizes = broadcast_bundle_sizes(bundle_size, len(runs))
+    # One signal for the whole call, so an abort reaches the runs that have not
+    # started yet. `keep_going` is what keeps `_fail` away from it: a run that
+    # fails must not strand the siblings still queued behind `limit`.
+    parent_signal = AbortSignal()
+    session._register(parent_signal, keep_going=True)  # ruff: ignore[private-member-access]
     jobs: list[Callable[[], OptimizationResult]] = [
         partial(
             _optimize,
@@ -127,6 +142,7 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
             bundle_size=run_bundle_size,
             keep_going=keep_going,
             metadata=run_metadata,
+            parent_signal=parent_signal,
         )
         for (
             (run_config, run_x0, run_function),
@@ -137,7 +153,10 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     ]
     # Dedicated threads, not a shared thread pool: each run blocks its thread
     # while waiting for evaluations that would queue behind it in such a pool.
-    outcomes = run_concurrent(jobs, limit)
+    try:
+        outcomes = run_concurrent(jobs, limit, interrupt=parent_signal.abort)
+    finally:
+        session._deregister(parent_signal)  # ruff: ignore[private-member-access]
     for outcome in outcomes:
         # A KeyboardInterrupt or SystemExit is the program going down, not a run
         # reporting a problem, so it travels on rather than into a carrier.

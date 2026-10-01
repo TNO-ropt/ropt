@@ -54,6 +54,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     bundle_size: int | None,
+    keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[FunctionResults | None]:
     array = np.asarray(variables, dtype=np.float64)
@@ -68,6 +69,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         handlers=handlers,
         report=report,
         bundle_size=bundle_size,
+        keep_going=keep_going,
         metadata=metadata,
     )
     return EvaluationResult(
@@ -86,6 +88,7 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     bundle_size: int | None,
+    keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     array = np.asarray(variables, dtype=np.float64)
@@ -100,6 +103,7 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
         handlers=handlers,
         report=report,
         bundle_size=bundle_size,
+        keep_going=keep_going,
         metadata=metadata,
     )
 
@@ -114,6 +118,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     bundle_size: int | None,
+    keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     context = EnOptContext.model_validate(config)
@@ -125,7 +130,10 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     step = EvaluationStep(evaluator=evaluator, abort_signal=signal)
     step.add_event_handler(history)
     attach_handlers(step, handlers, report)
-    session._register(signal, keep_going=False)  # ruff: ignore[private-member-access]
+    session._register(  # ruff: ignore[private-member-access]
+        signal,
+        keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
+    )
     try:
         step.run(
             context=context,
@@ -133,7 +141,9 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
             metadata=metadata,
         )
     except Exception:
-        session._fail()  # ruff: ignore[private-member-access]
+        # Being cut off is not a failure, so it must not cut off anything else.
+        if not signal.aborting:
+            session._fail()  # ruff: ignore[private-member-access]
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]

@@ -201,11 +201,14 @@ Aborting consults nothing: the result is whatever the run had reached.
 A run is cut off at its next evaluation boundary, so the evaluations already in
 flight are still carried out and their workers are free only once they return.
 
-`abort()` reaches the runs that are registered at the moment of the call, and
+`abort()` reaches the runs that are under way at the moment of the call, and
 nothing more: it is not a latch. A run started afterwards is unaffected, so a
-loop that abandons one attempt and starts another keeps working. Leaving the
-session's `with` block aborts its runs as well, and then releases its pools,
-which is what refuses a run started after that.
+loop that abandons one attempt and starts another keeps working. An
+[`optimize_many`][ropt.simple.Session.optimize_many] counts as one run here: a
+run it has queued behind its `limit` is cut off as well, and reports `ABORTED`
+without evaluating anything. Leaving the session's `with` block aborts its runs
+as well, and then releases its pools, which is what refuses a run started after
+that.
 
 A run started with the module-level [`optimize`][ropt.simple.optimize] belongs
 to no session you hold and cannot be aborted this way. It evaluates on the

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
+from ropt.exceptions import OptimizerStop
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
@@ -19,6 +20,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from numpy.typing import NDArray
+
+    from ropt.components.concurrency import AbortSignal
 
 
 class FunctionEvaluator(Evaluator):
@@ -37,18 +40,21 @@ class FunctionEvaluator(Evaluator):
         *,
         function: EvaluationFunctionCallback,
         batch_id_callback: Callable[[], int] | None = None,
+        abort_signal: AbortSignal | None = None,
     ) -> None:
         """Initialize the FunctionEvaluator.
 
         Args:
             function:          The function used for objectives and constraints.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
+            abort_signal:      An optional signal that abandons a running batch.
         """
         super().__init__()
         self._function = function
         self._batch_id_callback = (
             batch_id_callback if batch_id_callback is not None else BatchIdCounter()
         )
+        self._abort_signal = abort_signal
 
     def _eval(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
@@ -61,6 +67,9 @@ class FunctionEvaluator(Evaluator):
 
         Returns:
             The result of calling the wrapped evaluator function.
+
+        Raises:
+            OptimizerStop: If the abort signal abandoned the batch.
         """
         batch_id = self._batch_id_callback()
         no = evaluator_context.context.objectives.weights.size
@@ -75,6 +84,10 @@ class FunctionEvaluator(Evaluator):
         for eval_idx, function_context in _active_evaluations(
             evaluator_context, batch_id
         ):
+            # The rows run on this thread, so this is the only place the batch
+            # can be abandoned part way.
+            if self._abort_signal is not None and self._abort_signal.aborting:
+                raise OptimizerStop(self._abort_signal.exit_reason)
             _scatter_result(
                 eval_idx,
                 self._function(variables[eval_idx, :], function_context),
