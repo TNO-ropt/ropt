@@ -5,6 +5,8 @@ from __future__ import annotations
 import threading
 from functools import partial
 
+import pytest
+
 from ropt.components.concurrency import run_concurrent
 
 
@@ -79,3 +81,80 @@ def test_run_concurrent_starts_pending_jobs_after_a_failure() -> None:
     assert len(started) == 5
     assert isinstance(outcomes[0], RuntimeError)
     assert outcomes[1:] == [1, 2, 3, 4]
+
+
+def test_run_concurrent_uses_no_more_threads_than_the_limit() -> None:
+    limit = 2
+    count = 50
+    lock = threading.Lock()
+    threads: set[int] = set()
+
+    def _job(index: int) -> int:
+        with lock:
+            threads.add(threading.get_ident())
+        return index
+
+    outcomes = run_concurrent([partial(_job, i) for i in range(count)], limit=limit)
+    assert outcomes == list(range(count))
+    # The threads live for the whole call, so no identity here is a reused one.
+    assert len(threads) <= limit
+
+
+def _break_the_first_join(monkeypatch: pytest.MonkeyPatch) -> None:
+    # An interrupt in the thread that waits, without the timing of a signal.
+    original_join = threading.Thread.join
+    broken = False
+
+    def _join(self: threading.Thread, timeout: float | None = None) -> None:
+        nonlocal broken
+        if not broken:
+            broken = True
+            raise KeyboardInterrupt
+        original_join(self, timeout)
+
+    monkeypatch.setattr(threading.Thread, "join", _join)
+
+
+def test_run_concurrent_waits_for_its_jobs_when_an_interrupt_breaks_the_wait(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    stop = threading.Event()
+    finished: list[int] = []
+    lock = threading.Lock()
+
+    def _job(index: int) -> int:
+        stop.wait(timeout=10.0)
+        with lock:
+            finished.append(index)
+        return index
+
+    _break_the_first_join(monkeypatch)
+    with pytest.raises(KeyboardInterrupt):
+        run_concurrent(
+            [partial(_job, i) for i in range(2)], limit=2, interrupt=stop.set
+        )
+    with lock:
+        assert sorted(finished) == [0, 1]
+
+
+def test_run_concurrent_abandons_its_jobs_when_no_interrupt_is_given(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    stop = threading.Event()
+    finished: list[int] = []
+    lock = threading.Lock()
+
+    def _job(index: int) -> int:
+        stop.wait(timeout=10.0)
+        with lock:
+            finished.append(index)
+        return index
+
+    _break_the_first_join(monkeypatch)
+    try:
+        with pytest.raises(KeyboardInterrupt):
+            run_concurrent([partial(_job, i) for i in range(2)], limit=2)
+        with lock:
+            assert finished == []
+    finally:
+        stop.set()

@@ -17,8 +17,8 @@ given. A compute step calls it on the thread it is already on.
 
 Several compute steps can share one executor. Each blocks in its own `run()`
 call on its own thread, and each gets back the results of its own batch. Running
-several optimizations at once is therefore a matter of starting a thread per
-optimization — [`run_concurrent`][ropt.components.concurrency.run_concurrent]
+several optimizations at once is therefore a matter of giving each a thread of
+its own while it runs — [`run_concurrent`][ropt.components.concurrency.run_concurrent]
 does that, and is what [`optimize_many`][ropt.simple.optimize_many] is built
 on.
 
