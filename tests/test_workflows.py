@@ -900,6 +900,21 @@ def test_abort_signal_runs_the_callbacks_after_one_that_raises(
     assert "boom" in caplog.text
 
 
+def test_abort_signal_does_not_raise_a_late_callback_that_raises(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    signal = AbortSignal()
+    signal.abort()
+
+    def _raises() -> None:
+        msg = "boom"
+        raise ValueError(msg)
+
+    with caplog.at_level(logging.ERROR):
+        signal.add_callback(_raises)
+    assert "boom" in caplog.text
+
+
 _EVALUATION_EVENTS = {
     EnOptEventType.START_ENSEMBLE_EVALUATOR,
     EnOptEventType.START_EVALUATION,

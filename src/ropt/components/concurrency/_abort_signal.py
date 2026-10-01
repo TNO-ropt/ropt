@@ -15,6 +15,15 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
+def _run_callback(callback: Callable[[], None]) -> None:
+    # One observer's callback must not withhold the abort from the observers
+    # after it, nor leave the caller that registered it holding an exception.
+    try:
+        callback()
+    except Exception:
+        _logger.exception("An abort callback raised")
+
+
 class AbortSignal:
     """An abort request that compute steps can be told to observe.
 
@@ -57,12 +66,7 @@ class AbortSignal:
             self._aborting = True
             callbacks = list(self._callbacks)
         for callback in callbacks:
-            try:
-                callback()
-            except Exception:
-                # One observer's callback must not withhold the abort from the
-                # observers after it.
-                _logger.exception("An abort callback raised")
+            _run_callback(callback)
 
     @property
     def exit_reason(self) -> ExitReason:
@@ -90,9 +94,10 @@ class AbortSignal:
         A signal that is already aborting runs the callback immediately, so a
         caller that registers late is not left waiting.
 
-        The callback runs on the thread that calls `abort`, so it must return
-        promptly. One that raises is logged, and the callbacks after it still
-        run.
+        The callback runs on the thread that aborts the signal, or on this one
+        when the signal is already aborting, so it must return promptly. One
+        that raises is logged instead of raised, and the callbacks after it
+        still run.
 
         Args:
             callback: The zero-argument callable to run.
@@ -101,7 +106,7 @@ class AbortSignal:
             if not self._aborting:
                 self._callbacks.append(callback)
                 return
-        callback()
+        _run_callback(callback)
 
     def remove_callback(self, callback: Callable[[], None]) -> None:
         """Deregister a callback.
