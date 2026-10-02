@@ -5,6 +5,9 @@
         members: []
 
 ::: ropt.components.compute_steps.ComputeStep
+    options:
+        filters: ["!^_[^_]", "^_run$"]
+
 ::: ropt.components.compute_steps.EvaluationStep
 ::: ropt.components.compute_steps.OptimizationStep
 

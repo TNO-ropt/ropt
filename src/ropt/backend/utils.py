@@ -24,6 +24,13 @@ from numpy.typing import NDArray
 from ropt._native_streams import flush_native_streams
 from ropt._utils import split_constraints
 
+__all__ = [
+    "collect_native_output",
+    "create_output_path",
+    "resolve_verbosity",
+    "split_linear_constraints",
+]
+
 
 def resolve_verbosity(*, verbose: bool | int | None) -> int | None:
     """Resolve how much the optimizer should report.

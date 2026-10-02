@@ -1,4 +1,4 @@
-# Evaluation Classes
+# Batch Evaluation
 
 ::: ropt.evaluation
     options:

@@ -1,4 +1,4 @@
-# Core Classes
+# Ensemble Evaluator and Optimizer
 
 ::: ropt.core
     options:

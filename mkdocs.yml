@@ -151,16 +151,14 @@ nav:
           - "Writing a Plugin": advanced/writing_plugins.md
   - "Reference":
       - "Simple API": reference/simple.md
-      - "Utility Functions": reference/utils.md
       - "Configuration":
         - "Context Class": reference/context.md
         - "Configuration Classes": reference/config.md
       - "Results & Events":
         - "Evaluation Results": reference/results.md
         - "Optimization Events": reference/events.md
-      - "Optimization Engine":
-        - "Core Classes": reference/core.md
-        - "Evaluation Classes": reference/evaluation.md
+      - "Ensemble Evaluator and Optimizer": reference/core.md
+      - "Batch Evaluation": reference/evaluation.md
       - "Optimizer Components":
         - "Function Estimators": reference/function_estimator.md
         - "Realization Filters": reference/realization_filter.md
@@ -173,6 +171,7 @@ nav:
         - "Executors": reference/components_executors.md
         - "Concurrency": reference/components_concurrency.md
       - "Plugin System": reference/plugin_manager.md
+      - "Utility Functions": reference/utils.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
 

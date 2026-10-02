@@ -5,6 +5,9 @@
         members: []
 
 ::: ropt.components.evaluators.Evaluator
+    options:
+        filters: ["!^_[^_]", "^_eval$"]
+
 ::: ropt.components.evaluators.BatchEvaluator
 ::: ropt.components.evaluators.FunctionEvaluator
 ::: ropt.components.evaluators.ParallelEvaluator
