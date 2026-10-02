@@ -319,9 +319,9 @@ belongs on a cluster.
     pool = s.hpc_pool(workers=100, workdir="/scratch/my-run")
     ```
 
-    A process pool is the wrong rehearsal: it reuses workers, keeps your
-    objective in Python, and leaves the programs it starts running when the run
-    stops — none of which is how a cluster job behaves.
+    A process pool does not stand in for a cluster job: it reuses workers, keeps
+    your objective in Python, and leaves the programs it starts running when the
+    run stops — none of which is how a cluster job behaves.
 
 ### Running on an HPC cluster
 
@@ -343,7 +343,7 @@ with session() as s:
 The runnable script is
 [examples/simple/hpc.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/hpc.py).
 Pass it `--local` and it runs the identical optimization on a
-local pool, which is the rehearsal described above, so the example works
+local pool, which is the stand-in described above, so the example works
 with or without a cluster to hand.
 
 A job is nothing more than a submission script with your evaluation command in
@@ -390,16 +390,17 @@ Once that is settled, the choice is about speed, and about what
     is a mixture whose Python-level share is invisible to the person who wrote
     it.
 
-    What makes the answer cheap is an asymmetry: **threads are the cheap thing
-    to try, processes are the expensive commitment.** Trying a thread pool
-    costs one argument, and its failure mode is *no speedup* — not breakage. So:
+    Switching to a thread pool costs one argument, and if threads do not scale
+    on your objective the result is no speedup rather than a broken run.
+    Switching to processes costs a serializable objective and a process start
+    per worker. So try threads first:
 
     1. Start with a thread pool. Time `workers=1` against `workers=4` on a
        shortened run.
     2. If it scales, you are done, and you never needed to know what the GIL was
        doing.
     3. If it does not, set `OMP_NUM_THREADS=1` (see below) and time it again.
-    4. Only then pay for processes.
+    4. Only then move to processes.
 
     Directional guidance is fine as orientation — waiting on an external program
     almost always scales, arithmetic written in Python never does, array-heavy
@@ -439,9 +440,9 @@ the workers it is itself occupying — a deadlock as soon as they are all busy,
 which is the normal case, since a run fills its pool with one work item per
 realization. Rather than hang, the pool refuses work submitted by the
 evaluation itself with a [`WorkflowError`][ropt.exceptions.WorkflowError]. A
-thread the evaluation starts is on its own: it is not recognized as a worker, so
-it can still deadlock on the pool. Give the inner run its own pool, or
-none at all, which evaluates inline.
+thread the evaluation starts is not recognized as a worker, so work submitted
+from it is not refused and can still deadlock on the pool. Give the inner run
+its own pool, or none at all, which evaluates inline.
 
 The evaluation must stay **in your process**, so on a thread pool or with no
 pool. On a process, local, or HPC pool the evaluation function is copied
@@ -466,7 +467,7 @@ to them differs:
 
 Three consequences follow.
 
-**A thread pool cannot be hurried.** Python provides no way to interrupt a
+**A thread pool cannot be stopped early.** Python provides no way to interrupt a
 running thread from outside, so a long evaluation on a thread pool ends
 when it ends, and your program cannot exit before it does. If an evaluation may
 run long and has to be interruptible, put it on one of the other pools.
