@@ -181,7 +181,7 @@ it had reached.
 The `report` callback runs inside the run it stops, which is no use to a signal
 handler or a user interface. [`Session.abort`][ropt.simple.Session.abort] is
 the one that is called from another thread: it cuts off every run that belongs
-to the session, and each ends with `ABORTED`, keeping the best result it had
+to the session, and each ends with `USER_ABORT`, keeping the best result it had
 reached.
 
 ```python
@@ -190,7 +190,7 @@ with session() as s:
     signal.signal(signal.SIGINT, lambda *_: s.abort())
     result = pool.optimize(config, x0, objective)
 
-if result.exit_code is ExitCode.ABORTED:
+if result.exit_code is ExitCode.USER_ABORT:
     print("cut off early, best so far:", result.results)
 ```
 
@@ -205,10 +205,11 @@ flight are still carried out and their workers are free only once they return.
 nothing more: it is not a latch. A run started afterwards is unaffected, so a
 loop that abandons one attempt and starts another keeps working. An
 [`optimize_many`][ropt.simple.Session.optimize_many] counts as one run here: a
-run it has queued behind its `limit` is cut off as well, and reports `ABORTED`
+run it has queued behind its `limit` is cut off as well, and reports `USER_ABORT`
 without evaluating anything. Leaving the session's `with` block aborts its runs
 as well, and then releases its pools, which is what refuses a run started after
-that.
+that. A run cut off that way reports `ABORTED` rather than `USER_ABORT`, since
+it was the block ending rather than a request to stop.
 
 A run started with the module-level [`optimize`][ropt.simple.optimize] belongs
 to no session you hold and cannot be aborted this way. It evaluates on the
@@ -294,7 +295,7 @@ receives, so everything is read the same way wherever it came from. Here
 `report` callback, where the optimizer chose the point.
 
 An evaluation is a single batch, so it produces either every result or none.
-That is why `exit_code` can only be `FINISHED`, or `ABORTED` and
+That is why `exit_code` can only be `FINISHED`, or `USER_ABORT` and
 `ABORTED_ON_ERROR` when [`Session.abort`](#stopping-from-outside) or a failing
 run on the same session cut it off. An abort that arrives after the batch has
 finished costs it nothing, and the evaluation reports `FINISHED`.

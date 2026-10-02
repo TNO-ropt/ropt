@@ -133,7 +133,7 @@ def test_session_abort_keeps_the_results_of_completed_batches() -> None:
             _CONFIG, _INITIAL, _sphere, report=_abort_on_first_result
         )
 
-    assert result.exit_code == ExitCode.ABORTED
+    assert result.exit_code == ExitCode.USER_ABORT
     assert result.results is not None
 
 
@@ -160,7 +160,7 @@ def test_session_abort_abandons_the_batch_in_flight() -> None:
 
         result = pool.optimize(_CONFIG, _INITIAL, objective)
 
-    assert result.exit_code == ExitCode.ABORTED
+    assert result.exit_code == ExitCode.USER_ABORT
     # A run that was let alone evaluates the vector and a perturbation per
     # variable, many times over; this one stopped almost immediately.
     with lock:
@@ -185,7 +185,7 @@ def test_session_abort_leaves_an_evaluation_batch_without_results() -> None:
 
         outcome = pool.evaluate_batch(_CONFIG, matrix, objective, bundle_size=1)
 
-    assert outcome.exit_code == ExitCode.ABORTED
+    assert outcome.exit_code == ExitCode.USER_ABORT
     assert outcome.results == ()
 
 
@@ -208,7 +208,7 @@ def test_an_in_process_evaluation_batch_is_cut_off_between_its_rows() -> None:
 
         outcome = opened.evaluate_batch(_CONFIG, matrix, objective)
 
-    assert outcome.exit_code == ExitCode.ABORTED
+    assert outcome.exit_code == ExitCode.USER_ABORT
     assert outcome.results == ()
     assert calls == 1
 
@@ -279,7 +279,7 @@ def test_session_abort_cuts_off_every_run_in_progress() -> None:
         finally:
             stopper.join(timeout=30)
 
-    assert [result.exit_code for result in results] == [ExitCode.ABORTED] * runs
+    assert [result.exit_code for result in results] == [ExitCode.USER_ABORT] * runs
 
 
 @pytest.mark.timeout(60)
@@ -480,7 +480,7 @@ def test_session_abort_reaches_a_run_that_keeps_going() -> None:
         release.set()
         driver.join(timeout=30)
 
-    assert outcome[0].exit_code == ExitCode.ABORTED
+    assert outcome[0].exit_code == ExitCode.USER_ABORT
 
 
 @pytest.mark.timeout(60)
@@ -512,7 +512,7 @@ def test_session_abort_cuts_off_the_runs_queued_behind_the_limit() -> None:
             limit=1,
         )
 
-    assert [outcome.exit_code for outcome in outcomes] == [ExitCode.ABORTED] * 5
+    assert [outcome.exit_code for outcome in outcomes] == [ExitCode.USER_ABORT] * 5
     with lock:
         assert calls[0] >= 1
         assert calls[1:] == [0, 0, 0, 0]

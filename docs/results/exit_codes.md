@@ -25,12 +25,13 @@ comes back is then whatever it had reached rather than a chosen endpoint.
 | `MAX_BATCHES_REACHED`   | The configured maximum number of evaluation batches was reached.                                     |
 | `STOPPED`               | A `report` callback returned `True`, ending the run at the next evaluation boundary.                 |
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
-| `ABORTED`               | [`Session.abort`](../running/running.md#stopping-from-outside) cut the run off.                      |
+| `ABORTED`               | An [`AbortSignal`][ropt.components.concurrency.AbortSignal] cut the run off, as closing a session does to a run still under way. |
 | `ABORTED_ON_ERROR`      | Another run on the same session raised, and brought this one down with it.                           |
+| `USER_ABORT`            | [`Session.abort`](../running/running.md#stopping-from-outside) cut the run off.                      |
 | `EXECUTOR_SHUT_DOWN`    | The pool the run was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
 | `UNKNOWN`               | The zero value of the enumeration. No run reports it.                                                |
 
-The first five are stops and the next three aborts; `UNKNOWN` is neither.
+The first five are stops and the next four aborts; `UNKNOWN` is neither.
 `TOO_FEW_REALIZATIONS` ends a run at an evaluation boundary like the other
 stops, but unlike them it follows from a failure: one failed realization is
 enough to trigger it unless
@@ -42,7 +43,7 @@ is lowered.
 An **optimization** can end for any of the reasons above.
 
 An **evaluation** is a single batch with no optimizer loop around it, so it
-reports only `FINISHED`, `ABORTED` or `ABORTED_ON_ERROR`. It is also all or
+reports only `FINISHED`, `USER_ABORT`, `ABORTED` or `ABORTED_ON_ERROR`. It is also all or
 nothing: either every vector was evaluated, or the batch was abandoned and
 `results` is empty. An abort that arrives once the batch has finished costs it
 nothing, and the evaluation reports `FINISHED`.

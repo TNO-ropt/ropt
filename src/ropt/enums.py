@@ -146,12 +146,23 @@ class ExitCode(IntEnum):
     """
 
     ABORTED = 7
-    """Returned when the run was cut off through a
+    """Returned when the run was cut off through an
     [`AbortSignal`][ropt.components.concurrency.AbortSignal], without regard to
-    where it had got to."""
+    where it had got to.
+
+    This is the code a signal carries unless it was aborted with another one,
+    and it is what closing a session reports for a run still under way.
+    """
 
     ABORTED_ON_ERROR = 8
     """Returned when another run this one shares a session with raised."""
+
+    USER_ABORT = 9
+    """Returned when [`Session.abort`][ropt.simple.Session.abort] cut the run off.
+
+    Set apart from [`ABORTED`][ropt.enums.ExitCode.ABORTED] so that an abort
+    that was asked for can be told from one the library performed itself.
+    """
 
 
 class AxisName(StrEnum):

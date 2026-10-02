@@ -122,7 +122,7 @@ class Session:
     def abort(self) -> None:
         """Cut off the runs that belong to this session.
 
-        Each run ends with `ExitCode.ABORTED`, keeping whatever its completed
+        Each run ends with `ExitCode.USER_ABORT`, keeping whatever its completed
         batches produced; one cut off during its first batch has no result. An
         [`offload`][ropt.simple.WorkerPool.offload] in flight raises
         [`AbortedError`][ropt.exceptions.AbortedError] instead, since it has no
@@ -137,7 +137,7 @@ class Session:
         with self._lock:
             signals = list(self._signals)
         for signal in signals:
-            signal.abort()
+            signal.abort(ExitCode.USER_ABORT)
 
     def _fail(self) -> None:
         # A run that failed brings down the rest, which is what makes a script
