@@ -70,18 +70,6 @@ covering *how* to run a configured optimization:
 2. [Optimization Workflows](advanced/workflows.md) expose the individual
    building blocks — compute steps, event handlers, executors — directly.
 
-## Getting started
-
-- Read the [Background](getting_started/background.md) for the ideas behind
-  `ropt`, then work through [Installation](getting_started/installation.md) and
-  the [Quickstart](getting_started/quickstart.md).
-- [Running Optimizations](running/running.md) covers running an optimization,
-  and most cases with it.
-- The [Key Concepts](optimizer_setup/key_concepts.md) page introduces the terms used
-  throughout the documentation.
-- The [Configuration](optimizer_setup/configuration.md) page describes the
-  configuration format in detail.
-
 ## Related packages
 
 ### Plugins

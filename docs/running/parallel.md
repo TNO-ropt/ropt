@@ -328,9 +328,11 @@ belongs on a cluster.
 An [`hpc_pool`][ropt.simple.Session.hpc_pool] submits each evaluation as a job to
 an HPC queue through [`pysqa`](https://pysqa.readthedocs.io/); it needs the
 `ropt[hpc]` extra. `workdir` is required and must be an existing absolute
-directory on a filesystem the compute nodes share. With no further arguments it
-uses the default cluster and queue from the `pysqa` configuration of your `ropt`
-installation:
+directory on a filesystem the compute nodes share. A job is a fresh command, so
+the evaluation function must live in a module the job can import, which means a
+module installed on the compute nodes, or the `ropt[cloudpickle]` extra. With no
+further arguments it uses the default cluster and queue from the `pysqa`
+configuration of your `ropt` installation:
 
 ```python
 with session() as s:
