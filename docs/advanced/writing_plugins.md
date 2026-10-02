@@ -109,8 +109,8 @@ class UniformSampler(Sampler):
     ...
 ```
 
-Annotating it as a `ClassVar` is what keeps type checkers and linters happy
-about a set assigned at class level; a bare `methods = {...}` works just as
+Annotating it as a `ClassVar` is what type checkers and linters expect
+for a set assigned at class level; a bare `methods = {...}` works just as
 well at runtime.
 
 ## Registering it
@@ -192,7 +192,7 @@ settings.
 So while a run is in progress a backend must not change the working directory,
 the environment, `sys.stdout` or `sys.stderr`, or file descriptors 1 and 2.
 Where the optimizer produces a log, configure the library to write it to a named
-file — that is the per-run answer — or to produce no output.
+file, which is per run, or to produce no output.
 
 Not every library allows this, and `ropt` does not work around the ones that do
 not. Such a backend must instead **state this in its own
@@ -230,8 +230,8 @@ so it is left alone.
 
 Set the corresponding option only if the user has not set it themselves —
 `setdefault` for a dictionary, or a check before appending for a list — so that
-a specific option such as `DISPLAY_DEGREE 3` refines the generic flag rather
-than fighting it.
+a specific option such as `DISPLAY_DEGREE 3` takes precedence over the generic
+flag instead of conflicting with it.
 
 ## Declaring native output { #declaring-native-output }
 
@@ -255,12 +255,12 @@ class MyBackend(Backend):
 
 The answer may differ per method, in which case return it based on the
 configured method — the built-in SciPy backend returns `self._method == "tnc"`.
-**When unsure, declare it for the whole backend.** Being wrong that way costs
-only a brief rewiring of process-global state; being wrong the other way means
-the user's output escapes to the terminal, and nothing announces it.
+Declaring it for the whole backend when only some methods need it costs only a
+brief rewiring of process-global state. Declaring it for none when a method
+needs it sends the user's output to the terminal, with no error raised.
 
-You do not have to guess.
-[`collect_native_output`][ropt.backend.utils.collect_native_output] runs an
+[`collect_native_output`][ropt.backend.utils.collect_native_output] settles it:
+it runs an
 optimization with the Python streams diverted and the descriptors captured, so
 whatever it returns was written below Python:
 
