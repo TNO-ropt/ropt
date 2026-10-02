@@ -3002,7 +3002,22 @@ rather than raised:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Each code carries a short description in
+<a class="autorefs autorefs-internal" title="            message
+
+
+  
+      property
+  " href="../../reference/enums/#ropt.enums.ExitCode.message"><code>message</code></a>, which is what to print or log when
+reporting a run. Use <code>name</code> where the identifier itself is wanted, and compare
+against the member to branch on it. Note that <code>str()</code> and an f-string give the
+integer value, as they do for any <code>IntEnum</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">code</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">code</span><span class="o">.</span><span class="n">message</span>  <span class="c1"># 'Maximum number of function evaluations reached'</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">code</span><span class="o">.</span><span class="n">name</span>     <span class="c1"># 'MAX_FUNCTIONS_REACHED'</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nb">str</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>     <span class="c1"># '2'</span>
 </span></code></pre></div>
 <p>A run either <strong>stops</strong> or is <strong>aborted</strong>, and the exit code indicates which. It
 stops when a condition on the run is met — the optimizer converged, a budget ran
