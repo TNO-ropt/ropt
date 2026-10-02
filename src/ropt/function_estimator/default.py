@@ -38,14 +38,24 @@ class DefaultFunctionEstimator(FunctionEstimator):
         if self._method == "default":
             self._method = "mean"
 
-    def init(self, *, merge_realizations: bool) -> None:  # ruff: ignore[undocumented-public-method]
+    def init(self, *, merge_realizations: bool) -> None:
+        """Record whether the gradient keeps its realizations separate."""
         self._merge_realizations = merge_realizations
 
-    def calculate_function(  # ruff: ignore[undocumented-public-method]
+    def calculate_function(
         self,
         functions: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
+        """Estimate the function value as a weighted mean or standard deviation.
+
+        Returns:
+            The estimated function value for each objective or constraint.
+
+        Raises:
+            ValueError: If the configured method is not supported, or `stddev`
+                        is combined with merged realizations.
+        """
         if self._method == "stddev" and self._merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "
@@ -60,12 +70,21 @@ class DefaultFunctionEstimator(FunctionEstimator):
         msg = f"Function estimator method not supported: {estimator_method}"
         raise ValueError(msg)
 
-    def calculate_gradient(  # ruff: ignore[undocumented-public-method]
+    def calculate_gradient(
         self,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
+        """Estimate the gradient to match the function the estimator returns.
+
+        Returns:
+            The estimated gradient.
+
+        Raises:
+            ValueError: If the configured method is not supported, or `stddev`
+                        is combined with merged realizations.
+        """
         if self._method == "stddev" and self._merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "

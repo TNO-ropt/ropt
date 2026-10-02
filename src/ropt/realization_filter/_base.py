@@ -29,7 +29,7 @@ class RealizationFilter(ABC):
     """
 
     @abstractmethod
-    def __init__(self, filter_config: RealizationFilterConfig) -> None:  # D107
+    def __init__(self, filter_config: RealizationFilterConfig) -> None:
         """Create a new realization filter instance.
 
         Store the configuration and pre-compute any method-specific state.

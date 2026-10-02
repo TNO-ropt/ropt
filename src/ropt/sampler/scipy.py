@@ -71,7 +71,15 @@ class SciPySampler(Sampler):
 
     methods: ClassVar[MethodSpec] = SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"}
 
-    def __init__(self, sampler_config: SamplerConfig) -> None:  # ruff: ignore[undocumented-public-init]
+    def __init__(self, sampler_config: SamplerConfig) -> None:
+        """Initialize the SciPy sampler.
+
+        Args:
+            sampler_config: The sampler configuration.
+
+        Raises:
+            UnsupportedError: If the requested method is not supported.
+        """
         self._sampler_config = sampler_config
         _, _, self._method = self._sampler_config.method.lower().rpartition("/")
         if self._method == "default":
@@ -82,7 +90,7 @@ class SciPySampler(Sampler):
             raise UnsupportedError(msg)
         self._sampler: rv_continuous | QMCEngine | None = None
 
-    def init(  # ruff: ignore[undocumented-public-method]
+    def init(
         self,
         *,
         realization_count: int,
@@ -91,6 +99,7 @@ class SciPySampler(Sampler):
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
+        """Record the sample shape and build the underlying SciPy sampler."""
         self._realization_count = realization_count
         self._perturbation_count = perturbation_count
         self._variable_count = variable_count
@@ -101,7 +110,12 @@ class SciPySampler(Sampler):
                 self._sampler_config.options
             )
 
-    def generate_samples(self) -> NDArray[np.float64]:  # ruff: ignore[undocumented-public-method]
+    def generate_samples(self) -> NDArray[np.float64]:
+        """Draw one set of perturbations for every realization.
+
+        Returns:
+            The perturbations, shape `(realizations, perturbations, variables)`.
+        """
         variable_count = self._variable_count
         realization_count = self._realization_count
         perturbation_count = self._perturbation_count

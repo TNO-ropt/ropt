@@ -101,7 +101,7 @@ class ExternalBackend(Backend):
         self._delegate_cls = get_plugin("backend", method=method)
         self._delegate_name = get_plugin_name("backend", method)
 
-    def start(  # ruff: ignore[undocumented-public-method]
+    def start(
         self,
         problem: OptimizationProblem,
         optimizer_callback: OptimizerCallback,
@@ -109,6 +109,7 @@ class ExternalBackend(Backend):
         evaluation_policy: Literal["speculative", "separate", "auto"],
         output_dir: Path | None,
     ) -> None:
+        """Run the delegate backend in a child process until it finishes."""
         self._optimizer_callback = optimizer_callback
         payload = self._serialize(problem, evaluation_policy, output_dir)
 
@@ -167,9 +168,10 @@ class ExternalBackend(Backend):
         if exception is not None:
             raise exception
 
-    def validate_options(  # ruff: ignore[undocumented-public-method]
+    def validate_options(
         self,
     ) -> None:
+        """Check the options by asking the delegate backend to validate them."""
         self._delegate_cls(self._backend_config).validate_options()
 
     def _serialize(

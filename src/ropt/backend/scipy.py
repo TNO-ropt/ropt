@@ -176,7 +176,7 @@ class SciPyBackend(Backend):
             msg = f"SciPy optimizer algorithm {self._method} is not supported."
             raise UnsupportedError(msg)
 
-    def start(  # ruff: ignore[undocumented-public-method]
+    def start(
         self,
         problem: OptimizationProblem,
         optimizer_callback: OptimizerCallback,
@@ -184,6 +184,7 @@ class SciPyBackend(Backend):
         evaluation_policy: Literal["speculative", "separate", "auto"],
         output_dir: Path | None,  # ruff: ignore[unused-method-argument]
     ) -> None:
+        """Run the configured SciPy algorithm to completion."""
         self._problem = problem
         self._optimizer_callback = optimizer_callback
         self._evaluation_policy = evaluation_policy
@@ -235,14 +236,21 @@ class SciPyBackend(Backend):
                 )
 
     @property
-    def bypasses_python_output(self) -> bool:  # ruff: ignore[undocumented-public-method]
+    def bypasses_python_output(self) -> bool:
+        """Whether the selected method prints outside `sys.stdout`."""
         # Every SciPy method prints through `sys.stdout`, except `tnc`, which
         # prints from its C implementation.
         return self._method == "tnc"
 
-    def validate_options(  # ruff: ignore[undocumented-public-method]
+    def validate_options(
         self,
     ) -> None:
+        """Check the configured options against the method's schema.
+
+        Raises:
+            ValueError: If the options are not a dictionary, or are not valid
+                        for the configured method.
+        """
         if self._config.options is not None:
             if not isinstance(self._config.options, dict):
                 msg = "SciPy backend options must be a dictionary"

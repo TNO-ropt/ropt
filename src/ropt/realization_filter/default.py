@@ -85,7 +85,7 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
 
-    def get_realization_weights(  # D107  # ruff: ignore[undocumented-public-method, too-many-arguments]
+    def get_realization_weights(  # ruff: ignore[too-many-arguments]
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
@@ -96,6 +96,16 @@ class DefaultRealizationFilter(RealizationFilter):
         constraint_lower_bounds: NDArray[np.float64] | None,
         constraint_upper_bounds: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
+        """Weight the realizations by the configured CVaR or sort criterion.
+
+        Returns:
+            The weight of each realization.
+
+        Raises:
+            ValueError:          If the configured method is not supported.
+            TooFewRealizations:  If no realization can be given a positive
+                                 weight.
+        """
         match self._method:
             case "cvar-objective":
                 self._filter_options = CVaRObjectiveOptions.model_validate(
