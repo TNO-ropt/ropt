@@ -110,7 +110,7 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
 - **`realizations`** ([`Realizations`][ropt.results.Realizations]) — same
   structure as for `FunctionResults` (see above).
 
-The shape and axes of every field are tabulated under
+The shape and axes of every field are listed under
 [Axes and dimensionality](#axes-and-dimensionality). All values are NumPy
 arrays.
 
