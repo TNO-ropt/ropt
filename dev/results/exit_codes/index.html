@@ -3040,11 +3040,15 @@ comes back is then whatever it had reached rather than a chosen endpoint.</p>
 </tr>
 <tr>
 <td><code>ABORTED</code></td>
-<td><a href="../../running/running/#stopping-from-outside"><code>Session.abort</code></a> cut the run off.</td>
+<td>An <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.AbortSignal" href="../../reference/components_concurrency/#ropt.components.concurrency.AbortSignal"><code>AbortSignal</code></a> cut the run off, as closing a session does to a run still under way.</td>
 </tr>
 <tr>
 <td><code>ABORTED_ON_ERROR</code></td>
 <td>Another run on the same session raised, and brought this one down with it.</td>
+</tr>
+<tr>
+<td><code>USER_ABORT</code></td>
+<td><a href="../../running/running/#stopping-from-outside"><code>Session.abort</code></a> cut the run off.</td>
 </tr>
 <tr>
 <td><code>EXECUTOR_SHUT_DOWN</code></td>
@@ -3056,7 +3060,7 @@ comes back is then whatever it had reached rather than a chosen endpoint.</p>
 </tr>
 </tbody>
 </table>
-<p>The first five are stops and the next three aborts; <code>UNKNOWN</code> is neither.
+<p>The first five are stops and the next four aborts; <code>UNKNOWN</code> is neither.
 <code>TOO_FEW_REALIZATIONS</code> ends a run at an evaluation boundary like the other
 stops, but unlike them it follows from a failure: one failed realization is
 enough to trigger it unless
@@ -3065,7 +3069,7 @@ is lowered.</p>
 <h2 id="what-each-kind-of-run-reports">What each kind of run reports</h2>
 <p>An <strong>optimization</strong> can end for any of the reasons above.</p>
 <p>An <strong>evaluation</strong> is a single batch with no optimizer loop around it, so it
-reports only <code>FINISHED</code>, <code>ABORTED</code> or <code>ABORTED_ON_ERROR</code>. It is also all or
+reports only <code>FINISHED</code>, <code>USER_ABORT</code>, <code>ABORTED</code> or <code>ABORTED_ON_ERROR</code>. It is also all or
 nothing: either every vector was evaluated, or the batch was abandoned and
 <code>results</code> is empty. An abort that arrives once the batch has finished costs it
 nothing, and the evaluation reports <code>FINISHED</code>.</p>

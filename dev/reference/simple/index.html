@@ -5934,7 +5934,7 @@ interface — calls to bring them down.</p>
     <div class="doc doc-contents ">
 
         <p>Cut off the runs that belong to this session.</p>
-<p>Each run ends with <code>ExitCode.ABORTED</code>, keeping whatever its completed
+<p>Each run ends with <code>ExitCode.USER_ABORT</code>, keeping whatever its completed
 batches produced; one cut off during its first batch has no result. An
 <a class="autorefs autorefs-internal" title="            offload" href="#ropt.simple.WorkerPool.offload"><code>offload</code></a> in flight raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead, since it has no

@@ -3185,6 +3185,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.USER_ABORT" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USER_ABORT
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3676,6 +3687,17 @@
     <span class="md-ellipsis">
       
         ABORTED_ON_ERROR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.USER_ABORT" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USER_ABORT
       
     </span>
   </a>
@@ -4713,9 +4735,11 @@ instead.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when the run was cut off through a
+        <p>Returned when the run was cut off through an
 <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.AbortSignal" href="../components_concurrency/#ropt.components.concurrency.AbortSignal"><code>AbortSignal</code></a>, without regard to
 where it had got to.</p>
+<p>This is the code a signal carries unless it was aborted with another one,
+and it is what closing a session reports for a run still under way.</p>
 
     </div>
 
@@ -4746,6 +4770,44 @@ where it had got to.</p>
     <div class="doc doc-contents ">
 
         <p>Returned when another run this one shares a session with raised.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.ExitCode.USER_ABORT" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">USER_ABORT</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">USER_ABORT</span> <span class="o">=</span> <span class="mi">9</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returned when <a class="autorefs autorefs-internal" title="            abort" href="../simple/#ropt.simple.Session.abort"><code>Session.abort</code></a> cut the run off.</p>
+<p>Set apart from <a class="autorefs autorefs-internal" title="            ABORTED
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="#ropt.enums.ExitCode.ABORTED"><code>ABORTED</code></a> so that an abort
+that was asked for can be told from one the library performed itself.</p>
 
     </div>
 

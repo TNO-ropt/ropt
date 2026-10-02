@@ -3155,7 +3155,7 @@ session, which a single run can still override with <code>keep_going=False</code
 aborts the others if it fails itself, and its exception still reaches its
 caller, so opting out cannot turn a failure into silence.
 <a href="../running/#stopping-from-outside"><code>Session.abort</code></a> reaches every run whatever
-the flag says, and those end with <code>ABORTED</code> instead: the exit code
+the flag says, and those end with <code>USER_ABORT</code> instead: the exit code
 distinguishes an abort that was asked for from one another run caused. See
 <a href="../../results/exit_codes/">Exit Codes</a> for what each one means.</p>
 
