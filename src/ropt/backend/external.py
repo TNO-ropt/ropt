@@ -242,7 +242,7 @@ def _run(
                 output_dir=output_dir,
             )
     except OptimizerStop as exc:
-        request_queue.put({"stop": True, "exit_reason": exc.exit_reason})
+        request_queue.put({"stop": True, "exit_code": exc.exit_code})
     except Exception as exc:  # ruff: ignore[blind-except]
         request_queue.put(_encode_child_exception(exc))
     finally:
@@ -310,7 +310,7 @@ def _handle_request(
     request: dict[str, Any],
 ) -> Exception | dict[str, Any]:
     if "stop" in request:
-        return OptimizerStop(request["exit_reason"])
+        return OptimizerStop(request["exit_code"])
     if "exception" in request:
         return _decode_child_exception(request)
     if "error" in request:

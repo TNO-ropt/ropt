@@ -101,7 +101,7 @@ which carries two things:
 ```python
 result = optimize(config, x0, objective)
 
-result.exit_reason  # why the run stopped (an ropt.enums.ExitReason)
+result.exit_code  # why the run stopped (an ropt.enums.ExitCode)
 result.results      # the best evaluation, or None if none was valid
 ```
 
@@ -145,11 +145,11 @@ optimizer chose it, so this is how you follow the path a run takes.
 
 The `report` callback doubles as a **user-defined stopping criterion**: return
 `True` and the optimization stops gracefully after the current evaluation, with
-exit reason `STOPPED`. Any other return value (including `None`) lets it
+exit code `STOPPED`. Any other return value (including `None`) lets it
 continue.
 
 ```python
-from ropt.enums import ExitReason
+from ropt.enums import ExitCode
 
 
 def report(result):
@@ -159,7 +159,7 @@ def report(result):
 
 
 result = optimize(config, x0, objective, report=report)
-assert result.exit_reason is ExitReason.STOPPED
+assert result.exit_code is ExitCode.STOPPED
 ```
 
 With [`optimize_many`](many_runs.md) this stops only the run
@@ -190,7 +190,7 @@ with session() as s:
     signal.signal(signal.SIGINT, lambda *_: s.abort())
     result = pool.optimize(config, x0, objective)
 
-if result.exit_reason is ExitReason.ABORTED:
+if result.exit_code is ExitCode.ABORTED:
     print("cut off early, best so far:", result.results)
 ```
 
@@ -286,7 +286,7 @@ batch.results   # one per row of the matrix, empty if the batch was cut off
 
 Both return an [`EvaluationResult`][ropt.simple.EvaluationResult], shaped like
 the [`OptimizationResult`][ropt.simple.OptimizationResult] that `optimize`
-returns: `exit_reason` says why the evaluation ended and `results` holds what it
+returns: `exit_code` says why the evaluation ended and `results` holds what it
 produced. What is on `results` is a
 [`FunctionResults`][ropt.results.FunctionResults], the same kind a handler
 receives, so everything is read the same way wherever it came from. Here
@@ -294,7 +294,7 @@ receives, so everything is read the same way wherever it came from. Here
 `report` callback, where the optimizer chose the point.
 
 An evaluation is a single batch, so it produces either every result or none.
-That is why `exit_reason` can only be `FINISHED`, or `ABORTED` and
+That is why `exit_code` can only be `FINISHED`, or `ABORTED` and
 `ABORTED_ON_ERROR` when [`Session.abort`](#stopping-from-outside) or a failing
 run on the same session cut it off. An abort that arrives after the batch has
 finished costs it nothing, and the evaluation reports `FINISHED`.
@@ -306,12 +306,12 @@ which evaluates a single vector and then a matrix of them.
 ## When something goes wrong
 
 Not every problem is an exception. An optimization that cannot make progress
-still returns normally, and indicates why in `result.exit_reason` —
+still returns normally, and indicates why in `result.exit_code` —
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value, for
 instance, or `ABORTED_ON_ERROR` when another run on the same session raised and
 brought this one down with it (see
 [Failure in one run](many_runs.md#failure-in-one-run)).
-[Exit Reasons](../results/exit_reasons.md) lists them all, and explains why a
+[Exit Codes](../results/exit_codes.md) lists them all, and explains why a
 reason and a result are independent: `result.results` is `None` when no feasible
 result was ever recorded, whatever the reason the run ended, and a run that fails
 part-way still returns the best result it had reached before that. The
@@ -362,9 +362,9 @@ function stay whatever you raised.
 
 A few config values and result fields use enumerations, such as
 [`VariableType`][ropt.enums.VariableType] for integer variables and
-[`ExitReason`][ropt.enums.ExitReason] for `result.exit_reason`. These are
+[`ExitCode`][ropt.enums.ExitCode] for `result.exit_code`. These are
 **not** part of `ropt.simple`; import them from [`ropt.enums`][ropt.enums]:
 
 ```python
-from ropt.enums import ExitReason, VariableType
+from ropt.enums import ExitCode, VariableType
 ```

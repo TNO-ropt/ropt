@@ -10,7 +10,7 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt._scaling import scale
 from ropt.core import EnsembleEvaluator, EnsembleOptimizer
-from ropt.enums import EnOptEventType, ExitReason
+from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import OptimizerStop
 
@@ -30,7 +30,7 @@ _logger = get_logger(__name__)
 MetaDataType = dict[str, int | float | bool | str]
 
 
-class OptimizationStep(ComputeStep[ExitReason]):
+class OptimizationStep(ComputeStep[ExitCode]):
     """The default optimizer compute step.
 
     Executes an optimization algorithm, iteratively performing function and
@@ -59,7 +59,7 @@ class OptimizationStep(ComputeStep[ExitReason]):
         variables: ArrayLike,
         *,
         metadata: dict[str, Any] | None = None,
-    ) -> ExitReason:
+    ) -> ExitCode:
         """Run the optimization.
 
         `metadata` is attached to the emitted
@@ -111,14 +111,14 @@ class OptimizationStep(ComputeStep[ExitReason]):
             ensemble_evaluator=ensemble_evaluator,
             signal_evaluation=self._signal_evaluation,
         )
-        exit_reason = ensemble_optimizer.start(variables)
+        exit_code = ensemble_optimizer.start(variables)
 
-        _logger.info("Optimization finished: %s", exit_reason.name)
+        _logger.info("Optimization finished: %s", exit_code.name)
         self._emit_event(
             EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context)
         )
 
-        return exit_reason
+        return exit_code
 
     def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
         # Called by the ensemble optimizer around every evaluation: without
@@ -143,7 +143,7 @@ class OptimizationStep(ComputeStep[ExitReason]):
             )
         # Poll on the optimizer stack so a handler's stop() becomes a clean exit.
         if self._stop_requested:
-            raise OptimizerStop(ExitReason.STOPPED)
+            raise OptimizerStop(ExitCode.STOPPED)
         if self._aborting:
             assert self._abort_signal is not None
-            raise OptimizerStop(self._abort_signal.exit_reason)
+            raise OptimizerStop(self._abort_signal.exit_code)

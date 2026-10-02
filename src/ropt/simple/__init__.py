@@ -5,7 +5,7 @@ directly, for example `from ropt.simple import optimize, session`. See
 [Running Optimizations](../running/running.md) for a walkthrough.
 
 Enumerations used in the configuration and results (for example
-[`ExitReason`][ropt.enums.ExitReason] and
+[`ExitCode`][ropt.enums.ExitCode] and
 [`VariableType`][ropt.enums.VariableType]) are not re-exported here; import them
 from [`ropt.enums`][ropt.enums].
 

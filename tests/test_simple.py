@@ -23,7 +23,7 @@ from ropt.components.executors import (
     ProcessExecutor,
     ThreadExecutor,
 )
-from ropt.enums import EnOptEventType, ExitReason
+from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import ExecutionError, RunsFailedError, WorkflowError
 from ropt.results import FunctionResults
 from ropt.simple import (
@@ -103,7 +103,7 @@ def config_fixture() -> dict[str, Any]:
 def test_optimize_returns_run_result(config: Any, test_functions: Any) -> None:
     result = optimize(config, initial_values, test_functions[0])
     assert isinstance(result, OptimizationResult)
-    assert result.exit_reason == ExitReason.FINISHED
+    assert result.exit_code == ExitCode.FINISHED
     assert result.results is not None
     assert np.allclose(result.results.variables, 0.5, atol=0.02)
     assert result.results.target_objective == pytest.approx(0.0, abs=1e-3)
@@ -136,7 +136,7 @@ def test_optimize_accepts_sequence_for_multiple_objectives(
 
 def test_optimize_no_valid_result_has_no_results(config: Any) -> None:
     result = optimize(config, initial_values, lambda _v, _c: np.nan)
-    assert result.exit_reason == ExitReason.TOO_FEW_REALIZATIONS
+    assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
     assert result.results is None
 
 
@@ -326,7 +326,7 @@ def test_report_callback_stops_optimization(config: Any, test_functions: Any) ->
         return True
 
     result = optimize(config, initial_values, test_functions[0], report=_report)
-    assert result.exit_reason == ExitReason.STOPPED
+    assert result.exit_code == ExitCode.STOPPED
     assert reported == 1
 
 
@@ -346,8 +346,8 @@ def test_report_callback_stops_only_own_run(
         test_functions[0],
         report=[_stop, _continue],
     )
-    assert results[0].exit_reason == ExitReason.STOPPED
-    assert results[1].exit_reason != ExitReason.STOPPED
+    assert results[0].exit_code == ExitCode.STOPPED
+    assert results[1].exit_code != ExitCode.STOPPED
 
 
 def test_adapt_function_rejects_scalar_for_multiple_objectives() -> None:
@@ -381,7 +381,7 @@ def test_adapt_function_splits_objectives_and_constraints() -> None:
 
 def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     outcome = evaluate(config, initial_values, test_functions[0])
-    assert outcome.exit_reason is ExitReason.FINISHED
+    assert outcome.exit_code is ExitCode.FINISHED
     result = outcome.results
     assert isinstance(result, FunctionResults)
     assert result.target_objective is not None
@@ -1075,7 +1075,7 @@ def test_sequential_pools_are_allowed(
     second = pools(ProcessExecutor, workers=2).optimize(
         config, initial_values, test_functions[0]
     )
-    assert first.exit_reason == second.exit_reason
+    assert first.exit_code == second.exit_code
     assert first.results is not None
     assert second.results is not None
     assert first.results.variables == pytest.approx(second.results.variables)
@@ -1321,10 +1321,7 @@ def test_optimize_many_carries_the_outcome_of_every_run_when_one_fails(
     for index in (0, 2):
         outcome = outcomes[index]
         assert isinstance(outcome, OptimizationResult)
-        assert outcome.exit_reason in {
-            ExitReason.ABORTED_ON_ERROR,
-            ExitReason.FINISHED,
-        }
+        assert outcome.exit_code in {ExitCode.ABORTED_ON_ERROR, ExitCode.FINISHED}
 
 
 @pytest.mark.timeout(60)
@@ -1351,7 +1348,7 @@ def test_optimize_many_cuts_off_queued_runs_when_one_fails(
     assert isinstance(outcomes[0], ValueError)
     for outcome in outcomes[1:]:
         assert isinstance(outcome, OptimizationResult)
-        assert outcome.exit_reason == ExitReason.ABORTED_ON_ERROR
+        assert outcome.exit_code == ExitCode.ABORTED_ON_ERROR
         assert outcome.results is None
     with lock:
         assert calls == 1
@@ -1377,7 +1374,7 @@ def test_optimize_many_cuts_off_a_queued_run_before_validating_its_config(
     assert isinstance(outcomes[0], ValueError)
     for outcome in outcomes[1:]:
         assert isinstance(outcome, OptimizationResult)
-        assert outcome.exit_reason == ExitReason.ABORTED_ON_ERROR
+        assert outcome.exit_code == ExitCode.ABORTED_ON_ERROR
 
 
 @pytest.mark.timeout(60)
@@ -1405,7 +1402,7 @@ def test_optimize_many_cuts_off_queued_runs_when_one_cannot_be_built(
     assert isinstance(outcomes[0], Exception)
     for outcome in outcomes[1:]:
         assert isinstance(outcome, OptimizationResult)
-        assert outcome.exit_reason == ExitReason.ABORTED_ON_ERROR
+        assert outcome.exit_code == ExitCode.ABORTED_ON_ERROR
     with lock:
         assert calls == 0
 
@@ -1475,7 +1472,7 @@ def test_optimize_many_leaves_the_pool_usable_after_a_failure(
     # The siblings keep their workers until they finish, so the pool must stay
     # usable and must not deadlock against them.
     result = pool.optimize(config, initial_values, test_functions[0])
-    assert result.exit_reason == ExitReason.FINISHED
+    assert result.exit_code == ExitCode.FINISHED
 
 
 def test_shared_handler_without_a_pool_aggregates_runs(

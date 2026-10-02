@@ -138,7 +138,7 @@ except RunsFailedError as failure:
         if isinstance(outcome, Exception):
             print(f"run {index} raised: {outcome}")
         else:
-            print(f"run {index} ended with {outcome.exit_reason.name}")
+            print(f"run {index} ended with {outcome.exit_code.name}")
 ```
 
 Without this the work the other runs did would be thrown away along with the run
@@ -169,6 +169,6 @@ The flag decides only whether a run is *aborted*. A run that keeps going still
 aborts the others if it fails itself, and its exception still reaches its
 caller, so opting out cannot turn a failure into silence.
 [`Session.abort`](running.md#stopping-from-outside) reaches every run whatever
-the flag says, and those end with `ABORTED` instead: the exit reason
+the flag says, and those end with `ABORTED` instead: the exit code
 distinguishes an abort that was asked for from one another run caused. See
-[Exit Reasons](../results/exit_reasons.md) for what each one means.
+[Exit Codes](../results/exit_codes.md) for what each one means.

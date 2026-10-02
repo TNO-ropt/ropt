@@ -103,7 +103,7 @@ class EnOptEventType(IntEnum):
     [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep] finishes."""
 
 
-class ExitReason(IntEnum):
+class ExitCode(IntEnum):
     """Enumerates the reasons a run ends.
 
     A run is an optimization or a single evaluation. It either **stops** or is

@@ -87,7 +87,7 @@ class FunctionEvaluator(Evaluator):
             # The rows run on this thread, so this is the only place the batch
             # can be abandoned part way.
             if self._abort_signal is not None and self._abort_signal.aborting:
-                raise OptimizerStop(self._abort_signal.exit_reason)
+                raise OptimizerStop(self._abort_signal.exit_code)
             _scatter_result(
                 eval_idx,
                 self._function(variables[eval_idx, :], function_context),

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic, TypeVar
 
 if TYPE_CHECKING:
-    from ropt.enums import ExitReason
+    from ropt.enums import ExitCode
     from ropt.results import FunctionResults
 
 _T = TypeVar("_T")
@@ -21,11 +21,11 @@ class OptimizationResult:
     [Running Optimizations](../running/running.md) for a walkthrough.
 
     Attributes:
-        exit_reason: Why the optimization terminated.
-        results:     The best evaluation, or `None` if there was no valid result.
+        exit_code: Why the optimization terminated.
+        results:   The best evaluation, or `None` if there was no valid result.
     """
 
-    exit_reason: ExitReason
+    exit_code: ExitCode
     results: FunctionResults | None
 
 
@@ -41,9 +41,9 @@ class EvaluationResult(Generic[_T]):
     result or none.
 
     Attributes:
-        exit_reason: Why the evaluation ended.
-        results:     What the evaluation produced.
+        exit_code: Why the evaluation ended.
+        results:   What the evaluation produced.
     """
 
-    exit_reason: ExitReason
+    exit_code: ExitCode
     results: _T

@@ -25,7 +25,7 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.enums import ExitReason, VariableType
+from ropt.enums import ExitCode, VariableType
 from ropt.simple import (
     DataFrameHandler,
     EvaluationFunction,
@@ -143,7 +143,7 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         # a realization, so realization alone would not identify the caller.
         metadata={"outer_batch": context.batch_id, "outer_eval": context.eval_idx},
     )
-    if result.exit_reason is ExitReason.TOO_FEW_REALIZATIONS:
+    if result.exit_code is ExitCode.TOO_FEW_REALIZATIONS:
         memo[key] = float("nan")
     else:
         assert result.results is not None

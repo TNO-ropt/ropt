@@ -16,7 +16,7 @@ from ropt.components.compute_steps import EvaluationStep
 from ropt.components.concurrency import AbortSignal
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
-from ropt.enums import ExitReason
+from ropt.enums import ExitCode
 
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
@@ -91,7 +91,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         metadata=metadata,
     )
     return EvaluationResult(
-        exit_reason=outcome.exit_reason,
+        exit_code=outcome.exit_code,
         results=outcome.results[0] if outcome.results else None,
     )
 
@@ -202,5 +202,5 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     # An abort that arrived too late to cost the batch anything did not abort
     # it: the step reports its results either way.
     if signal.aborting and not results:
-        return EvaluationResult(exit_reason=signal.exit_reason, results=())
-    return EvaluationResult(exit_reason=ExitReason.FINISHED, results=results)
+        return EvaluationResult(exit_code=signal.exit_code, results=())
+    return EvaluationResult(exit_code=ExitCode.FINISHED, results=results)

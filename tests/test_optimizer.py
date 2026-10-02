@@ -12,7 +12,7 @@ from ropt.components.event_handlers import CallbackHandler
 from ropt.config import LinearConstraintsConfig
 from ropt.config.constants import DEFAULT_SEED
 from ropt.context import EnOptContext
-from ropt.enums import EnOptEventType, ExitReason
+from ropt.enums import EnOptEventType, ExitCode
 from ropt.results import FunctionResults, GradientResults
 from ropt.simple import optimize
 from ropt.utils import validate_backend_options
@@ -100,7 +100,7 @@ def test_max_functions_exceeded(config: Any, eval_func: Any, external: str) -> N
         ],
     )
     assert last_evaluation == max_functions + 1
-    assert result.exit_reason == ExitReason.MAX_FUNCTIONS_REACHED
+    assert result.exit_code == ExitCode.MAX_FUNCTIONS_REACHED
 
 
 def test_max_batches_exceeded(config: Any, eval_func: Any, external: str) -> None:
@@ -124,7 +124,7 @@ def test_max_batches_exceeded(config: Any, eval_func: Any, external: str) -> Non
         ],
     )
     assert last_evaluation == max_batches
-    assert result.exit_reason == ExitReason.MAX_BATCHES_REACHED
+    assert result.exit_code == ExitCode.MAX_BATCHES_REACHED
 
 
 def test_max_functions_not_exceeded(config: Any, eval_func: Any, external: str) -> None:
@@ -149,7 +149,7 @@ def test_max_functions_not_exceeded(config: Any, eval_func: Any, external: str) 
         ],
     )
     assert last_evaluation + 1 < 2 * max_functions
-    assert result.exit_reason == ExitReason.FINISHED
+    assert result.exit_code == ExitCode.FINISHED
 
 
 def test_failed_realizations(config: Any, eval_func: Any, external: str) -> None:
@@ -160,7 +160,7 @@ def test_failed_realizations(config: Any, eval_func: Any, external: str) -> None
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
     result = optimize(config, initial_values, eval_func(functions), report=_observer)
-    assert result.exit_reason == ExitReason.TOO_FEW_REALIZATIONS
+    assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
 def test_failed_realizations_constraints(
@@ -181,7 +181,7 @@ def test_failed_realizations_constraints(
         eval_func(test_functions, [lambda _0, _1: np.nan]),
         report=_observer,
     )
-    assert result.exit_reason == ExitReason.TOO_FEW_REALIZATIONS
+    assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
 def test_single_perturbation(config: Any, eval_func: Any, external: str) -> None:

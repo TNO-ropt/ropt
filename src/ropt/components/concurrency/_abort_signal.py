@@ -7,7 +7,7 @@ import threading
 from typing import TYPE_CHECKING
 
 from ropt._logging import get_logger
-from ropt.enums import ExitReason
+from ropt.enums import ExitCode
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -47,36 +47,36 @@ class AbortSignal:
         self._lock = threading.Lock()
         self._aborting = False
         self._callbacks: list[Callable[[], None]] = []
-        self._exit_reason = ExitReason.ABORTED
+        self._exit_code = ExitCode.ABORTED
 
-    def abort(self, exit_reason: ExitReason = ExitReason.ABORTED) -> None:
+    def abort(self, exit_code: ExitCode = ExitCode.ABORTED) -> None:
         """Cut off everything observing this signal.
 
         Calling this more than once has no further effect: the first call
-        decides the exit reason, so a later abort for another reason cannot
-        overwrite the reason a run is already ending for.
+        decides the exit code, so a later abort for another reason cannot
+        overwrite the code a run is already ending with.
 
         Args:
-            exit_reason: The reason the steps on this signal end with.
+            exit_code: The exit code the steps on this signal end with.
         """
         with self._lock:
             if self._aborting:
                 return
-            self._exit_reason = exit_reason
+            self._exit_code = exit_code
             self._aborting = True
             callbacks = list(self._callbacks)
         for callback in callbacks:
             _run_callback(callback)
 
     @property
-    def exit_reason(self) -> ExitReason:
-        """The reason a step on this signal ends with.
+    def exit_code(self) -> ExitCode:
+        """The exit code a step on this signal ends with.
 
         Returns:
-            The reason passed to the first `abort` call.
+            The exit code passed to the first `abort` call.
         """
         with self._lock:
-            return self._exit_reason
+            return self._exit_code
 
     @property
     def aborting(self) -> bool:

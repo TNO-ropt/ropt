@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from ropt.enums import ExitReason
+    from ropt.enums import ExitCode
     from ropt.simple import OptimizationResult
 
 
@@ -73,17 +73,17 @@ class AbortedError(RoptError):
     returns instead, and does not raise this.
 
     Attributes:
-        exit_reason: Why the work was cut off.
+        exit_code: Why the work was cut off.
     """
 
-    def __init__(self, exit_reason: ExitReason) -> None:
+    def __init__(self, exit_code: ExitCode) -> None:
         """Initialize the error.
 
         Args:
-            exit_reason: Why the work was cut off.
+            exit_code: Why the work was cut off.
         """
-        self.exit_reason = exit_reason
-        msg = f"The work was cut off before it could finish: {exit_reason.name}."
+        self.exit_code = exit_code
+        msg = f"The work was cut off before it could finish: {exit_code.name}."
         super().__init__(msg)
 
 
@@ -97,7 +97,7 @@ class RunsFailedError(RoptError):
     went wrong.
 
     The runs that did not fail were cut off when this one did and ended with
-    `ExitReason.ABORTED_ON_ERROR`, unless they were started with
+    `ExitCode.ABORTED_ON_ERROR`, unless they were started with
     `keep_going=True`. Each kept whatever its completed batches had produced;
     one cut off during its first batch has no result.
 
@@ -123,20 +123,20 @@ class RunsFailedError(RoptError):
 
 
 class OptimizerStop(Exception):  # ruff: ignore[error-suffix-on-exception-name]
-    """Raised internally to stop an optimization with a specific exit reason.
+    """Raised internally to stop an optimization with a specific exit code.
 
     Used only within the optimizer core to unwind the backend optimization loop
     (for example when a function or batch budget is reached). It carries the
-    [`ExitReason`][ropt.enums.ExitReason] the optimization terminates with.
+    [`ExitCode`][ropt.enums.ExitCode] the optimization terminates with.
     """
 
-    def __init__(self, exit_reason: ExitReason) -> None:
+    def __init__(self, exit_code: ExitCode) -> None:
         """Initialize the OptimizerStop exception.
 
         Args:
-            exit_reason: The reason the optimization terminates with.
+            exit_code: The exit code the optimization terminates with.
         """
-        self.exit_reason = exit_reason
+        self.exit_code = exit_code
         super().__init__()
 
 

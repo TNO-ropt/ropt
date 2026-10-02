@@ -1,14 +1,14 @@
-# Exit Reasons
+# Exit Codes
 
 Every run reports why it ended. The reason is an
-[`ExitReason`][ropt.enums.ExitReason], carried on the object the run returns
+[`ExitCode`][ropt.enums.ExitCode], carried on the object the run returns
 rather than raised:
 
 ```python
 from ropt.simple import optimize
 
 result = optimize(config, x0, objective)
-print(result.exit_reason.name)
+print(result.exit_code.name)
 ```
 
 A run either **stops** or is **aborted**, and the reason indicates which. It
@@ -18,7 +18,7 @@ returned `True` — so it ends at a point someone declared acceptable. It is
 aborted when something cuts it off without consulting the run at all, and what
 comes back is then whatever it had reached rather than a chosen endpoint.
 
-| Exit reason             | Meaning                                                                                              |
+| Exit code               | Meaning                                                                                              |
 | ----------------------- | ---------------------------------------------------------------------------------------------------- |
 | `FINISHED`              | The run terminated normally. For an optimization this means the backend ended it, by converging or on a limit of its own such as `max_iterations`. |
 | `MAX_FUNCTIONS_REACHED` | The configured maximum number of function evaluations was reached.                                   |
@@ -47,7 +47,7 @@ nothing: either every vector was evaluated, or the batch was abandoned and
 `results` is empty. An abort that arrives once the batch has finished costs it
 nothing, and the evaluation reports `FINISHED`.
 
-## An exit reason is not a result
+## An exit code is not a result
 
 The two are independent. `results` is `None` when no feasible result was ever
 recorded, whatever the reason the run ended, and a run that ends early still
@@ -63,5 +63,5 @@ linear constraints as well as the nonlinear ones. See
 [`WorkerPool.offload`][ropt.simple.WorkerPool.offload] returns whatever its
 callables return, so there is nowhere to carry a reason. A call abandoned by an
 abort raises [`AbortedError`][ropt.exceptions.AbortedError] instead, whose
-`exit_reason` attribute distinguishes an abort that was asked for from one
+`exit_code` attribute distinguishes an abort that was asked for from one
 another run caused.

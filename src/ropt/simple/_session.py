@@ -21,7 +21,7 @@ from ropt.components.executors import (
     ProcessExecutor,
     ThreadExecutor,
 )
-from ropt.enums import ExitReason
+from ropt.enums import ExitCode
 from ropt.exceptions import WorkflowError
 
 from ._evaluate import _evaluate, _evaluate_batch
@@ -122,7 +122,7 @@ class Session:
     def abort(self) -> None:
         """Cut off the runs that belong to this session.
 
-        Each run ends with `ExitReason.ABORTED`, keeping whatever its completed
+        Each run ends with `ExitCode.ABORTED`, keeping whatever its completed
         batches produced; one cut off during its first batch has no result. An
         [`offload`][ropt.simple.WorkerPool.offload] in flight raises
         [`AbortedError`][ropt.exceptions.AbortedError] instead, since it has no
@@ -148,7 +148,7 @@ class Session:
                 signal for signal, keep_going in self._signals.items() if not keep_going
             ]
         for signal in signals:
-            signal.abort(ExitReason.ABORTED_ON_ERROR)
+            signal.abort(ExitCode.ABORTED_ON_ERROR)
 
     def _resolve_keep_going(self, *, keep_going: bool | None) -> bool:
         return self._keep_going if keep_going is None else keep_going

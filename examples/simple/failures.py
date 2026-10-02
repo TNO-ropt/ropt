@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.enums import ExitReason
+from ropt.enums import ExitCode
 from ropt.simple import optimize
 
 if TYPE_CHECKING:
@@ -62,8 +62,8 @@ def main() -> None:
     # Every realization must succeed, so the single NaN ends the run and
     # leaves the run without a result at all.
     strict = optimize(CONFIG, INITIAL_VALUES, objective)
-    print(f"all required: {strict.exit_reason.name}, results={strict.results}")
-    assert strict.exit_reason == ExitReason.TOO_FEW_REALIZATIONS
+    print(f"all required: {strict.exit_code.name}, results={strict.results}")
+    assert strict.exit_code == ExitCode.TOO_FEW_REALIZATIONS
     assert strict.results is None
 
     # Allowing one failure lets the aggregate form from the rest.
@@ -71,9 +71,9 @@ def main() -> None:
     lenient = optimize(CONFIG, INITIAL_VALUES, objective)
     assert lenient.results is not None
     print(
-        f"one allowed: {lenient.exit_reason.name}, variables={lenient.results.variables}"
+        f"one allowed: {lenient.exit_code.name}, variables={lenient.results.variables}"
     )
-    assert lenient.exit_reason != ExitReason.TOO_FEW_REALIZATIONS
+    assert lenient.exit_code != ExitCode.TOO_FEW_REALIZATIONS
     assert np.allclose(lenient.results.variables, 1.0, atol=1e-1)
 
 

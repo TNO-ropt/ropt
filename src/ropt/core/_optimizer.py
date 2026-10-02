@@ -14,7 +14,7 @@ from ropt._logging import get_logger
 from ropt._native_streams import flush_native_streams
 from ropt._utils import split_constraints
 from ropt.backend import OptimizationProblem
-from ropt.enums import ExitReason
+from ropt.enums import ExitCode
 from ropt.exceptions import (
     ExecutorStopped,
     OptimizerStop,
@@ -143,7 +143,7 @@ class EnsembleOptimizer:
         # Built in `start`: it asks the backend how it reports.
         self._capture: _OutputCapture
 
-    def start(self, variables: NDArray[np.float64]) -> ExitReason:
+    def start(self, variables: NDArray[np.float64]) -> ExitCode:
         """Start the optimization process.
 
         This method initiates the optimization process using the provided
@@ -154,7 +154,7 @@ class EnsembleOptimizer:
             variables: The initial variables for the optimization.
 
         Returns:
-            An [`ExitReason`][ropt.enums.ExitReason] describing why it terminated.
+            An [`ExitCode`][ropt.enums.ExitCode] describing why it terminated.
         """
         self._initial_variables = variables.copy()
         problem = OptimizationProblem(self._context, variables)
@@ -162,7 +162,7 @@ class EnsembleOptimizer:
             self._context,
             bypasses_python_output=self._backend.bypasses_python_output,
         )
-        exit_reason = ExitReason.FINISHED
+        exit_code = ExitCode.FINISHED
         try:
             with self._capture.capture():
                 self._backend.start(
@@ -172,12 +172,12 @@ class EnsembleOptimizer:
                     output_dir=self._context.optimizer.output_dir,
                 )
         except TooFewRealizations:
-            exit_reason = ExitReason.TOO_FEW_REALIZATIONS
+            exit_code = ExitCode.TOO_FEW_REALIZATIONS
         except ExecutorStopped:
-            exit_reason = ExitReason.EXECUTOR_SHUT_DOWN
+            exit_code = ExitCode.EXECUTOR_SHUT_DOWN
         except OptimizerStop as exc:
-            exit_reason = exc.exit_reason
-        return exit_reason
+            exit_code = exc.exit_code
+        return exit_code
 
     def _optimizer_callback(
         self,
@@ -252,14 +252,14 @@ class EnsembleOptimizer:
                 "Stopping: Maximum number of function evaluations reached (%d)",
                 max_functions,
             )
-            raise OptimizerStop(ExitReason.MAX_FUNCTIONS_REACHED)
+            raise OptimizerStop(ExitCode.MAX_FUNCTIONS_REACHED)
         max_batches = self._context.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
             _logger.info(
                 "Stopping: Maximum number of evaluation batches reached (%d)",
                 max_batches,
             )
-            raise OptimizerStop(ExitReason.MAX_BATCHES_REACHED)
+            raise OptimizerStop(ExitCode.MAX_BATCHES_REACHED)
 
     def _run_evaluations(
         self,

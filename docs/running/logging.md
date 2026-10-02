@@ -45,8 +45,8 @@ failed realization; how many failures a run tolerates is set by
 **A new best objective** is reported each time the run improves on what it had.
 
 **The reason for stopping** is stated before the run ends, and the closing line
-names the [`ExitReason`][ropt.enums.ExitReason] it finished with — the same one
-`result.exit_reason` reports. See
+names the [`ExitCode`][ropt.enums.ExitCode] it finished with — the same one
+`result.exit_code` reports. See
 [When something goes wrong](running.md#when-something-goes-wrong) for what each
 reason means.
 

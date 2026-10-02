@@ -16,7 +16,7 @@ import pytest
 from ropt.components.concurrency import AbortSignal
 from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
-from ropt.enums import EnOptEventType, ExitReason
+from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import AbortedError, ExecutionError
 from ropt.simple import session
 from ropt.simple._offload import _run
@@ -214,16 +214,16 @@ def test_an_offload_that_completes_despite_an_abort_returns_its_results() -> Non
         assert pool.offload(_abort_then_return) == 7
 
 
-@pytest.mark.parametrize("reason", [ExitReason.ABORTED, ExitReason.ABORTED_ON_ERROR])
+@pytest.mark.parametrize("exit_code", [ExitCode.ABORTED, ExitCode.ABORTED_ON_ERROR])
 def test_an_abandoned_offload_call_carries_why_it_was_cut_off(
-    reason: ExitReason,
+    exit_code: ExitCode,
 ) -> None:
     # A signal that is already stopping abandons every call before it starts,
     # which is what an abort arriving mid-batch leaves behind. Driving `_run`
     # directly is what makes the ordering certain: through `offload` the worker
     # may drain the queue before the collecting thread is scheduled to drop it.
     signal = AbortSignal()
-    signal.abort(reason)
+    signal.abort(exit_code)
     with pytest.raises(AbortedError) as exc_info:
         _run(ThreadExecutor(workers=1), [partial(_square, 2)], signal)
-    assert exc_info.value.exit_reason == reason
+    assert exc_info.value.exit_code == exit_code

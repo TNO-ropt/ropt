@@ -32,7 +32,7 @@ from ropt.components.event_handlers import (
 )
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
 from ropt.context import EnOptContext
-from ropt.enums import EnOptEventType, ExitReason, VariableType
+from ropt.enums import EnOptEventType, ExitCode, VariableType
 from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
 
@@ -167,13 +167,13 @@ def main() -> None:
 
         # Tag every inner result with the outer worker thread that ran this
         # _optimize call, so the report can show parallelism at both layers.
-        exit_reason = step.run(
+        exit_code = step.run(
             variables=new_variables,
             context=EnOptContext.model_validate(INNER_CONFIG),
             metadata={"thread": threading.current_thread().name},
         )
 
-        if exit_reason is ExitReason.TOO_FEW_REALIZATIONS:
+        if exit_code is ExitCode.TOO_FEW_REALIZATIONS:
             memo[key] = float("nan")
         else:
             inner_result = result_handler["results"]

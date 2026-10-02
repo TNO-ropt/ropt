@@ -79,7 +79,7 @@ class ComputeStep(ABC, Generic[_ResultT]):
 
         Intended for an event handler that decides, after inspecting an event,
         that its optimization should stop; the run then ends with
-        `ExitReason.STOPPED`. Setting the request is thread-safe, so a handler
+        `ExitCode.STOPPED`. Setting the request is thread-safe, so a handler
         attached to several steps at once may call it too. A new `run` clears
         any earlier request.
         """

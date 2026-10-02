@@ -48,7 +48,7 @@ if TYPE_CHECKING:
 
 def _cut_off(signal: AbortSignal, parent_signal: AbortSignal) -> None:
     # Registered before the parent aborts, so the reason is read when it fires.
-    signal.abort(parent_signal.exit_reason)
+    signal.abort(parent_signal.exit_code)
 
 
 def _build_optimization(  # ruff: ignore[too-many-arguments]
@@ -91,7 +91,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     if parent_signal is not None and parent_signal.aborting:
         # Cut off before anything is built, so an invalid config in a run that
         # never starts is not reported beside the failure that stopped it.
-        return OptimizationResult(exit_reason=parent_signal.exit_reason, results=None)
+        return OptimizationResult(exit_code=parent_signal.exit_code, results=None)
     signal = AbortSignal()
     try:
         context, step, result_handler = _build_optimization(
@@ -121,7 +121,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         cut_off = partial(_cut_off, signal, parent_signal)
         parent_signal.add_callback(cut_off)
     try:
-        exit_reason = step.run(
+        exit_code = step.run(
             context=context,
             variables=np.asarray(x0, dtype=np.float64),
             metadata=metadata,
@@ -137,7 +137,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
             parent_signal.remove_callback(cut_off)
     results = result_handler["results"]
     return OptimizationResult(
-        exit_reason=exit_reason,
+        exit_code=exit_code,
         results=None if results is None or results.functions is None else results,
     )
 

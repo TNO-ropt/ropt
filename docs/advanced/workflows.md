@@ -189,15 +189,15 @@ The following events are emitted during execution:
   Emitted after the entire compute step, including result emission, is
   finished.
 
-### Exit reasons
+### Exit codes
 
 The [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep]'s
-`run()` method returns an [`ExitReason`][ropt.enums.ExitReason] indicating why
+`run()` method returns an [`ExitCode`][ropt.enums.ExitCode] indicating why
 the optimizer finished; the
 [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep]'s `run()`
 returns nothing, and a caller that needs to know whether it was cut off reads
 its [`AbortSignal`][ropt.components.concurrency.AbortSignal]. What each reason
-means is listed under [Exit Reasons](../results/exit_reasons.md).
+means is listed under [Exit Codes](../results/exit_codes.md).
 
 Two of them are produced here rather than by the optimizer. An event handler can
 stop its own optimization by calling `event.source.stop()` — for example after

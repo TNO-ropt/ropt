@@ -69,7 +69,7 @@ def _run(
     abandoned = any(isinstance(value, WorkNotRun) for value in values)
     # An abort that arrived too late to cost a call anything did not abort it.
     if abandoned and signal.aborting:
-        raise AbortedError(signal.exit_reason)
+        raise AbortedError(signal.exit_code)
     for value in values:
         if isinstance(value, (ExecutorFailure, WorkNotRun)):
             msg = f"An offloaded call could not be run: {value.message}"
