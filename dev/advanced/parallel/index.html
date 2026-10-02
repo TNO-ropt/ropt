@@ -4044,7 +4044,7 @@ differs:</p>
 <tr>
 <td><code>ProcessExecutor</code></td>
 <td><strong>runs to completion</strong> in its worker</td>
-<td>never submitted</td>
+<td>never submitted, bar the one bundle below</td>
 </tr>
 <tr>
 <td><code>LocalJobExecutor</code></td>
@@ -4061,6 +4061,11 @@ differs:</p>
 <p>At most <code>workers × bundle_size</code> evaluations are in that first column, so that is
 what a leaving batch has to wait out or leave behind. With <code>bundle_size=0</code> the
 whole batch is one bundle, and nothing can be dropped once it starts.</p>
+<p><strong>A process executor starts one bundle more than it is running.</strong> It keeps
+<code>workers + 1</code> bundles submitted at a time, and the pool marks a bundle as
+running when it moves it towards a worker, not when a worker takes it. The extra
+bundle is therefore past cancelling while still unstarted: it runs, and a
+leaving batch waits for it as well. That is one bundle, however large the batch.</p>
 <p><strong>Threads run to completion because a thread cannot be cancelled.</strong> Python
 offers no way to interrupt one from outside, so an evaluation on a
 <code>ThreadExecutor</code> stops only when it returns, and the program cannot leave until

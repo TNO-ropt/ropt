@@ -3161,9 +3161,19 @@ unless you want the runs' reports interleaved on the terminal.</p>
 <h2 id="failure-in-one-run">Failure in one run</h2>
 <p>A run that raises aborts the other runs on its session. Each of those ends at
 its next evaluation boundary with <code>ABORTED_ON_ERROR</code>, keeping the best result it
-had reached. This is the default because most runs are started from a script
-with nobody watching: a problem should end the script rather than leave the rest
-of the work grinding on towards output that will not be used.</p>
+had reached. A run still queued behind <code>limit</code> is cut off before its first
+evaluation, and reports <code>ABORTED_ON_ERROR</code> with no result at all. Nothing is
+built for such a run, so an invalid configuration in one is never reported. This
+is the default because most runs are started from a script with nobody watching:
+a problem ends the script rather than the remaining runs continuing towards
+output that will not be used.</p>
+<p>A call that fails before it creates any run stops them too. <code>optimize_many</code>
+broadcasts its arguments first, so lists whose lengths disagree raise
+<code>ValueError</code>; <code>evaluate</code> and <code>evaluate_batch</code> raise on a vector of the wrong
+shape. Each aborts the other runs on the session before raising.
+<code>RunsFailedError</code> is not raised in those cases, since no run exists to carry an
+outcome. A closed session is not a failure: the call is refused and nothing is
+aborted.</p>
 <p>The call then raises
 <a class="autorefs autorefs-internal" title="            RunsFailedError" href="../../reference/exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a>. With several runs there is
 no single exception to re-raise and no single set of results to return, so the
@@ -3197,7 +3207,8 @@ interrupt abandons them.</p>
 started separately on the same session. A run started with the module-level
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> has a session of its own, holding
 only the runs of that call.</p>
-<p>Pass <code>keep_going=True</code> to let a run finish anyway:</p>
+<p>Pass <code>keep_going=True</code> to let a run finish anyway, which also lets the runs
+queued behind <code>limit</code> start:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">keep_going</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 <p>or <code>session(keep_going=True)</code> to make that the default for everything on the

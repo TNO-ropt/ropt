@@ -3685,7 +3685,7 @@ and the resources a job asks for, are set out in
 rules choices <em>out</em>: whether your objective touches anything beyond its
 arguments and its return value. If it does, stay with threads or with no
 pool, because the others work on a copy. Once that is settled, the choice is
-about speed:</p>
+about speed, and about what <a href="#stopping-a-run">stopping a run</a> can do:</p>
 <table>
 <thead>
 <tr>
@@ -3827,7 +3827,7 @@ to them differs:</p>
 </tr>
 </tbody>
 </table>
-<p>Two consequences follow.</p>
+<p>Three consequences follow.</p>
 <p><strong>A thread pool cannot be hurried.</strong> Python provides no way to interrupt a
 running thread from outside, so a long evaluation on a thread pool ends
 when it ends, and your program cannot exit before it does. If an evaluation may
@@ -3837,6 +3837,10 @@ everything is signalled to end and not waited for. A program that ignores the
 request, or that is stuck inside the operating system, keeps running. The run
 exits promptly instead of waiting out the current batch, but processes it
 started may still be alive afterwards.</p>
+<p><strong>A process pool also finishes one evaluation it had not started.</strong> It keeps one
+more evaluation submitted than it has workers, and a submitted evaluation can no
+longer be cancelled, so that one runs too before the run ends. It is one
+evaluation however many are left to do.</p>
 <div class="admonition tip">
 <p class="admonition-title">If Ctrl-C seems to do nothing at all</p>
 <p>Some third-party packages change a process-wide setting when imported that

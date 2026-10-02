@@ -3642,8 +3642,10 @@ overwrite the reason a run is already ending for.</p>
         <p>Register a callback to run when this signal aborts.</p>
 <p>A signal that is already aborting runs the callback immediately, so a
 caller that registers late is not left waiting.</p>
-<p>The callback runs on the thread that calls <code>abort</code>, so it must return
-promptly and must not raise.</p>
+<p>The callback runs on the thread that aborts the signal, or on this one
+when the signal is already aborting, so it must return promptly. One
+that raises is logged instead of raised, and the callbacks after it
+still run.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

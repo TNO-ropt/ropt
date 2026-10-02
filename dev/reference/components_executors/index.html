@@ -3639,7 +3639,10 @@ the call's position instead, and every call keeps its place.</p>
 <p>An <code>abort_signal</code> that fires abandons the batch: queued calls are never
 started, started ones are cancelled where the mechanism allows it, and
 each abandoned call gets a <code>WorkNotRun</code>. Calls already running on a
-worker thread or process run to their end.</p>
+worker thread or process run to their end, and so does a call the
+mechanism has handed to a worker but can no longer withdraw, which gets
+its result rather than a <code>WorkNotRun</code>. See
+<a href="../../advanced/parallel/#releasing-a-batch">Releasing a batch</a>.</p>
 <p>May be called from any thread, except one of the executor's own workers:
 that caller would wait for workers it is itself occupying, so it is
 refused rather than left to deadlock.</p>
@@ -4493,6 +4496,14 @@ point must use.</p>
 started itself keeps running, without an error being raised. Use
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> where
 an evaluation launches external programs.</p>
+</details>
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>An abort also runs one bundle that was submitted but not yet started:
+the pool marks a bundle as running when it moves it towards a worker,
+so it can no longer be withdrawn. See
+<a href="../../advanced/parallel/#releasing-a-batch">Releasing a batch</a>.</p>
 </details>
 
 
