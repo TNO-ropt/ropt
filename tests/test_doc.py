@@ -7,10 +7,12 @@ import pytest
 
 from ropt.backend.scipy import SCIPY_OPTIONS_SCHEMA, _gen_capability_table
 from ropt.config.options import gen_options_table
+from ropt.enums import ExitCode
 
 _ROOT = Path(__file__).parent.parent
 _SNIPPET_DIR = _ROOT / "docs" / "snippets"
 _QUICKSTART = _ROOT / "docs" / "getting_started" / "quickstart.md"
+_EXIT_CODES = _ROOT / "docs" / "results" / "exit_codes.md"
 _EXAMPLE_PAGES = {
     "simple": _ROOT / "docs" / "getting_started" / "examples.md",
     "advanced": _ROOT / "docs" / "advanced" / "examples.md",
@@ -21,6 +23,7 @@ _EXAMPLE_PAGES = {
 _MALFORMED_REF = re.compile(r"\[`[^`\n]*\]\[[^`\n]*`\]")
 _PYTHON_BLOCK = re.compile(r"```python\n(.*?)```", re.DOTALL)
 _EXAMPLE_LINK = re.compile(r"examples/(?:simple|advanced)/\w+\.py")
+_TABLE_CODE = re.compile(r"^\| `(\w+)`", re.MULTILINE)
 
 
 def _check_snippet(name: str, generated: str) -> None:
@@ -89,3 +92,15 @@ def test_examples_pages_have_no_dead_entries() -> None:
     )
     if missing:
         pytest.fail("Listed but absent from the repository:\n" + "\n".join(missing))
+
+
+def test_exit_codes_page_tabulates_every_exit_code() -> None:
+    # Checked against the table rather than the page, because most names also
+    # appear in the prose, which would hide a row that was never added.
+    tabulated = set(_TABLE_CODE.findall(_EXIT_CODES.read_text()))
+    missing = [code.name for code in ExitCode if code.name not in tabulated]
+    if missing:
+        pytest.fail(
+            "Missing from the table on the exit codes page, so a run can report "
+            "a code the manual does not explain:\n" + "\n".join(missing)
+        )

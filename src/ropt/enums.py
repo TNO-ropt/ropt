@@ -1,6 +1,7 @@
 """Enumerations used in the configuration, event and result APIs."""
 
 from enum import IntEnum, StrEnum
+from typing import Final
 
 
 class VariableType(IntEnum):
@@ -109,9 +110,12 @@ class ExitCode(IntEnum):
     A run is an optimization or a single evaluation. It either **stops** or is
     **aborted**. It stops when a condition on the run is met — the optimizer
     converged, a budget ran out, a handler decided the results were good enough
-    — so it ends at a point someone declared acceptable. It is aborted when
-    something cuts it off without consulting the run at all, and the result is
-    then whatever it had reached, not a considered endpoint.
+    — so it ends at a point that satisfied a stated criterion. It is aborted
+    when something cuts it off regardless of the state of the run, and the
+    result is then whatever it had reached, not a considered endpoint.
+
+    Each member carries a short description in
+    [`message`][ropt.enums.ExitCode.message], for reporting.
     """
 
     UNKNOWN = 0
@@ -163,6 +167,34 @@ class ExitCode(IntEnum):
     Set apart from [`ABORTED`][ropt.enums.ExitCode.ABORTED] so that an abort
     that was asked for can be told from one the library performed itself.
     """
+
+    @property
+    def message(self) -> str:
+        """A short description of this exit code, for reporting.
+
+        Note that `str()` and f-strings give the integer value, as they do for
+        any [`IntEnum`][enum.IntEnum]; use this or `name` to report a run.
+
+        Returns:
+            A capitalized phrase with no trailing period.
+        """
+        return _MESSAGES[self]
+
+
+# Kept beside the members rather than in the docs, so that one call site reports
+# a run the same way everywhere.
+_MESSAGES: Final[dict[ExitCode, str]] = {
+    ExitCode.UNKNOWN: "Exit code not set",
+    ExitCode.TOO_FEW_REALIZATIONS: "Too few realizations evaluated successfully",
+    ExitCode.MAX_FUNCTIONS_REACHED: "Maximum number of function evaluations reached",
+    ExitCode.MAX_BATCHES_REACHED: "Maximum number of evaluation batches reached",
+    ExitCode.STOPPED: "Stopped by an event handler",
+    ExitCode.FINISHED: "Run completed normally",
+    ExitCode.EXECUTOR_SHUT_DOWN: "Executor could no longer run the evaluations",
+    ExitCode.ABORTED: "Run aborted",
+    ExitCode.ABORTED_ON_ERROR: "Aborted because another run on the session failed",
+    ExitCode.USER_ABORT: "Run aborted on request",
+}
 
 
 class AxisName(StrEnum):

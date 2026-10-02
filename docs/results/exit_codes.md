@@ -8,7 +8,20 @@ rather than raised:
 from ropt.simple import optimize
 
 result = optimize(config, x0, objective)
-print(result.exit_code.name)
+print(result.exit_code.message)
+```
+
+Each code carries a short description in
+[`message`][ropt.enums.ExitCode.message], which is what to print or log when
+reporting a run. Use `name` where the identifier itself is wanted, and compare
+against the member to branch on it. Note that `str()` and an f-string give the
+integer value, as they do for any `IntEnum`:
+
+```python
+code = result.exit_code
+code.message  # 'Maximum number of function evaluations reached'
+code.name     # 'MAX_FUNCTIONS_REACHED'
+str(code)     # '2'
 ```
 
 A run either **stops** or is **aborted**, and the exit code indicates which. It

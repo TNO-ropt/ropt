@@ -77,7 +77,7 @@ def main() -> None:
     """Run until the callback calls a halt, then read the best point found."""
     result = optimize(CONFIG, INITIAL_VALUES, objective, report=stop_after_max_results)
 
-    print(f"exit_code={result.exit_code.name} after {_seen} results")
+    print(f"{result.exit_code.message} after {_seen} results")
     assert result.exit_code == ExitCode.STOPPED
     assert _seen == MAX_RESULTS
 

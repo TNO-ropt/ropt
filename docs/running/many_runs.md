@@ -138,7 +138,7 @@ except RunsFailedError as failure:
         if isinstance(outcome, Exception):
             print(f"run {index} raised: {outcome}")
         else:
-            print(f"run {index} ended with {outcome.exit_code.name}")
+            print(f"run {index} ended with {outcome.exit_code.message}")
 ```
 
 Without this the work the other runs did would be thrown away along with the run

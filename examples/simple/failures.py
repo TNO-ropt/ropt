@@ -62,7 +62,7 @@ def main() -> None:
     # Every realization must succeed, so the single NaN ends the run and
     # leaves the run without a result at all.
     strict = optimize(CONFIG, INITIAL_VALUES, objective)
-    print(f"all required: {strict.exit_code.name}, results={strict.results}")
+    print(f"all required: {strict.exit_code.message}, results={strict.results}")
     assert strict.exit_code == ExitCode.TOO_FEW_REALIZATIONS
     assert strict.results is None
 
@@ -71,7 +71,8 @@ def main() -> None:
     lenient = optimize(CONFIG, INITIAL_VALUES, objective)
     assert lenient.results is not None
     print(
-        f"one allowed: {lenient.exit_code.name}, variables={lenient.results.variables}"
+        f"one allowed: {lenient.exit_code.message}, "
+        f"variables={lenient.results.variables}"
     )
     assert lenient.exit_code != ExitCode.TOO_FEW_REALIZATIONS
     assert np.allclose(lenient.results.variables, 1.0, atol=1e-1)
