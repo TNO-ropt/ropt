@@ -8,8 +8,7 @@ can be offloaded the same way. Both go through a **pool**.
 By default [`optimize`][ropt.simple.optimize] runs on the calling thread, one
 evaluation at a time. To run the evaluations in parallel, open a
 [`session`][ropt.simple.session], build a **pool** on it and start the run on
-that pool. [Running in Parallel](../getting_started/execution.md) introduces the
-four kinds; this page is the full account of each:
+that pool:
 
 ```python
 from ropt.simple import session
@@ -28,6 +27,49 @@ evaluates on the pool it was started on, and on no other. A run started with
 the module-level [`optimize`][ropt.simple.optimize] evaluates in-process and
 needs no session, wherever it is called from — including from a thread you
 started yourself.
+
+Where an evaluation runs depends on which pool it was started on:
+
+```mermaid
+flowchart TB
+    subgraph proc["your program (one process)"]
+        main(["your code<br/>(main thread)"])
+        seq["no pool —<br/>one eval at a time"]
+        th["thread_pool —<br/>worker threads<br/>(share memory)"]
+    end
+    wp["process_pool —<br/>a few reused processes<br/>(data copied)"]
+    loc["local_pool —<br/>one process per eval<br/>(data copied)"]
+    clu["hpc_pool —<br/>cluster jobs<br/>(data copied)"]
+    main --> seq
+    main --> th
+    main --> wp
+    main --> loc
+    main --> clu
+```
+
+Threads stay **inside** your program and share its memory, so any Python
+function works and nothing is copied. The other three run the work **outside**
+it, so the objective and its data are copied there.
+
+Only the evaluations ever leave. The optimizer itself, the pool object and your
+handlers all stay in the process that opened the session and started the run,
+whichever pool you choose. Throughout this page, **your program** means that
+process.
+
+??? info "New to threads and processes?"
+    A **process** is a running program with its own private memory. A **thread**
+    is a worker inside a process, and all threads in a process share that memory.
+    Threads are cheap and share data for free, but Python runs only one thread's
+    *Python* code at a time. Work that **waits** — for a file, a network reply,
+    an external tool — overlaps freely, because a waiting thread is not running
+    Python code; and so does work a library performs outside Python, as `numpy`
+    does while it works on an array. What is stuck one-at-a-time is arithmetic
+    written in Python itself. Separate **processes** each have their own
+    interpreter and always run truly in parallel, but they do not share memory,
+    so data has to be copied between them, and starting one takes noticeably
+    longer than starting a thread. A process also need not be on this machine:
+    an HPC pool runs each evaluation as a job on a cluster, which is the
+    same arrangement spread over more machines.
 
 ### How many workers?
 
@@ -310,11 +352,26 @@ and the resources a job asks for, are set out in
 
 ### Which pool should I use? { #which-pool }
 
-[Running in Parallel](../getting_started/execution.md) asks the question that
-rules choices *out*: whether your objective touches anything beyond its
-arguments and its return value. If it does, stay with threads or with no
-pool, because the others work on a copy. Once that is settled, the choice is
-about speed, and about what [stopping a run](#stopping-a-run) can do:
+One question rules choices *out*, and it is the only one you can answer by
+reading your own code rather than by measuring:
+
+!!! question "Does your objective read or write anything outside its arguments and its return value?"
+
+    Global variables, a cache, a logger, an open file or database handle, an
+    event handler, a counter it increments — anything at all that outlives one
+    call.
+
+    - **No.** Every pool works. Choose on speed alone, and you can swap
+      between them freely later.
+    - **Yes.** Stay with threads, or with no pool at all: either way the
+      objective runs in your program, where it sees the same memory. A process,
+      local or HPC pool runs the objective somewhere else, on a *copy* of
+      everything it touched, so a write goes to that copy and a read sees
+      whatever the copy was made from. No error is raised; the numbers come out
+      wrong.
+
+Once that is settled, the choice is about speed, and about what
+[stopping a run](#stopping-a-run) can do:
 
 | Pool | Where evaluations run | Data | Speeds up heavy Python? | Use when |
 | --- | --- | --- | --- | --- |

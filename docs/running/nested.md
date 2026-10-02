@@ -158,7 +158,7 @@ The dictionary is reachable only because the outer evaluations run on threads,
 in this process. On a process pool or an HPC pool the function is
 copied into a worker, which starts from an empty dictionary and discards it when
 it finishes, without raising. See
-[the rule to settle first](../getting_started/execution.md#the-rule-to-settle-first).
+[Which pool should I use?](parallel.md#which-pool).
 
 Two outer evaluations run at the same time, so both can find the same key
 missing and both compute it. The stored value is the same either way, so the
