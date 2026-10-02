@@ -11,11 +11,11 @@ result = optimize(config, x0, objective)
 print(result.exit_code.name)
 ```
 
-A run either **stops** or is **aborted**, and the reason indicates which. It
+A run either **stops** or is **aborted**, and the exit code indicates which. It
 stops when a condition on the run is met — the optimizer converged, a budget ran
 out, a [`report` callback](../running/running.md#stopping-early-from-the-callback)
-returned `True` — so it ends at a point someone declared acceptable. It is
-aborted when something cuts it off without consulting the run at all, and what
+returned `True` — so it ends at a point that satisfied a stated criterion. It is
+aborted when something cuts it off regardless of the state of the run, and what
 comes back is then whatever it had reached rather than a chosen endpoint.
 
 | Exit code               | Meaning                                                                                              |
@@ -26,7 +26,7 @@ comes back is then whatever it had reached rather than a chosen endpoint.
 | `STOPPED`               | A `report` callback returned `True`, ending the run at the next evaluation boundary.                 |
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
 | `ABORTED`               | An [`AbortSignal`][ropt.components.concurrency.AbortSignal] cut the run off, as closing a session does to a run still under way. |
-| `ABORTED_ON_ERROR`      | Another run on the same session raised, and brought this one down with it.                           |
+| `ABORTED_ON_ERROR`      | Another run on the same session raised, and this one was cut off with it.                            |
 | `USER_ABORT`            | [`Session.abort`](../running/running.md#stopping-from-outside) cut the run off.                      |
 | `EXECUTOR_SHUT_DOWN`    | The pool the run was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
 | `UNKNOWN`               | The zero value of the enumeration. No run reports it.                                                |
@@ -40,18 +40,18 @@ is lowered.
 
 ## What each kind of run reports
 
-An **optimization** can end for any of the reasons above.
+An **optimization** can end with any of the codes above.
 
 An **evaluation** is a single batch with no optimizer loop around it, so it
-reports only `FINISHED`, `USER_ABORT`, `ABORTED` or `ABORTED_ON_ERROR`. It is also all or
-nothing: either every vector was evaluated, or the batch was abandoned and
-`results` is empty. An abort that arrives once the batch has finished costs it
-nothing, and the evaluation reports `FINISHED`.
+reports only `FINISHED`, `USER_ABORT`, `ABORTED` or `ABORTED_ON_ERROR`. It is
+also all or nothing: either every vector was evaluated, or the batch was
+abandoned and `results` is empty. An abort that arrives once the batch has
+finished leaves it unaffected, and the evaluation reports `FINISHED`.
 
 ## An exit code is not a result
 
 The two are independent. `results` is `None` when no feasible result was ever
-recorded, whatever the reason the run ended, and a run that ends early still
+recorded, whatever the code the run ended with, and a run that ends early still
 returns the best result it had reached before that. A run can therefore report
 `FINISHED` and still have nothing on `results`, because only a result satisfying
 every constraint to within `constraint_tolerance` can be returned as the best
@@ -62,7 +62,8 @@ linear constraints as well as the nonlinear ones. See
 ## Work that has no result object
 
 [`WorkerPool.offload`][ropt.simple.WorkerPool.offload] returns whatever its
-callables return, so there is nowhere to carry a reason. A call abandoned by an
-abort raises [`AbortedError`][ropt.exceptions.AbortedError] instead, whose
+callables return, so there is no result object to carry an exit code. A call
+abandoned by an abort raises
+[`AbortedError`][ropt.exceptions.AbortedError] instead, whose
 `exit_code` attribute distinguishes an abort that was asked for from one
 another run caused.
