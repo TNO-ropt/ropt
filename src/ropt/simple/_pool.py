@@ -164,7 +164,8 @@ class WorkerPool:
             One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
 
         Raises:
-            WorkflowError: If this pool's session has closed.
+            RunsFailedError: If any of the runs raised.
+            WorkflowError:   If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
         return _optimize_many(
             self._session,

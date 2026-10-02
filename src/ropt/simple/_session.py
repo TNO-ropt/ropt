@@ -214,7 +214,10 @@ class Session:
 
         Returns:
             An [`OptimizationResult`][ropt.simple.OptimizationResult].
-        """
+
+        Raises:
+            WorkflowError: If this session has closed.
+        """  # ruff: ignore[docstring-extraneous-exception]
         return _optimize(
             self,
             None,
@@ -267,7 +270,11 @@ class Session:
 
         Returns:
             One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
-        """
+
+        Raises:
+            RunsFailedError: If any of the runs raised.
+            WorkflowError:   If this session has closed.
+        """  # ruff: ignore[docstring-extraneous-exception]
         return _optimize_many(
             self,
             None,
@@ -314,7 +321,8 @@ class Session:
             for the vector, or `None` if the evaluation was cut off.
 
         Raises:
-            ValueError: If `variables` is not a single vector.
+            ValueError:    If `variables` is not a single vector.
+            WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
         return _evaluate(
             self,
@@ -363,7 +371,8 @@ class Session:
             empty if the batch was cut off.
 
         Raises:
-            ValueError: If `variables` is not a 2-D matrix.
+            ValueError:    If `variables` is not a 2-D matrix.
+            WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
         return _evaluate_batch(
             self,
@@ -391,7 +400,10 @@ class Session:
 
         Returns:
             A pool backed by worker threads.
-        """
+
+        Raises:
+            WorkflowError: If this session has closed.
+        """  # ruff: ignore[docstring-extraneous-exception]
         return self._open_pool(
             lambda: ThreadExecutor(workers=workers, bundle_size=bundle_size)
         )
@@ -420,7 +432,10 @@ class Session:
 
         Returns:
             A pool backed by worker processes.
-        """
+
+        Raises:
+            WorkflowError: If this session has closed.
+        """  # ruff: ignore[docstring-extraneous-exception]
         return self._open_pool(
             lambda: ProcessExecutor(
                 workers=workers,
@@ -465,7 +480,10 @@ class Session:
 
         Returns:
             A pool backed by local job processes.
-        """
+
+        Raises:
+            WorkflowError: If this session has closed.
+        """  # ruff: ignore[docstring-extraneous-exception]
         return self._open_pool(
             lambda: LocalJobExecutor(
                 workdir=workdir,
@@ -535,7 +553,10 @@ class Session:
 
         Returns:
             A pool backed by an HPC cluster.
-        """
+
+        Raises:
+            WorkflowError: If this session has closed.
+        """  # ruff: ignore[docstring-extraneous-exception]
         return self._open_pool(
             lambda: HPCExecutor(
                 workdir=workdir,

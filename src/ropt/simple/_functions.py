@@ -104,7 +104,10 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
 
     Returns:
         One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
-    """
+
+    Raises:
+        RunsFailedError: If any of the runs raised.
+    """  # ruff: ignore[docstring-extraneous-exception]
     with session() as opened:
         return opened.optimize_many(
             config,
