@@ -108,8 +108,8 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         # No abort can reach a run being built, so this needs no exemption.
         session._fail()  # ruff: ignore[private-member-access]
         raise
-    # Left outside the guard above: a refusal here means the session is
-    # closing, not that this run failed.
+    # Left outside the guard above: registration raises because the session is
+    # closed, which is not this run failing.
     session._register(  # ruff: ignore[private-member-access]
         signal,
         keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
@@ -127,7 +127,8 @@ def _optimize(  # ruff: ignore[too-many-arguments]
             metadata=metadata,
         )
     except Exception:
-        # Being cut off is not a failure, so it must not cut off anything else.
+        # `signal.aborting` means this run was cut off rather than failing, so
+        # `_fail` is skipped and the other runs are left alone.
         if not signal.aborting:
             session._fail()  # ruff: ignore[private-member-access]
         raise
@@ -208,8 +209,8 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     finally:
         session._deregister(parent_signal)  # ruff: ignore[private-member-access]
     for outcome in outcomes:
-        # A KeyboardInterrupt or SystemExit is the program going down, not a run
-        # reporting a problem, so it travels on rather than into a carrier.
+        # A KeyboardInterrupt or SystemExit means the program is ending, so it
+        # is re-raised rather than collected into `RunsFailedError`.
         if isinstance(outcome, BaseException) and not isinstance(outcome, Exception):
             raise outcome
     errors = [outcome for outcome in outcomes if isinstance(outcome, Exception)]

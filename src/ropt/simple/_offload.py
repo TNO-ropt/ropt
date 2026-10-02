@@ -48,7 +48,8 @@ def _offload(
             return ()
         return tuple(_run(executor, functions, signal))
     except Exception:
-        # Being cut off is not a failure, so it must not cut off anything else.
+        # `signal.aborting` means this call was cut off rather than failing, so
+        # `_fail` is skipped and the other runs are left alone.
         if not signal.aborting:
             session._fail()  # ruff: ignore[private-member-access]
         raise
@@ -67,7 +68,8 @@ def _run(
         abort_signal=signal,
     )
     abandoned = any(isinstance(value, WorkNotRun) for value in values)
-    # An abort that arrived too late to cost a call anything did not abort it.
+    # Both conditions: an abort that arrived after every call had run leaves
+    # nothing abandoned, and is not reported as one.
     if abandoned and signal.aborting:
         raise AbortedError(signal.exit_code)
     for value in values:

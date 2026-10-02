@@ -46,7 +46,7 @@ class WorkerPool:
 
     Built by a session factory such as
     [`thread_pool`][ropt.simple.Session.thread_pool], and released when that
-    session closes. Runs are started on it, so the pool decides both where the
+    session closes. Starting a run on a pool sets both where the
     evaluations happen and which session the run belongs to. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
