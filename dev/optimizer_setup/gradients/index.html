@@ -3159,7 +3159,7 @@ perturbed points.</p>
 <p>This page explains how perturbations, samplers, function estimators, and the
 gradient configuration work together. The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py">examples/simple/ensemble.py</a>,
-which exercises this machinery with only <code>perturbation_magnitudes</code> and the
+which exercises this estimation with only <code>perturbation_magnitudes</code> and the
 realization weights set, leaving the sampler, the estimator and the remaining
 gradient settings at their defaults.</p>
 <h2 id="the-pieces">The pieces</h2>
@@ -3276,7 +3276,8 @@ while remaining reproducible on its own.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"seed"</span><span class="p">:</span> <span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">)}</span>
 </span></code></pre></div>
 <h2 id="choosing-number_of_perturbations">Choosing <code>number_of_perturbations</code></h2>
-<p>More perturbations → more accurate gradient estimates but more evaluator calls
+<p>More perturbations give more accurate gradient estimates at the cost of more
+evaluator calls
 per iteration. With <code>merge_realizations=False</code> (the default) the per-realization
 gradient is estimated from <code>number_of_perturbations</code> samples <em>per realization</em>;
 with <code>merge_realizations=True</code> all realizations are pooled before estimation,
@@ -3297,7 +3298,7 @@ realizations that did work.</p>
 <p><a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig.evaluation_policy</code></a> picks one of:</p>
 <ul>
 <li><code>"auto"</code> — compute objectives and gradients strictly when the backend requests
-  them. The default, and the policy that evaluates least.</li>
+  them. The default, and the policy that performs the fewest evaluations.</li>
 <li><code>"speculative"</code> — also compute the gradient whenever an objective is
   requested. Improves load balancing on HPC clusters when gradient evaluations
   are likely to be needed soon.</li>

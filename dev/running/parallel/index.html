@@ -3630,9 +3630,9 @@ switch when it works:</p>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># Then run here:</span>
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
 </span></code></pre></div>
-<p>A process pool is the wrong rehearsal: it reuses workers, keeps your
-objective in Python, and leaves the programs it starts running when the run
-stops — none of which is how a cluster job behaves.</p>
+<p>A process pool does not stand in for a cluster job: it reuses workers, keeps
+your objective in Python, and leaves the programs it starts running when the
+run stops — none of which is how a cluster job behaves.</p>
 </div>
 <h3 id="running-on-an-hpc-cluster">Running on an HPC cluster</h3>
 <p>An <a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/simple/#ropt.simple.Session.hpc_pool"><code>hpc_pool</code></a> submits each evaluation as a job to
@@ -3650,7 +3650,7 @@ configuration of your <code>ropt</code> installation:</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/hpc.py">examples/simple/hpc.py</a>.
 Pass it <code>--local</code> and it runs the identical optimization on a
-local pool, which is the rehearsal described above, so the example works
+local pool, which is the stand-in described above, so the example works
 with or without a cluster to hand.</p>
 <p>A job is nothing more than a submission script with your evaluation command in
 it, and there are <strong>two mutually exclusive ways</strong> to say what that script should
@@ -3733,16 +3733,17 @@ objective. "I use <code>numpy</code>" says almost nothing: whether the GIL is re
 depends on the operation, the dtype and the array size, and a real objective
 is a mixture whose Python-level share is invisible to the person who wrote
 it.</p>
-<p>What makes the answer cheap is an asymmetry: <strong>threads are the cheap thing
-to try, processes are the expensive commitment.</strong> Trying a thread pool
-costs one argument, and its failure mode is <em>no speedup</em> — not breakage. So:</p>
+<p>Switching to a thread pool costs one argument, and if threads do not scale
+on your objective the result is no speedup rather than a broken run.
+Switching to processes costs a serializable objective and a process start
+per worker. So try threads first:</p>
 <ol>
 <li>Start with a thread pool. Time <code>workers=1</code> against <code>workers=4</code> on a
    shortened run.</li>
 <li>If it scales, you are done, and you never needed to know what the GIL was
    doing.</li>
 <li>If it does not, set <code>OMP_NUM_THREADS=1</code> (see below) and time it again.</li>
-<li>Only then pay for processes.</li>
+<li>Only then move to processes.</li>
 </ol>
 <p>Directional guidance is fine as orientation — waiting on an external program
 almost always scales, arithmetic written in Python never does, array-heavy
@@ -3776,9 +3777,9 @@ the workers it is itself occupying — a deadlock as soon as they are all busy,
 which is the normal case, since a run fills its pool with one work item per
 realization. Rather than hang, the pool refuses work submitted by the
 evaluation itself with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A
-thread the evaluation starts is on its own: it is not recognized as a worker, so
-it can still deadlock on the pool. Give the inner run its own pool, or
-none at all, which evaluates inline.</p>
+thread the evaluation starts is not recognized as a worker, so work submitted
+from it is not refused and can still deadlock on the pool. Give the inner run
+its own pool, or none at all, which evaluates inline.</p>
 <p>The evaluation must stay <strong>in your process</strong>, so on a thread pool or with no
 pool. On a process, local, or HPC pool the evaluation function is copied
 into a worker, and a pool cannot be copied with it: open a session and build
@@ -3820,7 +3821,7 @@ to them differs:</p>
 </tbody>
 </table>
 <p>Three consequences follow.</p>
-<p><strong>A thread pool cannot be hurried.</strong> Python provides no way to interrupt a
+<p><strong>A thread pool cannot be stopped early.</strong> Python provides no way to interrupt a
 running thread from outside, so a long evaluation on a thread pool ends
 when it ends, and your program cannot exit before it does. If an evaluation may
 run long and has to be interruptible, put it on one of the other pools.</p>

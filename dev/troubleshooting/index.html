@@ -3106,7 +3106,8 @@ reached <code>max_iterations</code> or <code>convergence_tolerance</code>. Those
 <code>ropt</code>, so a run can stop far short of <code>max_functions</code>, and the exit code does
 not distinguish which of the three applied. Only <code>MAX_FUNCTIONS_REACHED</code> and
 <code>MAX_BATCHES_REACHED</code> correspond to a limit <code>ropt</code> enforced itself.</p>
-<p><strong>A broken machine is an error, not a failed realization.</strong> When the machinery
+<p><strong>A broken executor is an error, not a failed realization.</strong> When the executor
+or pool
 itself fails — a worker process is killed, a cluster job never writes its result
 — the run stops with an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> giving
 the number of evaluations lost and the reason. It is not absorbed as a <code>NaN</code>,
@@ -3134,7 +3135,7 @@ from one computed over the whole ensemble.</p>
 </tr>
 <tr>
 <td><code>ExecutionError</code> part-way through a run</td>
-<td>The machinery failed, not your objective. The message names the reason and how many evaluations went with it.</td>
+<td>The executor or pool failed, not your objective. The message names the reason and how many evaluations went with it.</td>
 </tr>
 <tr>
 <td>Numbers do not match what you configured</td>

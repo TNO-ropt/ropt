@@ -3011,7 +3011,7 @@ its own driver thread, sharing one pool for their evaluations. Use
 <div class="admonition tip">
 <p class="admonition-title">Give each run an ID</p>
 <p>Pass a per-run <code>metadata</code> list to tag every run with a user-defined
-identifier that travels with its results (and shows up in a
+identifier that is attached to its results (and shows up in a
 <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a>'s tables):</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"low"</span><span class="p">,</span> <span class="s2">"mid"</span><span class="p">,</span> <span class="s2">"high"</span><span class="p">]</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span>
@@ -3135,13 +3135,15 @@ raised:</p>
 </span></code></pre></div>
 <p>Without this the work the other runs did would be thrown away along with the run
 that failed, which matters more now that they are cut off deliberately. The
-first exception is chained, so a traceback still shows what went wrong, and a
-<code>KeyboardInterrupt</code> or <code>SystemExit</code> travels on untouched rather than into the
-carrier — that is the program going down, not a run reporting a problem. The
+first exception is chained, so a traceback still shows what went wrong. A
+<code>KeyboardInterrupt</code> or <code>SystemExit</code> propagates unchanged instead of being
+collected into <code>RunsFailedError</code>, since it means the program is ending rather
+than a run reporting a problem. The
 interrupt also aborts the runs that are still going and waits for them, so they
-end at their next evaluation boundary instead of carrying on unwatched; a second
-interrupt abandons them.</p>
-<p>The reach is the session, not the call, so a failure also aborts runs that were
+end at their next evaluation boundary rather than continuing in the background;
+a second interrupt abandons them.</p>
+<p>A failure reaches every run on the session, not only those of the call, so it
+also aborts runs that were
 started separately on the same session. A run started with the module-level
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> has a session of its own, holding
 only the runs of that call.</p>
@@ -3153,7 +3155,7 @@ queued behind <code>limit</code> start:</p>
 session, which a single run can still override with <code>keep_going=False</code>.</p>
 <p>The flag decides only whether a run is <em>aborted</em>. A run that keeps going still
 aborts the others if it fails itself, and its exception still reaches its
-caller, so opting out cannot turn a failure into silence.
+caller, so the flag does not suppress the failure.
 <a href="../running/#stopping-from-outside"><code>Session.abort</code></a> reaches every run whatever
 the flag says, and those end with <code>USER_ABORT</code> instead: the exit code
 distinguishes an abort that was asked for from one another run caused. See

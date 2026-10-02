@@ -3162,7 +3162,7 @@ which we use to index the parameter arrays:</p>
 <p>The <a href="../quickstart/">Quickstart</a> ignored this second argument; an ensemble
 objective uses <code>context.realization</code> to select the parameters for the
 realization it is computing. <code>ropt</code> combines the per-realization values into the
-robust objective for you.</p>
+robust objective.</p>
 <p>Returning a single number, as here, is the simplest case. A function with
 multiple objectives, or with constraints, returns a sequence instead — the
 objectives first, then the constraints; see
@@ -3213,7 +3213,7 @@ robust objective, which is what it optimizes.</p>
 <ul>
 <li><code>result.exit_code</code> indicates why the run stopped (a member of the
   <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> enumeration).</li>
-<li><code>result.results</code> is the best evaluation the run reached, a
+<li><code>result.results</code> is the best evaluation of the run, a
   <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 

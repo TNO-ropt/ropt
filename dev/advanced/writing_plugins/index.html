@@ -3254,8 +3254,8 @@ goes on the class itself:</p>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="o">...</span>
 </span></code></pre></div>
-<p>Annotating it as a <code>ClassVar</code> is what keeps type checkers and linters happy
-about a set assigned at class level; a bare <code>methods = {...}</code> works just as
+<p>Annotating it as a <code>ClassVar</code> is what type checkers and linters expect
+for a set assigned at class level; a bare <code>methods = {...}</code> works just as
 well at runtime.</p>
 <h2 id="registering-it">Registering it</h2>
 <p>Declare the class under the entry-point group of its area, in the
@@ -3314,7 +3314,7 @@ settings.</p>
 <p>So while a run is in progress a backend must not change the working directory,
 the environment, <code>sys.stdout</code> or <code>sys.stderr</code>, or file descriptors 1 and 2.
 Where the optimizer produces a log, configure the library to write it to a named
-file — that is the per-run answer — or to produce no output.</p>
+file, which is per run, or to produce no output.</p>
 <p>Not every library allows this, and <code>ropt</code> does not work around the ones that do
 not. Such a backend must instead <strong>state this in its own
 documentation</strong>: that it needs exclusive process state — a working directory, a
@@ -3344,8 +3344,8 @@ nothing unless asked, so it must be switched on, while NOMAD reports by default,
 so it is left alone.</p>
 <p>Set the corresponding option only if the user has not set it themselves —
 <code>setdefault</code> for a dictionary, or a check before appending for a list — so that
-a specific option such as <code>DISPLAY_DEGREE 3</code> refines the generic flag rather
-than fighting it.</p>
+a specific option such as <code>DISPLAY_DEGREE 3</code> takes precedence over the generic
+flag instead of conflicting with it.</p>
 <h2 id="declaring-native-output">Declaring native output</h2>
 <p><code>ropt</code> captures the optimizer's output by swapping <code>sys.stdout</code> and
 <code>sys.stderr</code> for the duration of the run. That catches anything printed from
@@ -3368,11 +3368,11 @@ as well:</p>
 </span></code></pre></div>
 <p>The answer may differ per method, in which case return it based on the
 configured method — the built-in SciPy backend returns <code>self._method == "tnc"</code>.
-<strong>When unsure, declare it for the whole backend.</strong> Being wrong that way costs
-only a brief rewiring of process-global state; being wrong the other way means
-the user's output escapes to the terminal, and nothing announces it.</p>
-<p>You do not have to guess.
-<a class="autorefs autorefs-internal" title="            collect_native_output" href="../../reference/backend/#ropt.backend.utils.collect_native_output"><code>collect_native_output</code></a> runs an
+Declaring it for the whole backend when only some methods need it costs only a
+brief rewiring of process-global state. Declaring it for none when a method
+needs it sends the user's output to the terminal, with no error raised.</p>
+<p><a class="autorefs autorefs-internal" title="            collect_native_output" href="../../reference/backend/#ropt.backend.utils.collect_native_output"><code>collect_native_output</code></a> settles it:
+it runs an
 optimization with the Python streams diverted and the descriptors captured, so
 whatever it returns was written below Python:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.backend.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">collect_native_output</span>

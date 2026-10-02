@@ -3004,11 +3004,11 @@ rather than raised:</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 </span></code></pre></div>
-<p>A run either <strong>stops</strong> or is <strong>aborted</strong>, and the reason indicates which. It
+<p>A run either <strong>stops</strong> or is <strong>aborted</strong>, and the exit code indicates which. It
 stops when a condition on the run is met — the optimizer converged, a budget ran
 out, a <a href="../../running/running/#stopping-early-from-the-callback"><code>report</code> callback</a>
-returned <code>True</code> — so it ends at a point someone declared acceptable. It is
-aborted when something cuts it off without consulting the run at all, and what
+returned <code>True</code> — so it ends at a point that satisfied a stated criterion. It is
+aborted when something cuts it off regardless of the state of the run, and what
 comes back is then whatever it had reached rather than a chosen endpoint.</p>
 <table>
 <thead>
@@ -3044,7 +3044,7 @@ comes back is then whatever it had reached rather than a chosen endpoint.</p>
 </tr>
 <tr>
 <td><code>ABORTED_ON_ERROR</code></td>
-<td>Another run on the same session raised, and brought this one down with it.</td>
+<td>Another run on the same session raised, and this one was cut off with it.</td>
 </tr>
 <tr>
 <td><code>USER_ABORT</code></td>
@@ -3067,15 +3067,15 @@ enough to trigger it unless
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 is lowered.</p>
 <h2 id="what-each-kind-of-run-reports">What each kind of run reports</h2>
-<p>An <strong>optimization</strong> can end for any of the reasons above.</p>
+<p>An <strong>optimization</strong> can end with any of the codes above.</p>
 <p>An <strong>evaluation</strong> is a single batch with no optimizer loop around it, so it
-reports only <code>FINISHED</code>, <code>USER_ABORT</code>, <code>ABORTED</code> or <code>ABORTED_ON_ERROR</code>. It is also all or
-nothing: either every vector was evaluated, or the batch was abandoned and
-<code>results</code> is empty. An abort that arrives once the batch has finished costs it
-nothing, and the evaluation reports <code>FINISHED</code>.</p>
+reports only <code>FINISHED</code>, <code>USER_ABORT</code>, <code>ABORTED</code> or <code>ABORTED_ON_ERROR</code>. It is
+also all or nothing: either every vector was evaluated, or the batch was
+abandoned and <code>results</code> is empty. An abort that arrives once the batch has
+finished leaves it unaffected, and the evaluation reports <code>FINISHED</code>.</p>
 <h2 id="an-exit-code-is-not-a-result">An exit code is not a result</h2>
 <p>The two are independent. <code>results</code> is <code>None</code> when no feasible result was ever
-recorded, whatever the reason the run ended, and a run that ends early still
+recorded, whatever the code the run ended with, and a run that ends early still
 returns the best result it had reached before that. A run can therefore report
 <code>FINISHED</code> and still have nothing on <code>results</code>, because only a result satisfying
 every constraint to within <code>constraint_tolerance</code> can be returned as the best
@@ -3084,8 +3084,9 @@ linear constraints as well as the nonlinear ones. See
 <a href="../../running/running/#when-something-goes-wrong">When something goes wrong</a>.</p>
 <h2 id="work-that-has-no-result-object">Work that has no result object</h2>
 <p><a class="autorefs autorefs-internal" title="            offload" href="../../reference/simple/#ropt.simple.WorkerPool.offload"><code>WorkerPool.offload</code></a> returns whatever its
-callables return, so there is nowhere to carry a reason. A call abandoned by an
-abort raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead, whose
+callables return, so there is no result object to carry an exit code. A call
+abandoned by an abort raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead, whose
 <code>exit_code</code> attribute distinguishes an abort that was asked for from one
 another run caused.</p>
 
