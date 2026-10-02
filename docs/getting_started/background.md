@@ -57,5 +57,5 @@ each other.
 
 ## See also
 
-- Understand the stochastic gradient (StoSAG) machinery in depth:
+- Understand the stochastic gradient (StoSAG) estimation in depth:
   [Stochastic Gradients](../optimizer_setup/gradients.md).

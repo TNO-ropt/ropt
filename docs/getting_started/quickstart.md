@@ -65,6 +65,6 @@ Every `ropt` optimization needs three things:
 
 [`optimize`][ropt.simple.optimize] combines these three, runs the optimization,
 and returns an [`OptimizationResult`][ropt.simple.OptimizationResult]. Its
-`results` field holds the best evaluation the run reached, as a
+`results` field holds the best evaluation of the run, as a
 [`FunctionResults`][ropt.results.FunctionResults] — the same object a handler
 receives — and is `None` if the run found nothing valid.

@@ -68,7 +68,7 @@ which we use to index the parameter arrays:
 The [Quickstart](quickstart.md) ignored this second argument; an ensemble
 objective uses `context.realization` to select the parameters for the
 realization it is computing. `ropt` combines the per-realization values into the
-robust objective for you.
+robust objective.
 
 Returning a single number, as here, is the simplest case. A function with
 multiple objectives, or with constraints, returns a sequence instead — the
@@ -114,7 +114,7 @@ robust objective, which is what it optimizes.
 
 - `result.exit_code` indicates why the run stopped (a member of the
   [`ExitCode`][ropt.enums.ExitCode] enumeration).
-- `result.results` is the best evaluation the run reached, a
+- `result.results` is the best evaluation of the run, a
   [`FunctionResults`][ropt.results.FunctionResults] carrying every value that
   evaluation produced — the same object a handler receives. It is `None` if the
   run produced no valid result, so one check covers every value read from it.

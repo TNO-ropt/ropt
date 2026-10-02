@@ -10,7 +10,7 @@ perturbed points.
 This page explains how perturbations, samplers, function estimators, and the
 gradient configuration work together. The runnable script is
 [examples/simple/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py),
-which exercises this machinery with only `perturbation_magnitudes` and the
+which exercises this estimation with only `perturbation_magnitudes` and the
 realization weights set, leaving the sampler, the estimator and the remaining
 gradient settings at their defaults.
 
@@ -93,7 +93,8 @@ while remaining reproducible on its own.
 
 ## Choosing `number_of_perturbations`
 
-More perturbations → more accurate gradient estimates but more evaluator calls
+More perturbations give more accurate gradient estimates at the cost of more
+evaluator calls
 per iteration. With `merge_realizations=False` (the default) the per-realization
 gradient is estimated from `number_of_perturbations` samples *per realization*;
 with `merge_realizations=True` all realizations are pooled before estimation,
@@ -119,7 +120,7 @@ realizations that did work.
 [`GradientConfig.evaluation_policy`][ropt.config.GradientConfig] picks one of:
 
 - `"auto"` — compute objectives and gradients strictly when the backend requests
-  them. The default, and the policy that evaluates least.
+  them. The default, and the policy that performs the fewest evaluations.
 - `"speculative"` — also compute the gradient whenever an objective is
   requested. Improves load balancing on HPC clusters when gradient evaluations
   are likely to be needed soon.
