@@ -80,7 +80,7 @@ violated by more than that amount.
 **feasible** evaluation; if none satisfied the constraints to within the
 tolerance, the run returns `None` instead of a best result. A tolerance that is
 too tight is a common reason for an empty result — see
-[Common Pitfalls](../troubleshooting/index.md).
+[Troubleshooting](../troubleshooting/index.md).
 
 To watch feasibility as the run proceeds, read `constraint_info` from the result
 the `report` callback receives. Its `nonlinear_violation` is zero where a

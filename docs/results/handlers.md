@@ -119,7 +119,7 @@ value, which is `None` until then.
 ### `DataFrameHandler`
 
 [`DataFrameHandler`][ropt.simple.DataFrameHandler] collects results into named
-DataFrames, using either `polars` (the default) or `pandas` as its backend; the
+DataFrames, using either `polars` (the default) or `pandas` as its engine; the
 corresponding package must be installed. Define a table with
 `add_table(name, table_type, columns)`, where `table_type` is
 `"functions"` or `"gradients"` and `columns` maps result-field names (dotted
@@ -167,7 +167,7 @@ The tables carry the same columns under the same titles. As explained in
 [Exporting to polars](results.md#exporting-to-polars), polars
 has no index, so the key columns (`batch_id`, `realization`, and the other axis
 names) appear as ordinary leading columns rather than in the index; with pandas
-they form the index instead. Both backends align fields of differing
+they form the index instead. Both engines align fields of differing
 granularity, broadcasting a per-batch field across the per-realization rows.
 
 Convenience methods:
@@ -208,7 +208,7 @@ Convenience methods:
 `ropt.components.event_handlers` holds a few more handlers that `ropt.simple`
 does not re-export, because a run driven by `optimize` does not need them.
 
-The remaining one that applies to a `optimize` run is
+The remaining one that applies to an `optimize` run is
 [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler], which
 calls a function for the event types you name. That is how you observe events
 other than results — the start or end of a run, for example; for results alone,

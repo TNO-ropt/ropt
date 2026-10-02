@@ -28,10 +28,12 @@ comes back is then whatever it had reached rather than a chosen endpoint.
 | `ABORTED`               | [`Session.abort`](../running/running.md#stopping-from-outside) cut the run off.                      |
 | `ABORTED_ON_ERROR`      | Another run on the same session raised, and brought this one down with it.                           |
 | `EXECUTOR_SHUT_DOWN`    | The pool the run was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
+| `UNKNOWN`               | The zero value of the enumeration. No run reports it.                                                |
 
-The first five are stops, the last three aborts. `TOO_FEW_REALIZATIONS` ends a
-run at an evaluation boundary like the other stops, but unlike them it follows
-from a failure: one failed realization is enough to trigger it unless
+The first five are stops and the next three aborts; `UNKNOWN` is neither.
+`TOO_FEW_REALIZATIONS` ends a run at an evaluation boundary like the other
+stops, but unlike them it follows from a failure: one failed realization is
+enough to trigger it unless
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
 is lowered.
 

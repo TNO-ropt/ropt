@@ -135,4 +135,4 @@ results from runs that overlap are all covered in
 - Collecting results from runs that overlap in time:
   [Result Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 - When more workers made it slower, or Ctrl-C seemed to do nothing:
-  [Common Pitfalls](../troubleshooting/index.md).
+  [Troubleshooting](../troubleshooting/index.md).

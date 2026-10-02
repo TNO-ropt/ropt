@@ -168,4 +168,4 @@ a time can use it — leave those unset on runs that overlap. See
 - Watching results as they arrive, instead of reading optimizer output:
   [Result Handlers](../results/handlers.md).
 - When a run stops earlier than expected, or returns no result at all:
-  [Common Pitfalls](../troubleshooting/index.md).
+  [Troubleshooting](../troubleshooting/index.md).

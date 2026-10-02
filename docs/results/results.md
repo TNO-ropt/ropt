@@ -43,7 +43,7 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
 | Result             | Fields                                                                                          |
 | ------------------ | ----------------------------------------------------------------------------------------------- |
 | `FunctionResults`  | `variables`, `target_objective`, `evaluations` ([`FunctionEvaluations`][ropt.results.FunctionEvaluations]), `functions` ([`Functions`][ropt.results.Functions]), `realizations` ([`Realizations`][ropt.results.Realizations]), `constraint_info` ([`ConstraintInfo`][ropt.results.ConstraintInfo]), `scaled` ([`ScaledFunctionResults`][ropt.results.ScaledFunctionResults]). |
-| `GradientResults`  | `variables`, `perturbed_variables`, `target_gradient`, `evaluations` ([`GradientEvaluations`][ropt.results.GradientEvaluations]), `gradients` ([`Gradients`][ropt.results.Gradients]), `scaled` ([`ScaledGradientResults`][ropt.results.ScaledGradientResults]). |
+| `GradientResults`  | `variables`, `perturbed_variables`, `target_gradient`, `evaluations` ([`GradientEvaluations`][ropt.results.GradientEvaluations]), `gradients` ([`Gradients`][ropt.results.Gradients]), `realizations` ([`Realizations`][ropt.results.Realizations]), `scaled` ([`ScaledGradientResults`][ropt.results.ScaledGradientResults]). |
 
 ### What each field holds
 

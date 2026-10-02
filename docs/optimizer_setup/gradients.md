@@ -148,4 +148,4 @@ average, are covered in [Function Estimators](function_estimators.md).
 - What `evaluation_policy` means when evaluations are submitted concurrently:
   [Evaluating in Parallel](../running/parallel.md).
 - When a run ends with `TOO_FEW_REALIZATIONS`, or two runs disagree:
-  [Common Pitfalls](../troubleshooting/index.md).
+  [Troubleshooting](../troubleshooting/index.md).
