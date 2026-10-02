@@ -12,7 +12,7 @@
         <link rel="prev" href="../../advanced/writing_plugins/">
       
       
-        <link rel="next" href="../utils/">
+        <link rel="next" href="../context/">
       
       
         
@@ -1069,14 +1069,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../results/exit_reasons/" class="md-nav__link">
+      <a href="../../results/exit_codes/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Exit Reasons
+    Exit Codes
   
 
     
@@ -2848,34 +2848,6 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../utils/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Utility Functions
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
     
     
     
@@ -2895,10 +2867,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_2" >
         
           
-          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="">
             
   
   
@@ -2916,8 +2888,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_3">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_2">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3016,10 +2988,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_3" >
         
           
-          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="">
             
   
   
@@ -3037,8 +3009,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3118,63 +3090,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_5" id="__nav_8_5_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Engine
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Optimization Engine
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="../core/" class="md-nav__link">
         
@@ -3183,7 +3098,7 @@
   <span class="md-ellipsis">
     
   
-    Core Classes
+    Ensemble Evaluator and Optimizer
   
 
     
@@ -3211,7 +3126,7 @@
   <span class="md-ellipsis">
     
   
-    Evaluation Classes
+    Batch Evaluation
   
 
     
@@ -3220,14 +3135,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -3630,6 +3537,34 @@
     
   
     Plugin System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utility Functions
   
 
     
@@ -4518,7 +4453,7 @@
 directly, for example <code>from ropt.simple import optimize, session</code>. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 <p>Enumerations used in the configuration and results (for example
-<a class="autorefs autorefs-internal" title="            ExitReason" href="../enums/#ropt.enums.ExitReason"><code>ExitReason</code></a> and
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> and
 <a class="autorefs autorefs-internal" title="            VariableType" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a>) are not re-exported here; import them
 from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../enums/#ropt.enums"><code>ropt.enums</code></a>.</p>
 <p>Nothing about a run depends on where it is called from. What it is started on
@@ -4984,6 +4919,40 @@ the evaluations workers.</p>
   
       dataclass
   " href="#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a> per run.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RunsFailedError">RunsFailedError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If any of the runs raised.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>x0</code> has the wrong shape, or the sequences given
+             per run disagree in length.</p>
               </div>
             </td>
           </tr>
@@ -5965,33 +5934,16 @@ interface — calls to bring them down.</p>
     <div class="doc doc-contents ">
 
         <p>Cut off the runs that belong to this session.</p>
-<p>Each ends with <code>ExitReason.ABORTED</code>. Nothing about the state of an
-optimization is consulted, so what comes back is whatever the run had
-got to and not a point it chose to stop at; a handler's own criterion
-ends a run with <code>ExitReason.STOPPED</code> instead.</p>
-<p>The evaluation batch in flight is abandoned rather than waited for, so a
-run keeps only what earlier batches produced. A run aborted during its
-first batch has no result at all, and so has an
-<a class="autorefs autorefs-internal" title="            evaluate" href="#ropt.simple.Session.evaluate"><code>evaluate</code></a> call, which is a single
-batch. Evaluations already running are not killed, since a thread cannot
-be interrupted, and their workers are free only once they return. An
-abort that arrives once every one of them has returned costs the batch
-nothing, and it reports <code>ExitReason.FINISHED</code>.</p>
-<p>This reaches every run, <code>keep_going</code> or not: that flag exempts a run
-from the abort a failing run triggers, not from one that was asked for.
-It reaches an <a class="autorefs autorefs-internal" title="            offload" href="#ropt.simple.WorkerPool.offload"><code>offload</code></a> in flight too:
-a call it abandons makes that <code>offload</code> raise
-<a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, since there is no result
-object to report a reason on.</p>
-<p>Only the runs under way at the moment of the call are reached. A run
-started afterwards is unaffected, so a loop that abandons one attempt
-and starts another keeps working. An
-<a class="autorefs autorefs-internal" title="            optimize_many" href="#ropt.simple.Session.optimize_many"><code>optimize_many</code></a> counts as one run
-here: a run it has queued behind its <code>limit</code> is cut off as well, and
-reports <code>ExitReason.ABORTED</code> without evaluating anything. Closing the
-session aborts its runs too, and then releases its pools, which is what
-refuses a later run.</p>
-<p>Calling this is thread-safe, and safe on a session that has no runs.</p>
+<p>Each run ends with <code>ExitCode.ABORTED</code>, keeping whatever its completed
+batches produced; one cut off during its first batch has no result. An
+<a class="autorefs autorefs-internal" title="            offload" href="#ropt.simple.WorkerPool.offload"><code>offload</code></a> in flight raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead, since it has no
+result object to report a reason on.</p>
+<p>This reaches every run under way, <code>keep_going</code> or not: that flag exempts
+a run from the abort a failing run triggers, not from one that was asked
+for. Calling it is thread-safe, and safe on a session with no runs. See
+<a href="../../running/running/#stopping-from-outside">Aborting a run from outside</a>
+for which runs are reached and when.</p>
 
 
     </div>
@@ -6207,6 +6159,29 @@ session's pools to give them workers. See
   
       dataclass
   " href="#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If this session has closed.</p>
               </div>
             </td>
           </tr>
@@ -6458,6 +6433,50 @@ walkthrough.</p>
   
       dataclass
   " href="#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a> per run.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RunsFailedError">RunsFailedError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If any of the runs raised.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>x0</code> has the wrong shape, or the sequences
+             given per run disagree in length.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If this session has closed.</p>
               </div>
             </td>
           </tr>
@@ -6732,6 +6751,16 @@ walkthrough.</p>
             <td>
               <div class="doc-md-description">
                 <p>If <code>variables</code> is not a single vector.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If this session has closed.</p>
               </div>
             </td>
           </tr>
@@ -7031,6 +7060,16 @@ walkthrough.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If this session has closed.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -7128,6 +7167,29 @@ that releases the GIL. See
             <td>
               <div class="doc-md-description">
                 <p>A pool backed by worker threads.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If this session has closed.</p>
               </div>
             </td>
           </tr>
@@ -7250,6 +7312,29 @@ an evaluation launches external programs.</p>
             <td>
               <div class="doc-md-description">
                 <p>A pool backed by worker processes.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If this session has closed.</p>
               </div>
             </td>
           </tr>
@@ -7428,6 +7513,29 @@ walkthrough.</p>
             <td>
               <div class="doc-md-description">
                 <p>A pool backed by local job processes.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If this session has closed.</p>
               </div>
             </td>
           </tr>
@@ -7779,6 +7887,29 @@ configuration layout and Slurm examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>A pool backed by an HPC cluster.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If this session has closed.</p>
               </div>
             </td>
           </tr>
@@ -8437,6 +8568,27 @@ walkthrough.</p>
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="RunsFailedError">RunsFailedError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If any of the runs raised.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>x0</code> has the wrong shape, or the sequences
+             given per run disagree in length.</p>
+              </div>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td>
                   <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
@@ -10818,9 +10970,9 @@ carried unchanged on <code>results</code>. See
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizationResult.exit_reason">exit_reason</span></code></td>
+            <td><code><span title="ropt.simple.OptimizationResult.exit_code">exit_code</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -10915,9 +11067,9 @@ result or none.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.EvaluationResult.exit_reason">exit_reason</span></code></td>
+            <td><code><span title="ropt.simple.EvaluationResult.exit_code">exit_code</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -11140,6 +11292,7 @@ result or none.</p>
     <div class="doc doc-contents first">
 
         <p>Called with each function evaluation; returning <code>True</code> stops the run.</p>
+<p>Results later in the same batch are not passed on.</p>
 
     </div>
 
@@ -11196,13 +11349,13 @@ result or none.</p>
         
         
           
-          <a href="../utils/" class="md-footer__link md-footer__link--next" aria-label="Next: Utility Functions">
+          <a href="../context/" class="md-footer__link md-footer__link--next" aria-label="Next: Context Class">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Utility Functions
+                Context Class
               </div>
             </div>
             <div class="md-footer__button md-icon">

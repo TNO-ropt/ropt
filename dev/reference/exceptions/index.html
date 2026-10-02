@@ -1067,14 +1067,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../results/exit_reasons/" class="md-nav__link">
+      <a href="../../results/exit_codes/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Exit Reasons
+    Exit Codes
   
 
     
@@ -2053,34 +2053,6 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../utils/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Utility Functions
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
     
     
     
@@ -2100,10 +2072,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_2" >
         
           
-          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="">
             
   
   
@@ -2121,8 +2093,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_3">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_2">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2221,10 +2193,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_3" >
         
           
-          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="">
             
   
   
@@ -2242,8 +2214,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2323,63 +2295,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_5" id="__nav_8_5_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Engine
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Optimization Engine
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="../core/" class="md-nav__link">
         
@@ -2388,7 +2303,7 @@
   <span class="md-ellipsis">
     
   
-    Core Classes
+    Ensemble Evaluator and Optimizer
   
 
     
@@ -2416,7 +2331,7 @@
   <span class="md-ellipsis">
     
   
-    Evaluation Classes
+    Batch Evaluation
   
 
     
@@ -2425,14 +2340,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2835,6 +2742,34 @@
     
   
     Plugin System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utility Functions
   
 
     
@@ -3354,6 +3289,20 @@
     <div class="doc doc-contents first">
 
         <p>Exceptions raised within the <code>ropt</code> library.</p>
+<p>Two families are defined here. The errors derive from
+<a class="autorefs autorefs-internal" title="            RoptError" href="#ropt.exceptions.RoptError"><code>RoptError</code></a> and report a failure a caller may
+catch: <a class="autorefs autorefs-internal" title="            WorkflowError" href="#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>,
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>,
+<a class="autorefs autorefs-internal" title="            UnsupportedError" href="#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a>,
+<a class="autorefs autorefs-internal" title="            AbortedError" href="#ropt.exceptions.AbortedError"><code>AbortedError</code></a> and
+<a class="autorefs autorefs-internal" title="            RunsFailedError" href="#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a>.</p>
+<p>The other three derive from <code>Exception</code> directly and are control-flow signals
+rather than errors. <a class="autorefs autorefs-internal" title="            OptimizerStop" href="#ropt.exceptions.OptimizerStop"><code>OptimizerStop</code></a> and
+<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> are raised and caught
+inside <code>ropt</code>. <a class="autorefs autorefs-internal" title="            TooFewRealizations" href="#ropt.exceptions.TooFewRealizations"><code>TooFewRealizations</code></a> is
+raised by a
+<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> that can give
+no realization a positive weight.</p>
 
 
 
@@ -3400,11 +3349,8 @@
         <p>Base class for all runtime errors raised by <code>ropt</code>.</p>
 <p>Catch this to handle any error raised by <code>ropt</code> itself. Configuration and
 validation errors are <strong>not</strong> part of this hierarchy; they surface as
-<code>pydantic.ValidationError</code>. The internal stop signals
-(<a class="autorefs autorefs-internal" title="            OptimizerStop" href="#ropt.exceptions.OptimizerStop"><code>OptimizerStop</code></a>,
-<a class="autorefs autorefs-internal" title="            TooFewRealizations" href="#ropt.exceptions.TooFewRealizations"><code>TooFewRealizations</code></a>,
-<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>) are control flow, not
-errors, and are excluded too.</p>
+<code>pydantic.ValidationError</code>. The control-flow signals <code>OptimizerStop</code>,
+<code>TooFewRealizations</code> and <code>ExecutorStopped</code> are excluded too.</p>
 
 
 
@@ -3574,7 +3520,7 @@ returns instead, and does not raise this.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.exceptions.AbortedError.exit_reason">exit_reason</span></code></td>
+            <td><code><span title="ropt.exceptions.AbortedError.exit_code">exit_code</span></code></td>
             <td>
             </td>
             <td>
@@ -3612,7 +3558,7 @@ returns instead, and does not raise this.</p>
 
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">exit_reason</span><span class="p">:</span> <span class="n">ExitReason</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3633,10 +3579,10 @@ returns instead, and does not raise this.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>exit_reason</code>
+                <code>exit_code</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3693,7 +3639,7 @@ both, so the work the other runs did is not thrown away with the one that
 failed. The first exception is chained, so a traceback still shows what
 went wrong.</p>
 <p>The runs that did not fail were cut off when this one did and ended with
-<code>ExitReason.ABORTED_ON_ERROR</code>, unless they were started with
+<code>ExitCode.ABORTED_ON_ERROR</code>, unless they were started with
 <code>keep_going=True</code>. Each kept whatever its completed batches had produced;
 one cut off during its first batch has no result.</p>
 
@@ -3835,10 +3781,10 @@ one cut off during its first batch has no result.</p>
 
 
 
-        <p>Raised internally to stop an optimization with a specific exit reason.</p>
+        <p>Raised internally to stop an optimization with a specific exit code.</p>
 <p>Used only within the optimizer core to unwind the backend optimization loop
 (for example when a function or batch budget is reached). It carries the
-<a class="autorefs autorefs-internal" title="            ExitReason" href="../enums/#ropt.enums.ExitReason"><code>ExitReason</code></a> the optimization terminates with.</p>
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> the optimization terminates with.</p>
 
 
 
@@ -3866,7 +3812,7 @@ one cut off during its first batch has no result.</p>
 
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">exit_reason</span><span class="p">:</span> <span class="n">ExitReason</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3887,14 +3833,14 @@ one cut off during its first batch has no result.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>exit_reason</code>
+                <code>exit_code</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitReason (ropt.enums.ExitReason)" href="../enums/#ropt.enums.ExitReason">ExitReason</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The reason the optimization terminates with.</p>
+                <p>The exit code the optimization terminates with.</p>
               </div>
             </td>
             <td>

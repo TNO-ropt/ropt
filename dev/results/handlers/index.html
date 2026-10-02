@@ -12,7 +12,7 @@
         <link rel="prev" href="../results/">
       
       
-        <link rel="next" href="../exit_reasons/">
+        <link rel="next" href="../exit_codes/">
       
       
         
@@ -1202,14 +1202,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../exit_reasons/" class="md-nav__link">
+      <a href="../exit_codes/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Exit Reasons
+    Exit Codes
   
 
     
@@ -2185,34 +2185,6 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../reference/utils/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Utility Functions
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
     
     
     
@@ -2229,10 +2201,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_2" >
         
           
-          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="0">
             
   
   
@@ -2250,8 +2222,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_3">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_2">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2347,10 +2319,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_3" >
         
           
-          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="0">
             
   
   
@@ -2368,8 +2340,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2449,60 +2421,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_5" id="__nav_8_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Engine
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Optimization Engine
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="../../reference/core/" class="md-nav__link">
         
@@ -2511,7 +2429,7 @@
   <span class="md-ellipsis">
     
   
-    Core Classes
+    Ensemble Evaluator and Optimizer
   
 
     
@@ -2539,7 +2457,7 @@
   <span class="md-ellipsis">
     
   
-    Evaluation Classes
+    Batch Evaluation
   
 
     
@@ -2548,14 +2466,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2972,6 +2882,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utility Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/enums/" class="md-nav__link">
         
   
@@ -3281,7 +3219,7 @@ until the first result arrives, or with <code>handler["results"]</code>, the raw
 value, which is <code>None</code> until then.</p>
 <h3 id="dataframehandler"><code>DataFrameHandler</code></h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.simple.DataFrameHandler" href="../../reference/simple/#ropt.simple.DataFrameHandler"><code>DataFrameHandler</code></a> collects results into named
-DataFrames, using either <code>polars</code> (the default) or <code>pandas</code> as its backend; the
+DataFrames, using either <code>polars</code> (the default) or <code>pandas</code> as its engine; the
 corresponding package must be installed. Define a table with
 <code>add_table(name, table_type, columns)</code>, where <code>table_type</code> is
 <code>"functions"</code> or <code>"gradients"</code> and <code>columns</code> maps result-field names (dotted
@@ -3322,7 +3260,7 @@ DataFrames instead:</p>
 <a href="../results/#exporting-to-polars">Exporting to polars</a>, polars
 has no index, so the key columns (<code>batch_id</code>, <code>realization</code>, and the other axis
 names) appear as ordinary leading columns rather than in the index; with pandas
-they form the index instead. Both backends align fields of differing
+they form the index instead. Both engines align fields of differing
 granularity, broadcasting a per-batch field across the per-realization rows.</p>
 <p>Convenience methods:</p>
 <ul>
@@ -3358,7 +3296,7 @@ result waits for the write to finish.</p>
 <h3 id="other-handlers">Other handlers</h3>
 <p><code>ropt.components.event_handlers</code> holds a few more handlers that <code>ropt.simple</code>
 does not re-export, because a run driven by <code>optimize</code> does not need them.</p>
-<p>The remaining one that applies to a <code>optimize</code> run is
+<p>The remaining one that applies to an <code>optimize</code> run is
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a>, which
 calls a function for the event types you name. That is how you observe events
 other than results — the start or end of a run, for example; for results alone,
@@ -3369,7 +3307,7 @@ step that emitted it, so calling <code>event.source.stop()</code> ends that run 
 <code>STOPPED</code> — the <a href="../../running/running/#stopping-early-from-the-callback"><code>report</code></a>
 callback above is a convenience wrapper around this. Only the run that owns the
 emitting step is affected, so concurrent runs continue. See
-<a href="../exit_reasons/">Exit Reasons</a>.</p>
+<a href="../exit_codes/">Exit Codes</a>.</p>
 <h2 id="handlers-and-the-process-boundary">Handlers and the process boundary</h2>
 <p>On a thread pool (or with no pool) your objective and your handlers run
 in the <strong>same process</strong> and share memory: a handler can see anything the
@@ -3480,13 +3418,13 @@ returning the data works everywhere.</p>
         
         
           
-          <a href="../exit_reasons/" class="md-footer__link md-footer__link--next" aria-label="Next: Exit Reasons">
+          <a href="../exit_codes/" class="md-footer__link md-footer__link--next" aria-label="Next: Exit Codes">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Exit Reasons
+                Exit Codes
               </div>
             </div>
             <div class="md-footer__button md-icon">
