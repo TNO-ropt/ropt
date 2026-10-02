@@ -195,14 +195,14 @@ if result.exit_code is ExitCode.USER_ABORT:
 ```
 
 The two are not the same kind of ending, which is why they have different exit
-reasons. A `report` callback stops the run *on a criterion*, at a point it chose.
-Aborting consults nothing: the result is whatever the run had reached.
+codes. A `report` callback stops the run *on a criterion*, at a point it chose.
+An abort applies no criterion: the result is whatever the run had reached.
 
 A run is cut off at its next evaluation boundary, so the evaluations already in
 flight are still carried out and their workers are free only once they return.
 
 `abort()` reaches the runs that are under way at the moment of the call, and
-nothing more: it is not a latch. A run started afterwards is unaffected, so a
+nothing more. A run started afterwards is unaffected, so a
 loop that abandons one attempt and starts another keeps working. An
 [`optimize_many`][ropt.simple.Session.optimize_many] counts as one run here: a
 run it has queued behind its `limit` is cut off as well, and reports `USER_ABORT`
@@ -214,7 +214,7 @@ it was the block ending rather than a request to stop.
 A run started with the module-level [`optimize`][ropt.simple.optimize] belongs
 to no session you hold and cannot be aborted this way. It evaluates on the
 calling thread, which is the thread that would have to call `abort()`. Start it
-on a session or one of its pools to bring it within reach.
+on a session or one of its pools to make it abortable.
 
 ## Attaching metadata
 
@@ -287,7 +287,7 @@ batch.results   # one per row of the matrix, empty if the batch was cut off
 
 Both return an [`EvaluationResult`][ropt.simple.EvaluationResult], shaped like
 the [`OptimizationResult`][ropt.simple.OptimizationResult] that `optimize`
-returns: `exit_code` says why the evaluation ended and `results` holds what it
+returns: `exit_code` indicates why the evaluation ended and `results` holds what it
 produced. What is on `results` is a
 [`FunctionResults`][ropt.results.FunctionResults], the same kind a handler
 receives, so everything is read the same way wherever it came from. Here
@@ -298,7 +298,7 @@ An evaluation is a single batch, so it produces either every result or none.
 That is why `exit_code` can only be `FINISHED`, or `USER_ABORT` and
 `ABORTED_ON_ERROR` when [`Session.abort`](#stopping-from-outside) or a failing
 run on the same session cut it off. An abort that arrives after the batch has
-finished costs it nothing, and the evaluation reports `FINISHED`.
+finished leaves it unaffected, and the evaluation reports `FINISHED`.
 
 The runnable script is
 [examples/simple/evaluate.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/evaluate.py),
@@ -338,8 +338,8 @@ What *is* raised falls into three groups:
   dependency is missing, or when the chosen method cannot handle the problem
   as configured — a constraint it does not support, for instance, which is
   checked as the run starts — and
-  [`ExecutionError`][ropt.exceptions.ExecutionError] when the machinery that
-  runs your evaluations, or a call handed to
+  [`ExecutionError`][ropt.exceptions.ExecutionError] when the executor or pool
+  that runs your evaluations, or a call handed to
   [`WorkerPool.offload`][ropt.simple.WorkerPool.offload], cannot start or breaks
   down, and [`AbortedError`][ropt.exceptions.AbortedError] when an abort
   abandoned an offloaded call.
