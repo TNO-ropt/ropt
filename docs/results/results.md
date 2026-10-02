@@ -49,34 +49,30 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
 
 #### `FunctionResults` fields
 
-- **`variables`** — the variable vector that was evaluated, shape $(n_v,)$.
+- **`variables`** — the variable vector that was evaluated.
 - **`target_objective`** — the single weighted scalar the optimizer minimizes
   (0-D array), or `None` if no aggregate could be formed. Always in the domain
   the optimizer works in; see [Scaling of results](#scaling-of-results).
 - **`evaluations`** ([`FunctionEvaluations`][ropt.results.FunctionEvaluations])
   — the raw per-realization values returned by the evaluator:
-    - `objectives`: objective values per realization, shape $(n_r, n_o)$.
-    - `constraints`: constraint values per realization, shape $(n_r, n_c)$
-      (only present when nonlinear constraints are configured).
-    - `metadata`: optional dict of per-realization metadata arrays, each of
-      shape $(n_r,)$.
+    - `objectives`: objective values per realization.
+    - `constraints`: constraint values per realization (only present when
+      nonlinear constraints are configured).
+    - `metadata`: optional dict of per-realization metadata arrays.
 - **`functions`** ([`Functions`][ropt.results.Functions]) — aggregated values
   derived from the per-realization evaluations (or `None` if all realizations
   failed):
-    - `objectives`: individual objective values, shape $(n_o,)$.
-    - `constraints`: individual constraint values, shape $(n_c,)$ (if
-      configured).
+    - `objectives`: individual objective values.
+    - `constraints`: individual constraint values (if configured).
 - **`realizations`** ([`Realizations`][ropt.results.Realizations]) — ensemble
   metadata:
     - `evaluated_realizations`: boolean array indicating which realizations were
-      evaluated, shape $(n_r,)$.
-    - `objective_weights`: per-realization objective weights, shape
-      $(n_o, n_r)$, or `None` when no
+      evaluated.
+    - `objective_weights`: per-realization objective weights, or `None` when no
       [realization filter](../optimizer_setup/realization_filters.md) is
       configured. A filter may change them from one batch to the next.
-    - `constraint_weights`: per-realization constraint weights, shape
-      $(n_c, n_r)$, or `None` unless nonlinear constraints and a realization
-      filter are both configured.
+    - `constraint_weights`: per-realization constraint weights, or `None` unless
+      nonlinear constraints and a realization filter are both configured.
 - **`constraint_info`** ([`ConstraintInfo`][ropt.results.ConstraintInfo]) —
   constraint bound information. Present when bounds or constraints are defined.
   Contains two kinds of data for each constraint type (bound, linear, and
@@ -96,30 +92,27 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
 
 #### `GradientResults` fields
 
-- **`variables`** — the unperturbed variable vector, shape $(n_v,)$.
-- **`perturbed_variables`** — perturbed variable values, shape
-  $(n_r, n_p, n_v)$.
-- **`target_gradient`** — the gradient the optimizer descends, shape $(n_v,)$,
-  or `None` if estimation failed. Always in the domain the optimizer works in.
+- **`variables`** — the unperturbed variable vector.
+- **`perturbed_variables`** — perturbed variable values.
+- **`target_gradient`** — the gradient the optimizer descends, or `None` if
+  estimation failed. Always in the domain the optimizer works in.
 - **`evaluations`** ([`GradientEvaluations`][ropt.results.GradientEvaluations])
   — the raw per-perturbation values returned by the evaluator:
-    - `perturbed_objectives`: objective values for each perturbation, shape
-      $(n_r, n_p, n_o)$.
-    - `perturbed_constraints`: constraint values for each perturbation, shape
-      $(n_r, n_p, n_c)$ (if configured).
+    - `perturbed_objectives`: objective values for each perturbation.
+    - `perturbed_constraints`: constraint values for each perturbation (if
+      configured).
     - `metadata`: optional dict of per-realization/perturbation metadata
-      arrays, each of shape $(n_r, n_p)$.
+      arrays.
 - **`gradients`** ([`Gradients`][ropt.results.Gradients]) — aggregated gradient
   values (or `None` if estimation failed):
-    - `objectives`: per-objective gradients, shape $(n_o, n_v)$.
-    - `constraints`: per-constraint gradients, shape $(n_c, n_v)$ (if
-      configured).
+    - `objectives`: per-objective gradients.
+    - `constraints`: per-constraint gradients (if configured).
 - **`realizations`** ([`Realizations`][ropt.results.Realizations]) — same
   structure as for `FunctionResults` (see above).
 
-In the shapes above: $n_v$ = number of variables, $n_o$ = number of objectives,
-$n_c$ = number of nonlinear constraints, $n_r$ = number of realizations,
-$n_p$ = number of perturbations. All values are NumPy arrays.
+The shape and axes of every field are tabulated under
+[Axes and dimensionality](#axes-and-dimensionality). All values are NumPy
+arrays.
 
 ### Common attributes on all results
 
