@@ -1,4 +1,21 @@
-"""Exceptions raised within the `ropt` library."""
+"""Exceptions raised within the `ropt` library.
+
+Two families are defined here. The errors derive from
+[`RoptError`][ropt.exceptions.RoptError] and report a failure a caller may
+catch: [`WorkflowError`][ropt.exceptions.WorkflowError],
+[`ExecutionError`][ropt.exceptions.ExecutionError],
+[`UnsupportedError`][ropt.exceptions.UnsupportedError],
+[`AbortedError`][ropt.exceptions.AbortedError] and
+[`RunsFailedError`][ropt.exceptions.RunsFailedError].
+
+The other three derive from `Exception` directly and are control-flow signals
+rather than errors. [`OptimizerStop`][ropt.exceptions.OptimizerStop] and
+[`ExecutorStopped`][ropt.exceptions.ExecutorStopped] are raised and caught
+inside `ropt`. [`TooFewRealizations`][ropt.exceptions.TooFewRealizations] is
+raised by a
+[`RealizationFilter`][ropt.realization_filter.RealizationFilter] that can give
+no realization a positive weight.
+"""
 
 from __future__ import annotations
 
@@ -16,11 +33,8 @@ class RoptError(Exception):
 
     Catch this to handle any error raised by `ropt` itself. Configuration and
     validation errors are **not** part of this hierarchy; they surface as
-    `pydantic.ValidationError`. The internal stop signals
-    ([`OptimizerStop`][ropt.exceptions.OptimizerStop],
-    [`TooFewRealizations`][ropt.exceptions.TooFewRealizations],
-    [`ExecutorStopped`][ropt.exceptions.ExecutorStopped]) are control flow, not
-    errors, and are excluded too.
+    `pydantic.ValidationError`. The control-flow signals `OptimizerStop`,
+    `TooFewRealizations` and `ExecutorStopped` are excluded too.
     """
 
 
