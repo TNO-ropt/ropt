@@ -42,6 +42,7 @@ def run_concurrent(
     Args:
         jobs:      The zero-argument callables to run, one outcome each.
         limit:     The maximum number to run at once, or `None` for no limit.
+                   A value below 1 is treated as 1.
         interrupt: Called to stop the jobs when an interrupt breaks the wait.
 
     Returns:

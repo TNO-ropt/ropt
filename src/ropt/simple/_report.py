@@ -20,26 +20,13 @@ if TYPE_CHECKING:
 
 
 ReportCallback = Callable[[FunctionResults], bool | None]
-"""Called with each function evaluation; returning `True` stops the run."""
+"""Called with each function evaluation; returning `True` stops the run.
+
+Results later in the same batch are not passed on.
+"""
 
 
 def make_report_handler(report: ReportCallback) -> EventHandler:
-    """Build a handler that reports each new function evaluation.
-
-    The callback is given the
-    [`FunctionResults`][ropt.results.FunctionResults] of the evaluation;
-    gradient results are skipped. If the callback returns `True`, the emitting
-    run stops gracefully (exit code `STOPPED`); any other return
-    value continues it. Reporting stops there: results after it in the same
-    batch are not passed on.
-
-    Args:
-        report: The callback invoked with a `FunctionResults` per evaluation.
-
-    Returns:
-        A handler forwarding each function evaluation to the callback.
-    """
-
     def _callback(event: EnOptEvent) -> None:
         for item in event.results or ():
             if (

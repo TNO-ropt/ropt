@@ -29,13 +29,6 @@ def attach_handlers(
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
 ) -> None:
-    """Wire a run's handlers to its compute step.
-
-    Args:
-        step:     The compute step of the run.
-        handlers: The handlers to wire up, in the order they are called in.
-        report:   An optional callback wired up as a report handler.
-    """
     for handler in handlers or ():
         step.add_event_handler(handler)
     if report is not None:

@@ -122,37 +122,17 @@ class Session:
     def abort(self) -> None:
         """Cut off the runs that belong to this session.
 
-        Each ends with `ExitReason.ABORTED`. Nothing about the state of an
-        optimization is consulted, so what comes back is whatever the run had
-        got to and not a point it chose to stop at; a handler's own criterion
-        ends a run with `ExitReason.STOPPED` instead.
+        Each run ends with `ExitReason.ABORTED`, keeping whatever its completed
+        batches produced; one cut off during its first batch has no result. An
+        [`offload`][ropt.simple.WorkerPool.offload] in flight raises
+        [`AbortedError`][ropt.exceptions.AbortedError] instead, since it has no
+        result object to report a reason on.
 
-        The evaluation batch in flight is abandoned rather than waited for, so a
-        run keeps only what earlier batches produced. A run aborted during its
-        first batch has no result at all, and so has an
-        [`evaluate`][ropt.simple.Session.evaluate] call, which is a single
-        batch. Evaluations already running are not killed, since a thread cannot
-        be interrupted, and their workers are free only once they return. An
-        abort that arrives once every one of them has returned costs the batch
-        nothing, and it reports `ExitReason.FINISHED`.
-
-        This reaches every run, `keep_going` or not: that flag exempts a run
-        from the abort a failing run triggers, not from one that was asked for.
-        It reaches an [`offload`][ropt.simple.WorkerPool.offload] in flight too:
-        a call it abandons makes that `offload` raise
-        [`AbortedError`][ropt.exceptions.AbortedError], since there is no result
-        object to report a reason on.
-
-        Only the runs under way at the moment of the call are reached. A run
-        started afterwards is unaffected, so a loop that abandons one attempt
-        and starts another keeps working. An
-        [`optimize_many`][ropt.simple.Session.optimize_many] counts as one run
-        here: a run it has queued behind its `limit` is cut off as well, and
-        reports `ExitReason.ABORTED` without evaluating anything. Closing the
-        session aborts its runs too, and then releases its pools, which is what
-        refuses a later run.
-
-        Calling this is thread-safe, and safe on a session that has no runs.
+        This reaches every run under way, `keep_going` or not: that flag exempts
+        a run from the abort a failing run triggers, not from one that was asked
+        for. Calling it is thread-safe, and safe on a session with no runs. See
+        [Aborting a run from outside](../running/running.md#stopping-from-outside)
+        for which runs are reached and when.
         """
         with self._lock:
             signals = list(self._signals)
@@ -273,6 +253,8 @@ class Session:
 
         Raises:
             RunsFailedError: If any of the runs raised.
+            ValueError:      If `x0` has the wrong shape, or the sequences
+                             given per run disagree in length.
             WorkflowError:   If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
         return _optimize_many(

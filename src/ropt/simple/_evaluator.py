@@ -25,26 +25,6 @@ def make_evaluator(
     bundle_size: int | None = None,
     abort_signal: AbortSignal | None = None,
 ) -> Evaluator:
-    """Wire an evaluator for a validated configuration.
-
-    The number of objectives and constraints the evaluation function must
-    produce follows from the context. An executor spreads the evaluations over
-    its workers; without one they run in-process on the calling thread, and
-    `bundle_size` does not apply.
-
-    Batch IDs come from the program-wide counter either way, so no two runs in
-    this process land on the same ID.
-
-    Args:
-        context:      The validated optimizer context.
-        function:     The user-supplied evaluation function.
-        executor:     The executor the evaluations run on, or `None`.
-        bundle_size:  Evaluations per worker task, `None` for the executor's own.
-        abort_signal: An optional signal that abandons a running batch.
-
-    Returns:
-        The evaluator to run with.
-    """
     n_obj = context.objectives.weights.size
     n_con = (
         0

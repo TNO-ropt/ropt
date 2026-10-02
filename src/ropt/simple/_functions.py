@@ -107,6 +107,8 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
 
     Raises:
         RunsFailedError: If any of the runs raised.
+        ValueError:      If `x0` has the wrong shape, or the sequences given
+                         per run disagree in length.
     """  # ruff: ignore[docstring-extraneous-exception]
     with session() as opened:
         return opened.optimize_many(

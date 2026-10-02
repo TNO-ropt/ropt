@@ -165,6 +165,8 @@ class WorkerPool:
 
         Raises:
             RunsFailedError: If any of the runs raised.
+            ValueError:      If `x0` has the wrong shape, or the sequences
+                             given per run disagree in length.
             WorkflowError:   If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
         return _optimize_many(

@@ -57,8 +57,8 @@ class VariablesConfig(BaseModel):
         variable_count:           Number of variables.
         lower_bounds:             Lower bounds for the variables (default: $-\infty$).
         upper_bounds:             Upper bounds for the variables (default: $+\infty$).
-        types:                    Optional variable types.
-        mask:                     Optional boolean mask indicating free variables.
+        types:                    The type of each variable (default: continuous).
+        mask:                     Which variables are free (default: all free).
         scales:                   Scale factors for the variables (default: 1.0).
         offsets:                  Offsets for the variables (default: 0.0).
         perturbation_magnitudes:  Magnitude of the perturbation of each variable.

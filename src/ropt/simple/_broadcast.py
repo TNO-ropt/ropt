@@ -24,19 +24,6 @@ def broadcast_runs(
     x0: ArrayLike,
     function: EvaluationFunction | Sequence[EvaluationFunction],
 ) -> list[tuple[dict[str, Any], ArrayLike, EvaluationFunction]]:
-    """Pair up the configuration, start point and function of each run.
-
-    Args:
-        config:   The configuration, or one per run.
-        x0:       The initial variable vector, or one per row.
-        function: The evaluation function, or one per run.
-
-    Returns:
-        One `(config, x0, function)` triple per run.
-
-    Raises:
-        ValueError: If `x0` has the wrong shape, or the sequences disagree.
-    """
     configs = [config] if isinstance(config, Mapping) else list(config)
     functions = [function] if callable(function) else list(function)
 
@@ -64,15 +51,6 @@ def broadcast_runs(
 def broadcast_reports(
     report: ReportCallback | Sequence[ReportCallback] | None, count: int
 ) -> list[ReportCallback | None]:
-    """Give each run its report callback.
-
-    Args:
-        report: A callback shared by every run, one per run, or `None`.
-        count:  The number of runs.
-
-    Returns:
-        One callback, or `None`, per run.
-    """
     if report is None:
         return [None] * count
     if callable(report):
@@ -83,15 +61,6 @@ def broadcast_reports(
 def broadcast_metadata(
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None, count: int
 ) -> list[dict[str, Any] | None]:
-    """Give each run its metadata dictionary.
-
-    Args:
-        metadata: A dictionary shared by every run, one per run, or `None`.
-        count:    The number of runs.
-
-    Returns:
-        One dictionary, or `None`, per run.
-    """
     if metadata is None:
         return [None] * count
     if isinstance(metadata, Mapping):
@@ -102,15 +71,6 @@ def broadcast_metadata(
 def broadcast_bundle_sizes(
     bundle_size: int | Sequence[int | None] | None, count: int
 ) -> list[int | None]:
-    """Give each run its bundle size.
-
-    Args:
-        bundle_size: A size shared by every run, or one per run.
-        count:       The number of runs.
-
-    Returns:
-        One size per run.
-    """
     if bundle_size is None or isinstance(bundle_size, int):
         return [bundle_size] * count
     return _sized(list(bundle_size), count, "bundle_size")
