@@ -64,7 +64,6 @@ ignore = [
     "CPY",
     "line-too-long",
     "assert",
-    "non-pep695-type-alias",
 ]
 
 [tool.ruff.lint.per-file-ignores]

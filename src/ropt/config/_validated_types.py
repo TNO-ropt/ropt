@@ -2,15 +2,13 @@
 
 from collections.abc import Sequence
 from collections.abc import Sequence as AbstractSequence
-from typing import Annotated, Any, TypeVar
+from typing import Annotated, Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from pydantic import BeforeValidator
 
 from ropt._utils import immutable_array
-
-T = TypeVar("T")
 
 
 def _convert_1d_array(array: ArrayLike | None) -> NDArray[np.float64] | None:
@@ -76,7 +74,7 @@ Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)
 Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
 """Convert to an immutable 1D numpy array of boolean values."""
 
-ItemOrTuple = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
+type ItemOrTuple[T] = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
 """Convert to single value to a tuple containing that value, passes sets unchanged."""
 
 Keys = Annotated[tuple[str | None, ...], BeforeValidator(_convert_keys)]

@@ -5,11 +5,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from collections.abc import Set as AbstractSet
 from importlib.metadata import entry_points
-from typing import Any, Final, Literal, TypeAlias, cast
+from typing import Any, Final, Literal, cast
 
 from ropt._logging import get_logger
 
-MethodSpec: TypeAlias = AbstractSet[str] | Callable[[str], bool]
+type MethodSpec = AbstractSet[str] | Callable[[str], bool]
 """How a plugin declares the methods it provides.
 
 Either a set of method names, which the registry matches case-insensitively, or
