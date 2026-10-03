@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import numpy as np
 import pytest
@@ -57,6 +57,7 @@ class MockedSampler(Sampler):
         # This sampler only works if the number of perturbation equals the
         # number of variables:
 
+    @override
     def init(
         self,
         *,
@@ -72,6 +73,7 @@ class MockedSampler(Sampler):
         self._mask = mask
         self._rng = rng
 
+    @override
     def generate_samples(
         self,
     ) -> NDArray[np.float64]:

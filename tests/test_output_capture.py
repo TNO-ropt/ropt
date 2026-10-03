@@ -11,7 +11,7 @@ import subprocess
 import sys
 import textwrap
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, override
 
 import numpy as np
 import pytest
@@ -49,13 +49,14 @@ class _PrintingBackend(Backend):
     def __init__(self, backend_config: BackendConfig) -> None:
         self._config = backend_config
 
-    def start(  # ruff: ignore[no-self-use]
+    @override
+    def start(
         self,
         problem: OptimizationProblem,
         optimizer_callback: OptimizerCallback,
         *,
-        evaluation_policy: Literal["speculative", "separate", "auto"],  # ruff: ignore[unused-method-argument]
-        output_dir: Path | None,  # ruff: ignore[unused-method-argument]
+        evaluation_policy: Literal["speculative", "separate", "auto"],
+        output_dir: Path | None,
     ) -> None:
         print("OPTIMIZER-PYTHON-STDOUT")
         print("OPTIMIZER-PYTHON-STDERR", file=sys.stderr)
@@ -65,6 +66,7 @@ class _PrintingBackend(Backend):
         )
         print("OPTIMIZER-AFTER-EVALUATION")
 
+    @override
     def validate_options(self) -> None:
         pass
 
@@ -73,6 +75,7 @@ class _NativePrintingBackend(_PrintingBackend):
     methods: ClassVar[MethodSpec] = {"printing"}
 
     @property
+    @override
     def bypasses_python_output(self) -> bool:
         return True
 

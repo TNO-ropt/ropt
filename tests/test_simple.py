@@ -11,7 +11,7 @@ import os
 import pickle  # ruff: ignore[suspicious-pickle-import]
 import threading
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import numpy as np
 import pytest
@@ -275,9 +275,11 @@ def test_optimize_from_a_handler_reaching_itself_raises(
             self.nested = False
 
         @property
+        @override
         def event_types(self) -> set[EnOptEventType]:
             return {EnOptEventType.FINISHED_EVALUATION}
 
+        @override
         def _handle_event(self, _event: EnOptEvent) -> None:
             if self.nested:
                 return
@@ -302,9 +304,11 @@ def test_optimize_from_a_handler_with_a_separate_handler_succeeds(
             self.nested = False
 
         @property
+        @override
         def event_types(self) -> set[EnOptEventType]:
             return {EnOptEventType.FINISHED_EVALUATION}
 
+        @override
         def _handle_event(self, _event: EnOptEvent) -> None:
             if self.nested:
                 return

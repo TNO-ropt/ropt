@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import numpy as np
 
@@ -53,6 +53,7 @@ class OptimizationStep(ComputeStep[ExitCode]):
         super().__init__(abort_signal=abort_signal)
         self._evaluator = evaluator
 
+    @override
     def _run(
         self,
         context: EnOptContext,

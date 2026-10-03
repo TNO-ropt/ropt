@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import numpy as np
 
@@ -64,6 +64,7 @@ class ParallelEvaluator(Evaluator):
             batch_id_callback if batch_id_callback is not None else BatchIdCounter()
         )
 
+    @override
     def _eval(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
     ) -> EvaluationBatchResult:

@@ -1,7 +1,7 @@
 # ruff: file-ignore[float-equality-comparison]
 
 from functools import partial
-from typing import Any, Literal
+from typing import Any, Literal, override
 
 import numpy as np
 import pytest
@@ -576,16 +576,17 @@ class CustomRealizationFilter(RealizationFilter):
     def __init__(self, _: RealizationFilterConfig) -> None:  # D107
         pass
 
-    def get_realization_weights(  # ruff: ignore[no-self-use]
+    @override
+    def get_realization_weights(
         self,
         objectives: NDArray[np.float64],
         _: NDArray[np.float64] | None,
         *,
-        objective_scales: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
-        maximize: NDArray[np.bool_],  # ruff: ignore[unused-method-argument]
-        objective_weights: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
-        constraint_lower_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
-        constraint_upper_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
+        objective_scales: NDArray[np.float64],
+        maximize: NDArray[np.bool_],
+        objective_weights: NDArray[np.float64],
+        constraint_lower_bounds: NDArray[np.float64] | None,
+        constraint_upper_bounds: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         return np.ones(objectives.shape[0])
 
@@ -606,16 +607,17 @@ class _ScaleRecordingFilter(RealizationFilter):
     def __init__(self, _: RealizationFilterConfig) -> None:  # D107
         self.received: list[NDArray[np.float64]] = []
 
+    @override
     def get_realization_weights(
         self,
         objectives: NDArray[np.float64],
         _: NDArray[np.float64] | None,
         *,
         objective_scales: NDArray[np.float64],
-        maximize: NDArray[np.bool_],  # ruff: ignore[unused-method-argument]
-        objective_weights: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
-        constraint_lower_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
-        constraint_upper_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
+        maximize: NDArray[np.bool_],
+        objective_weights: NDArray[np.float64],
+        constraint_lower_bounds: NDArray[np.float64] | None,
+        constraint_upper_bounds: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         self.received.append(objective_scales)
         return np.ones(objectives.shape[0])

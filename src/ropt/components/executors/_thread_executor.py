@@ -5,7 +5,7 @@ from __future__ import annotations
 import queue
 from concurrent.futures import Future, ThreadPoolExecutor
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from ropt._logging import get_logger
 
@@ -55,6 +55,7 @@ class ThreadExecutor(ExecutorBase):
         self._pool = ThreadPoolExecutor(max_workers=workers)
         _logger.debug("Started thread executor with %d worker(s)", workers)
 
+    @override
     def _run_bundles(
         self,
         bundles: list[list[WorkItem]],

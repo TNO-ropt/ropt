@@ -8,7 +8,7 @@ from collections.abc import Callable
 from functools import partial
 from pathlib import Path
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any, ClassVar, Final, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Literal, override
 
 import numpy as np
 from numpy.typing import NDArray
@@ -176,13 +176,14 @@ class SciPyBackend(Backend):
             msg = f"SciPy optimizer algorithm {self._method} is not supported."
             raise UnsupportedError(msg)
 
+    @override
     def start(
         self,
         problem: OptimizationProblem,
         optimizer_callback: OptimizerCallback,
         *,
         evaluation_policy: Literal["speculative", "separate", "auto"],
-        output_dir: Path | None,  # ruff: ignore[unused-method-argument]
+        output_dir: Path | None,
     ) -> None:
         """Run the configured SciPy algorithm to completion."""
         self._problem = problem
@@ -236,12 +237,14 @@ class SciPyBackend(Backend):
                 )
 
     @property
+    @override
     def bypasses_python_output(self) -> bool:
         """Whether the selected method prints outside `sys.stdout`."""
         # Every SciPy method prints through `sys.stdout`, except `tnc`, which
         # prints from its C implementation.
         return self._method == "tnc"
 
+    @override
     def validate_options(
         self,
     ) -> None:

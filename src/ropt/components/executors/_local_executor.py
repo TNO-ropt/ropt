@@ -22,7 +22,7 @@ import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import tempfile
 import threading
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 from ropt._logging import get_logger
 from ropt.exceptions import ExecutionError
@@ -184,6 +184,7 @@ class LocalJobExecutor(JobExecutorBase):
         """
         return self._workdir
 
+    @override
     def _start_job(self, bundle_id: UUID, command: list[str]) -> int:
         output_file = self._workdir / f"{bundle_id}.txt"
         # Started and registered under one acquisition, so that a poll never
@@ -210,6 +211,7 @@ class LocalJobExecutor(JobExecutorBase):
             self._processes[job_id] = process
         return job_id
 
+    @override
     def _live_job_ids(self) -> set[int]:
         with self._processes_lock:
             entries = list(self._processes.items())
@@ -223,6 +225,7 @@ class LocalJobExecutor(JobExecutorBase):
                         self._processes.pop(job_id, None)
         return live
 
+    @override
     def _cancel_job(self, job_id: int) -> None:
         with self._processes_lock:
             process = self._processes.pop(job_id, None)

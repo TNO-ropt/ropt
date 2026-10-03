@@ -1,6 +1,6 @@
 """Default realization filter plugin with CVaR methods."""
 
-from typing import Annotated, ClassVar
+from typing import Annotated, ClassVar, override
 
 import numpy as np
 from numpy.typing import NDArray
@@ -85,7 +85,8 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
 
-    def get_realization_weights(  # ruff: ignore[too-many-arguments]
+    @override
+    def get_realization_weights(
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,

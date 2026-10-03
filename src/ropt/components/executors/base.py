@@ -22,7 +22,7 @@ from __future__ import annotations
 import threading
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from ropt.exceptions import ExecutorStopped, WorkflowError
 
@@ -223,6 +223,7 @@ class ExecutorBase(Executor):
         self._default_bundle_size = bundle_size
         self._thread_state = _ThreadState()
 
+    @override
     def run(
         self,
         calls: Sequence[WorkItem],

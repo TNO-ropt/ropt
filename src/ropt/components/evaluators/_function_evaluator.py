@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import numpy as np
 
@@ -56,6 +56,7 @@ class FunctionEvaluator(Evaluator):
         )
         self._abort_signal = abort_signal
 
+    @override
     def _eval(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
     ) -> EvaluationBatchResult:

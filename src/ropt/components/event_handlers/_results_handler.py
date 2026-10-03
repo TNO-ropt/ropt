@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, assert_never
+from typing import TYPE_CHECKING, Literal, assert_never, override
 
 import numpy as np
 
@@ -64,6 +64,7 @@ class ResultsHandler(EventHandler):
         selected: FunctionResults | None = self["results"]
         return selected
 
+    @override
     def _handle_event(self, event: EnOptEvent) -> None:
         results: tuple[FunctionResults, ...] = tuple(
             item
@@ -100,6 +101,7 @@ class ResultsHandler(EventHandler):
                 assert_never(unreachable)
 
     @property
+    @override
     def event_types(self) -> set[EnOptEventType]:
         """The event types that are handled.
 

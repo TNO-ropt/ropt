@@ -2,7 +2,7 @@
 
 import copy
 import warnings
-from typing import Any, ClassVar, Final
+from typing import Any, ClassVar, Final, override
 
 import numpy as np
 from numpy.random import Generator
@@ -90,6 +90,7 @@ class SciPySampler(Sampler):
             raise UnsupportedError(msg)
         self._sampler: rv_continuous | QMCEngine | None = None
 
+    @override
     def init(
         self,
         *,
@@ -110,6 +111,7 @@ class SciPySampler(Sampler):
                 self._sampler_config.options
             )
 
+    @override
     def generate_samples(self) -> NDArray[np.float64]:
         """Draw one set of perturbations for every realization.
 

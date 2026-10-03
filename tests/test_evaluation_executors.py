@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-# ruff: file-ignore[unused-function-argument, unused-method-argument, unused-lambda-argument, no-self-use, mutable-class-default, private-member-access, subprocess-without-shell-equals-true]
+# ruff: file-ignore[unused-function-argument, unused-method-argument, unused-lambda-argument, mutable-class-default, private-member-access, subprocess-without-shell-equals-true]
 import collections
 import contextlib
 import gc
@@ -23,7 +23,7 @@ from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 from multiprocessing.connection import Client, Listener
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, cast, override
 from uuid import UUID, uuid4
 
 import numpy as np
@@ -213,6 +213,7 @@ def _explode() -> Any:
 class _Unrebuildable:
     # Pickles into a call to `_explode`, so reading it back raises rather than
     # returning an object.
+    @override
     def __reduce__(self) -> tuple[Any, ...]:
         return (_explode, ())
 
@@ -371,6 +372,7 @@ def test_hpc_scheduler_query_fails_after_retry_limit(
     class _UnreachableScheduler(MockedHPCAdapter):
         queries = 0
 
+        @override
         def live_job_ids(self) -> set[int]:
             type(self).queries += 1
             msg = "squeue: error: Unable to contact slurm controller"
@@ -400,6 +402,7 @@ def test_hpc_scheduler_query_budget_resets_after_an_answer(
     class _FlakyScheduler(MockedHPCAdapter):
         calls = 0
 
+        @override
         def live_job_ids(self) -> set[int]:
             type(self).calls += 1
             if type(self).calls in {1, 3}:
@@ -424,11 +427,13 @@ def test_hpc_missing_output_file_fails_work(
     # A job that dies before writing its result: the scheduler reports it gone,
     # but there is nothing to read, so waiting forever is not an option.
     class _VanishingJob(MockedHPCAdapter):
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             self._job_id += 1
             self._jobs[self._job_id] = job_name
             return self._job_id
 
+        @override
         def live_job_ids(self) -> set[int]:
             return set()
 
@@ -448,12 +453,14 @@ def test_hpc_unreadable_output_file_fails_work(
     # A result read while it is still being written: retrying is right, but it
     # has to give up eventually rather than retry for ever.
     class _CorruptResult(MockedHPCAdapter):
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             self._job_id += 1
             self._jobs[self._job_id] = job_name
             (self._path / f"{job_name}.out").write_bytes(b"half a pickle")
             return self._job_id
 
+        @override
         def live_job_ids(self) -> set[int]:
             return set()
 
@@ -475,6 +482,7 @@ def test_hpc_result_of_an_unknown_type_fails_work(
     class _AlienResult(MockedHPCAdapter):
         polls = 0
 
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             self._job_id += 1
             self._jobs[self._job_id] = job_name
@@ -484,6 +492,7 @@ def test_hpc_result_of_an_unknown_type_fails_work(
             )
             return self._job_id
 
+        @override
         def live_job_ids(self) -> set[int]:
             type(self).polls += 1
             return set()
@@ -507,12 +516,14 @@ def test_hpc_result_that_cannot_be_rebuilt_fails_work(
     class _UnrebuildableResult(MockedHPCAdapter):
         polls = 0
 
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             self._job_id += 1
             self._jobs[self._job_id] = job_name
             (self._path / f"{job_name}.out").write_bytes(pickle.dumps(_Unrebuildable()))
             return self._job_id
 
+        @override
         def live_job_ids(self) -> set[int]:
             type(self).polls += 1
             return set()
@@ -536,6 +547,7 @@ def test_hpc_job_command_uses_submitting_interpreter(
     commands: list[str] = []
 
     class _RecordingAdapter(MockedHPCAdapter):
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             commands.append(command)
             return super().submit_job(job_name, command, **kwargs)
@@ -554,6 +566,7 @@ def test_hpc_failed_work_keeps_job_output(
     # A job that died before writing a result left its reason in the captured
     # output alone, so cleanup must not take that away with the rest.
     class _CrashingJob(MockedHPCAdapter):
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             self._job_id += 1
             self._jobs[self._job_id] = job_name
@@ -562,6 +575,7 @@ def test_hpc_failed_work_keeps_job_output(
             )
             return self._job_id
 
+        @override
         def live_job_ids(self) -> set[int]:
             return set()
 
@@ -588,6 +602,7 @@ def test_hpc_failure_names_the_output_file_it_could_not_quote(
             super().__init__(path)
             self.submitted = ""
 
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             self.submitted = job_name
             self._job_id += 1
@@ -596,6 +611,7 @@ def test_hpc_failure_names_the_output_file_it_could_not_quote(
                 (self._path / f"{job_name}.txt").write_text(captured)
             return self._job_id
 
+        @override
         def live_job_ids(self) -> set[int]:
             return set()
 
@@ -618,6 +634,7 @@ def test_hpc_batch_leaving_cancels_the_jobs_it_started(
     cancelled = threading.Event()
 
     class _StuckThenRejecting(MockedHPCAdapter):
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             if self._job_id >= 1:
                 msg = "sbatch: error: Batch job submission failed"
@@ -627,6 +644,7 @@ def test_hpc_batch_leaving_cancels_the_jobs_it_started(
             self._jobs[self._job_id] = job_name
             return self._job_id
 
+        @override
         def delete_job(self, process_id: int) -> str:
             deleted = super().delete_job(process_id)
             cancelled.set()
@@ -673,6 +691,7 @@ def test_hpc_failing_submission_fails_own_work(
             super().__init__(path)
             self.rejected = False
 
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             if not self.rejected:
                 self.rejected = True
@@ -694,6 +713,7 @@ def test_rejected_hpc_submission_leaves_no_input_file(
     # The input file is written before the job is handed over, so a scheduler
     # that rejects it would otherwise block a retry under the same name.
     class _RejectingScheduler(MockedHPCAdapter):
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             msg = "sbatch: error: Batch job submission failed"
             raise RuntimeError(msg)
@@ -1222,6 +1242,7 @@ class _RecordingExecutor(ThreadExecutor):
         super().__init__(workers=2)
         self.sizes: list[int] = []
 
+    @override
     def _run_bundles(
         self,
         bundles: list[list[WorkItem]],
@@ -1732,6 +1753,7 @@ def test_hpc_submit_options_reach_the_submission(
     class _RecordingKwargs(MockedHPCAdapter):
         seen: dict[str, Any] = {}
 
+        @override
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
             type(self).seen = kwargs
             return super().submit_job(job_name, command, **kwargs)
@@ -2225,9 +2247,11 @@ class _ControlledJobExecutor(JobExecutorBase):
         self.pass_entered = threading.Event()
         self.release_pass = threading.Event()
 
+    @override
     def _start_job(self, bundle_id: UUID, command: list[str]) -> int:
         raise AssertionError((bundle_id, command))
 
+    @override
     def _launch_job(self, bundle_id: UUID, bundle: list[WorkItem]) -> int:
         job_id = len(self.started) + 1
         self.started.append((bundle_id, job_id))
@@ -2236,13 +2260,16 @@ class _ControlledJobExecutor(JobExecutorBase):
         ]
         return job_id
 
+    @override
     def _live_job_ids(self) -> set[int]:
         return set()
 
+    @override
     def _cancel_job(self, job_id: int) -> None:
         self.cancelled.append(job_id)
         self.cancel_daemon.append(threading.current_thread().daemon)
 
+    @override
     def _launch_jobs(self, update: _StateUpdate) -> None:
         with self._state._lock:
             self.passes += 1

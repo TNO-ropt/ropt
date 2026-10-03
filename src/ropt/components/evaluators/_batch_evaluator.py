@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 from .base import Evaluator
 
@@ -38,6 +38,7 @@ class BatchEvaluator(Evaluator):
         super().__init__()
         self._callback = callback
 
+    @override
     def _eval(
         self, variables: NDArray[np.float64], context: EvaluationBatchContext
     ) -> EvaluationBatchResult:

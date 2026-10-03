@@ -8,7 +8,7 @@ import sys
 import threading
 from functools import partial
 from operator import add
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import numpy as np
 import pytest
@@ -173,10 +173,12 @@ class _OffloadingHandler(EventHandler):
         self.outcome: int | None = None
 
     @property
+    @override
     def event_types(self) -> set[EnOptEventType]:
         return {EnOptEventType.FINISHED_EVALUATION}
 
-    def _handle_event(self, event: EnOptEvent) -> None:  # ruff: ignore[unused-method-argument]
+    @override
+    def _handle_event(self, event: EnOptEvent) -> None:
         if self.outcome is None:
             self.outcome = self.pool.offload(partial(_square, 4))
 

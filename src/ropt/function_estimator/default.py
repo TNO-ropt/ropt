@@ -1,6 +1,6 @@
 """Default function estimator plugin with mean and standard deviation methods."""
 
-from typing import ClassVar, Final
+from typing import ClassVar, Final, override
 
 import numpy as np
 from numpy.typing import NDArray
@@ -38,10 +38,12 @@ class DefaultFunctionEstimator(FunctionEstimator):
         if self._method == "default":
             self._method = "mean"
 
+    @override
     def init(self, *, merge_realizations: bool) -> None:
         """Record whether the gradient keeps its realizations separate."""
         self._merge_realizations = merge_realizations
 
+    @override
     def calculate_function(
         self,
         functions: NDArray[np.float64],
@@ -70,6 +72,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         msg = f"Function estimator method not supported: {estimator_method}"
         raise ValueError(msg)
 
+    @override
     def calculate_gradient(
         self,
         functions: NDArray[np.float64],

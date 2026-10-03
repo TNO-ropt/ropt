@@ -1,7 +1,7 @@
 # ruff: file-ignore[private-member-access]
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, override
 
 import pytest
 from pydantic import ValidationError
@@ -31,6 +31,7 @@ class MockedPlugin1(Backend):
     def __init__(self, _0: BackendConfig) -> None:
         pass
 
+    @override
     def start(
         self,
         _0: OptimizationProblem,
@@ -41,6 +42,7 @@ class MockedPlugin1(Backend):
     ) -> None:
         pass
 
+    @override
     def validate_options(self) -> None:
         pass
 
@@ -53,6 +55,7 @@ class MockedPluginWithoutMethods(Backend):
     def __init__(self, _0: BackendConfig) -> None:
         pass
 
+    @override
     def start(
         self,
         _0: OptimizationProblem,
@@ -63,12 +66,14 @@ class MockedPluginWithoutMethods(Backend):
     ) -> None:
         pass
 
+    @override
     def validate_options(self) -> None:
         pass
 
 
 class MockedPluginWithValidation(MockedPlugin1):
     @classmethod
+    @override
     def validate_options(  # type: ignore[override]
         cls, method: str, options: dict[str, Any] | list[str] | None
     ) -> None:

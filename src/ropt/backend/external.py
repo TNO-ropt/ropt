@@ -7,7 +7,7 @@ import multiprocessing
 import queue
 import traceback
 from functools import partial
-from typing import TYPE_CHECKING, Any, ClassVar, Final, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Literal, override
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
@@ -101,6 +101,7 @@ class ExternalBackend(Backend):
         self._delegate_cls = get_plugin("backend", method=method)
         self._delegate_name = get_plugin_name("backend", method)
 
+    @override
     def start(
         self,
         problem: OptimizationProblem,
@@ -168,6 +169,7 @@ class ExternalBackend(Backend):
         if exception is not None:
             raise exception
 
+    @override
     def validate_options(
         self,
     ) -> None:

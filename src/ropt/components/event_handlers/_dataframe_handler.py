@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import threading
-from typing import TYPE_CHECKING, Any, Final, Literal, cast
+from typing import TYPE_CHECKING, Any, Final, Literal, cast, override
 
 from ropt.enums import EnOptEventType
 from ropt.exceptions import UnsupportedError
@@ -207,6 +207,7 @@ class DataFrameHandler(EventHandler):
         """
         return {key: table.get_table() for key, table in self._tables.items()}
 
+    @override
     def _handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
@@ -220,6 +221,7 @@ class DataFrameHandler(EventHandler):
                 self._callback(event.context.optimizer.output_dir)
 
     @property
+    @override
     def event_types(self) -> set[EnOptEventType]:
         """The event types that are handled.
 
@@ -228,7 +230,8 @@ class DataFrameHandler(EventHandler):
         """
         return {EnOptEventType.FINISHED_EVALUATION}
 
-    def __getitem__(self, key: str) -> Any:  # ruff: ignore[any-type]
+    @override
+    def __getitem__(self, key: str) -> Any:
         """Retrieve a of a table from the event handler.
 
         Warning:

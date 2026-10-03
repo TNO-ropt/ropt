@@ -11,7 +11,7 @@ from __future__ import annotations
 import sysconfig
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Any, Final, override
 
 from ropt.exceptions import ExecutionError
 
@@ -186,6 +186,7 @@ class HPCExecutor(JobExecutorBase):
                 queue_type=_DEFAULT_SCHEDULER if scheduler is None else scheduler
             )
 
+    @override
     def _start_job(self, bundle_id: UUID, command: list[str]) -> int:
         return int(
             self._queue_adapter.submit_job(
@@ -202,12 +203,14 @@ class HPCExecutor(JobExecutorBase):
             )
         )
 
+    @override
     def _live_job_ids(self) -> set[int]:
         # The only place that knows the scheduler answers with a table: above
         # this line a queueing system is a source of job ids and nothing else,
         # so `pandas` stays `pysqa`'s dependency rather than becoming ropt's.
         return set(self._queue_adapter.get_status_of_my_jobs()["jobid"].tolist())
 
+    @override
     def _cancel_job(self, job_id: int) -> None:
         self._queue_adapter.delete_job(job_id)
 

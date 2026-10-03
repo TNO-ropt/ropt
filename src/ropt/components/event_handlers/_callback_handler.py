@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 from .base import EventHandler
 
@@ -36,6 +36,7 @@ class CallbackHandler(EventHandler):
         self._event_types = event_types
         self._callback = callback
 
+    @override
     def _handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
@@ -46,6 +47,7 @@ class CallbackHandler(EventHandler):
             self._callback(event)
 
     @property
+    @override
     def event_types(self) -> set[EnOptEventType]:
         """The event types that are handled.
 

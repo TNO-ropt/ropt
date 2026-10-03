@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, Literal
+from typing import Any, Literal, override
 
 import numpy as np
 import pytest
@@ -187,15 +187,18 @@ class CustomFunctionEstimator(FunctionEstimator):
     def __init__(self, _: FunctionEstimatorConfig) -> None:
         pass
 
+    @override
     def init(self, *, merge_realizations: bool) -> None:
         pass
 
-    def calculate_function(  # ruff: ignore[no-self-use]
+    @override
+    def calculate_function(
         self, functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         return np.asarray(np.dot(functions, weights) + 1.0)
 
-    def calculate_gradient(  # ruff: ignore[no-self-use]
+    @override
+    def calculate_gradient(
         self,
         _: NDArray[np.float64],
         gradient: NDArray[np.float64],

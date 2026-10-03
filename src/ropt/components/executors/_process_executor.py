@@ -9,7 +9,7 @@ from collections import deque
 from concurrent.futures import Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, cast, override
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
@@ -102,6 +102,7 @@ class ProcessExecutor(ExecutorBase):
             )
             raise ExecutionError(msg) from exc
 
+    @override
     def _run_bundles(
         self,
         bundles: list[list[WorkItem]],

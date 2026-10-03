@@ -40,7 +40,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
 from pickle import UnpicklingError  # ruff: ignore[suspicious-pickle-import]
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Any, Final, override
 from uuid import uuid4
 
 from ropt._logging import get_logger
@@ -405,6 +405,7 @@ class JobExecutorBase(ExecutorBase):
         # jobs when it leaves, so this finds only what outlived one.
         self._cancel_jobs(self._state.clear())
 
+    @override
     def _run_bundles(
         self,
         bundles: list[list[WorkItem]],

@@ -5,7 +5,7 @@ import pickle  # ruff: ignore[suspicious-pickle-import]
 import threading
 from copy import deepcopy
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 import numpy as np
 import pytest
@@ -1029,7 +1029,8 @@ def test_evaluator_raises_on_concurrent_use() -> None:
     thread2_error: list[BaseException | None] = [None]
 
     class _BlockingEvaluator(Evaluator):
-        def _eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:  # ruff: ignore[no-self-use]
+        @override
+        def _eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:
             in_eval.set()
             can_finish.wait()
             return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
@@ -1063,6 +1064,7 @@ class _RecordingEvaluator(Evaluator):
         super().__init__()
         self.threads: list[int] = []
 
+    @override
     def _eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:
         self.threads.append(threading.get_ident())
         return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
@@ -1096,10 +1098,12 @@ def test_event_handler_serializes_concurrent_use() -> None:
 
     class _BlockingHandler(EventHandler):
         @property
+        @override
         def event_types(self) -> set[EnOptEventType]:
             return {EnOptEventType.FINISHED_EVALUATION}
 
-        def _handle_event(self, _event: EnOptEvent) -> None:  # ruff: ignore[no-self-use]
+        @override
+        def _handle_event(self, _event: EnOptEvent) -> None:
             with calls_lock:
                 calls.append("enter")
             in_handle.set()
@@ -1147,9 +1151,11 @@ def test_event_handler_raises_on_reentrant_use() -> None:
             self.error: WorkflowError | None = None
 
         @property
+        @override
         def event_types(self) -> set[EnOptEventType]:
             return {EnOptEventType.FINISHED_EVALUATION}
 
+        @override
         def _handle_event(self, event: EnOptEvent) -> None:
             try:
                 self.handle_event(event)
@@ -1170,9 +1176,11 @@ class _RecordingHandler(EventHandler):
         self.threads: list[int] = []
 
     @property
+    @override
     def event_types(self) -> set[EnOptEventType]:
         return {EnOptEventType.FINISHED_EVALUATION}
 
+    @override
     def _handle_event(self, _event: EnOptEvent) -> None:
         self.threads.append(threading.get_ident())
 

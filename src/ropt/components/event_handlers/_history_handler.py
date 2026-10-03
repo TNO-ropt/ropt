@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 
 from ropt.enums import EnOptEventType
 
@@ -36,6 +36,7 @@ class HistoryHandler(EventHandler):
         collected: tuple[Results, ...] | None = self["results"]
         return () if collected is None else collected
 
+    @override
     def _handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
@@ -53,6 +54,7 @@ class HistoryHandler(EventHandler):
             )
 
     @property
+    @override
     def event_types(self) -> set[EnOptEventType]:
         """The event types that are handled.
 
