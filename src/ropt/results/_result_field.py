@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import Field, dataclass, fields
-from typing import Any, ClassVar, TypeVar
-
-TypeResultField = TypeVar("TypeResultField", bound="ResultField")
+from typing import Any, ClassVar
 
 
 class AxisMetadata:

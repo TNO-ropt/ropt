@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
 
 from ropt.enums import AxisName
 
@@ -16,8 +16,6 @@ if TYPE_CHECKING:
     from ._gradient_evaluations import GradientEvaluations
     from ._gradients import Gradients
     from ._realizations import Realizations
-
-TypeResults = TypeVar("TypeResults", bound="Results")
 
 _PERTURBED_AXES = (
     AxisName.REALIZATION,

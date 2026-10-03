@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING
 
 from ropt.enums import AxisName
 
@@ -17,9 +17,6 @@ if TYPE_CHECKING:
     from ._function_evaluations import FunctionEvaluations
     from ._functions import Functions
     from ._realizations import Realizations
-
-
-TypeResults = TypeVar("TypeResults", bound="Results")
 
 
 @dataclass(slots=True)

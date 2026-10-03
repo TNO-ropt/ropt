@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import UnsupportedError
 
@@ -30,8 +30,6 @@ if HAVE_PANDAS:
     from ._pandas import _to_pandas_frame
 if HAVE_POLARS:
     from ._polars import _to_polars_frame
-
-TypeResults = TypeVar("TypeResults", bound="Results")
 
 
 @dataclass(slots=True)
