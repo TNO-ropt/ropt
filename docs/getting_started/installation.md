@@ -1,7 +1,7 @@
 # Installation
 
 `ropt` is distributed on [PyPI](https://pypi.org/project/ropt/) and can be
-installed with any standard Python package manager. It requires Python 3.11 or
+installed with any standard Python package manager. It requires Python 3.12 or
 newer.
 
 ## Install the core package

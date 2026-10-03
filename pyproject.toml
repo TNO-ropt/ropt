@@ -11,13 +11,12 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Natural Language :: English",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering",
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dynamic = ["version"]
 dependencies = ["numpy", "pydantic", "scipy>=1.15"]
 
@@ -60,7 +59,15 @@ exclude = ["src/ropt/version.py", "build", "docs/**/*.md"]
 [tool.ruff.lint]
 preview = true
 select = ["ALL"]
-ignore = ["missing-trailing-comma", "CPY", "line-too-long", "assert"]
+ignore = [
+    "missing-trailing-comma",
+    "CPY",
+    "line-too-long",
+    "assert",
+    "non-pep695-generic-class",
+    "non-pep695-generic-function",
+    "non-pep695-type-alias",
+]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
