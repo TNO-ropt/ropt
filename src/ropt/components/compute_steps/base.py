@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import threading
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any
 
 from ropt.components.event_handlers import EventHandler
 from ropt.exceptions import WorkflowError
@@ -16,10 +16,8 @@ if TYPE_CHECKING:
     from ropt.context import EnOptContext
     from ropt.events import EnOptEvent
 
-_ResultT = TypeVar("_ResultT")
 
-
-class ComputeStep(ABC, Generic[_ResultT]):
+class ComputeStep[ResultT](ABC):
     """Abstract base class for optimization compute steps.
 
     A concrete step performs a specific action, such as running an optimizer or
@@ -96,7 +94,7 @@ class ComputeStep(ABC, Generic[_ResultT]):
         variables: ArrayLike,
         *,
         metadata: dict[str, Any] | None = None,
-    ) -> _ResultT:
+    ) -> ResultT:
         """Execute the logic defined by this compute step.
 
         Implemented by concrete subclasses; callers use `run`, which adds the
@@ -117,7 +115,7 @@ class ComputeStep(ABC, Generic[_ResultT]):
         variables: ArrayLike,
         *,
         metadata: dict[str, Any] | None = None,
-    ) -> _ResultT:
+    ) -> ResultT:
         """Run this compute step.
 
         Args:

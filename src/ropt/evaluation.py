@@ -14,14 +14,12 @@ usage.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Protocol, TypeVar
+from typing import Any, Protocol
 
 import numpy as np
 from numpy.typing import NDArray
 
 from ropt.context import EnOptContext
-
-T = TypeVar("T", bound=np.generic)
 
 
 @dataclass(slots=True)
@@ -47,7 +45,7 @@ class EvaluationBatchContext:
     batch_id: int = 0
     metadata: dict[str, Any] | None = None
 
-    def get_active_evaluations(self, array: NDArray[T]) -> NDArray[T]:
+    def get_active_evaluations[T: np.generic](self, array: NDArray[T]) -> NDArray[T]:
         """Return only the rows of `array` where `active` is `True`.
 
         Args:
@@ -58,7 +56,7 @@ class EvaluationBatchContext:
         """
         return array[self.active, ...]
 
-    def insert_inactive_results(
+    def insert_inactive_results[T: np.generic](
         self, array: NDArray[T], *, fill_value: float = 0.0
     ) -> NDArray[T]:
         """Expand a filtered array back to full size, filling inactive rows.

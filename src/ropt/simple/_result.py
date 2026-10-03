@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ropt.enums import ExitCode
     from ropt.results import FunctionResults
-
-_T = TypeVar("_T")
 
 
 @dataclass
@@ -30,7 +28,7 @@ class OptimizationResult:
 
 
 @dataclass
-class EvaluationResult(Generic[_T]):
+class EvaluationResult[T]:
     """The outcome of a single evaluation run.
 
     What `results` holds depends on which method produced it: one
@@ -46,4 +44,4 @@ class EvaluationResult(Generic[_T]):
     """
 
     exit_code: ExitCode
-    results: _T
+    results: T

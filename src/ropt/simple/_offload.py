@@ -12,7 +12,7 @@ names, not to the one running the evaluation.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from ropt.components.concurrency import AbortSignal
 from ropt.components.executors import ExecutorFailure, WorkItem, WorkNotRun
@@ -25,16 +25,14 @@ if TYPE_CHECKING:
 
     from ._session import Session
 
-_T = TypeVar("_T")
 
-
-def _offload(
+def _offload[T](
     session: Session,
     executor: Executor,
-    work: Callable[[], _T] | Sequence[Callable[[], _T]],
+    work: Callable[[], T] | Sequence[Callable[[], T]],
     *,
     keep_going: bool | None,
-) -> _T | tuple[_T, ...]:
+) -> T | tuple[T, ...]:
     signal = AbortSignal()
     session._register(  # ruff: ignore[private-member-access]
         signal,
@@ -42,7 +40,7 @@ def _offload(
     )
     try:
         if callable(work):
-            return cast("_T", _run(executor, [work], signal)[0])
+            return cast("T", _run(executor, [work], signal)[0])
         functions = list(work)
         if not functions:
             return ()

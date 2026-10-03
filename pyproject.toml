@@ -64,8 +64,6 @@ ignore = [
     "CPY",
     "line-too-long",
     "assert",
-    "non-pep695-generic-class",
-    "non-pep695-generic-function",
     "non-pep695-type-alias",
 ]
 

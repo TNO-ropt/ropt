@@ -1,7 +1,7 @@
 """Annotated types for Pydantic models providing input conversion and validation."""
 
 from collections.abc import Callable, Mapping, Sequence
-from typing import Annotated, Any, Protocol, Self, TypeVar
+from typing import Annotated, Any, Protocol, Self
 
 from pydantic import BeforeValidator, PlainValidator
 
@@ -26,19 +26,15 @@ class _PluginConfig(Protocol):
         ...
 
 
-_ConfigT = TypeVar("_ConfigT", bound=_PluginConfig)
-_InstanceT = TypeVar("_InstanceT")
-
-
-def _make_validator(
+def _make_validator[ConfigT: _PluginConfig, InstanceT](
     plugin_type: PluginType,
-    config_type: type[_ConfigT],
-    instance_type: type[_InstanceT],
-    extra: Callable[[_InstanceT], None] | None = None,
-) -> Callable[[Any], _InstanceT]:
+    config_type: type[ConfigT],
+    instance_type: type[InstanceT],
+    extra: Callable[[InstanceT], None] | None = None,
+) -> Callable[[Any], InstanceT]:
     article = "an" if instance_type.__name__[0] in "AEIOU" else "a"
 
-    def _convert(value: Any) -> _InstanceT:  # ruff: ignore[any-type]
+    def _convert(value: Any) -> InstanceT:  # ruff: ignore[any-type]
         if isinstance(value, instance_type):
             result = value
         elif isinstance(value, (config_type, dict)):

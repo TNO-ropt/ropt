@@ -45,7 +45,7 @@ def _convert_enum_array(array: ArrayLike | None) -> NDArray[np.ubyte] | None:
     return immutable_array(array, dtype=np.ubyte, ndmin=1)
 
 
-def _convert_tuple(value: T | Sequence[T]) -> tuple[T, ...]:
+def _convert_tuple[T](value: T | Sequence[T]) -> tuple[T, ...]:
     if isinstance(value, str):
         return (value,)
     return tuple(value) if isinstance(value, AbstractSequence) else (value,)

@@ -11,7 +11,7 @@ the pool rather than from where the call was made.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypeVar, overload
+from typing import TYPE_CHECKING, Any, overload
 
 from ropt.exceptions import WorkflowError
 
@@ -32,8 +32,6 @@ if TYPE_CHECKING:
     from ._report import ReportCallback
     from ._result import EvaluationResult, OptimizationResult
     from ._session import Session
-
-_T = TypeVar("_T")
 
 _RELEASED = (
     "This pool was released when its session closed; build a new one inside an "
@@ -286,21 +284,21 @@ class WorkerPool:
         )
 
     @overload
-    def offload(
-        self, work: Callable[[], _T], *, keep_going: bool | None = None
-    ) -> _T: ...
+    def offload[T](
+        self, work: Callable[[], T], *, keep_going: bool | None = None
+    ) -> T: ...
 
     @overload
-    def offload(
-        self, work: Sequence[Callable[[], _T]], *, keep_going: bool | None = None
-    ) -> tuple[_T, ...]: ...
+    def offload[T](
+        self, work: Sequence[Callable[[], T]], *, keep_going: bool | None = None
+    ) -> tuple[T, ...]: ...
 
-    def offload(
+    def offload[T](
         self,
-        work: Callable[[], _T] | Sequence[Callable[[], _T]],
+        work: Callable[[], T] | Sequence[Callable[[], T]],
         *,
         keep_going: bool | None = None,
-    ) -> _T | tuple[_T, ...]:
+    ) -> T | tuple[T, ...]:
         """Run one or more arbitrary callables on this pool's workers.
 
         Pass a single zero-argument callable to run one call and get its result,

@@ -11,20 +11,18 @@ from __future__ import annotations
 
 import queue
 import threading
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-_T = TypeVar("_T")
 
-
-def run_concurrent(
-    jobs: Sequence[Callable[[], _T]],
+def run_concurrent[T](
+    jobs: Sequence[Callable[[], T]],
     limit: int | None = None,
     *,
     interrupt: Callable[[], None] | None = None,
-) -> list[_T | BaseException]:
+) -> list[T | BaseException]:
     """Run blocking jobs concurrently on dedicated threads and collect outcomes.
 
     The threads are this call's own, so a job never waits for work queued
@@ -52,7 +50,7 @@ def run_concurrent(
     if count == 0:
         return []
 
-    outcomes = cast("list[_T | BaseException]", [None] * count)
+    outcomes = cast("list[T | BaseException]", [None] * count)
     pending: queue.SimpleQueue[int] = queue.SimpleQueue()
     for index in range(count):
         pending.put(index)
@@ -80,10 +78,10 @@ def run_concurrent(
     return outcomes
 
 
-def _consume(
-    jobs: Sequence[Callable[[], _T]],
+def _consume[T](
+    jobs: Sequence[Callable[[], T]],
     pending: queue.SimpleQueue[int],
-    outcomes: list[_T | BaseException],
+    outcomes: list[T | BaseException],
 ) -> None:
     while True:
         try:

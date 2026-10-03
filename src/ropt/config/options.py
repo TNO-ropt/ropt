@@ -8,14 +8,12 @@ of a configuration section, and into a Markdown table for the documentation.
 from __future__ import annotations
 
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
+from typing import TYPE_CHECKING, Any, Self
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, create_model, model_validator
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-
-T = TypeVar("T")
 
 
 class OptionsSchemaModel(BaseModel):
@@ -122,7 +120,7 @@ class OptionsSchemaModel(BaseModel):
         )
 
 
-class MethodSchemaModel(BaseModel, Generic[T]):
+class MethodSchemaModel[T](BaseModel):
     """The schema for the options of a single method.
 
     Attributes:
