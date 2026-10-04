@@ -2419,6 +2419,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="FunctionResults">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.FunctionResults.function_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        function_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3363,6 +3380,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="FunctionResults">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.FunctionResults.function_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        function_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -4363,6 +4397,17 @@ evaluated:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.function_id">function_id</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>This evaluation's index within its batch.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="ropt.results.FunctionResults.variables">variables</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
@@ -4479,6 +4524,67 @@ evaluated:</p>
 
 <div class="doc doc-children">
 
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.results.FunctionResults.function_key" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">function_key</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">function_key</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Identify this function evaluation.</p>
+<p>A <code>function_id</code> is unique within its batch only, so a function
+evaluation is identified by its batch together with its index there.
+A <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> carries the same
+value in its own <code>function_key</code>, which is how the two are paired.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The batch ID and the index within that batch.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
 
 
 
@@ -4753,6 +4859,18 @@ values for each realization and perturbation:</p>
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientResults.function_key">function_key</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Identifies the function evaluation this gradient
+                 was computed from.</p>
+              </div>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.GradientResults.variables">variables</span></code></td>
             <td>

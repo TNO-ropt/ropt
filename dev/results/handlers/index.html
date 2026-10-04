@@ -3240,6 +3240,12 @@ are.</p>
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> and returns <code>True</code> to keep it or <code>False</code> to
   drop it.</li>
 </ul>
+<p>The gradient computed at the result it keeps, if there is one, is read via
+<code>handler["gradient"]</code>. A gradient usually reaches the handler in a later
+evaluation than the result it belongs to, and is matched on the <code>function_key</code>
+they share. It is <code>None</code> while that gradient has not arrived, and stays <code>None</code>
+for a point where no gradient was computed — the best point of a run often is
+one.</p>
 <h3 id="historyhandler"><code>HistoryHandler</code></h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
 in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
