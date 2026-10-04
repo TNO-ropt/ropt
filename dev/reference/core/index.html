@@ -3378,7 +3378,9 @@ gradient estimates.</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">f0</span><span class="p">:</span> <span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">g0</span><span class="p">:</span> <span class="n">GradientResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">signal_evaluation</span><span class="p">:</span> <span class="n">SignalEvaluationCallback</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3481,6 +3483,22 @@ gradient estimates.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional gradient results at the initial variables.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>signal_evaluation</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.core.SignalEvaluationCallback (ropt.core._evaluator.SignalEvaluationCallback)" href="#ropt.core.SignalEvaluationCallback">SignalEvaluationCallback</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional callback, invoked around each evaluation.</p>
               </div>
             </td>
             <td>
@@ -3721,9 +3739,7 @@ from the optimization steps.</p>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">ensemble_evaluator</span><span class="p">:</span> <span class="n">EnsembleEvaluator</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">signal_evaluation</span><span class="p">:</span> <span class="n">SignalEvaluationCallback</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3772,22 +3788,6 @@ from the optimization steps.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>signal_evaluation</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.core.SignalEvaluationCallback (ropt.core._optimizer.SignalEvaluationCallback)" href="#ropt.core.SignalEvaluationCallback">SignalEvaluationCallback</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional callback, invoked around each evaluation.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -3907,8 +3907,8 @@ criterion is met or an error occurs.</p>
 
 
         <p>Protocol for a callback to signal the start and end of an evaluation.</p>
-<p>This callback is invoked before and after each evaluation, allowing for
-custom handling or tracking of evaluation events.</p>
+<p>This callback is invoked around each evaluation that is actually performed,
+allowing for custom handling or tracking of evaluation events.</p>
 
 
 
@@ -3944,11 +3944,11 @@ custom handling or tracking of evaluation events.</p>
     <div class="doc doc-contents ">
 
         <p>Callback protocol for signaling the start and end of evaluations.</p>
-<p>This callback is invoked by the ensemble optimizer before and after
-each evaluation. Before the evaluation starts, the callback is called
-with <code>results</code> set to <code>None</code>. After the evaluation completes, the
-callback is called again, this time with <code>results</code> containing the
-output of the evaluation.</p>
+<p>Before the evaluation starts, the callback is called with <code>results</code> set
+to <code>None</code>. After the evaluation completes, the callback is called again,
+this time with <code>results</code> containing the output of the evaluation.</p>
+<p>Results that are returned from the cache are not evaluated, and the
+callback is not invoked for them.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
