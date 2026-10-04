@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../objectives/">
+        <link rel="prev" href="../restart/">
       
       
-        <link rel="next" href="../discrete/">
+        <link rel="next" href="../logging/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Constraints - ropt Documentation</title>
+        <title>Reusing Results at the Starting Point - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#constraints" class="md-skip">
+        <a href="#reusing-results-at-the-starting-point" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Constraints
+              Reusing Results at the Starting Point
             
           </span>
         </div>
@@ -260,11 +260,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../running/running/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../running/" class="md-tabs__link">
           
   
   
@@ -300,13 +302,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../key_concepts/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
           
   
   
@@ -727,28 +727,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -766,7 +769,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -784,7 +787,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/running/" class="md-nav__link">
+      <a href="../running/" class="md-nav__link">
         
   
   
@@ -812,7 +815,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/parallel/" class="md-nav__link">
+      <a href="../parallel/" class="md-nav__link">
         
   
   
@@ -840,7 +843,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/many_runs/" class="md-nav__link">
+      <a href="../many_runs/" class="md-nav__link">
         
   
   
@@ -868,7 +871,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/nested/" class="md-nav__link">
+      <a href="../nested/" class="md-nav__link">
         
   
   
@@ -896,7 +899,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/restart/" class="md-nav__link">
+      <a href="../restart/" class="md-nav__link">
         
   
   
@@ -921,10 +924,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../running/initial_values/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reusing Results at the Starting Point
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -940,6 +970,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recording-the-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recording the results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supplying-them-to-the-next-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supplying them to the next run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-read-from-the-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is read from the results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-may-differ-between-the-two-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What may differ between the two runs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#realizations-and-perturbations-that-were-not-recorded" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Realizations and perturbations that were not recorded
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#things-to-know" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Things to know
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#several-runs-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Several runs at once
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -952,7 +1079,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/logging/" class="md-nav__link">
+      <a href="../logging/" class="md-nav__link">
         
   
   
@@ -1129,31 +1256,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1171,7 +1295,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1189,7 +1313,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../key_concepts/" class="md-nav__link">
+      <a href="../../optimizer_setup/key_concepts/" class="md-nav__link">
         
   
   
@@ -1217,7 +1341,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
         
   
   
@@ -1245,7 +1369,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration_sections/" class="md-nav__link">
+      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
         
   
   
@@ -1273,7 +1397,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../variables/" class="md-nav__link">
+      <a href="../../optimizer_setup/variables/" class="md-nav__link">
         
   
   
@@ -1301,7 +1425,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../objectives/" class="md-nav__link">
+      <a href="../../optimizer_setup/objectives/" class="md-nav__link">
         
   
   
@@ -1326,37 +1450,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Constraints
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/constraints/" class="md-nav__link">
         
   
   
@@ -1372,70 +1469,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#declaring-bounds-and-nonlinear-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Declaring bounds and nonlinear constraints
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#returning-a-constraint-from-the-evaluation-function" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returning a constraint from the evaluation function
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deciding-when-a-constraint-is-satisfied" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Deciding when a constraint is satisfied
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#adding-a-linear-constraint" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adding a linear constraint
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1448,7 +1481,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../discrete/" class="md-nav__link">
+      <a href="../../optimizer_setup/discrete/" class="md-nav__link">
         
   
   
@@ -1476,7 +1509,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimizer/" class="md-nav__link">
+      <a href="../../optimizer_setup/optimizer/" class="md-nav__link">
         
   
   
@@ -1504,7 +1537,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gradients/" class="md-nav__link">
+      <a href="../../optimizer_setup/gradients/" class="md-nav__link">
         
   
   
@@ -1532,7 +1565,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../samplers/" class="md-nav__link">
+      <a href="../../optimizer_setup/samplers/" class="md-nav__link">
         
   
   
@@ -1560,7 +1593,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../realization_filters/" class="md-nav__link">
+      <a href="../../optimizer_setup/realization_filters/" class="md-nav__link">
         
   
   
@@ -1588,7 +1621,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../function_estimators/" class="md-nav__link">
+      <a href="../../optimizer_setup/function_estimators/" class="md-nav__link">
         
   
   
@@ -2982,10 +3015,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#declaring-bounds-and-nonlinear-constraints" class="md-nav__link">
+  <a href="#recording-the-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Declaring bounds and nonlinear constraints
+        Recording the results
       
     </span>
   </a>
@@ -2993,10 +3026,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#returning-a-constraint-from-the-evaluation-function" class="md-nav__link">
+  <a href="#supplying-them-to-the-next-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Returning a constraint from the evaluation function
+        Supplying them to the next run
       
     </span>
   </a>
@@ -3004,10 +3037,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deciding-when-a-constraint-is-satisfied" class="md-nav__link">
+  <a href="#what-is-read-from-the-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Deciding when a constraint is satisfied
+        What is read from the results
       
     </span>
   </a>
@@ -3015,10 +3048,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adding-a-linear-constraint" class="md-nav__link">
+  <a href="#what-may-differ-between-the-two-runs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adding a linear constraint
+        What may differ between the two runs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#realizations-and-perturbations-that-were-not-recorded" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Realizations and perturbations that were not recorded
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#things-to-know" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Things to know
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#several-runs-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Several runs at once
       
     </span>
   </a>
@@ -3045,159 +3111,130 @@
   
 
 
-<h1 id="constraints">Constraints</h1>
-<p>A constraint restricts which variable vectors count as a valid solution. <code>ropt</code>
-distinguishes three kinds, and they differ in <em>who computes them</em>:</p>
+<h1 id="reusing-results-at-the-starting-point">Reusing Results at the Starting Point</h1>
+<p>An optimization begins by evaluating its start point. If those evaluations have
+already been performed — by an earlier run, or by one that was interrupted after
+them — pass them to <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> as <code>f0</code> and <code>g0</code> and they
+are not performed again.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is not <a href="../restart/">Restarting from the Best Point</a>, where a new run
+begins where a previous one ended. Here the new run begins at the <em>same</em>
+point as the recorded one, and only the evaluations at that point are
+avoided.</p>
+</div>
+<p>The full script for this example is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/initial_values.py">examples/simple/initial_values.py</a>.</p>
+<h2 id="recording-the-results">Recording the results</h2>
+<p>The results of the first run are collected with a
+<a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a>, from which the first
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and the first
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> are the ones at the start
+point:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">f0</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">history</span><span class="o">.</span><span class="n">results</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">FunctionResults</span><span class="p">))</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">g0</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">history</span><span class="o">.</span><span class="n">results</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">GradientResults</span><span class="p">))</span>
+</span></code></pre></div>
+<p>How these are kept between the runs is up to you: held in memory, pickled to
+disk, or stored in a database.</p>
+<h2 id="supplying-them-to-the-next-run">Supplying them to the next run</h2>
+<p>The second run starts from the same vector and is given both results. Its
+realization weights differ from the first run's:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">config</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">config</span><span class="p">[</span><span class="s2">"realizations"</span><span class="p">][</span><span class="s2">"weights"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">reused</span><span class="p">],</span> <span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">,</span> <span class="n">g0</span><span class="o">=</span><span class="n">g0</span><span class="p">)</span>
+</span></code></pre></div>
+<p>The second run evaluates nothing at the start point. Its objective there differs
+from the first run's, because the recorded per-realization values are aggregated
+under the new weights:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>objective at the starting point, first run:  [1.1]
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>objective at the starting point, second run: [0.96]
+</span></code></pre></div>
+<p>Either argument may be given on its own. With only <code>f0</code>, the perturbations at
+the start point are evaluated as usual; with only <code>g0</code>, the unperturbed
+evaluations are.</p>
+<h2 id="what-is-read-from-the-results">What is read from the results</h2>
 <table>
 <thead>
 <tr>
-<th>Kind</th>
-<th>Declared</th>
-<th>Computed by</th>
+<th>From <code>f0</code></th>
+<th>From <code>g0</code></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Bounds</strong></td>
-<td><code>variables.lower_bounds</code> / <code>upper_bounds</code></td>
-<td>nobody — the optimizer never leaves the box</td>
+<td><code>evaluations.objectives</code></td>
+<td><code>evaluations.perturbed_objectives</code></td>
 </tr>
 <tr>
-<td><strong>Linear</strong></td>
-<td><code>linear_constraints</code></td>
-<td><code>ropt</code>, from the coefficients you give</td>
+<td><code>evaluations.constraints</code></td>
+<td><code>evaluations.perturbed_constraints</code></td>
 </tr>
 <tr>
-<td><strong>Nonlinear</strong></td>
-<td><code>nonlinear_constraints</code></td>
-<td>your evaluation function, once per realization</td>
+<td><code>realizations.evaluated_realizations</code></td>
+<td><code>realizations.evaluated_realizations</code></td>
+</tr>
+<tr>
+<td><code>variables</code></td>
+<td><code>variables</code> and <code>perturbed_variables</code></td>
 </tr>
 </tbody>
 </table>
-<p>Bounds and linear constraints are deterministic: they are fully described by the
-configuration, so <code>ropt</code> can evaluate them itself. A nonlinear constraint is not
-— it is computed alongside the objective, which means it can be as expensive as
-the objective and, in an ensemble, can differ between realizations.</p>
-<p>The runnable script for this page is
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/constrained.py">examples/simple/constrained.py</a>.
-It adds a nonlinear constraint to the ensemble Rosenbrock problem of
-<a href="../../getting_started/ensemble/">Ensemble-Based Optimization</a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Not every optimization method supports every kind of constraint. <code>ropt</code>
-reports an error when the configured method cannot handle what you declared;
-see <a href="../../reference/backend/">Optimizer Backends</a> for what each method
-supports.</p>
-</div>
-<h2 id="declaring-bounds-and-nonlinear-constraints">Declaring bounds and nonlinear constraints</h2>
-<p>Both live in the configuration, next to the variables:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="n">DIM</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">},</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">REALIZATIONS</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="p">},</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="p">},</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
+<p>These are the per-realization values as the evaluation function returned them,
+before any scaling, together with the record of which realizations were
+evaluated. Everything else on the two objects is ignored, including the
+aggregated functions and gradients, the realization weights, the metadata and
+the batch id. All of those are recomputed by the second run under its own
+configuration.</p>
+<h2 id="what-may-differ-between-the-two-runs">What may differ between the two runs</h2>
+<p>The number of realizations and the number of perturbations may both grow or
+shrink. Realization weights, realization filters, objective weights, scales,
+offsets, <code>maximize</code> flags, function estimators, <code>merge_realizations</code> and the
+sampler settings may all change.</p>
+<p>What may not change is the meaning of the recorded columns: the number of
+objectives, the number of nonlinear constraints, whether constraints are present
+at all, and the number of variables. A mismatch raises <code>ValueError</code> before
+anything is evaluated.</p>
+<p>The start point is checked as well. The <code>variables</code> on <code>f0</code> and on <code>g0</code> must
+match <code>x0</code>, which is also what makes the two results belong together. A run
+starting anywhere else raises <code>ValueError</code>.</p>
+<h2 id="realizations-and-perturbations-that-were-not-recorded">Realizations and perturbations that were not recorded</h2>
+<p><code>evaluated_realizations</code> says which realizations the recorded run computed. One
+that it skipped — because its weight was zero, or because it did not exist yet —
+is evaluated by the new run, and the rest are taken from the record. The same
+holds per perturbation: a run configured with more perturbations than were
+recorded evaluates the additional ones and reuses the rest.</p>
+<p>Perturbed points that were recorded are used as they were; the new run draws
+points only for the perturbations it adds.</p>
+<h2 id="things-to-know">Things to know</h2>
+<p><strong>Realizations correspond by position.</strong> Realization 3 of the recorded run is
+realization 3 of the new one. If the realizations were reordered between the
+runs, the values are attached to the wrong ones, and nothing detects this.</p>
+<p><strong>A failed realization counts as evaluated.</strong> A realization that returned <code>NaN</code>
+is part of the record and is not evaluated again. Supply a record without it if
+it should be retried.</p>
+<p><strong>Only the start point is covered.</strong> <code>f0</code> and <code>g0</code> are used once, by the first
+evaluation of each kind; every later point is evaluated normally. Under an
+unchanged configuration the recorded values are the ones the run would have
+computed, so it follows the same trajectory as the recorded run.</p>
+<h2 id="several-runs-at-once">Several runs at once</h2>
+<p><a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> takes either one result shared by
+every run, or a sequence with one per run, as it does for <code>config</code> and
+<code>metadata</code>. Sharing one result requires the runs to share <code>x0</code>, which is the
+case when the same point is optimized under several configurations:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">optimize_many</span><span class="p">([</span><span class="n">config_a</span><span class="p">,</span> <span class="n">config_b</span><span class="p">],</span> <span class="n">x0</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">,</span> <span class="n">g0</span><span class="o">=</span><span class="n">g0</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Bounds keep every variable in <span class="arithmatex">\([-5, 5]\)</span>. The <code>nonlinear_constraints</code> section
-declares <em>how many</em> nonlinear constraints there are and what range each value
-must fall in — here a single constraint that must stay at or below <span class="arithmatex">\(-1\)</span>. Use
-<code>-np.inf</code> or <code>np.inf</code> for a one-sided constraint, and equal lower and upper
-bounds for an equality.</p>
-<p>The section declares only the bounds; the values themselves come from the
-evaluation function. See
-<a href="../configuration_sections/#nonlinear_constraints"><code>nonlinear_constraints</code></a> and
-<a href="../configuration_sections/#variables"><code>variables</code></a> for the full field reference.
-Constraint values can also be rescaled before the optimizer sees them; see
-<a href="../configuration_sections/#constraint-scales">Scaling constraints</a>.</p>
-<h2 id="returning-a-constraint-from-the-evaluation-function">Returning a constraint from the evaluation function</h2>
-<p>An evaluation function that has constraints returns a sequence instead of a
-single number: <strong>the objectives first, then the constraints</strong>. With one
-objective and one constraint, that is a two-element list:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">rosenbrock</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationFunctionContext</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="sd">"""The Rosenbrock objective and nonlinear constraint for one realization.</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="sd">    Args:</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="sd">        variables: The variable vector to evaluate.</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="sd">        context:   Identifies the realization being evaluated.</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="sd">    Returns:</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="sd">        The objective followed by the constraint value for the realization.</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="sd">    """</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">realization</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="n">objective</span> <span class="o">=</span> <span class="mf">0.0</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="k">for</span> <span class="n">d_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">d_idx</span> <span class="p">:</span> <span class="n">d_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>        <span class="n">objective</span> <span class="o">+=</span> <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">B</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    <span class="n">constraint</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">y</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">objective</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">constraint</span><span class="p">)]</span>
-</span></code></pre></div>
-<p>The order is positional — there are no names — so it must match the order in
-which the objectives and constraints are configured. See
-<a href="../../running/running/#the-evaluation-function">Running Optimizations</a> for the
-other shapes the return value can take.</p>
-<p>Because the constraint is computed per realization and uses <code>A[r]</code>, it is
-<em>stochastic</em>: each realization constrains the problem slightly differently, and
-<code>ropt</code> combines them the same way it combines the objectives.</p>
-<h2 id="deciding-when-a-constraint-is-satisfied">Deciding when a constraint is satisfied</h2>
-<p>A constraint is rarely met exactly, so <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> takes a
-<code>constraint_tolerance</code>: a result counts as feasible when no constraint is
-violated by more than that amount.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">config</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-6</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">)</span>
-</span></code></pre></div>
-<p><code>result.results</code> is only ever the best
-<strong>feasible</strong> evaluation; if none satisfied the constraints to within the
-tolerance, the run returns <code>None</code> instead of a best result. A tolerance that is
-too tight is a common reason for an empty result — see
-<a href="../../troubleshooting/">Troubleshooting</a>.</p>
-<p>To watch feasibility as the run proceeds, read <code>constraint_info</code> from the result
-the <code>report</code> callback receives. Its <code>nonlinear_violation</code> is zero where a
-constraint is met and positive by the amount it is exceeded:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">FunctionResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""Print any constraint violation, and the point that caused it.</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="sd">    Args:</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="sd">        result: The result of a single function evaluation.</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="sd">    """</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">info</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">constraint_info</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="k">if</span> <span class="p">(</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="ow">and</span> <span class="n">info</span><span class="o">.</span><span class="n">nonlinear_violation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">nonlinear_violation</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="p">):</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  constraint violation: </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">nonlinear_violation</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  at variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span></code></pre></div>
-<h2 id="adding-a-linear-constraint">Adding a linear constraint</h2>
-<p>A linear constraint is a row of coefficients applied to the variable vector,
-with bounds on the result. It never reaches your evaluation function. Equal
-lower and upper bounds make it an equality — this one forces the fourth and
-fifth variables to be equal:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">config</span><span class="p">[</span><span class="s2">"linear_constraints"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">"coefficients"</span><span class="p">:</span> <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]],</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>The script adds it when run with <code>--linear</code>. One row per constraint, one
-coefficient per variable; see
-<a href="../configuration_sections/#linear_constraints"><code>linear_constraints</code></a> for the field
-reference, and <a href="../configuration_sections/#linear-constraint-scales">Scaling the
-equations</a> for rescaling a
-row before it reaches the optimizer.</p>
 
 
 
@@ -3233,7 +3270,7 @@ row before it reaches the optimizer.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../objectives/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Objectives">
+          <a href="../restart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Restarting from the Best Point">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3243,20 +3280,20 @@ row before it reaches the optimizer.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Objectives
+                Restarting from the Best Point
               </div>
             </div>
           </a>
         
         
           
-          <a href="../discrete/" class="md-footer__link md-footer__link--next" aria-label="Next: Discrete and Mixed-Integer Variables">
+          <a href="../logging/" class="md-footer__link md-footer__link--next" aria-label="Next: Logging">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Discrete and Mixed-Integer Variables
+                Logging
               </div>
             </div>
             <div class="md-footer__button md-icon">
