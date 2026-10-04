@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
     from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
-    from ropt.results import FunctionResults
+    from ropt.results import FunctionResults, GradientResults
 
     from ._function import EvaluationFunction
     from ._report import ReportCallback
@@ -84,6 +84,8 @@ class WorkerPool:
         bundle_size: int | None = None,
         keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
+        f0: FunctionResults | None = None,
+        g0: GradientResults | None = None,
     ) -> OptimizationResult:
         """Run a single optimization, evaluating on this pool.
 
@@ -101,6 +103,8 @@ class WorkerPool:
             keep_going:           Whether to run on when another run in this
                                   session fails, `None` for the session's own.
             metadata:             Optional dictionary attached to every result.
+            f0:                   Optional function results at `x0`.
+            g0:                   Optional gradient results at `x0`.
 
         Returns:
             An [`OptimizationResult`][ropt.simple.OptimizationResult].
@@ -121,6 +125,8 @@ class WorkerPool:
             keep_going=keep_going,
             metadata=metadata,
             parent_signal=None,
+            f0=f0,
+            g0=g0,
         )
 
     def optimize_many(  # ruff: ignore[too-many-arguments]
@@ -136,6 +142,8 @@ class WorkerPool:
         bundle_size: int | Sequence[int | None] | None = None,
         keep_going: bool | None = None,
         metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
+        f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
+        g0: GradientResults | Sequence[GradientResults | None] | None = None,
     ) -> tuple[OptimizationResult, ...]:
         """Run several optimizations concurrently, all evaluating on this pool.
 
@@ -157,6 +165,10 @@ class WorkerPool:
             keep_going:           Whether to run on when another run in this
                                   session fails, `None` for the session's own.
             metadata:             Optional dictionary attached to every result.
+            f0:                   Optional function results at `x0`, shared or
+                                  one per run.
+            g0:                   Optional gradient results at `x0`, shared or
+                                  one per run.
 
         Returns:
             One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
@@ -180,6 +192,8 @@ class WorkerPool:
             bundle_size=bundle_size,
             keep_going=keep_going,
             metadata=metadata,
+            f0=f0,
+            g0=g0,
         )
 
     def evaluate(  # ruff: ignore[too-many-arguments]

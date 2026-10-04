@@ -12,8 +12,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ropt.results import Results
+
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
+
+    from ropt.results import FunctionResults, GradientResults
 
     from ._function import EvaluationFunction
     from ._report import ReportCallback
@@ -74,6 +78,47 @@ def broadcast_bundle_sizes(
     if bundle_size is None or isinstance(bundle_size, int):
         return [bundle_size] * count
     return _sized(list(bundle_size), count, "bundle_size")
+
+
+def broadcast_initial_values[ResultT: Results](
+    values: ResultT | Sequence[ResultT | None] | None, count: int, name: str
+) -> list[ResultT | None]:
+    if values is None or isinstance(values, Results):
+        return [values] * count
+    return _sized(list(values), count, name)
+
+
+type RunArguments = tuple[
+    list[tuple[dict[str, Any], ArrayLike, EvaluationFunction]],
+    list[ReportCallback | None],
+    list[dict[str, Any] | None],
+    list[int | None],
+    list[FunctionResults | None],
+    list[GradientResults | None],
+]
+
+
+def broadcast_arguments(  # ruff: ignore[too-many-arguments]
+    config: dict[str, Any] | Sequence[dict[str, Any]],
+    x0: ArrayLike,
+    function: EvaluationFunction | Sequence[EvaluationFunction],
+    *,
+    report: ReportCallback | Sequence[ReportCallback] | None,
+    metadata: dict[str, Any] | Sequence[dict[str, Any]] | None,
+    bundle_size: int | Sequence[int | None] | None,
+    f0: FunctionResults | Sequence[FunctionResults | None] | None,
+    g0: GradientResults | Sequence[GradientResults | None] | None,
+) -> RunArguments:
+    runs = broadcast_runs(config, x0, function)
+    count = len(runs)
+    return (
+        runs,
+        broadcast_reports(report, count),
+        broadcast_metadata(metadata, count),
+        broadcast_bundle_sizes(bundle_size, count),
+        broadcast_initial_values(f0, count, "f0"),
+        broadcast_initial_values(g0, count, "g0"),
+    )
 
 
 def _sized(values: list[Any], count: int, name: str) -> list[Any]:

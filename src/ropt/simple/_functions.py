@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.components.event_handlers import EventHandler
-    from ropt.results import FunctionResults
+    from ropt.results import FunctionResults, GradientResults
 
     from ._function import EvaluationFunction
     from ._report import ReportCallback
@@ -37,6 +37,8 @@ def optimize(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None = None,
     constraint_tolerance: float = 1e-10,
     metadata: dict[str, Any] | None = None,
+    f0: FunctionResults | None = None,
+    g0: GradientResults | None = None,
 ) -> OptimizationResult:
     """Run a single optimization in-process.
 
@@ -53,6 +55,8 @@ def optimize(  # ruff: ignore[too-many-arguments]
         report:               Optional callback invoked per evaluation.
         constraint_tolerance: The tolerance within which a constraint holds.
         metadata:             Optional dictionary attached to every result.
+        f0:                   Optional function results at `x0`.
+        g0:                   Optional gradient results at `x0`.
 
     Returns:
         An [`OptimizationResult`][ropt.simple.OptimizationResult].
@@ -66,6 +70,8 @@ def optimize(  # ruff: ignore[too-many-arguments]
             report=report,
             constraint_tolerance=constraint_tolerance,
             metadata=metadata,
+            f0=f0,
+            g0=g0,
         )
 
 
@@ -80,6 +86,8 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     constraint_tolerance: float = 1e-10,
     keep_going: bool | None = None,
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
+    f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
+    g0: GradientResults | Sequence[GradientResults | None] | None = None,
 ) -> tuple[OptimizationResult, ...]:
     """Run several optimizations concurrently, in-process.
 
@@ -101,6 +109,10 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         keep_going:           Whether a run carries on when another of these
                               runs fails; they all fail fast by default.
         metadata:             Optional dictionary attached to every result.
+        f0:                   Optional function results at `x0`, shared or one
+                              per run.
+        g0:                   Optional gradient results at `x0`, shared or one
+                              per run.
 
     Returns:
         One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
@@ -121,6 +133,8 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             constraint_tolerance=constraint_tolerance,
             keep_going=keep_going,
             metadata=metadata,
+            f0=f0,
+            g0=g0,
         )
 
 

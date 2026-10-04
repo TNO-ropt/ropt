@@ -25,6 +25,7 @@ from ropt.results import (
 
 from ._function import _calculate_estimated_functions
 from ._gradient import _calculate_estimated_gradients, _perturb_variables
+from ._initial_values import _InitialValueFiller
 from ._results import (
     _FunctionEvaluatorResults,
     _get_function_and_gradient_results,
@@ -61,6 +62,9 @@ class EnsembleEvaluator:
         context: EnOptContext,
         evaluator: EvaluationBatchCallback,
         metadata: dict[str, Any] | None = None,
+        *,
+        f0: FunctionResults | None = None,
+        g0: GradientResults | None = None,
     ) -> None:
         """Initialize the EnsembleEvaluator.
 
@@ -68,9 +72,21 @@ class EnsembleEvaluator:
             context:   The optimization context object.
             evaluator: The callable for evaluating individual functions.
             metadata:  Optional metadata to pass to the evaluator.
-        """
+            f0:        Optional function results at the initial variables.
+            g0:        Optional gradient results at the initial variables.
+
+        Raises:
+            ValueError: If `f0` or `g0` does not fit the configuration.
+        """  # ruff: ignore[docstring-extraneous-exception]
         self._context = context
-        self._evaluator = evaluator
+        self._initial_values = (
+            None
+            if f0 is None and g0 is None
+            else _InitialValueFiller(context, evaluator, f0, g0)
+        )
+        self._evaluator = (
+            evaluator if self._initial_values is None else self._initial_values
+        )
         self._metadata = metadata
         self._realization_filters: dict[str, RealizationFilter] = (
             context.realization_filters
@@ -254,9 +270,7 @@ class EnsembleEvaluator:
         mask: NDArray[np.bool_] | None,
         cached_function: FunctionResults,
     ) -> tuple[GradientResults]:
-        perturbed_variables = _perturb_variables(
-            self._context, variables, self._samplers
-        )
+        perturbed_variables = self._perturb(variables)
 
         # No functions are computed in this case, instead they must have been
         # computed in a previous run, with the results stored in the
@@ -340,14 +354,22 @@ class EnsembleEvaluator:
             ),
         )
 
+    def _perturb(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:
+        perturbed_variables = _perturb_variables(
+            self._context, variables, self._samplers
+        )
+        if self._initial_values is None:
+            return perturbed_variables
+        return self._initial_values.apply_to_perturbations(
+            variables, perturbed_variables
+        )
+
     def _calculate_both(
         self,
         variables: NDArray[np.float64],
         mask: NDArray[np.bool_] | None,
     ) -> tuple[FunctionResults, GradientResults]:
-        perturbed_variables = _perturb_variables(
-            self._context, variables, self._samplers
-        )
+        perturbed_variables = self._perturb(variables)
         realizations_to_evaluate = _get_realizations_to_evaluate(self._context)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
             self._context,

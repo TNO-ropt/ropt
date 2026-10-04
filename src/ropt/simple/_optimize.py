@@ -22,12 +22,7 @@ from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
 from ropt.exceptions import RunsFailedError
 
-from ._broadcast import (
-    broadcast_bundle_sizes,
-    broadcast_metadata,
-    broadcast_reports,
-    broadcast_runs,
-)
+from ._broadcast import broadcast_arguments
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
 from ._result import OptimizationResult
@@ -40,6 +35,7 @@ if TYPE_CHECKING:
 
     from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
+    from ropt.results import FunctionResults, GradientResults
 
     from ._function import EvaluationFunction
     from ._report import ReportCallback
@@ -61,13 +57,15 @@ def _build_optimization(  # ruff: ignore[too-many-arguments]
     constraint_tolerance: float,
     bundle_size: int | None,
     signal: AbortSignal,
+    f0: FunctionResults | None,
+    g0: GradientResults | None,
 ) -> tuple[EnOptContext, OptimizationStep, ResultsHandler]:
     context = EnOptContext.model_validate(config)
     evaluator = make_evaluator(context, function, executor, bundle_size, signal)
     # This run's own handler, tracking the result the call returns; it is added
     # directly, so it stays out of the handlers the caller manages.
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
-    step = OptimizationStep(evaluator=evaluator, abort_signal=signal)
+    step = OptimizationStep(evaluator=evaluator, abort_signal=signal, f0=f0, g0=g0)
     step.add_event_handler(result_handler)
     attach_handlers(step, handlers, report)
     return context, step, result_handler
@@ -87,6 +85,8 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     keep_going: bool | None,
     metadata: dict[str, Any] | None,
     parent_signal: AbortSignal | None,
+    f0: FunctionResults | None = None,
+    g0: GradientResults | None = None,
 ) -> OptimizationResult:
     if parent_signal is not None and parent_signal.aborting:
         # Cut off before anything is built, so an invalid config in a run that
@@ -103,6 +103,8 @@ def _optimize(  # ruff: ignore[too-many-arguments]
             constraint_tolerance=constraint_tolerance,
             bundle_size=bundle_size,
             signal=signal,
+            f0=f0,
+            g0=g0,
         )
     except Exception:
         # No abort can reach a run being built, so this needs no exemption.
@@ -157,15 +159,23 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     bundle_size: int | Sequence[int | None] | None,
     keep_going: bool | None,
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None,
+    f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
+    g0: GradientResults | Sequence[GradientResults | None] | None = None,
 ) -> tuple[OptimizationResult, ...]:
     # Refused here rather than per run: a closed session makes the call invalid,
     # and leaving it to the runs would report it as every one of them failing.
     session._require_open()  # ruff: ignore[private-member-access]
     try:
-        runs = broadcast_runs(config, x0, function)
-        reports = broadcast_reports(report, len(runs))
-        metadatas = broadcast_metadata(metadata, len(runs))
-        bundle_sizes = broadcast_bundle_sizes(bundle_size, len(runs))
+        runs, reports, metadatas, bundle_sizes, f0s, g0s = broadcast_arguments(
+            config,
+            x0,
+            function,
+            report=report,
+            metadata=metadata,
+            bundle_size=bundle_size,
+            f0=f0,
+            g0=g0,
+        )
     except Exception:
         # Arguments that do not agree are a failed call, and stop the rest of
         # the session as a failed run does.
@@ -194,13 +204,17 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
             keep_going=keep_going,
             metadata=run_metadata,
             parent_signal=parent_signal,
+            f0=run_f0,
+            g0=run_g0,
         )
         for (
             (run_config, run_x0, run_function),
             run_report,
             run_metadata,
             run_bundle_size,
-        ) in zip(runs, reports, metadatas, bundle_sizes, strict=True)
+            run_f0,
+            run_g0,
+        ) in zip(runs, reports, metadatas, bundle_sizes, f0s, g0s, strict=True)
     ]
     # Dedicated threads, not a shared thread pool: each run blocks its thread
     # while waiting for evaluations that would queue behind it in such a pool.

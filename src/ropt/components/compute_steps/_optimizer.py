@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from ropt.components.concurrency import AbortSignal
     from ropt.components.evaluators import Evaluator
     from ropt.context import EnOptContext
-    from ropt.results import Results
+    from ropt.results import FunctionResults, GradientResults, Results
 
 
 _logger = get_logger(__name__)
@@ -42,16 +42,29 @@ class OptimizationStep(ComputeStep[ExitCode]):
     """
 
     def __init__(
-        self, *, evaluator: Evaluator, abort_signal: AbortSignal | None = None
+        self,
+        *,
+        evaluator: Evaluator,
+        abort_signal: AbortSignal | None = None,
+        f0: FunctionResults | None = None,
+        g0: GradientResults | None = None,
     ) -> None:
         """Initialize a default optimizer.
 
+        `f0` and `g0` hold results already known at the initial variables. Only
+        the unscaled evaluations and the realizations they cover are used;
+        everything derived from them is recomputed.
+
         Args:
-            evaluator:   The evaluator object to run function evaluations.
+            evaluator:    The evaluator object to run function evaluations.
             abort_signal: An optional signal that cuts this step off.
+            f0:           Optional function results at the initial variables.
+            g0:           Optional gradient results at the initial variables.
         """
         super().__init__(abort_signal=abort_signal)
         self._evaluator = evaluator
+        self._f0 = f0
+        self._g0 = g0
 
     @override
     def _run(
@@ -106,6 +119,8 @@ class OptimizationStep(ComputeStep[ExitCode]):
             self._context,
             self._evaluator.eval,
             self._metadata,
+            f0=self._f0,
+            g0=self._g0,
         )
         ensemble_optimizer = EnsembleOptimizer(
             context=self._context,
