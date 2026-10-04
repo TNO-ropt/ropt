@@ -121,11 +121,11 @@ class OptimizationStep(ComputeStep[ExitCode]):
             self._metadata,
             f0=self._f0,
             g0=self._g0,
+            signal_evaluation=self._signal_evaluation,
         )
         ensemble_optimizer = EnsembleOptimizer(
             context=self._context,
             ensemble_evaluator=ensemble_evaluator,
-            signal_evaluation=self._signal_evaluation,
         )
         exit_code = ensemble_optimizer.start(variables)
 

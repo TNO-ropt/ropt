@@ -118,11 +118,15 @@ class EvaluationStep(ComputeStep[None]):
             variables, context.variables.scales, context.variables.offsets
         )
 
-        ensemble_evaluator = EnsembleEvaluator(context, self._evaluator.eval, metadata)
-
-        self._emit_event(
-            EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
+        self._context = context
+        self._metadata = metadata
+        ensemble_evaluator = EnsembleEvaluator(
+            context,
+            self._evaluator.eval,
+            metadata,
+            signal_evaluation=self._signal_evaluation,
         )
+
         results = ensemble_evaluator.calculate(
             variables, compute_functions=True, compute_gradients=False
         )
@@ -130,16 +134,26 @@ class EvaluationStep(ComputeStep[None]):
         assert results
         assert isinstance(results[0], FunctionResults)
 
-        if metadata is not None:
-            for item in results:
-                item.metadata = deepcopy(metadata)
-
-        self._emit_event(
-            EnOptEvent(
-                event_type=EnOptEventType.FINISHED_EVALUATION,
-                context=context,
-                results=results,
-            )
-        )
-
         return results
+
+    def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
+        # Called by the ensemble evaluator around every evaluation: without
+        # results before one starts, with them once it has finished.
+        if results is None:
+            self._emit_event(
+                EnOptEvent(
+                    event_type=EnOptEventType.START_EVALUATION, context=self._context
+                )
+            )
+        else:
+            if self._metadata is not None:
+                for item in results:
+                    item.metadata = deepcopy(self._metadata)
+
+            self._emit_event(
+                EnOptEvent(
+                    event_type=EnOptEventType.FINISHED_EVALUATION,
+                    context=self._context,
+                    results=results,
+                )
+            )

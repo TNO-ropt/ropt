@@ -8,8 +8,8 @@ backend. Both are exposed for plugin authors and workflow developers; see
 """
 
 from ._callback import OptimizerCallback, OptimizerCallbackResult
-from ._evaluator import EnsembleEvaluator
-from ._optimizer import EnsembleOptimizer, SignalEvaluationCallback
+from ._evaluator import EnsembleEvaluator, SignalEvaluationCallback
+from ._optimizer import EnsembleOptimizer
 
 __all__ = [
     "EnsembleEvaluator",

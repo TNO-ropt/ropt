@@ -6,7 +6,7 @@ import os
 import sys
 import threading
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -72,27 +72,6 @@ def _resolve_output_path(path: Path | None, output_dir: Path | None) -> Path | N
     return output_dir / path
 
 
-class SignalEvaluationCallback(Protocol):
-    """Protocol for a callback to signal the start and end of an evaluation.
-
-    This callback is invoked before and after each evaluation, allowing for
-    custom handling or tracking of evaluation events.
-    """
-
-    def __call__(self, results: tuple[Results, ...] | None = None, /) -> None:
-        """Callback protocol for signaling the start and end of evaluations.
-
-        This callback is invoked by the ensemble optimizer before and after
-        each evaluation. Before the evaluation starts, the callback is called
-        with `results` set to `None`. After the evaluation completes, the
-        callback is called again, this time with `results` containing the
-        output of the evaluation.
-
-        Args:
-            results: The evaluation results, or `None` before it starts.
-        """
-
-
 class EnsembleOptimizer:
     """Backend for ensemble-based optimizations.
 
@@ -105,18 +84,15 @@ class EnsembleOptimizer:
         self,
         context: EnOptContext,
         ensemble_evaluator: EnsembleEvaluator,
-        signal_evaluation: SignalEvaluationCallback | None = None,
     ) -> None:
         """Initialize the EnsembleOptimizer.
 
         Args:
             context:            The ensemble optimization context.
             ensemble_evaluator: The evaluator for function evaluations.
-            signal_evaluation:  Optional callback, invoked around each evaluation.
         """
         self._context = context
         self._function_evaluator = ensemble_evaluator
-        self._signal_evaluation = signal_evaluation
 
         # How the nonlinear constraints split into the values handed to the
         # optimizer. Fixed for the run: it follows the configured bounds.
@@ -270,8 +246,6 @@ class EnsembleOptimizer:
     ) -> tuple[Results, ...]:
         with self._capture.release():
             assert compute_functions or compute_gradients
-            if self._signal_evaluation:
-                self._signal_evaluation()
             results = self._function_evaluator.calculate(
                 variables,
                 compute_functions=compute_functions,
@@ -286,9 +260,6 @@ class EnsembleOptimizer:
                 ) or (isinstance(result, GradientResults) and result.gradients is None):
                     too_few = True
                     break
-
-            if self._signal_evaluation:
-                self._signal_evaluation(results)
 
             if too_few:
                 raise TooFewRealizations
