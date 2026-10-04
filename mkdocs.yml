@@ -119,6 +119,7 @@ nav:
       - "Many Runs at Once": running/many_runs.md
       - "Nested Optimization": running/nested.md
       - "Restarting from the Best Point": running/restart.md
+      - "Reusing Results at the Starting Point": running/initial_values.md
       - "Logging": running/logging.md
   - "Results":
       - "Working with Results": results/results.md

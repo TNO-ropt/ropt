@@ -1,5 +1,11 @@
 # Restarting from the Best Point Found
 
+!!! note
+
+    This page is about starting a new run where a previous one ended. To start
+    at the *same* point as a previous run without evaluating it again, see
+    [Reusing Results at the Starting Point](initial_values.md).
+
 The full script for this example is
 [examples/simple/restart.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py).
 It restarts the same optimization several times, each time starting from the

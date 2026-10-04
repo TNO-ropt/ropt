@@ -109,6 +109,11 @@ def test_example_simple_restart(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("restart", "simple").main()
 
 
+def test_example_simple_initial_values(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("initial_values", "simple").main()
+
+
 @pytest.mark.slow
 def test_example_simple_nested_optimization(tmp_path: Path, monkeypatch: Any) -> None:
     pytest.importorskip("polars")
