@@ -8,7 +8,7 @@ import numpy as np
 
 from ropt._logging import get_logger
 from ropt.enums import EnOptEventType
-from ropt.results import FunctionResults
+from ropt.results import FunctionResults, GradientResults
 
 from .base import EventHandler
 
@@ -29,6 +29,10 @@ class ResultsHandler(EventHandler):
     filters by constraint tolerance. The selected result is accessible via the
     [`result`][ropt.components.event_handlers.ResultsHandler.result] property or
     `handler["results"]`.
+
+    The gradient computed at the selected result, if there is one, is available
+    as `handler["gradient"]`. It may arrive in a later event than the result it
+    belongs to, and stays `None` for a point where no gradient was computed.
 
     See [Result Handlers](../results/handlers.md#resultshandler) for full
     details on selection criteria and scaling.
@@ -57,6 +61,7 @@ class ResultsHandler(EventHandler):
         self._filter = filter
         self._best_results: FunctionResults | None = None
         self["results"] = None
+        self["gradient"] = None
 
     @property
     def result(self) -> FunctionResults | None:
@@ -64,8 +69,18 @@ class ResultsHandler(EventHandler):
         selected: FunctionResults | None = self["results"]
         return selected
 
+    @property
+    def gradient(self) -> GradientResults | None:
+        """The gradient at the selected result, or `None` if there is none."""
+        selected: GradientResults | None = self["gradient"]
+        return selected
+
     @override
     def _handle_event(self, event: EnOptEvent) -> None:
+        self._select(event)
+        self._attach_gradient(event)
+
+    def _select(self, event: EnOptEvent) -> None:
         results: tuple[FunctionResults, ...] = tuple(
             item
             for item in event.results
@@ -81,6 +96,7 @@ class ResultsHandler(EventHandler):
         # so the best seen so far must go with it.
         if self["results"] is None:
             self._best_results = None
+            self["gradient"] = None
 
         def _get_target_objective(result: FunctionResults) -> float:
             assert result.target_objective is not None
@@ -94,11 +110,29 @@ class ResultsHandler(EventHandler):
                 if best is not self._best_results:
                     self._best_results = best
                     _logger.info("New best objective: %g", _get_target_objective(best))
-                    self["results"] = best
+                    self._store(best)
             case "last":
-                self["results"] = results[-1]
+                self._store(results[-1])
             case _ as unreachable:
                 assert_never(unreachable)
+
+    def _store(self, results: FunctionResults) -> None:
+        self["results"] = results
+        self["gradient"] = None
+
+    def _attach_gradient(self, event: EnOptEvent) -> None:
+        # A gradient may reach the handler after the result it belongs to, so
+        # every event is searched, not only the one that selected the result.
+        selected: FunctionResults | None = self["results"]
+        if selected is None:
+            return
+        for item in event.results:
+            if (
+                isinstance(item, GradientResults)
+                and item.function_key == selected.function_key
+            ):
+                self["gradient"] = item
+                return
 
     @property
     @override

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ropt.enums import ExitCode
-    from ropt.results import FunctionResults
+    from ropt.results import FunctionResults, GradientResults
 
 
 @dataclass
@@ -21,10 +21,12 @@ class OptimizationResult:
     Attributes:
         exit_code: Why the optimization terminated.
         results:   The best evaluation, or `None` if there was no valid result.
+        gradient:  The gradient at that evaluation, if one was computed there.
     """
 
     exit_code: ExitCode
     results: FunctionResults | None
+    gradient: GradientResults | None = None
 
 
 @dataclass

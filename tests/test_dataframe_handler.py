@@ -56,6 +56,7 @@ def _make_result(batch_id: int, objective: float = 1.0) -> FunctionResults:
     context = EnOptContext.model_validate(_CONFIG)
     return FunctionResults(
         batch_id=batch_id,
+        function_id=0,
         metadata={},
         names=context.names,
         variables=np.array([0.5, 1.5]),
@@ -96,6 +97,7 @@ def _make_result_two_realizations(batch_id: int) -> FunctionResults:
     context = EnOptContext.model_validate(_CONFIG_TWO_REALIZATIONS)
     return FunctionResults(
         batch_id=batch_id,
+        function_id=0,
         metadata={},
         names=context.names,
         variables=np.array([0.5, 1.5]),
@@ -500,6 +502,7 @@ def _make_scaled_event() -> EnOptEvent:
         results=(
             FunctionResults(
                 batch_id=0,
+                function_id=0,
                 metadata={},
                 names=context.names,
                 variables=np.array([3.0, 6.0]),

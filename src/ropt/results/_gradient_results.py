@@ -125,6 +125,8 @@ class GradientResults(Results):
             - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
     Attributes:
+        function_key:        Identifies the function evaluation this gradient
+                             was computed from.
         variables:           The variable vector that was perturbed.
         perturbed_variables: The perturbed vectors that were evaluated.
         evaluations:         Per-perturbation values returned by the evaluator.
@@ -134,6 +136,7 @@ class GradientResults(Results):
         scaled:              The same quantities as the optimizer works with them.
     """
 
+    function_key: tuple[int, int]
     variables: NDArray[np.float64] = field(
         metadata={"__axes__": (AxisName.VARIABLE,)},
     )

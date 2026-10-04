@@ -39,6 +39,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None = None,
     f0: FunctionResults | None = None,
     g0: GradientResults | None = None,
+    report_gradients: bool = False,
 ) -> OptimizationResult:
     """Run a single optimization in-process.
 
@@ -57,6 +58,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         metadata:             Optional dictionary attached to every result.
         f0:                   Optional function results at `x0`.
         g0:                   Optional gradient results at `x0`.
+        report_gradients:     Whether `report` also receives gradient results.
 
     Returns:
         An [`OptimizationResult`][ropt.simple.OptimizationResult].
@@ -72,6 +74,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
             metadata=metadata,
             f0=f0,
             g0=g0,
+            report_gradients=report_gradients,
         )
 
 
@@ -88,6 +91,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
     f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
     g0: GradientResults | Sequence[GradientResults | None] | None = None,
+    report_gradients: bool = False,
 ) -> tuple[OptimizationResult, ...]:
     """Run several optimizations concurrently, in-process.
 
@@ -113,6 +117,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
                               per run.
         g0:                   Optional gradient results at `x0`, shared or one
                               per run.
+        report_gradients:     Whether `report` also receives gradient results.
 
     Returns:
         One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
@@ -135,6 +140,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             metadata=metadata,
             f0=f0,
             g0=g0,
+            report_gradients=report_gradients,
         )
 
 

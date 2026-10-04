@@ -62,6 +62,7 @@ def function_result_fixture(config: dict[str, Any]) -> FunctionResults:
     context = EnOptContext.model_validate(config)
     return FunctionResults(
         batch_id=1,
+        function_id=0,
         metadata={},
         names=context.names,
         variables=np.array([1.0, 2.0]),
@@ -88,6 +89,7 @@ def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
     context = EnOptContext.model_validate(config)
     return GradientResults(
         batch_id=1,
+        function_key=(1, 0),
         metadata={},
         names=context.names,
         variables=np.array([1.0, 2.0]),

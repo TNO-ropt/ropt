@@ -176,6 +176,7 @@ class Session:
         metadata: dict[str, Any] | None = None,
         f0: FunctionResults | None = None,
         g0: GradientResults | None = None,
+        report_gradients: bool = False,
     ) -> OptimizationResult:
         """Run a single optimization in-process, on this session.
 
@@ -195,6 +196,7 @@ class Session:
             metadata:             Optional dictionary attached to every result.
             f0:                   Optional function results at `x0`.
             g0:                   Optional gradient results at `x0`.
+            report_gradients:     Whether `report` also receives gradient results.
 
         Returns:
             An [`OptimizationResult`][ropt.simple.OptimizationResult].
@@ -217,6 +219,7 @@ class Session:
             parent_signal=None,
             f0=f0,
             g0=g0,
+            report_gradients=report_gradients,
         )
 
     def optimize_many(  # ruff: ignore[too-many-arguments]
@@ -233,6 +236,7 @@ class Session:
         metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
         f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
         g0: GradientResults | Sequence[GradientResults | None] | None = None,
+        report_gradients: bool = False,
     ) -> tuple[OptimizationResult, ...]:
         """Run several optimizations concurrently in-process, on this session.
 
@@ -259,6 +263,7 @@ class Session:
                                   one per run.
             g0:                   Optional gradient results at `x0`, shared or
                                   one per run.
+            report_gradients:     Whether `report` also receives gradient results.
 
         Returns:
             One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
@@ -284,6 +289,7 @@ class Session:
             metadata=metadata,
             f0=f0,
             g0=g0,
+            report_gradients=report_gradients,
         )
 
     def evaluate(  # ruff: ignore[too-many-arguments]

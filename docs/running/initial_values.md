@@ -18,16 +18,21 @@ The full script for this example is
 ## Recording the results
 
 The results of the first run are collected with a
-[`HistoryHandler`][ropt.simple.HistoryHandler], from which the first
-[`FunctionResults`][ropt.results.FunctionResults] and the first
-[`GradientResults`][ropt.results.GradientResults] are the ones at the start
-point:
+[`HistoryHandler`][ropt.simple.HistoryHandler]. Take the first
+[`GradientResults`][ropt.results.GradientResults], then the
+[`FunctionResults`][ropt.results.FunctionResults] it was computed from — its
+`function_key` names that evaluation, so the two are a pair rather than merely
+the first of each kind:
 
 ```python
 history = HistoryHandler()
 optimize(CONFIG, INITIAL_VALUES, first, handlers=[history])
-f0 = next(item for item in history.results if isinstance(item, FunctionResults))
 g0 = next(item for item in history.results if isinstance(item, GradientResults))
+f0 = next(
+    item
+    for item in history.results
+    if isinstance(item, FunctionResults) and item.function_key == g0.function_key
+)
 ```
 
 How these are kept between the runs is up to you: held in memory, pickled to

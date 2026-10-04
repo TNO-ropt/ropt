@@ -59,8 +59,12 @@ def main() -> None:
     history = HistoryHandler()
     first = CountingObjective()
     optimize(CONFIG, INITIAL_VALUES, first, handlers=[history])
-    f0 = next(item for item in history.results if isinstance(item, FunctionResults))
     g0 = next(item for item in history.results if isinstance(item, GradientResults))
+    f0 = next(
+        item
+        for item in history.results
+        if isinstance(item, FunctionResults) and item.function_key == g0.function_key
+    )
 
     config = deepcopy(CONFIG)
     config["realizations"]["weights"] = [3.0, 1.0, 1.0]

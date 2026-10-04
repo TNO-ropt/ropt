@@ -86,6 +86,7 @@ class WorkerPool:
         metadata: dict[str, Any] | None = None,
         f0: FunctionResults | None = None,
         g0: GradientResults | None = None,
+        report_gradients: bool = False,
     ) -> OptimizationResult:
         """Run a single optimization, evaluating on this pool.
 
@@ -105,6 +106,7 @@ class WorkerPool:
             metadata:             Optional dictionary attached to every result.
             f0:                   Optional function results at `x0`.
             g0:                   Optional gradient results at `x0`.
+            report_gradients:     Whether `report` also receives gradient results.
 
         Returns:
             An [`OptimizationResult`][ropt.simple.OptimizationResult].
@@ -127,6 +129,7 @@ class WorkerPool:
             parent_signal=None,
             f0=f0,
             g0=g0,
+            report_gradients=report_gradients,
         )
 
     def optimize_many(  # ruff: ignore[too-many-arguments]
@@ -144,6 +147,7 @@ class WorkerPool:
         metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
         f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
         g0: GradientResults | Sequence[GradientResults | None] | None = None,
+        report_gradients: bool = False,
     ) -> tuple[OptimizationResult, ...]:
         """Run several optimizations concurrently, all evaluating on this pool.
 
@@ -169,6 +173,7 @@ class WorkerPool:
                                   one per run.
             g0:                   Optional gradient results at `x0`, shared or
                                   one per run.
+            report_gradients:     Whether `report` also receives gradient results.
 
         Returns:
             One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
@@ -194,6 +199,7 @@ class WorkerPool:
             metadata=metadata,
             f0=f0,
             g0=g0,
+            report_gradients=report_gradients,
         )
 
     def evaluate(  # ruff: ignore[too-many-arguments]

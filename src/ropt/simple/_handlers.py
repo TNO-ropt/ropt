@@ -28,8 +28,10 @@ def attach_handlers(
     step: ComputeStep[Any],
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
+    *,
+    report_gradients: bool = False,
 ) -> None:
     for handler in handlers or ():
         step.add_event_handler(handler)
     if report is not None:
-        step.add_event_handler(make_report_handler(report))
+        step.add_event_handler(make_report_handler(report, gradients=report_gradients))

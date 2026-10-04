@@ -122,6 +122,7 @@ def _make_function_results(*, failed: bool) -> FunctionResults:
     )
     return FunctionResults(
         batch_id=0,
+        function_id=0,
         metadata={},
         names={},
         variables=np.array([0.0, 0.0]),
@@ -152,6 +153,7 @@ def _make_gradient_results(
     )
     return GradientResults(
         batch_id=0,
+        function_key=(0, 0),
         metadata={},
         names={},
         variables=np.array([0.0, 0.0]),

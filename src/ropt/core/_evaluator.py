@@ -212,7 +212,7 @@ class EnsembleEvaluator:
         self._signal_start()
         results = tuple(
             self._calculate_one_set_of_functions(
-                f_eval_results, variables[idx, :], realizations_to_evaluate
+                idx, f_eval_results, variables[idx, :], realizations_to_evaluate
             )
             for idx, f_eval_results in _get_function_results(
                 self._context,
@@ -227,6 +227,7 @@ class EnsembleEvaluator:
 
     def _calculate_one_set_of_functions(
         self,
+        function_id: int,
         f_eval_results: _FunctionEvaluatorResults,
         variables: NDArray[np.float64],
         realizations_to_evaluate: NDArray[np.bool_],
@@ -273,6 +274,7 @@ class EnsembleEvaluator:
 
         return FunctionResults(
             batch_id=f_eval_results.batch_id,
+            function_id=function_id,
             metadata={},
             names=self._context.names,
             variables=self._unscale_variables(variables),
@@ -363,6 +365,7 @@ class EnsembleEvaluator:
         results = (
             GradientResults(
                 batch_id=g_eval_results.batch_id,
+                function_key=cached_function.function_key,
                 metadata={},
                 names=self._context.names,
                 variables=self._unscale_variables(variables),
@@ -458,6 +461,7 @@ class EnsembleEvaluator:
 
         function_results = FunctionResults(
             batch_id=f_eval_results.batch_id,
+            function_id=0,
             metadata={},
             names=self._context.names,
             variables=self._unscale_variables(variables),
@@ -511,6 +515,7 @@ class EnsembleEvaluator:
 
         gradient_results = GradientResults(
             batch_id=g_eval_results.batch_id,
+            function_key=function_results.function_key,
             metadata={},
             names=self._context.names,
             variables=self._unscale_variables(variables),

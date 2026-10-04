@@ -59,6 +59,7 @@ def _build_optimization(  # ruff: ignore[too-many-arguments]
     signal: AbortSignal,
     f0: FunctionResults | None,
     g0: GradientResults | None,
+    report_gradients: bool,
 ) -> tuple[EnOptContext, OptimizationStep, ResultsHandler]:
     context = EnOptContext.model_validate(config)
     evaluator = make_evaluator(context, function, executor, bundle_size, signal)
@@ -67,7 +68,7 @@ def _build_optimization(  # ruff: ignore[too-many-arguments]
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
     step = OptimizationStep(evaluator=evaluator, abort_signal=signal, f0=f0, g0=g0)
     step.add_event_handler(result_handler)
-    attach_handlers(step, handlers, report)
+    attach_handlers(step, handlers, report, report_gradients=report_gradients)
     return context, step, result_handler
 
 
@@ -87,6 +88,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     parent_signal: AbortSignal | None,
     f0: FunctionResults | None = None,
     g0: GradientResults | None = None,
+    report_gradients: bool = False,
 ) -> OptimizationResult:
     if parent_signal is not None and parent_signal.aborting:
         # Cut off before anything is built, so an invalid config in a run that
@@ -105,6 +107,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
             signal=signal,
             f0=f0,
             g0=g0,
+            report_gradients=report_gradients,
         )
     except Exception:
         # No abort can reach a run being built, so this needs no exemption.
@@ -139,9 +142,12 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         if parent_signal is not None and cut_off is not None:
             parent_signal.remove_callback(cut_off)
     results = result_handler["results"]
+    if results is None or results.functions is None:
+        return OptimizationResult(exit_code=exit_code, results=None)
     return OptimizationResult(
         exit_code=exit_code,
-        results=None if results is None or results.functions is None else results,
+        results=results,
+        gradient=result_handler["gradient"],
     )
 
 
@@ -161,6 +167,7 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None,
     f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
     g0: GradientResults | Sequence[GradientResults | None] | None = None,
+    report_gradients: bool = False,
 ) -> tuple[OptimizationResult, ...]:
     # Refused here rather than per run: a closed session makes the call invalid,
     # and leaving it to the runs would report it as every one of them failing.
@@ -206,6 +213,7 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
             parent_signal=parent_signal,
             f0=run_f0,
             g0=run_g0,
+            report_gradients=report_gradients,
         )
         for (
             (run_config, run_x0, run_function),

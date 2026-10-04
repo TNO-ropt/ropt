@@ -108,6 +108,11 @@ are.
   [`Results`][ropt.results.Results] and returns `True` to keep it or `False` to
   drop it.
 
+The gradient computed at the result it keeps, if there is one, is read via
+`handler["gradient"]`. It is `None` while that gradient has not arrived, and
+stays `None` for a point where no gradient was computed — the best point of a
+run often is one.
+
 
 ### `HistoryHandler`
 

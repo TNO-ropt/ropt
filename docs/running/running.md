@@ -141,6 +141,31 @@ optimize(config, x0, objective, report=report)
 `result.variables` is the point that was evaluated. During an optimization the
 optimizer chose it, so this is how you follow the path a run takes.
 
+### Reporting gradients as well
+
+Set `report_gradients=True` and the callback is also called with each
+[`GradientResults`][ropt.results.GradientResults], which arrives in its own
+evaluation. The callback then receives both kinds and has to tell them apart:
+
+```python
+from ropt.results import FunctionResults
+
+
+def report(result):
+    if isinstance(result, FunctionResults):
+        print("objective", result.target_objective)
+    else:
+        print("gradient", result.target_gradient)
+
+
+optimize(config, x0, objective, report=report, report_gradients=True)
+```
+
+A [`GradientResults`][ropt.results.GradientResults] carries a `function_key`
+identifying the function evaluation it was computed from; the matching
+[`FunctionResults`][ropt.results.FunctionResults] has the same value in its own
+`function_key`.
+
 ### Stopping early from the callback
 
 The `report` callback doubles as a **user-defined stopping criterion**: return
