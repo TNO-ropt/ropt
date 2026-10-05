@@ -4104,12 +4104,12 @@ next batch. The pool of a
 restarted once a worker is lost: every later batch fails the same way, and a new
 executor is needed.</p>
 <p>The evaluator turns that result into an
-<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>, naming how many evaluations
-were lost and why, which ends the run. It does <strong>not</strong> write <code>numpy.nan</code> for the
-affected rows. A machine that broke is not a realization that failed to
-converge: absorbing it would let the optimization continue on whichever workers
-happened to survive, and produce a result that is indistinguishable from one
-computed over the whole ensemble.</p>
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>, naming the reason the first
+of the lost evaluations gave, which ends the run. It does <strong>not</strong> write
+<code>numpy.nan</code> for the affected rows. A machine that broke is not a realization
+that failed to converge: absorbing it would let the optimization continue on
+whichever workers happened to survive, and produce a result that is
+indistinguishable from one computed over the whole ensemble.</p>
 <div class="admonition note">
 <p class="admonition-title">A failed realization is still tolerated</p>
 <p><code>numpy.nan</code> returned <em>by the evaluation function</em> keeps its meaning — that

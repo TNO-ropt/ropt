@@ -3138,7 +3138,7 @@ not distinguish which of the three applied. Only <code>MAX_FUNCTIONS_REACHED</co
 or pool
 itself fails — a worker process is killed, a cluster job never writes its result
 — the run stops with an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> giving
-the number of evaluations lost and the reason. It is not absorbed as a <code>NaN</code>,
+the reason the first lost evaluation gave. It is not absorbed as a <code>NaN</code>,
 because a result computed over the workers that survived is indistinguishable
 from one computed over the whole ensemble.</p>
 <table>
@@ -3163,7 +3163,7 @@ from one computed over the whole ensemble.</p>
 </tr>
 <tr>
 <td><code>ExecutionError</code> part-way through a run</td>
-<td>The executor or pool failed, not your objective. The message names the reason and how many evaluations went with it.</td>
+<td>The executor or pool failed, not your objective. The message names the reason the first lost evaluation gave.</td>
 </tr>
 <tr>
 <td>Numbers do not match what you configured</td>
