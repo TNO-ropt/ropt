@@ -27,7 +27,7 @@ class ResultsHandler(EventHandler):
     Listens for `FINISHED_EVALUATION` events and retains either the best
     (lowest weighted objective) or most recent valid result. Optionally
     filters by constraint tolerance. The selected result is accessible via the
-    [`result`][ropt.components.event_handlers.ResultsHandler.result] property or
+    [`result`][ropt.simple.ResultsHandler.result] property or
     `handler["results"]`.
 
     The gradient computed at the selected result, if there is one, is available

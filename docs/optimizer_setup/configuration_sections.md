@@ -165,8 +165,7 @@ allowed, and disables its objective.
 Objective functions can optionally be processed using
 [realization filters](realization_filters.md) and
 [function estimators](function_estimators.md). Both fields select an object by
-its key in the corresponding mapping defined in
-[`EnOptContext`][ropt.context.EnOptContext].
+its key in the corresponding section of the configuration.
 
 - `realization_filters`: default `None` (no filter applied).
 - `function_estimators`: default `"0"` (the first function estimator). Unless
@@ -441,7 +440,7 @@ of realizations, meaning no failures are allowed).
 
 Validated into [`OptimizerConfig`][ropt.config.OptimizerConfig].
 
-Workflow-level settings that control how the optimization run is managed. All
+Run-level settings that control how the optimization is managed. All
 fields are optional and default to `None` (no limit) or `None` (no
 redirection):
 

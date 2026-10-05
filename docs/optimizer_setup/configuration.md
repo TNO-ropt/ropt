@@ -7,9 +7,8 @@ see [Configuration Sections](configuration_sections.md).
 
 ## The configuration object
 
-The dictionary is validated into an [`EnOptContext`][ropt.context.EnOptContext],
-where each top-level key becomes a field holding an instance of that section's
-configuration class: `variables` becomes a
+The dictionary is validated when the run starts, and each top-level key becomes
+an instance of that section's configuration class: `variables` becomes a
 [`VariablesConfig`][ropt.config.VariablesConfig], `objectives` an
 [`ObjectiveFunctionsConfig`][ropt.config.ObjectiveFunctionsConfig], and so on.
 Only `variables` is required; every other section has defaults.
@@ -19,10 +18,10 @@ Three keys are different in kind. `samplers`, `realization_filters` and
 the plugin system, which the sections that use them refer to by key.
 
 Most of the rules below follow from this one step. Because the dictionary is
-converted once, validation and coercion happen at construction rather than
-during the run; because the result is a set of objects rather than the dict you
-wrote, those objects are frozen; and because components are shared rather than
-copied, they are addressed by key.
+converted once, validation and coercion happen before the run rather than during
+it; because the result is a set of objects rather than the dict you wrote, those
+objects are frozen; and because components are shared rather than copied, they
+are addressed by key.
 
 ## Top-level layout
 
@@ -203,24 +202,20 @@ process](optimizer.md#external-backend).
 
 ### Immutability
 
-The configuration objects an [`EnOptContext`][ropt.context.EnOptContext] holds
-are frozen, so an individual setting cannot be changed in place. The context
-itself is not: replacing one of its fields wholesale is not prevented, but
-nothing re-runs the work construction did — bounds, perturbation magnitudes and
-linear constraints are all scaled at that point — so
-the result is inconsistent. To change settings, build a new context from a
-modified dict.
+The objects the dictionary is validated into are frozen, so a setting cannot be
+changed once a run has started. Validation also does work that a later change
+would not repeat: bounds, perturbation magnitudes and linear constraints are
+scaled at that point. To change a setting, modify the dictionary and start a new
+run.
 
 !!! warning
 
-    Treat an `EnOptContext` as read-only after construction. Do not try to
-    serialize and round-trip them (for example, to/from JSON). Some parameters
-    are scaled during construction in a way that cannot be undone, so
-    building an `EnOptContext` from those serialized values would scale
-    them again, incorrectly. NumPy arrays and plugin instances may also not
-    come back unchanged from a round-trip. Persist the raw input dicts instead
-    if you intend to
-    modify the values.
+    Do not serialize and round-trip the validated configuration objects (for
+    example, to and from JSON). Some parameters are scaled during validation in
+    a way that cannot be undone, so validating those serialized values would
+    scale them again, incorrectly. NumPy arrays and plugin instances may also
+    not come back unchanged from a round-trip. Persist the raw input dicts
+    instead.
 
 ## Naming things for output
 
@@ -286,10 +281,10 @@ Expand the block below to see every field and its default value.
 
 ??? example "Fully expanded configuration (all defaults shown)"
 
-    The example below shows every top-level section of the
-    [`EnOptContext`][ropt.context.EnOptContext] configuration with all fields
-    set to their default values. In practice you only need to specify the
-    fields you want to override — everything else is filled in automatically.
+    The example below shows every top-level section of the configuration with
+    all fields set to their default values. In practice you only need to
+    specify the fields you want to override — everything else is filled in
+    automatically.
 
     ```python
     from ropt.enums import BoundaryType, PerturbationType, VariableType

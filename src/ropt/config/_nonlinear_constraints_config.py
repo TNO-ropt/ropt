@@ -24,9 +24,8 @@ from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
 class NonlinearConstraintsConfig(BaseModel):
     r"""Configuration class for non-linear constraints.
 
-    `NonlinearConstraintsConfig` defines nonlinear constraints used as the
-    `nonlinear_constraints` field of an
-    [`EnOptContext`][ropt.context.EnOptContext] object.
+    `NonlinearConstraintsConfig` defines nonlinear constraints. It is the
+    `nonlinear_constraints` section of the configuration.
 
     See [Configuration
     Sections](../optimizer_setup/configuration_sections.md#nonlinear_constraints) for detailed

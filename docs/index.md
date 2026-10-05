@@ -68,22 +68,15 @@ with `ropt`.
 
 `ropt` separates two concerns. The **optimizer setup** describes *what* to
 solve: the variables, objectives, constraints, and the components that drive the
-optimization. It is the same whichever way the optimization is run, and is
-covered in the [Optimizer Setup](optimizer_setup/key_concepts.md) section.
+optimization. It is covered in the
+[Optimizer Setup](optimizer_setup/key_concepts.md) section.
 
-*How* to run a configured optimization is covered in two sections, which are
-alternatives rather than layers. Virtually all applications use the
-`ropt.simple` API, described in [Running Optimizations](running/running.md). It
-starts a run with a single function call and covers
+*How* to run a configured optimization is covered in
+[Running Optimizations](running/running.md), which describes the `ropt.simple`
+API. It starts a run with a single function call and covers
 [parallel evaluation](running/parallel.md),
 [many runs at once](running/many_runs.md),
-[nested optimization](running/nested.md), and custom result handling. It is the
-API used in the Getting Started and Running sections of this manual.
-
-[Optimization Workflows](advanced/workflows.md) describes a lower-level API that
-assembles a run from its individual components — compute steps, event handlers,
-evaluators and executors — and assumes familiarity with threads. It is for
-advanced use, and normal usage does not need it.
+[nested optimization](running/nested.md), and custom result handling.
 
 ## Related packages
 

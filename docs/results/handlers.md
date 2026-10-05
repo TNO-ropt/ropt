@@ -45,7 +45,7 @@ Handlers that store results expose them through `handler["results"]` (and, for
 The same handler may also be given to runs that execute **concurrently** — the
 runs of an [`optimize_many`](../running/many_runs.md), or runs
 you start on threads of your own. A handler's
-[`handle_event`][ropt.components.event_handlers.EventHandler.handle_event]
+[`handle_event`][ropt.simple.EventHandler.handle_event]
 takes a lock around each call, so a second run waits for the first to finish
 rather than interleaving with it:
 
@@ -255,7 +255,9 @@ print(counter.count)
 An [`EnOptEvent`][ropt.events.EnOptEvent] carries the `event_type` that
 triggered it and a `results` tuple, which holds the
 [`Results`][ropt.results.Results] objects of a `FINISHED_EVALUATION` and is
-empty for the other types. The types a run emits are:
+empty for the other types. Its `source` is the run that emitted the event, and
+calling `event.source.stop()` ends that run at the next evaluation boundary,
+with exit code `STOPPED`. The types a run emits are:
 
 | Event type            | When it is emitted                                          |
 | --------------------- | ----------------------------------------------------------- |

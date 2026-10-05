@@ -6,8 +6,7 @@
     objectives, constraints, and the components that drive it. The examples here
     run their setup so you can see it work, but the setup itself is independent
     of how you run an optimization: that is covered in
-    [Running Optimizations](../running/running.md) or
-    [Optimization Workflows](../advanced/workflows.md).
+    [Running Optimizations](../running/running.md).
 
 This page introduces the ideas and terms that appear throughout the `ropt`
 documentation and shows how they fit together. For the mathematical background

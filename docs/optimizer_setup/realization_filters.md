@@ -61,8 +61,8 @@ whose abstract methods define what a filter must provide. A filter defined where
 an entry point cannot reach it — in a script or a notebook — is added with
 [`register_plugin`][ropt.plugins.register_plugin], after which it is
 selected by its `"plugin/method"` string exactly like an installed one. An
-instance can also be passed directly in the `realization_filters` field of
-[`EnOptContext`][ropt.context.EnOptContext], which needs no registration.
+instance can also be passed directly in the `realization_filters` section of
+the configuration, which needs no registration.
 
 The runnable script is
 [examples/simple/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py),

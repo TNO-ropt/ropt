@@ -5,9 +5,9 @@ A backend receives an
 gradient values through the
 [`OptimizerCallback`][ropt.core.OptimizerCallback] interface, and advances the
 optimization from an initial variable vector. It is selected through the
-`backend` field of an [`EnOptContext`][ropt.context.EnOptContext], either as an
-instance or as a [`BackendConfig`][ropt.config.BackendConfig] naming a method.
-The context itself never reaches the backend: `ropt` reduces it to an
+`backend` section of the configuration, either as an instance or as a
+[`BackendConfig`][ropt.config.BackendConfig] naming a method. The configuration
+itself never reaches the backend: `ropt` reduces it to an
 `OptimizationProblem` when the run starts.
 
 `ropt` ships [`SciPyBackend`][ropt.backend.scipy.SciPyBackend] and

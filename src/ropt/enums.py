@@ -77,10 +77,10 @@ class PerturbationType(IntEnum):
 
 
 class EnOptEventType(IntEnum):
-    """Enumerates the types of events emitted during optimization workflows.
+    """Enumerates the types of events emitted during a run.
 
-    See [Optimization Workflows](../advanced/workflows.md#event-types) for a
-    description of when each event type fires and what data it carries.
+    See [Handling Results](../results/handlers.md#writing-your-own-handler) for
+    when each event type fires and what data it carries.
     """
 
     START_EVALUATION = 1
@@ -96,12 +96,10 @@ class EnOptEventType(IntEnum):
     """Emitted immediately after an optimizer finishes."""
 
     START_ENSEMBLE_EVALUATOR = 5
-    """Emitted before an
-    [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep] begins."""
+    """Emitted before an evaluation without an optimizer begins."""
 
     FINISHED_ENSEMBLE_EVALUATOR = 6
-    """Emitted after an
-    [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep] finishes."""
+    """Emitted after an evaluation without an optimizer finishes."""
 
 
 class ExitCode(IntEnum):
@@ -150,12 +148,10 @@ class ExitCode(IntEnum):
     """
 
     ABORTED = 7
-    """Returned when the run was cut off through an
-    [`AbortSignal`][ropt.components.concurrency.AbortSignal], without regard to
-    where it had got to.
+    """Returned when the run was cut off from outside, without regard to where
+    it had got to.
 
-    This is the code a signal carries unless it was aborted with another one,
-    and it is what closing a session reports for a run still under way.
+    This is what closing a session reports for a run still under way.
     """
 
     ABORTED_ON_ERROR = 8

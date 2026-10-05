@@ -1,7 +1,7 @@
 """Samplers: generators of the perturbation values used for gradient estimation.
 
-A sampler is selected through the `samplers` field of an
-[`EnOptContext`][ropt.context.EnOptContext], either as an instance or as a
+A sampler is selected through the `samplers` section of the configuration,
+either as an instance or as a
 [`SamplerConfig`][ropt.config.SamplerConfig] naming a method.
 [`SciPySampler`][ropt.sampler.scipy.SciPySampler] provides the methods backed by
 `scipy.stats` and `scipy.stats.qmc`.

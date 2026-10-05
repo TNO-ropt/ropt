@@ -17,9 +17,8 @@ from ropt.config._validated_types import (  # ruff: ignore[typing-only-first-par
 class LinearConstraintsConfig(BaseModel):
     r"""Configuration class for linear constraints.
 
-    `LinearConstraintsConfig` defines linear constraints used as the
-    `linear_constraints` field of an
-    [`EnOptContext`][ropt.context.EnOptContext] object.
+    `LinearConstraintsConfig` defines linear constraints. It is the
+    `linear_constraints` section of the configuration.
 
     See [Configuration
     Sections](../optimizer_setup/configuration_sections.md#linear_constraints) for detailed

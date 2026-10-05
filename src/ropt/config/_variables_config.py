@@ -33,9 +33,9 @@ from .constants import (
 class VariablesConfig(BaseModel):
     r"""Configuration class for optimization variables.
 
-    `VariablesConfig` defines optimization variable settings for an
-    [`EnOptContext`][ropt.context.EnOptContext] object: bounds, types, mask, and
-    perturbation settings.
+    `VariablesConfig` defines optimization variable settings: bounds, types,
+    mask, and perturbation settings. It is the `variables` section of the
+    configuration.
 
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#variables) for
     detailed descriptions and usage examples.

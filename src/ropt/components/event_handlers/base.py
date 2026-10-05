@@ -21,19 +21,18 @@ if TYPE_CHECKING:
 class EventHandler(ABC):
     """Abstract base class for event handlers.
 
-    A concrete handler reacts to the events emitted by a
-    [`ComputeStep`][ropt.components.compute_steps.ComputeStep] it is attached to,
-    by implementing
-    [`handle_event`][ropt.components.event_handlers.EventHandler.handle_event].
-    Handlers may store state using dictionary-like access (`[]`).
+    A concrete handler reacts to the events emitted by the run it is attached
+    to, by implementing
+    [`handle_event`][ropt.simple.EventHandler.handle_event]. Handlers may store
+    state using dictionary-like access (`[]`).
 
     Note:
         A handler's `handle_event` serializes itself: a call from a second
         thread waits for the first to finish, so the same handler may be
-        attached to several compute steps running at once. It is not
-        re-entrant, so a call that reaches the same handler again on the same
-        stack raises `WorkflowError` rather than deadlocking. See
-        [Optimization Workflows](../advanced/workflows.md#event-handlers) for
+        attached to several runs at once. It is not re-entrant, so a call that
+        reaches the same handler again on the same stack raises `WorkflowError`
+        rather than deadlocking. See
+        [Handling Results](../results/handlers.md#writing-your-own-handler) for
         usage and pitfalls.
     """
 

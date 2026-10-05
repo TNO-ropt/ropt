@@ -38,7 +38,7 @@ comes back is then whatever it had reached rather than a chosen endpoint.
 | `MAX_BATCHES_REACHED`   | The configured maximum number of evaluation batches was reached.                                     |
 | `STOPPED`               | A `report` callback returned `True`, ending the run at the next evaluation boundary.                 |
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
-| `ABORTED`               | An [`AbortSignal`][ropt.components.concurrency.AbortSignal] cut the run off, as closing a session does to a run still under way. |
+| `ABORTED`               | The run was cut off from outside, as closing a session does to a run still under way. |
 | `ABORTED_ON_ERROR`      | Another run on the same session raised, and this one was cut off with it.                            |
 | `USER_ABORT`            | [`Session.abort`](../running/running.md#stopping-from-outside) cut the run off.                      |
 | `EXECUTOR_SHUT_DOWN`    | The pool the run was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |

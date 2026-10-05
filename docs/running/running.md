@@ -1,20 +1,5 @@
 # Running Optimizations
 
-!!! note
-
-    This is one of two ways to **run** an optimization: the `ropt.simple` API,
-    used by the [Quickstart](../getting_started/quickstart.md) and the rest of
-    Getting Started, which covers most optimization tasks. The other is
-    [Optimization Workflows](../advanced/workflows.md), a low-level API that
-    exposes the building blocks — compute steps, event handlers, executors —
-    directly, at the cost of assembling the run yourself, and
-    written for readers at home in Python and threads.
-
-    What the optimization *does* — its variables, objectives, constraints, and
-    components — is set up in
-    [Optimizer Setup](../optimizer_setup/key_concepts.md), the same whichever way you run
-    it.
-
 The `ropt.simple` module covers running an optimization. Everything you need is
 imported from a single module:
 
@@ -24,7 +9,9 @@ from ropt.simple import optimize
 
 You give [`optimize`][ropt.simple.optimize] three things:
 
-- a **config** dictionary that describes the problem,
+- a **config** dictionary that describes the problem — its variables,
+  objectives, constraints and components, covered in
+  [Optimizer Setup](../optimizer_setup/key_concepts.md),
 - a **start point** (the first set of variable values),
 - an **evaluation function** that returns the objective value(s) to minimize,
   followed by any constraint values.
@@ -63,7 +50,7 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
 
 - `variables` is a 1-D NumPy array: one set of variable values to evaluate.
 - `context` is an
-  [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
+  [`EvaluationFunctionContext`][ropt.simple.EvaluationFunctionContext]
   that identifies *which* evaluation this is:
     - `context.realization` — the realization number, for a problem with an
       ensemble of realizations; `optimize` then minimizes the weighted average
@@ -82,7 +69,7 @@ There are three ways to return them:
 - a **single number** when there is one objective and no nonlinear constraints;
 - a **list** of numbers when there are several objectives or nonlinear
   constraints — put the objectives first, then the constraints;
-- an [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
+- an [`EvaluationFunctionResult`][ropt.simple.EvaluationFunctionResult]
   when you also want to attach `metadata`; it holds `objectives`, `constraints`
   and `metadata` in separate fields, so nothing has to be ordered.
 
@@ -261,7 +248,7 @@ You can attach arbitrary **metadata** to a run, from two sources:
   [Give each run an ID](many_runs.md).
 
 - **Per evaluation** — return an
-  [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
+  [`EvaluationFunctionResult`][ropt.simple.EvaluationFunctionResult]
   from the evaluation function with a `metadata` field. This value is stored per
   realization, next to the objective values:
 

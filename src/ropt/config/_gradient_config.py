@@ -18,8 +18,7 @@ class GradientConfig(BaseModel):
     """Configuration class for gradient calculations.
 
     `GradientConfig` specifies how gradients are estimated in gradient-based
-    optimizers. It is used as the `gradient` field of
-    [`EnOptContext`][ropt.context.EnOptContext].
+    optimizers. It is the `gradient` section of the configuration.
 
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#gradient) for
     detailed descriptions and usage examples.

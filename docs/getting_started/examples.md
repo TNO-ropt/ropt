@@ -5,12 +5,9 @@ Every script in the
 folder is listed here. They are short, and the test suite keeps them working, so
 they can be copied and adapted as they stand.
 
-They all use the [simple API](../running/running.md), which covers most
-optimization tasks. The last column links the page of the manual that walks
-through the script; read that page with the script open beside it.
-
-Scripts that assemble a workflow by hand are listed under
-[Workflow Examples](../advanced/examples.md).
+They all use the [simple API](../running/running.md). The last column links the
+page of the manual that walks through the script; read that page with the script
+open beside it.
 
 | Script | What it shows | Explained in |
 | --- | --- | --- |

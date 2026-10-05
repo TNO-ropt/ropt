@@ -1,10 +1,10 @@
-"""The events a compute step emits at lifecycle milestones.
+"""The events a run emits at its lifecycle milestones.
 
-An [`EnOptEvent`][ropt.events.EnOptEvent] carries the event type, the context of
-the run, and any results produced. Event handlers consume these to track
-progress, store results, or stop the run. See
+An [`EnOptEvent`][ropt.events.EnOptEvent] carries the event type, the
+configuration of the run, and any results produced. Event handlers consume these
+to track progress, store results, or stop the run. See
 [`EnOptEventType`][ropt.enums.EnOptEventType] for the available types, and
-[Optimization Workflows](../advanced/workflows.md) for usage.
+[Handling Results](../results/handlers.md#writing-your-own-handler) for usage.
 """
 
 from __future__ import annotations
@@ -21,18 +21,18 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class EnOptEvent:
-    """Container for data emitted with optimization workflow events.
+    """Container for the data emitted with an event.
 
     Attributes:
-        event_type:  Type of event that occurred.
-        context:     Optimizer context associated with the event.
-        results:     Tuple of result objects associated with the event.
-        source:      The compute step that emitted the event.
+        event_type: Type of event that occurred.
+        context:    The validated configuration of the run.
+        results:    Tuple of result objects associated with the event.
+        source:     The run that emitted the event.
 
     A handler may call `source.stop()` to stop the run that emitted the event.
 
-    See [Optimization Workflows](../advanced/workflows.md#the-enoptevent-object)
-    for a detailed description of events and their lifecycle.
+    See [Handling Results](../results/handlers.md#writing-your-own-handler) for
+    when each event fires and what it carries.
     """
 
     event_type: EnOptEventType

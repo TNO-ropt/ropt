@@ -74,7 +74,7 @@ whose docstring documents the methods to implement, including how
 an estimator with the plugin system is only required when it should be
 selectable via [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig];
 otherwise, an instance can be passed directly in the `function_estimators`
-field of [`EnOptContext`][ropt.context.EnOptContext].
+section of the configuration.
 
 The runnable script is
 [examples/simple/function_estimator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/function_estimator.py),

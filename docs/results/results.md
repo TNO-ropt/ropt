@@ -3,8 +3,7 @@
 `ropt` exposes the full intermediate and final state of an optimization through
 [`Results`][ropt.results.Results] objects. This page describes the result
 classes and how to inspect them; see
-[Running Optimizations](../running/running.md) and
-[Optimization Workflows](../advanced/workflows.md) for how results are produced and
+[Running Optimizations](../running/running.md) for how results are produced and
 delivered to your code.
 
 !!! note "One kind of result object"
@@ -407,10 +406,14 @@ Two groups of fields have a single domain:
 - `target_objective` and `target_gradient` exist only in the domain the
   optimizer works in. Each is a weighted total over objectives that may differ
   in both scale and direction, so there is no single factor to undo. The
-  gradient is differentiated with respect to the *scaled* variables. If you need
-  either in configured terms, combine the objectives yourself using
-  [`get_objective_scales`][ropt.context.EnOptContext.get_objective_scales] and
-  the directions on `objectives.maximize`.
+  gradient is differentiated with respect to the *scaled* variables. For a
+  combined value in configured terms, weight `functions.objectives` yourself
+  with the `weights` from the
+  [objectives](../optimizer_setup/configuration_sections.md#objectives) section;
+  the same objectives in the optimizer's domain are on
+  `scaled.functions.objectives`, so the factor applied to each — including an
+  [auto-scaled](../optimizer_setup/configuration_sections.md#objective-scales)
+  one, which is only known once the run has started — can be read off the pair.
 
 Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
@@ -433,12 +436,12 @@ Results carry two independent kinds of metadata, neither interpreted by `ropt`:
   It is set once when the run starts: pass a `metadata` dict to the simple-API
   [`optimize`][ropt.simple.optimize] /
   [`optimize_many`][ropt.simple.optimize_many] /
-  [`evaluate`][ropt.simple.evaluate] functions (or to the low-level compute
-  step). Use it to tag or identify a run, for example `{"run_id": 7}`.
+  [`evaluate`][ropt.simple.evaluate] functions. Use it to tag or identify a
+  run, for example `{"run_id": 7}`.
 - **Per-realization metadata** — the `metadata` dict on the `evaluations` field,
   with one array entry per realization. It is produced by the objective when it
   returns an
-  [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
+  [`EvaluationFunctionResult`][ropt.simple.EvaluationFunctionResult]
   with a `metadata` field.
 
 Result metadata is passed to the run and read back from `metadata`:

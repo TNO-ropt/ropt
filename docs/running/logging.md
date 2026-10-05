@@ -141,6 +141,4 @@ generally comes from the optimizer.
     dispatched batch and per cluster job, plus the configuration the run
     started from. It is verbose — a gradient-based method requests functions
     and gradients separately on most iterations, and each request is a line —
-    but it is what to attach to a bug report. See
-    [Optimization Workflows](../advanced/workflows.md) for what these
-    components are.
+    but it is what to attach to a bug report.

@@ -1,9 +1,8 @@
 """Configuration classes for ensemble-based optimization.
 
 Pydantic models that together define a complete optimization setup. Each
-corresponds to a top-level section of the configuration dictionary used to build
-an [`EnOptContext`][ropt.context.EnOptContext], the in-memory configuration of a
-single run. See
+corresponds to a top-level section of the configuration dictionary that
+describes a single run. See
 [Configuration Sections](../optimizer_setup/configuration_sections.md) for the
 fields, their defaults and worked examples.
 """

@@ -10,9 +10,8 @@ from pydantic import BaseModel, ConfigDict, PositiveInt
 class OptimizerConfig(BaseModel):
     """Configuration class for the optimization algorithm.
 
-    `OptimizerConfig` defines workflow-level settings for an optimization run,
-    configured as the `optimizer` field of
-    [`EnOptContext`][ropt.context.EnOptContext].
+    `OptimizerConfig` defines run-level settings for an optimization. It is the
+    `optimizer` section of the configuration.
 
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#optimizer) for
     detailed descriptions and usage examples.

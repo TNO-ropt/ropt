@@ -24,8 +24,8 @@ from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
 class ObjectiveFunctionsConfig(BaseModel):
     """Configuration class for objective functions.
 
-    `ObjectiveFunctionsConfig` defines objective function settings for an
-    [`EnOptContext`][ropt.context.EnOptContext] object.
+    `ObjectiveFunctionsConfig` defines objective function settings. It is the
+    `objectives` section of the configuration.
 
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#objectives) for
     detailed descriptions and usage examples.
