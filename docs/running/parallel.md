@@ -540,7 +540,7 @@ submission script that does not redirect the job's output — with
 
 You can hand **your own** functions to a pool with
 [`WorkerPool.offload`][ropt.simple.WorkerPool.offload]. It is useful when code
-you control — a custom step, a custom component, or a helper you call between
+you control — a custom handler, a custom component, or a helper you call between
 optimizations — has an expensive, self-contained piece of work you want to run
 on a pool instead of inline.
 

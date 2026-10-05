@@ -406,14 +406,11 @@ Two groups of fields have a single domain:
 - `target_objective` and `target_gradient` exist only in the domain the
   optimizer works in. Each is a weighted total over objectives that may differ
   in both scale and direction, so there is no single factor to undo. The
-  gradient is differentiated with respect to the *scaled* variables. For a
-  combined value in configured terms, weight `functions.objectives` yourself
-  with the `weights` from the
-  [objectives](../optimizer_setup/configuration_sections.md#objectives) section;
-  the same objectives in the optimizer's domain are on
-  `scaled.functions.objectives`, so the factor applied to each — including an
-  [auto-scaled](../optimizer_setup/configuration_sections.md#objective-scales)
-  one, which is only known once the run has started — can be read off the pair.
+  gradient is differentiated with respect to the *scaled* variables. A combined
+  objective in configured terms is built from `functions.objectives`, which
+  already holds the configured values, using the `weights` and `maximize`
+  entries of the
+  [objectives](../optimizer_setup/configuration_sections.md#objectives) section.
 
 Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
