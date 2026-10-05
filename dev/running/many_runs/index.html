@@ -3104,9 +3104,9 @@ a file, talking to a database — holds up every run feeding it.</p>
 <div class="admonition warning">
 <p class="admonition-title">Without a pool the driver threads do the evaluating</p>
 <p><code>optimize_many</code> needs no pool. Without one, the runs still execute
-concurrently, but each evaluates in-process on its own driver thread — so
-your evaluation function is called by several threads at once and must
-tolerate that. Give the call a pool when it must not be.</p>
+concurrently, but each evaluates inside your own program, on its own driver
+thread — so your evaluation function is called by several threads at once
+and must tolerate that. Give the call a pool when it must not be.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Not every backend can take part</p>

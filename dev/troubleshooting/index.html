@@ -3178,7 +3178,7 @@ from one computed over the whole ensemble.</p>
 your evaluation function is sent to a worker together with the data it uses. Anything
 it writes there — a global, a cache, a list it appends to — is thrown away when
 the worker finishes. Return what you need instead; see
-<a href="../results/handlers/#handlers-and-the-process-boundary">Handlers and the process boundary</a>.</p>
+<a href="../results/handlers/#handlers-and-separate-processes">Handlers and separate processes</a>.</p>
 <p><strong>Several runs may call your objective at the same time.</strong>
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> always runs its optimizations
 concurrently. Given a pool, their evaluations go there; given none, each run
@@ -3214,8 +3214,8 @@ raises a <code>TypeError</code> in the middle of the run.</p>
 <h2 id="pools-stopping-and-processes">Pools, stopping and processes</h2>
 <p><strong>A run evaluates on the pool it was started on, and no other.</strong> Nothing is
 picked up from the surrounding code. A run started with the module-level
-<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> evaluates in-process, on the thread that
-called it — even if a pool exists next to it.</p>
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> evaluates inside your own program, on the
+thread that called it — even if a pool exists next to it.</p>
 <p><strong>Threads cannot be interrupted.</strong> Evaluations on a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
 outside. If an evaluation may run long and has to be interruptible, put it on a

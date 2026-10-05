@@ -1204,10 +1204,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#handlers-and-the-process-boundary" class="md-nav__link">
+  <a href="#handlers-and-separate-processes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Handlers and the process boundary
+        Handlers and separate processes
       
     </span>
   </a>
@@ -3093,10 +3093,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#handlers-and-the-process-boundary" class="md-nav__link">
+  <a href="#handlers-and-separate-processes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Handlers and the process boundary
+        Handlers and separate processes
       
     </span>
   </a>
@@ -3153,7 +3153,11 @@ Everything a run produces is in them, at the field paths described in
 are configured in.</p>
 <p>The <a href="../../running/running/#reporting-progress"><code>report</code></a> callback you may already be using
 is only shorthand for this: <code>report=</code> builds a handler for you behind the
-scenes, added to the run it is given to.</p>
+scenes, added to the run it is given to. One is built per run, each with a lock
+of its own, so the same callback given to runs that execute concurrently can be
+entered from several threads at once. A handler object given to those runs is
+entered by one at a time, because the lock belongs to the handler. A callback
+that accumulates across concurrent runs needs synchronization of its own.</p>
 <p>Attach handlers to a run with the <code>handlers</code> argument. The same handler can be
 passed to several <code>optimize</code> calls, accumulating the results of each in turn:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
@@ -3241,9 +3245,11 @@ are.</p>
   drop it.</li>
 </ul>
 <p>The gradient computed at the result it keeps, if there is one, is read via
-<code>handler["gradient"]</code>. It is <code>None</code> while that gradient has not arrived, and
-stays <code>None</code> for a point where no gradient was computed — the best point of a
-run often is one.</p>
+<code>handler["gradient"]</code>. A gradient usually reaches the handler in a later
+evaluation than the result it belongs to, and is matched on the <code>function_key</code>
+they share. It is <code>None</code> while that gradient has not arrived, and stays <code>None</code>
+for a point where no gradient was computed — the best point of a run often is
+one.</p>
 <h3 id="historyhandler"><code>HistoryHandler</code></h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
 in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
@@ -3340,7 +3346,7 @@ step that emitted it, so calling <code>event.source.stop()</code> ends that run 
 callback above is a convenience wrapper around this. Only the run that owns the
 emitting step is affected, so concurrent runs continue. See
 <a href="../exit_codes/">Exit Codes</a>.</p>
-<h2 id="handlers-and-the-process-boundary">Handlers and the process boundary</h2>
+<h2 id="handlers-and-separate-processes">Handlers and separate processes</h2>
 <p>On a thread pool (or with no pool) your objective and your handlers run
 in the <strong>same process</strong> and share memory: a handler can see anything the
 objective left behind — a global it set, a list it appended to, an object it
@@ -3364,7 +3370,7 @@ process:</p>
     opt --&gt;|"variables"| obj
     obj --&gt;|"result + metadata&lt;br/&gt;(copied back)"| opt</code></pre>
 <details class="info">
-<summary>How data crosses the boundary</summary>
+<summary>How data is copied between processes</summary>
 <p>To move work and results between processes, <code>ropt</code> <strong>serializes</strong> them —
 turns the objects into bytes and rebuilds them on the other side. Both a
 process pool and an HPC pool use Python's standard <code>pickle</code> by default, so
@@ -3376,9 +3382,9 @@ database connections may not.</p>
 HPC pool they are written as <strong>files on a shared filesystem</strong> that the
 cluster nodes read, so it needs such a filesystem (its <code>workdir</code>).</p>
 <p>Serialization is only the mechanism <code>ropt</code> uses today; the essential
-requirement is that the data can be <em>carried across the boundary</em>, so a
-future version could use a different transport — for example one that works
-over a network.</p>
+requirement is that the data can be <em>moved from one process to the other</em>,
+so a future version could use a different transport — for example one that
+works over a network.</p>
 </details>
 <p>Handlers see those returned results and nothing else. Anything the objective did
 only in memory — setting a module global, appending to a shared list, updating an

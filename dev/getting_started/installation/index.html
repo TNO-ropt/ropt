@@ -3079,7 +3079,7 @@ which are enough for most basic optimization tasks.</p>
 <tr>
 <td><code>cloudpickle</code></td>
 <td><code>cloudpickle</code></td>
-<td>Optional everywhere: lets lambdas, closures, and notebook-defined code cross a process boundary.</td>
+<td>Copying lambdas, closures, and notebook-defined code into separate processes.</td>
 </tr>
 <tr>
 <td><code>hpc</code></td>
@@ -3088,44 +3088,23 @@ which are enough for most basic optimization tasks.</p>
 </tr>
 </tbody>
 </table>
-<p>Without <code>cloudpickle</code>, anything that crosses a process boundary is transferred
-using Python's standard <code>pickle</code> module, which only handles functions and
-classes it can look up by name — those defined at the top level of an importable
-module. Installing <code>cloudpickle</code> lifts that restriction, so code defined inline
-(lambdas), inside another function (closures), or in a Jupyter notebook can
-cross as well.</p>
-<p><code>cloudpickle</code> is optional in every case. It never changes what <code>ropt</code> can do,
-only where you are free to define the code it carries, and each place it applies
-works without it:</p>
-<table>
-<thead>
-<tr>
-<th>Where</th>
-<th>Works without <code>cloudpickle</code></th>
-<th>What <code>cloudpickle</code> adds</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../../running/parallel/#process-pool">Process pools</a></td>
-<td>Evaluation functions at the top level of a module <em>or of the script you ran</em></td>
-<td>Lambdas, closures, and notebook-defined evaluation functions</td>
-</tr>
-<tr>
-<td><a href="../../running/parallel/#local-pool">Local and cluster jobs</a></td>
-<td>Evaluation functions at the top level of a module the worker can <strong>import</strong></td>
-<td>The same, plus functions defined in the script you ran, and results built from locally defined classes</td>
-</tr>
-<tr>
-<td><a href="../../optimizer_setup/optimizer/#external-backend">The external backend</a></td>
-<td>The built-in plugins, and any plugin class at the top level of a module <em>or of the script you ran</em></td>
-<td>Plugin instances of classes defined in a function or a notebook</td>
-</tr>
-</tbody>
-</table>
-<p>The two pool rows differ because a process pool and a job start their workers
-differently; see
-<a href="../../running/parallel/#process-or-local">Worker or job</a>.</p>
+<details class="info">
+<summary>Why <code>cloudpickle</code>?</summary>
+<p>Some ways of running evaluations do not call your function inside your own
+program: they start separate processes — on your own machine, or as jobs on
+an HPC cluster — and run it there. Your function and its data must be copied
+into those processes, which Python does with its standard <code>pickle</code> module.
+<code>pickle</code> copies a function by storing its name, so the other process can
+only rebuild functions and classes that are defined at the top level of a
+module it can import. With <code>cloudpickle</code> installed, the code itself is
+copied, which adds lambdas, functions defined inside another function
+(closures), and functions written in a Jupyter notebook.</p>
+<p><code>cloudpickle</code> is optional in every case: it never changes what <code>ropt</code> can
+do, only where the copied code may be defined. Both
+<a href="../../running/parallel/">evaluating in parallel</a> and the
+<a href="../../optimizer_setup/optimizer/#external-backend">external backend</a> state
+what they accept without it.</p>
+</details>
 <p>Install with:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"ropt[pandas]"</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"ropt[polars]"</span>

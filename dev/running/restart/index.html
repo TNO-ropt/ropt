@@ -970,10 +970,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#collecting-every-result-with-a-handler" class="md-nav__link">
+  <a href="#seeing-every-evaluation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Collecting every result with a handler
+        Seeing every evaluation
       
     </span>
   </a>
@@ -985,6 +985,17 @@
     <span class="md-ellipsis">
       
         Restart in a loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-evaluating-the-restart-point-again" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not evaluating the restart point again
       
     </span>
   </a>
@@ -2993,10 +3004,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#collecting-every-result-with-a-handler" class="md-nav__link">
+  <a href="#seeing-every-evaluation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Collecting every result with a handler
+        Seeing every evaluation
       
     </span>
   </a>
@@ -3008,6 +3019,17 @@
     <span class="md-ellipsis">
       
         Restart in a loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#not-evaluating-the-restart-point-again" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not evaluating the restart point again
       
     </span>
   </a>
@@ -3048,8 +3070,9 @@
 <h1 id="restarting-from-the-best-point-found">Restarting from the Best Point Found</h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This page is about starting a new run where a previous one ended. To start
-at the <em>same</em> point as a previous run without evaluating it again, see
+<p>This page starts the new run where the previous one ended, under the same
+configuration. What the results at that point still cover when the
+configuration changes between the runs is described in
 <a href="../initial_values/">Reusing Results at the Starting Point</a>.</p>
 </div>
 <p>The full script for this example is
@@ -3063,37 +3086,55 @@ runs <a class="autorefs autorefs-internal" title="            ropt.simple.optimi
 new start point. Since
 each call to <code>optimize</code> is independent, this is a loop in your own code;
 <code>ropt</code> needs nothing special to support it.</p>
-<h2 id="collecting-every-result-with-a-handler">Collecting every result with a handler</h2>
-<p>The best point of one run is all you need to start the next, but if you
-also want to see every evaluation across the whole sequence of restarts — not
-just the final result — attach a <strong>handler</strong>. A handler is an object you pass
-with <code>handlers=</code> that observes every result an optimization produces; unlike
-the <code>report</code> callback (see
-<a href="../running/#reporting-progress">Running Optimizations</a>), the same
-handler can be reused across several sequential calls to <code>optimize</code>, accumulating
-results as it goes. See <a href="../../results/handlers/">Result handlers</a> for
-the full explanation.</p>
-<p>Here we use <a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a>, which keeps every
-result it sees, in order:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
+<h2 id="seeing-every-evaluation">Seeing every evaluation</h2>
+<p>The best point of one run is all you need to start the next. To also see every
+evaluation across the whole sequence of restarts, pass a
+<a href="../running/#reporting-progress"><code>report</code></a> callback: it is called with each
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> as that evaluation finishes.
+A callback belongs to the run it is given to, so appending to one list is what
+carries the results across the restarts:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">reported</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 </span></code></pre></div>
+<p>A <strong>handler</strong>, given with <code>handlers=</code>, receives the same results but is an
+object with state of its own. One handler can be given to several runs,
+including runs that execute concurrently, and does more than pass results on:
+<a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a> stores every result it receives,
+and <a class="autorefs autorefs-internal" title="            ropt.simple.DataFrameHandler" href="../../reference/simple/#ropt.simple.DataFrameHandler"><code>DataFrameHandler</code></a> collects them into named
+DataFrames. <a href="../../results/handlers/">Result Handlers</a> covers them.</p>
 <h2 id="restart-in-a-loop">Restart in a loop</h2>
 <p>Each iteration runs one optimization, starting from the previous best point,
-and feeds its results into <code>history</code>:</p>
+and appends its results to <code>reported</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">x0</span> <span class="o">=</span> <span class="n">INITIAL_VALUES</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">RESTARTS</span><span class="p">):</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">x0</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span>  <span class="c1"># restart from the best point found so far</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">f0</span><span class="p">:</span> <span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">g0</span><span class="p">:</span> <span class="n">GradientResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">RESTARTS</span><span class="p">):</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">reported</span><span class="o">.</span><span class="n">append</span><span class="p">,</span> <span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">,</span> <span class="n">g0</span><span class="o">=</span><span class="n">g0</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">x0</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span>  <span class="c1"># restart from the best point found so far</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">f0</span><span class="p">,</span> <span class="n">g0</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">gradient</span>
 </span></code></pre></div>
 <p><code>result.results.variables</code> is the best point the run found — feeding it back in
-as <code>x0</code> is the entire restart mechanism. After the loop, <code>history.results</code> holds
-every evaluation from every restart, not just the last run's:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"evaluations collected across all restarts: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+as <code>x0</code> is the entire restart mechanism. After the loop, <code>reported</code> holds every
+evaluation from every restart, not just the last run's:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"evaluations collected across all restarts: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reported</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"best objective after </span><span class="si">{</span><span class="n">RESTARTS</span><span class="si">}</span><span class="s2"> restarts: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
+<h2 id="not-evaluating-the-restart-point-again">Not evaluating the restart point again</h2>
+<p>The run that found the best point evaluated it, and returns that evaluation on
+<code>result.results</code>, together with the gradient computed at the same point on
+<code>result.gradient</code>. Passing the two back as <code>f0</code> and <code>g0</code> gives the next run
+those values, so it does not evaluate the point a second time.</p>
+<p><code>result.gradient</code> is <code>None</code> when no gradient was computed at the best point, and
+<code>optimize</code> accepts that: the perturbations at the start point are then evaluated
+as usual. Setting
+<a href="../../optimizer_setup/gradients/#evaluation-policy"><code>evaluation_policy</code></a> to
+<code>"speculative"</code> requests a gradient at every function evaluation, which leaves
+a gradient available at whatever point the run returns.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li>Restarting concurrent, rather than sequential, runs collects into the same

@@ -702,32 +702,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#a-handler-that-collects-everything" class="md-nav__link">
+  <a href="#built-in-handlers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A handler that collects everything
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example-restarting-from-the-best-point" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example: restarting from the best point
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#other-built-in-handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other built-in handlers
+        Built-in handlers
       
     </span>
   </a>
@@ -2971,32 +2949,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#a-handler-that-collects-everything" class="md-nav__link">
+  <a href="#built-in-handlers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A handler that collects everything
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example-restarting-from-the-best-point" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example: restarting from the best point
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#other-built-in-handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other built-in handlers
+        Built-in handlers
       
     </span>
   </a>
@@ -3043,7 +2999,7 @@ result an optimization produces.</p>
       dataclass
   " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> — rather than the summary <code>optimize</code> returns; see
 <a href="../../results/results/">Working with Results</a>.</p>
-<h2 id="a-handler-that-collects-everything">A handler that collects everything</h2>
+<p>For instance, the <a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a> collects all results:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
@@ -3056,23 +3012,7 @@ result an optimization produces.</p>
 general — it keeps or reacts to results, and, unlike <code>report</code>, the same
 handler can be reused across several <strong>sequential</strong> calls to <code>optimize</code>,
 accumulating results from all of them.</p>
-<h2 id="example-restarting-from-the-best-point">Example: restarting from the best point</h2>
-<p>For instance, restart the same optimization from the best point the previous
-run found, while collecting every result from every restart in one handler:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">x0</span> <span class="o">=</span> <span class="n">initial_values</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">x0</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span>   <span class="c1"># restart from the best point found so far</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"collected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2"> results across all restarts"</span><span class="p">)</span>
-</span></code></pre></div>
-<p>Restarting needs nothing special from <code>ropt</code>: each call to <code>optimize</code> is
-independent, so <code>result.results.variables</code> — the best point a run found — is
-the start point for the next one. The runnable script is
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py">examples/simple/restart.py</a>,
-which <a href="../../running/restart/">Restarting from the Best Point</a> walks through.</p>
-<h2 id="other-built-in-handlers">Other built-in handlers</h2>
+<h2 id="built-in-handlers">Built-in handlers</h2>
 <p><code>ropt</code> ships a few ready-to-use handlers, all imported from <code>ropt.simple</code>:</p>
 <ul>
 <li><strong><a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a></strong> — keeps every result, as used above.</li>

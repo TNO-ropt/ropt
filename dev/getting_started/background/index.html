@@ -3019,12 +3019,11 @@ calculated analytically, and estimates them using stochastic methods.</p>
 realizations into overall function and gradient values, and keeps track of
 intermediate and final results. Calculating the functions themselves — for
 example, running a simulation — is left to code that you provide.</p>
-<p>Most optimization problems only need a single run of one method. Some are
-solved by combining several runs, possibly with different algorithms
-— for example, when a problem mixes continuous and discrete variables, each
-kind needs its own method. <code>ropt</code> supports this: several
-optimization runs can be combined sequentially, in parallel, or nested within
-each other.</p>
+<p>Most optimization problems only need a single run of one method. Some are solved
+by combining several runs, possibly with different algorithms — for example,
+when a problem mixes continuous and discrete variables, each kind could be
+handled by its own method. <code>ropt</code> supports this: several optimization runs can
+be combined sequentially, in parallel, or nested within each other.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li>Understand the stochastic gradient (StoSAG) estimation in depth:

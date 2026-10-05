@@ -3070,11 +3070,20 @@ statistic, such as the mean, over the ensemble.</p>
   using plugins, for instance, to implement risk-aware optimization, such as
   Conditional Value at Risk (CVaR) or standard-deviation-based functions.</li>
 <li>Support for black-box optimization of arbitrary functions.</li>
-<li>Support for running complex optimization workflows, such as multiple runs with
-  different optimization settings or even different optimization methods.</li>
+<li>Running several optimizations at the same time, each with its own
+  configuration, start point and evaluation function.</li>
 <li>Support for nested optimization: an evaluation function can run an
   optimization of its own — for example to optimize a sub-set of the
   variables as part of a black-box function.</li>
+<li>Evaluation of the functions in parallel: on background threads, in worker
+  processes, as separate processes on the local machine, or as jobs on an HPC
+  cluster. One set of workers serves every optimization started on it, and work
+  of your own can be sent to it as well.</li>
+<li>Stopping a run on a criterion of your own, or aborting it from another
+  thread; both return the best result reached so far.</li>
+<li>Restarting an optimization from the point an earlier run reached, passing in
+  the function and gradient values already computed there so that they are not
+  evaluated again.</li>
 <li>An interface for running various continuous and discrete optimization methods.
   By default, optimizers from the
   <a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
@@ -3090,7 +3099,8 @@ statistic, such as the mean, over the ensemble.</p>
 <li>Configuration of the optimization process using
   <a href="https://docs.pydantic.dev/"><code>pydantic</code></a>.</li>
 <li>Support for tracking and processing optimization results generated during the
-  optimization process.</li>
+  optimization process, with a callback invoked for each evaluation, or with
+  handler objects that can be shared between runs.</li>
 <li>Optional support for exporting results as
   <a href="https://pandas.pydata.org/"><code>pandas</code></a> or <a href="https://pola.rs/"><code>polars</code></a> data
   frames.</li>
@@ -3105,20 +3115,22 @@ exposes all intermediate results of the optimization, such as objective and
 gradient values, but functionality to report or store any of these values must
 be added by the user. Optional functionality to assist with this is included
 with <code>ropt</code>.</p>
-<p><code>ropt</code> separates two concerns. The optimizer setup describes <em>what</em> to
-solve — the variables, objectives, constraints, and the components that drive
-the optimization — and is the same no matter how you run it; it is covered in
-the <a href="optimizer_setup/key_concepts/">Optimizer Setup</a> section. There are two options
-covering <em>how</em> to run a configured optimization:</p>
-<ol>
-<li><a href="running/running/">Running Optimizations</a> covers most optimization tasks
-   in a single function call, including
-   parallel evaluation across threads, processes, or an HPC cluster, custom
-   result handling, and running multiple optimization steps sequentially or
-   in parallel, possibly nested within each other.</li>
-<li><a href="advanced/workflows/">Optimization Workflows</a> expose the individual
-   building blocks — compute steps, event handlers, executors — directly.</li>
-</ol>
+<p><code>ropt</code> separates two concerns. The <strong>optimizer setup</strong> describes <em>what</em> to
+solve: the variables, objectives, constraints, and the components that drive the
+optimization. It is the same whichever way the optimization is run, and is
+covered in the <a href="optimizer_setup/key_concepts/">Optimizer Setup</a> section.</p>
+<p><em>How</em> to run a configured optimization is covered in two sections, which are
+alternatives rather than layers. Virtually all applications use the
+<code>ropt.simple</code> API, described in <a href="running/running/">Running Optimizations</a>. It
+starts a run with a single function call and covers
+<a href="running/parallel/">parallel evaluation</a>,
+<a href="running/many_runs/">many runs at once</a>,
+<a href="running/nested/">nested optimization</a>, and custom result handling. It is the
+API used in the Getting Started and Running sections of this manual.</p>
+<p><a href="advanced/workflows/">Optimization Workflows</a> describes a lower-level API that
+assembles a run from its individual components — compute steps, event handlers,
+evaluators and executors — and assumes familiarity with threads. It is for
+advanced use, and normal usage does not need it.</p>
 <h2 id="related-packages">Related packages</h2>
 <h3 id="plugins">Plugins</h3>
 <p>Additional backend optimizers can be installed separately and used via the plugin system:</p>

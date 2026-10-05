@@ -3576,8 +3576,11 @@ the worker, which reports the name it could not find. Whether that name resolves
 depends on the worker: <code>ProcessExecutor</code> re-imports <code>__main__</code>, so a script's
 functions are found again, while the local and HPC executors run a fresh command
 whose <code>__main__</code> is ropt's own, so they are not. Installing <code>ropt[cloudpickle]</code>
-lifts the restriction for all of them. <code>ThreadExecutor</code> serializes nothing and
-is never affected.</p>
+lifts the restriction for all of them. The result travels back under the same
+rule, serialized where the work item ran, so a result built from a locally
+defined class needs <code>cloudpickle</code> in <em>that</em> environment — which, for a job on a
+compute node, need not be the one you installed here. <code>ThreadExecutor</code>
+serializes nothing and is never affected.</p>
 <div class="admonition note">
 <p class="admonition-title">Working directory</p>
 <p>Work items cannot rely on the current directory being set consistently.

@@ -3364,9 +3364,9 @@ which takes <code>-m</code> to swap its thread pool for a process pool.</p>
 <p>The session owns the pools built on it and releases their workers when its
 block ends, so most code needs no further cleanup. Nothing is implicit: a run
 evaluates on the pool it was started on, and on no other. A run started with
-the module-level <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> evaluates in-process and
-needs no session, wherever it is called from — including from a thread you
-started yourself.</p>
+the module-level <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> evaluates inside your own
+program and needs no session, wherever it is called from — including from a
+thread you started yourself.</p>
 <p>Where an evaluation runs depends on which pool it was started on:</p>
 <pre class="mermaid"><code>flowchart TB
     subgraph proc["your program (one process)"]
@@ -3489,7 +3489,7 @@ all for a process pool, which holds a worker interpreter per worker:</p>
 </span></code></pre></div>
 <p>A pool used after its session has closed raises a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> rather than quietly
-evaluating in-process.</p>
+evaluating inside your own program.</p>
 </div>
 <h3 id="thread-pool">Evaluating on threads</h3>
 <p>A <a class="autorefs autorefs-internal" title="            thread_pool" href="../../reference/simple/#ropt.simple.Session.thread_pool"><code>thread_pool</code></a> runs the evaluations on
@@ -3523,7 +3523,7 @@ which each worker re-imports — works as is; a lambda, a closure, or a
 function defined in a notebook cell needs the <code>cloudpickle</code> extra (see
 <a href="../../getting_started/installation/#optional-extras">Installation</a>). Results can
 only come <strong>back</strong> through the return value; see
-<a href="../../results/handlers/#handlers-and-the-process-boundary">Handlers and the process boundary</a>.</p>
+<a href="../../results/handlers/#handlers-and-separate-processes">Handlers and separate processes</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">This pool does not clean up programs your objective started</p>
 <p>When a run is stopped by Ctrl-C the worker processes are killed, but
@@ -3918,7 +3918,7 @@ pools of its own, but they are <em>its</em> handlers and <em>its</em> pools.</p>
 <ul>
 <li><strong>Results cannot be tracked across offloaded calls.</strong> A handler created
   inside one sees only that call's results and cannot be brought back:
-  handlers refuse to cross a process boundary, so the return value is all
+  handlers cannot be moved between processes, so the return value is all
   that comes back. Following several concurrent pieces of work in one place
   is something <a href="../many_runs/"><code>optimize_many</code></a> can do and
   <code>offload</code> cannot.</li>
