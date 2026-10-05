@@ -15,7 +15,6 @@ _QUICKSTART = _ROOT / "docs" / "getting_started" / "quickstart.md"
 _EXIT_CODES = _ROOT / "docs" / "results" / "exit_codes.md"
 _EXAMPLE_PAGES = {
     "simple": _ROOT / "docs" / "getting_started" / "examples.md",
-    "advanced": _ROOT / "docs" / "advanced" / "examples.md",
 }
 
 # Misplaced backticks render as a code span, so no reference reaches

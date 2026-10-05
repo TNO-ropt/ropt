@@ -141,36 +141,20 @@ nav:
   - "Troubleshooting":
       - "Troubleshooting": troubleshooting/index.md
       - "Keyboard Interrupts": troubleshooting/keyboard_interrupt.md
-  - "Advanced":
-      - "Workflows":
-          - "Optimization Workflows": advanced/workflows.md
-          - "Writing Evaluation Callbacks": advanced/evaluation_callbacks.md
-          - "Parallel Evaluation": advanced/parallel.md
-          - "Workflow Examples": advanced/examples.md
-      - "Plugins":
-          - "Plugin Discovery": advanced/plugin_discovery.md
-          - "Writing a Plugin": advanced/writing_plugins.md
+  - "Plugins":
+      - "Plugin Discovery": advanced/plugin_discovery.md
+      - "Writing a Plugin": advanced/writing_plugins.md
   - "Reference":
       - "Simple API": reference/simple.md
-      - "Configuration":
-        - "Context Class": reference/context.md
-        - "Configuration Classes": reference/config.md
+      - "Configuration Classes": reference/config.md
       - "Results & Events":
         - "Evaluation Results": reference/results.md
         - "Optimization Events": reference/events.md
-      - "Ensemble Evaluator and Optimizer": reference/core.md
-      - "Batch Evaluation": reference/evaluation.md
       - "Optimizer Components":
         - "Function Estimators": reference/function_estimator.md
         - "Realization Filters": reference/realization_filter.md
         - "Optimizer Backends": reference/backend.md
         - "Samplers": reference/sampler.md
-      - "Workflow Components":
-        - "Compute Steps": reference/components_compute_steps.md
-        - "Event Handlers": reference/components_event_handlers.md
-        - "Evaluators": reference/components_evaluators.md
-        - "Executors": reference/components_executors.md
-        - "Concurrency": reference/components_concurrency.md
       - "Plugin System": reference/plugin_manager.md
       - "Utility Functions": reference/utils.md
       - "Enumerations": reference/enums.md
