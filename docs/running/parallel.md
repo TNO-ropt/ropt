@@ -496,6 +496,46 @@ evaluation however many are left to do.
     tested there. Free-threaded (no-GIL) builds of Python are untested and
     unsupported.
 
+## When an evaluation fails
+
+Two kinds of failure can end an evaluation, and they reach you differently.
+
+**A failure of the machinery** is one the evaluation function had no part in: a
+worker process is killed, a cluster job never writes its result, or the file it
+wrote cannot be read back. The run ends with an
+[`ExecutionError`][ropt.exceptions.ExecutionError] naming the first lost
+evaluation's reason. The affected rows are *not* recorded as `numpy.nan`: a
+machine that broke is not a realization that failed to converge, and absorbing
+it would continue the optimization on whichever workers happened to survive and
+produce a result indistinguishable from one computed over the whole ensemble.
+
+Whether the pool can run further work afterwards depends on which pool it is. A
+local pool and an HPC pool start fresh jobs for the next batch. A process pool
+cannot be restarted once a worker is lost: every later batch fails the same way,
+and a new pool is needed.
+
+**An exception from your evaluation function** is re-raised unchanged, from the
+`optimize` call, whichever pool it ran on. A bug in the objective therefore
+surfaces as the exception you wrote, with the pool left usable. Return
+`float("nan")` instead when a realization that could not produce a value should
+be tolerated; see
+[`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
+for how many a batch may contain before the run ends with
+`TOO_FEW_REALIZATIONS`.
+
+On an HPC pool the exception crosses a process boundary, and no serialization
+format carries a traceback. The job therefore attaches the formatted traceback
+to the exception as a note, so it travels with it. An exception that cannot be
+serialized at all arrives as a `RuntimeError` carrying its `repr` and notes.
+
+A job that died before writing a result leaves its only trace in the file
+holding its captured output. On a local pool and an HPC pool that file is kept
+when an evaluation fails, even when the pool removes the rest, and its last
+lines are added to the error message. The message names the file whether or not
+it could be read: a shared filesystem need not show its contents yet, and a
+submission script that does not redirect the job's output — with
+`#SBATCH --output={{output}}` or its equivalent — never writes them at all.
+
 ## Offloading your own work
 
 You can hand **your own** functions to a pool with
@@ -576,7 +616,7 @@ batch nothing lets it return its results.
     call waits for the lock the handler holds. On a process pool it
     raises an [`ExecutionError`][ropt.exceptions.ExecutionError], since a
     handler holds a lock and cannot be serialized. See
-    [Two hazards](../advanced/workflows.md#two-hazards).
+    [Sharing a handler across concurrent runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
     Work offloaded from the evaluation function runs without that lock held,
     so it does not make the other runs wait.
@@ -611,9 +651,59 @@ When the configuration defines several clusters, `cluster` picks one:
   needs exactly one cluster to provide it — no match, or several, is an error.
 - Give neither and the configuration's own defaults apply.
 
-`config_path` points at a configuration other than the installed one. See
-[HPCExecutor](../advanced/parallel.md#hpcexecutor) for how such a directory is
-laid out and where the installed one lives.
+`config_path` points at a configuration other than the installed one.
+
+#### Where the configuration lives { #hpc-configuration-directory }
+
+Without `config_path` the pool reads the site-wide configuration installed
+alongside `ropt`, at `<prefix>/share/ropt/pysqa/`, where `<prefix>` is the Python
+installation prefix. Deployments ship pre-configured clusters by installing them
+there. Find the directory with:
+
+```python
+from sysconfig import get_paths
+
+print(get_paths()["data"])
+```
+
+The directory holds a `queue.yaml` listing the queues, plus one submission
+script per queue. A minimal Slurm configuration:
+
+```yaml title="queue.yaml"
+queue_type: SLURM
+queue_primary: normal
+queues:
+  normal: {cores_max: 32, cores_min: 1, run_time_max: 3600, script: normal.sh}
+  long:   {cores_max: 32, cores_min: 1, run_time_max: 86400, script: long.sh}
+```
+
+```jinja title="normal.sh"
+#!/bin/bash
+#SBATCH --partition=normal
+#SBATCH --job-name={{job_name}}
+#SBATCH --output={{output}}
+#SBATCH --chdir={{working_directory}}
+#SBATCH --ntasks={{cores}}
+{%- if run_time_max %}
+#SBATCH --time={{ [1, run_time_max // 60]|max }}
+{%- endif %}
+{%- if memory_max %}
+#SBATCH --mem={{memory_max}}G
+{%- endif %}
+
+{{command}}
+```
+
+The scripts are
+[Jinja](https://jinja.palletsprojects.com/en/stable/templates/) templates, of
+the same form as the `template` described under
+[Submitting with your own template](#submitting-with-your-own-template). The
+partition is *not* among the rendered variables: it is written literally, which
+is why each queue normally needs its own script.
+
+Sites with more than one cluster use a `clusters.yaml` naming a `queue.yaml` per
+cluster, each declaring its own `queue_type`; see the
+[`pysqa` documentation](https://pysqa.readthedocs.io/en/latest/advanced.html#access-to-multiple-hpcs).
 
 ### Asking for resources
 

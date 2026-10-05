@@ -214,24 +214,81 @@ Convenience methods:
     Because this writes to disk on every update, the run that emitted the
     result waits for the write to finish.
 
-### Other handlers
+## Writing your own handler
 
-`ropt.components.event_handlers` holds a few more handlers that `ropt.simple`
-does not re-export, because a run driven by `optimize` does not need them.
+The built-in handlers above, and the `report` callback, cover the results a run
+produces. A handler of your own is for everything else: reacting to the start or
+the end of a run, writing results out in a format of your own, or keeping a
+summary that none of the built-ins keeps.
 
-The remaining one that applies to an `optimize` run is
-[`CallbackHandler`][ropt.components.event_handlers.CallbackHandler], which
-calls a function for the event types you name. That is how you observe events
-other than results — the start or end of a run, for example; for results alone,
-`report=` already does it. The rest belong to the component API, described in
-[Optimization Workflows](../advanced/workflows.md#event-handlers).
+Subclass [`EventHandler`][ropt.simple.EventHandler] and implement two members:
 
-A handler can also **stop the run that fed it**: every event carries the compute
-step that emitted it, so calling `event.source.stop()` ends that run with
-`STOPPED` — the [`report`](../running/running.md#stopping-early-from-the-callback)
-callback above is a convenience wrapper around this. Only the run that owns the
-emitting step is affected, so concurrent runs continue. See
-[Exit Codes](exit_codes.md).
+- `event_types` — the [`EnOptEventType`][ropt.enums.EnOptEventType] values this
+  handler wants to receive. An event of any other type never reaches it.
+- `_handle_event(event)` — called with each
+  [`EnOptEvent`][ropt.events.EnOptEvent] of those types.
+
+```python
+from ropt.enums import EnOptEventType
+from ropt.events import EnOptEvent
+from ropt.simple import EventHandler, optimize
+
+
+class CountEvaluations(EventHandler):
+    def __init__(self):
+        super().__init__()
+        self.count = 0
+
+    @property
+    def event_types(self):
+        return {EnOptEventType.FINISHED_EVALUATION}
+
+    def _handle_event(self, event: EnOptEvent) -> None:
+        self.count += len(event.results)
+
+
+counter = CountEvaluations()
+optimize(config, x0, objective, handlers=[counter])
+print(counter.count)
+```
+
+An [`EnOptEvent`][ropt.events.EnOptEvent] carries the `event_type` that
+triggered it and a `results` tuple, which holds the
+[`Results`][ropt.results.Results] objects of a `FINISHED_EVALUATION` and is
+empty for the other types. The types a run emits are:
+
+| Event type            | When it is emitted                                          |
+| --------------------- | ----------------------------------------------------------- |
+| `START_OPTIMIZER`     | Just before the optimization algorithm begins iterating.    |
+| `FINISHED_OPTIMIZER`  | After it finishes, whether it converged, stopped or failed. |
+| `START_EVALUATION`    | Before a batch of function or gradient evaluations.         |
+| `FINISHED_EVALUATION` | After that batch completes; carries its results.            |
+
+An [`evaluate`][ropt.simple.evaluate] or
+[`evaluate_batch`][ropt.simple.evaluate_batch] run has no optimizer, and emits
+`START_ENSEMBLE_EVALUATOR` and `FINISHED_ENSEMBLE_EVALUATOR` around its single
+batch instead of the optimizer pair.
+
+Handlers are called on the thread that emits the event, in the order the
+`handlers` argument lists them, and the run waits until every handler for that
+event has returned. A handler that blocks therefore holds up the run that fed
+it, and any run waiting on the same handler's lock. Keep a handler shared by
+concurrent runs cheap; if one must do heavy I/O, buffer in memory and write once
+the runs have finished.
+
+!!! note "A handler failure ends the run"
+    An exception raised by a handler is fatal. It is raised on the run's own
+    stack, so it propagates as a single exception, and the handlers listed after
+    it do not see that event.
+
+!!! note "Read a handler's state after its runs have finished"
+    State kept on a handler, or stored with `handler[key]`, is deliberately not
+    bound to a thread, so it can be read from anywhere once the runs feeding it
+    have returned. That return is what makes the latest values visible. Reading
+    it while a run is still feeding the handler on another thread gives a valid
+    but possibly stale value. To follow a run as it goes, use the handler's own
+    `_handle_event`, or a `report` callback, rather than polling another
+    handler's state.
 
 ## Handlers and separate processes
 

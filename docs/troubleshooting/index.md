@@ -93,11 +93,19 @@ the `metadata` you passed, so keep it to plain data — numbers, strings, lists,
 arrays. A lock, an open file, or a database connection cannot be copied and
 raises a `TypeError` in the middle of the run.
 
+**An exception from your objective is not turned into a failed realization.** It
+is re-raised from the `optimize` call, whichever pool the evaluation ran on, so
+a bug surfaces as the exception you wrote rather than as a missing value. Return
+`float("nan")` where a realization that could not produce a value should be
+tolerated; see
+[When an evaluation fails](../running/parallel.md#when-an-evaluation-fails).
+
 | What you see | Most likely cause |
 | --- | --- |
 | A global or a cache your objective writes to is never updated | The objective ran in a worker process, on a copy. Return the value as [metadata](../running/running.md#attaching-metadata) instead. |
 | An objective that works alone misbehaves under `optimize_many` | It is being called from several threads at once. Remove the shared mutable state, or guard it with a lock of its own. |
 | `TypeError: cannot pickle ...` part-way through a run | Something in `metadata` cannot be deep-copied. |
+| `ExecutionError` part-way through a run on a pool | A worker or job broke, rather than your objective; see [When an evaluation fails](../running/parallel.md#when-an-evaluation-fails). |
 
 ## Pools, stopping and processes
 
@@ -181,8 +189,3 @@ error from pandas or polars when a result is turned into a table.
 | --- | --- |
 | `RuntimeError: Auto-scaling of the objectives failed to estimate a scale factor` | The first batch averaged to zero, or to a value that is not finite, so no scale could be derived. Set the scales yourself, or start somewhere else. |
 | Two runs that should agree give different gradients | Quasi-random samplers (`sobol`, `halton`, `lhs`) are seeded in the order the [samplers](../optimizer_setup/configuration_sections.md#samplers) are defined, so reordering that section changes the perturbations. |
-
-## See also
-
-- The same failure model at the low level, in more detail:
-  [Error handling](../advanced/parallel.md#error-handling).

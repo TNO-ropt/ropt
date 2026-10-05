@@ -187,8 +187,3 @@ Reading the answer takes one more step than usual:
 The outer result is not the place to look. The outer layer only ever sees its
 own variables and holds the inner ones at their initial values, so the optimum
 over *all* variables exists only in the collected inner results.
-
-## See also
-
-- The same flow built from workflow components:
-  [Parallel Evaluation](../advanced/parallel.md).
