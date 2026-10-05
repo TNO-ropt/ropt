@@ -4094,8 +4094,15 @@ result whose value is an
   
       dataclass
   " href="../../reference/components_executors/#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a>
-rather than raised, which leaves the executor usable rather than tearing it
-down.</p>
+rather than raised, so the batch still returns one result per call and a call
+that did produce a value keeps it.</p>
+<p>Whether the executor can run further work afterwards depends on which one it is.
+A <a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a> starts fresh jobs for the
+next batch. The pool of a
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a> cannot be
+restarted once a worker is lost: every later batch fails the same way, and a new
+executor is needed.</p>
 <p>The evaluator turns that result into an
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>, naming how many evaluations
 were lost and why, which ends the run. It does <strong>not</strong> write <code>numpy.nan</code> for the
