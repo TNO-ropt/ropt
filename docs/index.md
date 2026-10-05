@@ -20,11 +20,20 @@ statistic, such as the mean, over the ensemble.
   using plugins, for instance, to implement risk-aware optimization, such as
   Conditional Value at Risk (CVaR) or standard-deviation-based functions.
 - Support for black-box optimization of arbitrary functions.
-- Support for running complex optimization workflows, such as multiple runs with
-  different optimization settings or even different optimization methods.
+- Running several optimizations at the same time, each with its own
+  configuration, start point and evaluation function.
 - Support for nested optimization: an evaluation function can run an
   optimization of its own — for example to optimize a sub-set of the
   variables as part of a black-box function.
+- Evaluation of the functions in parallel: on background threads, in worker
+  processes, as separate processes on the local machine, or as jobs on an HPC
+  cluster. One set of workers serves every optimization started on it, and work
+  of your own can be sent to it as well.
+- Stopping a run on a criterion of your own, or aborting it from another
+  thread; both return the best result reached so far.
+- Restarting an optimization from the point an earlier run reached, passing in
+  the function and gradient values already computed there so that they are not
+  evaluated again.
 - An interface for running various continuous and discrete optimization methods.
   By default, optimizers from the
   [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
@@ -40,7 +49,8 @@ statistic, such as the mean, over the ensemble.
 - Configuration of the optimization process using
   [`pydantic`](https://docs.pydantic.dev/).
 - Support for tracking and processing optimization results generated during the
-  optimization process.
+  optimization process, with a callback invoked for each evaluation, or with
+  handler objects that can be shared between runs.
 - Optional support for exporting results as
   [`pandas`](https://pandas.pydata.org/) or [`polars`](https://pola.rs/) data
   frames.
@@ -56,19 +66,24 @@ gradient values, but functionality to report or store any of these values must
 be added by the user. Optional functionality to assist with this is included
 with `ropt`.
 
-`ropt` separates two concerns. The optimizer setup describes *what* to
-solve — the variables, objectives, constraints, and the components that drive
-the optimization — and is the same no matter how you run it; it is covered in
-the [Optimizer Setup](optimizer_setup/key_concepts.md) section. There are two options
-covering *how* to run a configured optimization:
+`ropt` separates two concerns. The **optimizer setup** describes *what* to
+solve: the variables, objectives, constraints, and the components that drive the
+optimization. It is the same whichever way the optimization is run, and is
+covered in the [Optimizer Setup](optimizer_setup/key_concepts.md) section.
 
-1. [Running Optimizations](running/running.md) covers most optimization tasks
-   in a single function call, including
-   parallel evaluation across threads, processes, or an HPC cluster, custom
-   result handling, and running multiple optimization steps sequentially or
-   in parallel, possibly nested within each other.
-2. [Optimization Workflows](advanced/workflows.md) expose the individual
-   building blocks — compute steps, event handlers, executors — directly.
+*How* to run a configured optimization is covered in two sections, which are
+alternatives rather than layers. Virtually all applications use the
+`ropt.simple` API, described in [Running Optimizations](running/running.md). It
+starts a run with a single function call and covers
+[parallel evaluation](running/parallel.md),
+[many runs at once](running/many_runs.md),
+[nested optimization](running/nested.md), and custom result handling. It is the
+API used in the Getting Started and Running sections of this manual.
+
+[Optimization Workflows](advanced/workflows.md) describes a lower-level API that
+assembles a run from its individual components — compute steps, event handlers,
+evaluators and executors — and assumes familiarity with threads. It is for
+advanced use, and normal usage does not need it.
 
 ## Related packages
 

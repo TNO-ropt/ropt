@@ -1,93 +1,116 @@
-"""Reuse the results at the starting point in a second run.
+"""Restart with a larger ensemble, reusing the results at the restart point.
 
-The first run records the function and gradient results at its initial point. A
-second run starting from the same point is given those results, so the
-evaluations there are not repeated. Its realization weights differ, so the same
-recorded values are aggregated into a different objective.
+A first run optimizes an ensemble of two realizations. A second run restarts
+from its best point with five, and is given the function and gradient results
+the first run produced there. The two realizations evaluated at that point are
+reused, and only the three added ones are evaluated.
 """
 
-from copy import deepcopy
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.results import FunctionResults, GradientResults
-from ropt.simple import EvaluationFunctionContext, HistoryHandler, optimize
+from ropt.simple import EvaluationFunctionContext, optimize
+
+if TYPE_CHECKING:
+    from ropt.results import FunctionResults
 
 DIM = 3
-REALIZATIONS = 3
 PERTURBATIONS = 4
-CONFIG: dict[str, Any] = {
-    "variables": {
-        "variable_count": DIM,
-        "perturbation_magnitudes": 1e-3,
-    },
-    "realizations": {"weights": [1.0] * REALIZATIONS},
-    "gradient": {"number_of_perturbations": PERTURBATIONS},
-    "optimizer": {"max_functions": 5},
-}
-INITIAL_VALUES = np.zeros(DIM)
+SCREENING_REALIZATIONS = 2
+FULL_REALIZATIONS = 5
+UNCERTAINTY = 0.1
+INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
+
+# Drawn once for the full ensemble, so a realization is the same in both runs.
+rng = default_rng(seed=123)
+a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=FULL_REALIZATIONS)
+b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=FULL_REALIZATIONS)
 
 
-class CountingObjective:
-    """An ensemble objective that counts the evaluations it performs."""
+def config(realizations: int) -> dict[str, Any]:
+    """Build the configuration for an ensemble of the given size.
 
-    def __init__(self) -> None:
-        """Start with an empty count."""
-        self.count = 0
+    Args:
+        realizations: The number of realizations.
 
-    def __call__(
-        self, variables: NDArray[np.float64], context: EvaluationFunctionContext
-    ) -> float:
-        """Evaluate one realization and count the call.
+    Returns:
+        The optimization configuration.
+    """
+    return {
+        "variables": {
+            "variable_count": DIM,
+            "perturbation_magnitudes": 1e-6,
+        },
+        "realizations": {"weights": [1.0] * realizations},
+        "gradient": {
+            "number_of_perturbations": PERTURBATIONS,
+            # A gradient at every evaluation, so there is one at the best point.
+            "evaluation_policy": "speculative",
+        },
+        "optimizer": {"max_functions": 5},
+    }
 
-        Args:
-            variables: The variable vector to evaluate.
-            context:   The context of this evaluation.
 
-        Returns:
-            The squared distance to this realization's target.
-        """
-        self.count += 1
-        target = 0.5 + 0.1 * context.realization
-        return float(((variables - target) ** 2).sum())
+def rosenbrock(
+    variables: NDArray[np.float64], context: EvaluationFunctionContext
+) -> float:
+    """The Rosenbrock function of one realization, with uncertain coefficients.
+
+    Args:
+        variables: The variable vector to evaluate.
+        context:   Identifies the realization being evaluated.
+
+    Returns:
+        The objective of this realization at `variables`.
+    """
+    r = context.realization
+    objective = 0.0
+    for d_idx in range(DIM - 1):
+        x, y = variables[d_idx : d_idx + 2]
+        objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
+    return float(objective)
 
 
 def main() -> None:
-    """Record the results at the starting point, then reuse them."""
-    history = HistoryHandler()
-    first = CountingObjective()
-    optimize(CONFIG, INITIAL_VALUES, first, handlers=[history])
-    g0 = next(item for item in history.results if isinstance(item, GradientResults))
-    f0 = next(
-        item
-        for item in history.results
-        if isinstance(item, FunctionResults) and item.function_key == g0.function_key
-    )
+    """Optimize a small ensemble, then restart with a larger one."""
+    first = optimize(config(SCREENING_REALIZATIONS), INITIAL_VALUES, rosenbrock)
+    assert first.results is not None
+    assert first.gradient is not None
 
-    config = deepcopy(CONFIG)
-    config["realizations"]["weights"] = [3.0, 1.0, 1.0]
-    reused = HistoryHandler()
-    second = CountingObjective()
-    optimize(config, INITIAL_VALUES, second, handlers=[reused], f0=f0, g0=g0)
-    restarted = next(
-        item for item in reused.results if isinstance(item, FunctionResults)
+    reported: list[FunctionResults] = []
+    optimize(
+        config(FULL_REALIZATIONS),
+        first.results.variables,
+        rosenbrock,
+        report=reported.append,
+        f0=first.results,
+        g0=first.gradient,
     )
+    restart = reported[0]
 
-    assert f0.functions is not None
-    assert restarted.functions is not None
-    print(f"evaluations in the first run:  {first.count}")
-    print(f"evaluations in the second run: {second.count}")
-    print(f"not repeated at the starting point: {REALIZATIONS * (1 + PERTURBATIONS)}")
-    print(f"objective at the starting point, first run:  {f0.functions.objectives}")
+    assert first.results.functions is not None
+    assert restart.functions is not None
     print(
-        f"objective at the starting point, second run: {restarted.functions.objectives}"
+        f"per-realization objectives at the restart point: "
+        f"{restart.evaluations.objectives.ravel()}"
+    )
+    print(f"reused from the first run: {first.results.evaluations.objectives.ravel()}")
+    print(
+        f"objective there, {SCREENING_REALIZATIONS} realizations: "
+        f"{first.results.functions.objectives}"
+    )
+    print(
+        f"objective there, {FULL_REALIZATIONS} realizations: "
+        f"{restart.functions.objectives}"
     )
 
-    # The same raw values, aggregated under the new weights.
-    assert np.allclose(restarted.evaluations.objectives, f0.evaluations.objectives)
-    assert not np.allclose(restarted.functions.objectives, f0.functions.objectives)
+    assert np.allclose(
+        restart.evaluations.objectives[:SCREENING_REALIZATIONS, :],
+        first.results.evaluations.objectives,
+    )
 
 
 if __name__ == "__main__":

@@ -83,9 +83,9 @@ runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 !!! warning "Without a pool the driver threads do the evaluating"
     `optimize_many` needs no pool. Without one, the runs still execute
-    concurrently, but each evaluates in-process on its own driver thread — so
-    your evaluation function is called by several threads at once and must
-    tolerate that. Give the call a pool when it must not be.
+    concurrently, but each evaluates inside your own program, on its own driver
+    thread — so your evaluation function is called by several threads at once
+    and must tolerate that. Give the call a pool when it must not be.
 
 !!! warning "Not every backend can take part"
     An optimizer that needs a working directory of its own, writes to a file

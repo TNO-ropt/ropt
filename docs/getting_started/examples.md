@@ -29,7 +29,7 @@ Scripts that assemble a workflow by hand are listed under
 | [`stopping.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/stopping.py) | Stopping a run from the `report` callback | [Running Optimizations](../running/running.md) |
 | [`failures.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py) | What a failing realization does, and how to allow some | [Troubleshooting](../troubleshooting/index.md) |
 | [`restart.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py) | Restarting from the best point, collecting every result | [Restarting from the Best Point](../running/restart.md) |
-| [`initial_values.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/initial_values.py) | Reusing the results at the starting point in a second run | [Reusing Results at the Starting Point](../running/initial_values.md) |
+| [`initial_values.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/initial_values.py) | Restarting with a larger ensemble, reusing what is known there | [Reusing Results at the Starting Point](../running/initial_values.md) |
 | [`parallel.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py) | Evaluating on a thread or process pool | [Evaluating in Parallel](../running/parallel.md) |
 | [`optimize_many.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/optimize_many.py) | Running several optimizations concurrently | [Many Runs at Once](../running/many_runs.md) |
 | [`nested_optimization.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/nested_optimization.py) | An inner optimization per outer evaluation, on its own pool | [Nested Optimization](../running/nested.md) |

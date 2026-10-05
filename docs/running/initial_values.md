@@ -7,55 +7,64 @@ are not performed again.
 
 !!! note
 
-    This is not [Restarting from the Best Point](restart.md), where a new run
-    begins where a previous one ended. Here the new run begins at the *same*
-    point as the recorded one, and only the evaluations at that point are
-    avoided.
+    [Restarting from the Best Point](restart.md) passes these results back under
+    an unchanged configuration, where they cover every evaluation at the start
+    point. This page is about a configuration that changes between the two runs,
+    where part of the start point must still be evaluated.
 
 The full script for this example is
 [examples/simple/initial_values.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/initial_values.py).
+It optimizes an ensemble of two realizations, then restarts from the best point
+with five.
 
-## Recording the results
+## Where the results come from
 
-The results of the first run are collected with a
-[`HistoryHandler`][ropt.simple.HistoryHandler]. Take the first
-[`GradientResults`][ropt.results.GradientResults], then the
-[`FunctionResults`][ropt.results.FunctionResults] it was computed from — its
-`function_key` names that evaluation, so the two are a pair rather than merely
-the first of each kind:
+[`optimize`][ropt.simple.optimize] returns the best evaluation of a run on
+`results`, and the gradient computed at that same point on `gradient`. Those are
+the two objects a run restarting from that point needs:
 
 ```python
-history = HistoryHandler()
-optimize(CONFIG, INITIAL_VALUES, first, handlers=[history])
-g0 = next(item for item in history.results if isinstance(item, GradientResults))
-f0 = next(
-    item
-    for item in history.results
-    if isinstance(item, FunctionResults) and item.function_key == g0.function_key
+first = optimize(config(SCREENING_REALIZATIONS), INITIAL_VALUES, rosenbrock)
+```
+
+The configuration sets
+[`evaluation_policy`](../optimizer_setup/gradients.md#evaluation-policy) to
+`"speculative"`, which computes a gradient at every function evaluation, so a
+gradient is available at the point the first run returns.
+
+## Restarting with a larger ensemble
+
+The second run starts at the best point of the first, with five realizations
+instead of two, and is given the results recorded there:
+
+```python
+optimize(
+    config(FULL_REALIZATIONS),
+    first.results.variables,
+    rosenbrock,
+    report=reported.append,
+    f0=first.results,
+    g0=first.gradient,
 )
 ```
 
-How these are kept between the runs is up to you: held in memory, pickled to
-disk, or stored in a database.
-
-## Supplying them to the next run
-
-The second run starts from the same vector and is given both results. Its
-realization weights differ from the first run's:
-
-```python
-config = deepcopy(CONFIG)
-config["realizations"]["weights"] = [3.0, 1.0, 1.0]
-optimize(config, INITIAL_VALUES, second, handlers=[reused], f0=f0, g0=g0)
-```
-
-The second run evaluates nothing at the start point. Its objective there differs
-from the first run's, because the recorded per-realization values are aggregated
-under the new weights:
+The five-realization ensemble needs 25 evaluations at that point: one per
+realization, and one per realization for each of the four perturbations. Ten of
+them — the two recorded realizations, unperturbed and at each perturbation —
+come from `f0` and `g0`, and the second run evaluates the remaining fifteen. The
+first two per-realization objectives are the values the first run returned:
 
 ```
-objective at the starting point, first run:  [1.1]
-objective at the starting point, second run: [0.96]
+per-realization objectives at the restart point: [64.0004475  56.66862051 63.84798703 58.60943629 58.6053663 ]
+reused from the first run: [64.0004475  56.66862051]
+```
+
+The aggregated objective is recomputed over all five, so it is not the value the
+first run reported:
+
+```
+objective there, 2 realizations: [60.334534]
+objective there, 5 realizations: [60.34637152]
 ```
 
 Either argument may be given on its own. With only `f0`, the perturbations at
@@ -92,7 +101,8 @@ anything is evaluated.
 
 The start point is checked as well. The `variables` on `f0` and on `g0` must
 match `x0`, which is also what makes the two results belong together. A run
-starting anywhere else raises `ValueError`.
+starting anywhere else raises `ValueError`. A restart meets this by
+construction, since `x0` is the `variables` of the result passed as `f0`.
 
 ## Realizations and perturbations that were not recorded
 
@@ -116,9 +126,7 @@ is part of the record and is not evaluated again. Supply a record without it if
 it should be retried.
 
 **Only the start point is covered.** `f0` and `g0` are used once, by the first
-evaluation of each kind; every later point is evaluated normally. Under an
-unchanged configuration the recorded values are the ones the run would have
-computed, so it follows the same trajectory as the recorded run.
+evaluation of each kind; every later point is evaluated normally.
 
 ## Several runs at once
 

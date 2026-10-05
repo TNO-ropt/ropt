@@ -47,12 +47,11 @@ realizations into overall function and gradient values, and keeps track of
 intermediate and final results. Calculating the functions themselves — for
 example, running a simulation — is left to code that you provide.
 
-Most optimization problems only need a single run of one method. Some are
-solved by combining several runs, possibly with different algorithms
-— for example, when a problem mixes continuous and discrete variables, each
-kind needs its own method. `ropt` supports this: several
-optimization runs can be combined sequentially, in parallel, or nested within
-each other.
+Most optimization problems only need a single run of one method. Some are solved
+by combining several runs, possibly with different algorithms — for example,
+when a problem mixes continuous and discrete variables, each kind could be
+handled by its own method. `ropt` supports this: several optimization runs can
+be combined sequentially, in parallel, or nested within each other.
 
 
 ## See also

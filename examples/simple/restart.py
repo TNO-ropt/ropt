@@ -2,16 +2,21 @@
 
 Each call to `optimize` starts a fresh run, so restarting from the previous
 best point is just a loop: feed the returned `result.results.variables` back
-in as the next start point. A `HistoryHandler` reused across the loop collects
-every result from every restart, not just the final one.
+in as the next start point. The results at that point are passed back as `f0`
+and `g0`, so the new run does not evaluate it again. A `report` callback
+appending to one list collects every evaluation from every restart, not just
+the final one.
 """
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.simple import EvaluationFunctionContext, HistoryHandler, optimize
+from ropt.simple import EvaluationFunctionContext, optimize
+
+if TYPE_CHECKING:
+    from ropt.results import FunctionResults, GradientResults
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -44,13 +49,16 @@ def rosenbrock(
 
 def main() -> None:
     """Restart from the best point found so far, `RESTARTS` times."""
-    history = HistoryHandler()
+    reported: list[FunctionResults] = []
     x0 = INITIAL_VALUES
+    f0: FunctionResults | None = None
+    g0: GradientResults | None = None
     for _ in range(RESTARTS):
-        result = optimize(CONFIG, x0, rosenbrock, handlers=[history])
+        result = optimize(CONFIG, x0, rosenbrock, report=reported.append, f0=f0, g0=g0)
         assert result.results is not None
         x0 = result.results.variables
-    print(f"evaluations collected across all restarts: {len(history.results)}")
+        f0, g0 = result.results, result.gradient
+    print(f"evaluations collected across all restarts: {len(reported)}")
     assert result.results is not None
     best = result.results.target_objective
     print(f"best objective after {RESTARTS} restarts: {best}")

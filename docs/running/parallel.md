@@ -24,9 +24,9 @@ which takes `-m` to swap its thread pool for a process pool.
 The session owns the pools built on it and releases their workers when its
 block ends, so most code needs no further cleanup. Nothing is implicit: a run
 evaluates on the pool it was started on, and on no other. A run started with
-the module-level [`optimize`][ropt.simple.optimize] evaluates in-process and
-needs no session, wherever it is called from — including from a thread you
-started yourself.
+the module-level [`optimize`][ropt.simple.optimize] evaluates inside your own
+program and needs no session, wherever it is called from — including from a
+thread you started yourself.
 
 Where an evaluation runs depends on which pool it was started on:
 
@@ -172,7 +172,7 @@ with session() as s:
 
     A pool used after its session has closed raises a
     [`WorkflowError`][ropt.exceptions.WorkflowError] rather than quietly
-    evaluating in-process.
+    evaluating inside your own program.
 
 ### Evaluating on threads { #thread-pool }
 
@@ -217,7 +217,7 @@ which each worker re-imports — works as is; a lambda, a closure, or a
 function defined in a notebook cell needs the `cloudpickle` extra (see
 [Installation](../getting_started/installation.md#optional-extras)). Results can
 only come **back** through the return value; see
-[Handlers and the process boundary](../results/handlers.md#handlers-and-the-process-boundary).
+[Handlers and separate processes](../results/handlers.md#handlers-and-separate-processes).
 
 !!! warning "This pool does not clean up programs your objective started"
     When a run is stopped by Ctrl-C the worker processes are killed, but
@@ -546,7 +546,7 @@ batch nothing lets it return its results.
 
     - **Results cannot be tracked across offloaded calls.** A handler created
       inside one sees only that call's results and cannot be brought back:
-      handlers refuse to cross a process boundary, so the return value is all
+      handlers cannot be moved between processes, so the return value is all
       that comes back. Following several concurrent pieces of work in one place
       is something [`optimize_many`](many_runs.md) can do and
       `offload` cannot.

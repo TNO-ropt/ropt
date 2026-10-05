@@ -16,7 +16,11 @@ are configured in.
 
 The [`report`](../running/running.md#reporting-progress) callback you may already be using
 is only shorthand for this: `report=` builds a handler for you behind the
-scenes, added to the run it is given to.
+scenes, added to the run it is given to. One is built per run, each with a lock
+of its own, so the same callback given to runs that execute concurrently can be
+entered from several threads at once. A handler object given to those runs is
+entered by one at a time, because the lock belongs to the handler. A callback
+that accumulates across concurrent runs needs synchronization of its own.
 
 Attach handlers to a run with the `handlers` argument. The same handler can be
 passed to several `optimize` calls, accumulating the results of each in turn:
@@ -109,9 +113,11 @@ are.
   drop it.
 
 The gradient computed at the result it keeps, if there is one, is read via
-`handler["gradient"]`. It is `None` while that gradient has not arrived, and
-stays `None` for a point where no gradient was computed — the best point of a
-run often is one.
+`handler["gradient"]`. A gradient usually reaches the handler in a later
+evaluation than the result it belongs to, and is matched on the `function_key`
+they share. It is `None` while that gradient has not arrived, and stays `None`
+for a point where no gradient was computed — the best point of a run often is
+one.
 
 
 ### `HistoryHandler`
@@ -227,7 +233,7 @@ callback above is a convenience wrapper around this. Only the run that owns the
 emitting step is affected, so concurrent runs continue. See
 [Exit Codes](exit_codes.md).
 
-## Handlers and the process boundary
+## Handlers and separate processes
 
 On a thread pool (or with no pool) your objective and your handlers run
 in the **same process** and share memory: a handler can see anything the
@@ -256,7 +262,7 @@ flowchart LR
     obj -->|"result + metadata<br/>(copied back)"| opt
 ```
 
-??? info "How data crosses the boundary"
+??? info "How data is copied between processes"
     To move work and results between processes, `ropt` **serializes** them —
     turns the objects into bytes and rebuilds them on the other side. Both a
     process pool and an HPC pool use Python's standard `pickle` by default, so
@@ -270,9 +276,9 @@ flowchart LR
     cluster nodes read, so it needs such a filesystem (its `workdir`).
 
     Serialization is only the mechanism `ropt` uses today; the essential
-    requirement is that the data can be *carried across the boundary*, so a
-    future version could use a different transport — for example one that works
-    over a network.
+    requirement is that the data can be *moved from one process to the other*,
+    so a future version could use a different transport — for example one that
+    works over a network.
 
 Handlers see those returned results and nothing else. Anything the objective did
 only in memory — setting a module global, appending to a shared list, updating an

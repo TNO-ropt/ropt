@@ -11,7 +11,7 @@ It collects the full result objects —
 [`GradientResults`][ropt.results.GradientResults] — rather than the summary `optimize` returns; see
 [Working with Results](../results/results.md).
 
-## A handler that collects everything
+For instance, the [`HistoryHandler`][ropt.simple.HistoryHandler] collects all results:
 
 ```python
 from ropt.simple import HistoryHandler, optimize
@@ -28,28 +28,7 @@ general — it keeps or reacts to results, and, unlike `report`, the same
 handler can be reused across several **sequential** calls to `optimize`,
 accumulating results from all of them.
 
-## Example: restarting from the best point
-
-For instance, restart the same optimization from the best point the previous
-run found, while collecting every result from every restart in one handler:
-
-```python
-x0 = initial_values
-for _ in range(3):
-    result = optimize(config, x0, objective, handlers=[history])
-    assert result.results is not None
-    x0 = result.results.variables   # restart from the best point found so far
-
-print(f"collected {len(history.results)} results across all restarts")
-```
-
-Restarting needs nothing special from `ropt`: each call to `optimize` is
-independent, so `result.results.variables` — the best point a run found — is
-the start point for the next one. The runnable script is
-[examples/simple/restart.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py),
-which [Restarting from the Best Point](../running/restart.md) walks through.
-
-## Other built-in handlers
+## Built-in handlers
 
 `ropt` ships a few ready-to-use handlers, all imported from `ropt.simple`:
 

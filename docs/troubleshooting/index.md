@@ -79,7 +79,7 @@ from one computed over the whole ensemble.
 your evaluation function is sent to a worker together with the data it uses. Anything
 it writes there — a global, a cache, a list it appends to — is thrown away when
 the worker finishes. Return what you need instead; see
-[Handlers and the process boundary](../results/handlers.md#handlers-and-the-process-boundary).
+[Handlers and separate processes](../results/handlers.md#handlers-and-separate-processes).
 
 **Several runs may call your objective at the same time.**
 [`optimize_many`][ropt.simple.optimize_many] always runs its optimizations
@@ -103,8 +103,8 @@ raises a `TypeError` in the middle of the run.
 
 **A run evaluates on the pool it was started on, and no other.** Nothing is
 picked up from the surrounding code. A run started with the module-level
-[`optimize`][ropt.simple.optimize] evaluates in-process, on the thread that
-called it — even if a pool exists next to it.
+[`optimize`][ropt.simple.optimize] evaluates inside your own program, on the
+thread that called it — even if a pool exists next to it.
 
 **Threads cannot be interrupted.** Evaluations on a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from

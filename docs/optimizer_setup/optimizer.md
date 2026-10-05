@@ -64,10 +64,10 @@ your program — for example one that crashes the interpreter, leaks memory,
 keeps state between runs, or links against native libraries that clash with
 your other dependencies.
 
-It is also the answer for a backend that **cannot run concurrently in-process**.
-Some optimizers need a working directory of their own, write to a file whose
-name is fixed, or keep state inside the library that a second simultaneous run
-corrupts. What such a backend rules out is not merely a second run of its own
+It is also the answer for a backend that **cannot run alongside anything else in
+the same process**. Some optimizers need a working directory of their own, write
+to a file whose name is fixed, or keep state inside the library that a second
+simultaneous run corrupts. What such a backend rules out is not merely a second run of its own
 kind: changing the working directory applies to the whole process, so it breaks
 another run's relative output path, and any file your evaluation function opens
 by relative name, just as surely. Each backend states in its own documentation

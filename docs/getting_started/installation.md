@@ -23,29 +23,26 @@ which are enough for most basic optimization tasks.
 | -------------- | ----------------------- | ---------------------------------------------------------- |
 | `pandas`       | `pandas`                | Exporting results to pandas data frames.                   |
 | `polars`       | `polars`                | Exporting results to polars data frames.                   |
-| `cloudpickle`  | `cloudpickle`           | Optional everywhere: lets lambdas, closures, and notebook-defined code cross a process boundary. |
+| `cloudpickle`  | `cloudpickle`           | Copying lambdas, closures, and notebook-defined code into separate processes. |
 | `hpc`          | `pysqa`                 | Running evaluations on HPC clusters.                       |
 
-Without `cloudpickle`, anything that crosses a process boundary is transferred
-using Python's standard `pickle` module, which only handles functions and
-classes it can look up by name — those defined at the top level of an importable
-module. Installing `cloudpickle` lifts that restriction, so code defined inline
-(lambdas), inside another function (closures), or in a Jupyter notebook can
-cross as well.
+??? info "Why `cloudpickle`?"
 
-`cloudpickle` is optional in every case. It never changes what `ropt` can do,
-only where you are free to define the code it carries, and each place it applies
-works without it:
+    Some ways of running evaluations do not call your function inside your own
+    program: they start separate processes — on your own machine, or as jobs on
+    an HPC cluster — and run it there. Your function and its data must be copied
+    into those processes, which Python does with its standard `pickle` module.
+    `pickle` copies a function by storing its name, so the other process can
+    only rebuild functions and classes that are defined at the top level of a
+    module it can import. With `cloudpickle` installed, the code itself is
+    copied, which adds lambdas, functions defined inside another function
+    (closures), and functions written in a Jupyter notebook.
 
-| Where | Works without `cloudpickle` | What `cloudpickle` adds |
-| ----- | --------------------------- | ----------------------- |
-| [Process pools](../running/parallel.md#process-pool) | Evaluation functions at the top level of a module *or of the script you ran* | Lambdas, closures, and notebook-defined evaluation functions |
-| [Local and cluster jobs](../running/parallel.md#local-pool) | Evaluation functions at the top level of a module the worker can **import** | The same, plus functions defined in the script you ran, and results built from locally defined classes |
-| [The external backend](../optimizer_setup/optimizer.md#external-backend) | The built-in plugins, and any plugin class at the top level of a module *or of the script you ran* | Plugin instances of classes defined in a function or a notebook |
-
-The two pool rows differ because a process pool and a job start their workers
-differently; see
-[Worker or job](../running/parallel.md#process-or-local).
+    `cloudpickle` is optional in every case: it never changes what `ropt` can
+    do, only where the copied code may be defined. Both
+    [evaluating in parallel](../running/parallel.md) and the
+    [external backend](../optimizer_setup/optimizer.md#external-backend) state
+    what they accept without it.
 
 Install with:
 
