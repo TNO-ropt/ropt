@@ -515,16 +515,24 @@ itself: a worker process is killed (`BrokenProcessPool`), or an HPC job's output
 file never appears or cannot be deserialized. These are delivered as an ordinary
 result whose value is an
 [`ExecutorFailure`][ropt.components.executors.ExecutorFailure]
-rather than raised, which leaves the executor usable rather than tearing it
-down.
+rather than raised, so the batch still returns one result per call and a call
+that did produce a value keeps it.
+
+Whether the executor can run further work afterwards depends on which one it is.
+A [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] or
+[`HPCExecutor`][ropt.components.executors.HPCExecutor] starts fresh jobs for the
+next batch. The pool of a
+[`ProcessExecutor`][ropt.components.executors.ProcessExecutor] cannot be
+restarted once a worker is lost: every later batch fails the same way, and a new
+executor is needed.
 
 The evaluator turns that result into an
-[`ExecutionError`][ropt.exceptions.ExecutionError], naming how many evaluations
-were lost and why, which ends the run. It does **not** write `numpy.nan` for the
-affected rows. A machine that broke is not a realization that failed to
-converge: absorbing it would let the optimization continue on whichever workers
-happened to survive, and produce a result that is indistinguishable from one
-computed over the whole ensemble.
+[`ExecutionError`][ropt.exceptions.ExecutionError], naming the reason the first
+of the lost evaluations gave, which ends the run. It does **not** write
+`numpy.nan` for the affected rows. A machine that broke is not a realization
+that failed to converge: absorbing it would let the optimization continue on
+whichever workers happened to survive, and produce a result that is
+indistinguishable from one computed over the whole ensemble.
 
 !!! note "A failed realization is still tolerated"
 

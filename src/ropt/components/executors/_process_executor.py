@@ -32,6 +32,8 @@ if TYPE_CHECKING:
 
 _logger = get_logger(__name__)
 
+_POOL_GONE = "The work item was not sent: the worker processes are gone."
+
 
 class ProcessExecutor(ExecutorBase):
     """An executor that employs a pool of multiprocessing workers.
@@ -128,7 +130,8 @@ class ProcessExecutor(ExecutorBase):
                     # worker is collected below, since it runs whether or not
                     # anyone is still waiting for it.
                     pending.clear()
-                self._submit_pending(pending, futures, done, abort_signal)
+                unsent = self._submit_pending(pending, futures, done, abort_signal)
+                _store_unsent(unsent, store)
                 if not futures:
                     continue
                 item = done.get()
@@ -154,7 +157,7 @@ class ProcessExecutor(ExecutorBase):
         futures: dict[Future[tuple[bool, bytes]], int],
         done: queue.SimpleQueue[Future[tuple[bool, bytes]] | None],
         abort_signal: AbortSignal | None,
-    ) -> None:
+    ) -> list[int]:
         # Waiting for a slot is safe only with nothing in flight: the slots this
         # batch holds are given back by the loop that calls this.
         while pending and self._payload_gate.acquire(
@@ -163,11 +166,19 @@ class ProcessExecutor(ExecutorBase):
             index, bundle = pending.popleft()
             try:
                 future = self._submit(bundle)
+            except BrokenProcessPool:
+                self._payload_gate.release()
+                # The pool cannot be restarted, so the rest of the batch is
+                # lost too and building its payloads would run nothing.
+                unsent = [index, *(other for other, _ in pending)]
+                pending.clear()
+                return unsent
             except BaseException:
                 self._payload_gate.release()
                 raise
             futures[future] = index
             future.add_done_callback(done.put)
+        return []
 
     def _submit(self, bundle: list[WorkItem]) -> Future[tuple[bool, bytes]]:
         # The payload is built here rather than in a worker, so that `ropt`'s
@@ -183,15 +194,19 @@ class ProcessExecutor(ExecutorBase):
             raise ExecutionError(msg) from exc
         try:
             return self._pool.submit(_run_payload, payload)
-        except BrokenProcessPool as exc:
-            # Checked ahead of RuntimeError, which it subclasses: every worker
-            # is gone and the pool cannot be restarted, only replaced.
-            msg = "The worker processes are gone; this executor cannot run more work."
-            raise ExecutionError(msg) from exc
+        except BrokenProcessPool:
+            # Caught ahead of RuntimeError, which it subclasses, so that a dead
+            # pool is not mistaken for interpreter shutdown below.
+            raise
         except RuntimeError:
             # The pool is gone, which at interpreter shutdown is how a caller
             # that outlived its program is released rather than left waiting.
             raise _stopped() from None
+
+
+def _store_unsent(unsent: list[int], store: Callable[[int, Any], None]) -> None:
+    for index in unsent:
+        store(index, ExecutorFailure(_POOL_GONE))
 
 
 def _bundle_result(

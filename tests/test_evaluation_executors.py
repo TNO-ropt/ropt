@@ -1306,34 +1306,55 @@ def test_broken_worker_pool_reported_at_startup(
         ProcessExecutor(workers=1)
 
 
-def test_worker_pool_broken_during_a_run_is_an_execution_error(
+class _BreaksAfterStartup:
+    # A pool that accepts the startup probe and `accepted` bundles after it.
+    accepted = 0
+
+    def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+        self._submits = 0
+        self._shutdown_lock = threading.Lock()
+        self._processes: dict[int, Any] = {}
+
+    def submit(self, function: Any, *args: Any) -> Future[Any]:
+        self._submits += 1
+        if self._submits > self.accepted + 1:
+            raise BrokenProcessPool
+        future: Future[Any] = Future()
+        future.set_result(function(*args))
+        return future
+
+    def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
+
+
+def test_worker_pool_broken_before_a_bundle_is_sent_is_a_failed_work_item(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    # A pool that broke under a caller is a failure, not the interpreter
-    # shutting down, even though BrokenProcessPool is a RuntimeError.
-    class _BreaksAfterStartup:
-        def __init__(self, *_args: Any, **_kwargs: Any) -> None:
-            self._started = False
-            self._shutdown_lock = threading.Lock()
-            self._processes: dict[int, Any] = {}
-
-        def submit(self, *_args: Any, **_kwargs: Any) -> Future[Any]:
-            if self._started:
-                raise BrokenProcessPool
-            self._started = True
-            future: Future[Any] = Future()
-            future.set_result(None)
-            return future
-
-        def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
-
+    # A pool that broke under a caller is a failure of the work, not the
+    # interpreter shutting down, even though BrokenProcessPool is a RuntimeError.
     monkeypatch.setattr(
         "ropt.components.executors._process_executor.ProcessPoolExecutor",
         _BreaksAfterStartup,
     )
-    executor = ProcessExecutor(workers=1)
-    with pytest.raises(ExecutionError, match="worker processes are gone"):
-        executor.run([WorkItem(function=_function, args=(0,))])
+    result = ProcessExecutor(workers=1).run([WorkItem(function=_function, args=(0,))])
+    assert isinstance(result[0], ExecutorFailure)
+    assert "worker processes are gone" in result[0].message
+
+
+def test_worker_pool_broken_mid_batch_keeps_the_results_already_collected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The payload gate caps how many bundles are in flight, so a batch larger
+    # than the gate still has bundles to send once the pool is already gone.
+    monkeypatch.setattr(_BreaksAfterStartup, "accepted", 1)
+    monkeypatch.setattr(
+        "ropt.components.executors._process_executor.ProcessPoolExecutor",
+        _BreaksAfterStartup,
+    )
+    results = ProcessExecutor(workers=1).run(
+        [WorkItem(function=_function, args=(value,)) for value in range(3)]
+    )
+    assert results[0] == 1
+    assert all(isinstance(result, ExecutorFailure) for result in results[1:])
 
 
 def _mixed_bundle() -> list[WorkItem]:
