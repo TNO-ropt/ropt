@@ -350,7 +350,7 @@ What *is* raised falls into three groups:
   dependency is missing, or when the chosen method cannot handle the problem
   as configured — a constraint it does not support, for instance, which is
   checked as the run starts — and
-  [`ExecutionError`][ropt.exceptions.ExecutionError] when the executor or pool
+  [`ExecutionError`][ropt.exceptions.ExecutionError] when the worker pool
   that runs your evaluations, or a call handed to
   [`WorkerPool.offload`][ropt.simple.WorkerPool.offload], cannot start or breaks
   down, and [`AbortedError`][ropt.exceptions.AbortedError] when an abort

@@ -23,7 +23,7 @@ FunctionValue = Union[
 
 
 class EvaluationFunction(Protocol):
-    """The call signature for a high-level evaluation function."""
+    """The call signature for an evaluation function."""
 
     def __call__(
         self,

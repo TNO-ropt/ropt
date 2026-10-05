@@ -55,8 +55,7 @@ reached `max_iterations` or `convergence_tolerance`. Those two live in the
 not distinguish which of the three applied. Only `MAX_FUNCTIONS_REACHED` and
 `MAX_BATCHES_REACHED` correspond to a limit `ropt` enforced itself.
 
-**A broken executor is an error, not a failed realization.** When the executor
-or pool
+**A broken worker pool is an error, not a failed realization.** When the pool
 itself fails — a worker process is killed, a cluster job never writes its result
 — the run stops with an [`ExecutionError`][ropt.exceptions.ExecutionError] giving
 the reason the first lost evaluation gave. It is not absorbed as a `NaN`,
@@ -68,7 +67,7 @@ from one computed over the whole ensemble.
 | `result.results` is `None`, but `exit_code` is `FINISHED` | No evaluation satisfied the constraints to within `constraint_tolerance` (default `1e-10`; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all. |
 | `TOO_FEW_REALIZATIONS` although only one realization failed | [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations) defaults to all of them. Lower it. |
 | The run stopped long before `max_functions`, with `FINISHED` | The backend ended it: `max_iterations`, `convergence_tolerance`, or its own convergence test. Those are set in the `backend` section; see [Limiting the length of a run](../optimizer_setup/optimizer.md#limiting-the-length-of-a-run). |
-| `ExecutionError` part-way through a run | The executor or pool failed, not your objective. The message names the reason the first lost evaluation gave. |
+| `ExecutionError` part-way through a run | The worker pool failed, not your objective. The message names the reason the first lost evaluation gave. |
 | Numbers do not match what you configured | Results carry the configured values and the optimizer's scaled ones side by side; see [Scaling of results](../results/results.md#scaling-of-results). |
 
 ## Your evaluation function
@@ -169,7 +168,7 @@ process of its own. Optimizer output capture is likewise for one run at a time.
 | --- | --- |
 | Results from a shared `report=` callback are jumbled or lost | The callback is called from every run's thread at once. Collect the results in a [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) instead, or use one callback per run. |
 | A run started from a handler raises `WorkflowError` about the call stack, or hangs | Its handler list reaches a handler that is already running; see [Result Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs). |
-| Many runs are slower than expected while the executor sits idle | A shared handler is serializing them. Make it cheaper. |
+| Many runs are slower than expected while the workers sit idle | A shared handler is serializing them. Make it cheaper. |
 | A second concurrent run raises `WorkflowError` about output capture | Only one run at a time may set `stdout` or `stderr`; see [Many Runs at Once](../running/many_runs.md). |
 
 ## Configuration
