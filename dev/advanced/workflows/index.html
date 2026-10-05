@@ -3451,9 +3451,6 @@ following event types:</p>
 </table>
 <p>Most event handlers only need to listen for <code>FINISHED_EVALUATION</code>; the other
 types are useful for logging, progress bars, or custom lifecycle hooks.</p>
-<p>An optimizer may ask for the functions at a point that was already evaluated.
-That point is not evaluated a second time, and no event is emitted for it, so
-each result reaches a handler exactly once: in the batch that computed it.</p>
 <h2 id="a-workflow-you-can-read-end-to-end">A workflow you can read end to end</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
@@ -3561,7 +3558,7 @@ sequence of <a class="autorefs autorefs-internal" title="            ropt.result
       instance-attribute
   " href="../../reference/enums/#ropt.enums.EnOptEventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
   immediately before a batch of function or perturbation evaluations is
-  performed. A request answered from an earlier evaluation emits nothing.</li>
+  performed.</li>
 <li><a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
 
 
@@ -3576,9 +3573,7 @@ sequence of <a class="autorefs autorefs-internal" title="            ropt.result
   
       dataclass
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects. Event handlers
-  typically listen for this event to process or track optimization progress.
-  Functions computed to obtain a gradient are carried here too, whether or not
-  the optimizer asked for them.</li>
+  typically listen for this event to process or track optimization progress.</li>
 <li><a class="autorefs autorefs-internal" title="            FINISHED_OPTIMIZER
 
 
