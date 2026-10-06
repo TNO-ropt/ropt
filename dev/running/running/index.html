@@ -2915,8 +2915,7 @@ That is why <code>exit_code</code> can only be <code>FINISHED</code>; <code>USER
 <code>ABORTED_ON_ERROR</code> when <a href="#stopping-from-outside"><code>Session.abort</code></a> or a failing
 run on the same session cut it off; or <code>EXECUTOR_SHUT_DOWN</code> when the pool it was
 evaluating on could no longer run the work. An abort that arrives after the
-batch has
-finished leaves it unaffected, and the evaluation reports <code>FINISHED</code>.</p>
+batch has finished leaves it unaffected, and the evaluation reports <code>FINISHED</code>.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/evaluate.py">examples/evaluate.py</a>,
 which evaluates a single vector and then a matrix of them.</p>

@@ -2616,7 +2616,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.run.ReportCallback" class="md-nav__link">
+  <a href="#ropt.ReportCallback" class="md-nav__link">
     <span class="md-ellipsis">
       
         ReportCallback
@@ -3853,7 +3853,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.run.ReportCallback" class="md-nav__link">
+  <a href="#ropt.ReportCallback" class="md-nav__link">
     <span class="md-ellipsis">
       
         ReportCallback
@@ -3946,7 +3946,35 @@ including a thread you spawn yourself.</p>
 
     </div>
 
-</div><h2 id="running-optimizations">Running optimizations</h2>
+</div><p>The remaining names imported from <code>ropt</code> are documented on their own pages:
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>;
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a>,
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>,
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a>,
+<a class="autorefs autorefs-internal" title="            ropt.results.results_to_pandas" href="../results/#ropt.results.results_to_pandas"><code>results_to_pandas</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.results.results_to_polars" href="../results/#ropt.results.results_to_polars"><code>results_to_polars</code></a>;
+and <a class="autorefs autorefs-internal" title="            RoptError" href="../exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> with
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>,
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>,
+<a class="autorefs autorefs-internal" title="            UnsupportedError" href="../exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a>,
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> and
+<a class="autorefs autorefs-internal" title="            RunsFailedError" href="../exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a>.</p>
+<h2 id="running-optimizations">Running optimizations</h2>
 
 
 <div class="doc doc-object doc-function">
@@ -4061,12 +4089,12 @@ session you hold.</p>
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4333,17 +4361,17 @@ the evaluations workers.</p>
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ReportCallback
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a>] | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4670,12 +4698,12 @@ the evaluations workers.</p>
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4902,12 +4930,12 @@ order. See <a href="../../running/running/">Running Optimizations</a> for a walk
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5667,12 +5695,12 @@ session's pools to give them workers. See
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5984,17 +6012,17 @@ walkthrough.</p>
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ReportCallback
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a>] | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6337,12 +6365,12 @@ walkthrough.</p>
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6623,12 +6651,12 @@ walkthrough.</p>
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7892,12 +7920,12 @@ evaluations happen and which session the run belongs to. See
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8225,17 +8253,17 @@ walkthrough.</p>
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ReportCallback
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a>] | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8595,12 +8623,12 @@ walkthrough.</p>
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8898,12 +8926,12 @@ walkthrough.</p>
                 <code>report</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
 
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.run.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -11196,8 +11224,8 @@ result or none.</p>
 
 
 
-<h2 id="ropt.run.ReportCallback" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ReportCallback</span>
+<h2 id="ropt.ReportCallback" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ropt.ReportCallback</span>
 
 
   <span class="doc doc-labels">
