@@ -13,15 +13,13 @@ _ROOT = Path(__file__).parent.parent
 _SNIPPET_DIR = _ROOT / "docs" / "snippets"
 _QUICKSTART = _ROOT / "docs" / "getting_started" / "quickstart.md"
 _EXIT_CODES = _ROOT / "docs" / "results" / "exit_codes.md"
-_EXAMPLE_PAGES = {
-    "simple": _ROOT / "docs" / "getting_started" / "examples.md",
-}
+_EXAMPLES_PAGE = _ROOT / "docs" / "getting_started" / "examples.md"
 
 # Misplaced backticks render as a code span, so no reference reaches
 # mkdocs-autorefs and `mkdocs build --strict` stays silent.
 _MALFORMED_REF = re.compile(r"\[`[^`\n]*\]\[[^`\n]*`\]")
 _PYTHON_BLOCK = re.compile(r"```python\n(.*?)```", re.DOTALL)
-_EXAMPLE_LINK = re.compile(r"examples/(?:simple|advanced)/\w+\.py")
+_EXAMPLE_LINK = re.compile(r"examples/\w+\.py")
 _TABLE_CODE = re.compile(r"^\| `(\w+)`", re.MULTILINE)
 
 
@@ -65,27 +63,26 @@ def test_quickstart_program_reaches_the_optimum_it_claims(tmp_path: Path) -> Non
     assert np.allclose(result.results.variables, 1.0, atol=1e-2)
 
 
-def test_examples_pages_list_every_script() -> None:
+def test_examples_page_list_every_script() -> None:
+    page = _EXAMPLES_PAGE.read_text()
     missing = [
         str(path.relative_to(_ROOT))
-        for sub_dir, page in _EXAMPLE_PAGES.items()
-        for path in sorted((_ROOT / "examples" / sub_dir).glob("*.py"))
-        if str(path.relative_to(_ROOT)) not in page.read_text()
+        for path in sorted((_ROOT / "examples").glob("*.py"))
+        if str(path.relative_to(_ROOT)) not in page
     ]
     if missing:
         pytest.fail(
-            "Not listed on the examples pages, so unreachable from the "
+            "Not listed on the examples page, so unreachable from the "
             "documentation:\n" + "\n".join(missing)
         )
 
 
-def test_examples_pages_have_no_dead_entries() -> None:
+def test_examples_page_have_no_dead_entries() -> None:
     # The scripts are linked by their GitHub URL, which mkdocs never resolves.
     missing = sorted(
         {
             name
-            for page in _EXAMPLE_PAGES.values()
-            for name in _EXAMPLE_LINK.findall(page.read_text())
+            for name in _EXAMPLE_LINK.findall(_EXAMPLES_PAGE.read_text())
             if not (_ROOT / name).exists()
         }
     )

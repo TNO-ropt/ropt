@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import importlib
 import operator
-import os
 import shutil
 import sys
 import time
@@ -98,10 +97,8 @@ def executor_fixture(workdir: Path, hpc_queue: str) -> Any:
 
 @pytest.fixture(name="example")
 def example_fixture(monkeypatch: pytest.MonkeyPatch) -> Any:
-    paths = [str(_EXAMPLES / name) for name in ("advanced", "simple")]
-    for path in paths:
-        monkeypatch.syspath_prepend(path)
-    monkeypatch.setenv("PYTHONPATH", os.pathsep.join(paths))
+    monkeypatch.syspath_prepend(str(_EXAMPLES))
+    monkeypatch.setenv("PYTHONPATH", str(_EXAMPLES))
 
     def _load(name: str) -> Any:
         sys.modules.pop(name, None)
@@ -192,16 +189,10 @@ def test_hpc_cluster_failed_job_reports_where_its_output_is(
     )
 
 
-def test_hpc_cluster_runs_the_simple_example(
+def test_hpc_cluster_runs_the_example(
     example: Any, hpc_queue: str, workdir: Path
 ) -> None:
     example("hpc").main(queue=hpc_queue, workdir=workdir)
-
-
-def test_hpc_cluster_runs_the_advanced_example(
-    example: Any, hpc_queue: str, workdir: Path
-) -> None:
-    example("hpc_executor").main(workdir=workdir, queue=hpc_queue)
 
 
 def _listing(workdir: Path, pattern: str = "*") -> list[str]:
