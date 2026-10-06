@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../basic_optimizer/">
+        <link rel="prev" href="../config/">
       
       
         <link rel="next" href="../events/">
@@ -264,26 +264,6 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
-          
-  
-  
-  Optimizer Setup
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
         <a href="../../running/running/" class="md-tabs__link">
           
   
@@ -304,11 +284,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../workflows/workflows/" class="md-tabs__link">
+        <a href="../../results/results/" class="md-tabs__link">
           
   
   
-  Workflows
+  Results
 
         </a>
       </li>
@@ -324,11 +304,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../utilities/logging/" class="md-tabs__link">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
           
   
   
-  Utilities
+  Optimizer Setup
 
         </a>
       </li>
@@ -344,11 +324,31 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../tutorials/" class="md-tabs__link">
+        <a href="../../troubleshooting/" class="md-tabs__link">
           
   
   
-  Tutorials
+  Troubleshooting
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../advanced/plugin_discovery/" class="md-tabs__link">
+          
+  
+  
+  Plugins
 
         </a>
       </li>
@@ -366,7 +366,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../simple/" class="md-tabs__link">
+        <a href="../api/" class="md-tabs__link">
           
   
   
@@ -601,34 +601,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting_started/deterministic/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Deterministic Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../getting_started/ensemble/" class="md-nav__link">
         
   
@@ -657,6 +629,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../getting_started/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collecting Results with Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../getting_started/execution/" class="md-nav__link">
         
   
@@ -665,6 +665,34 @@
     
   
     Running in Parallel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
   
 
     
@@ -717,7 +745,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Setup
+    Running
   
 
     
@@ -730,6 +758,408 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/running/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluating in Parallel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/many_runs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Many Runs at Once
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/nested/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nested Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/initial_values/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reusing Results at the Starting Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Results
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results/results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results/exit_codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exit Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -802,6 +1232,174 @@
   
   
     <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/objectives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Objectives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/constraints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constraints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/discrete/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discrete and Mixed-Integer Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing an Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../optimizer_setup/gradients/" class="md-nav__link">
         
   
@@ -810,6 +1408,34 @@
     
   
     Stochastic Gradients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/samplers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
   
 
     
@@ -879,296 +1505,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../optimizer_setup/results/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Working with Results
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Running
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Running
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../running/running/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Running Optimizations
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Workflows
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Workflows
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflows/workflows/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Workflows
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Writing Evaluation Callbacks
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflows/parallel/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Parallel Evaluation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1208,7 +1544,7 @@
   <span class="md-ellipsis">
     
   
-    Utilities
+    Troubleshooting
   
 
     
@@ -1224,7 +1560,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Utilities
+    Troubleshooting
   
 
           </label>
@@ -1237,14 +1573,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../utilities/logging/" class="md-nav__link">
+      <a href="../../troubleshooting/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Troubleshooting
   
 
     
@@ -1265,14 +1601,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../utilities/plugin_discovery/" class="md-nav__link">
+      <a href="../../troubleshooting/keyboard_interrupt/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Plugin Discovery
+    Keyboard Interrupts
   
 
     
@@ -1325,7 +1661,7 @@
   <span class="md-ellipsis">
     
   
-    Tutorials
+    Plugins
   
 
     
@@ -1341,7 +1677,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Tutorials
+    Plugins
   
 
           </label>
@@ -1354,14 +1690,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/" class="md-nav__link">
+      <a href="../../advanced/plugin_discovery/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overview
+    Plugin Discovery
   
 
     
@@ -1382,126 +1718,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/optimize/" class="md-nav__link">
+      <a href="../../advanced/writing_plugins/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Your First Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/ensemble/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Ensemble Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/constrained/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Constrained Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/discrete/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Mixed-Integer Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/workflow/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Building a Workflow
+    Writing a Plugin
   
 
     
@@ -1586,99 +1810,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../simple/" class="md-nav__link">
+      <a href="../api/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Simple API
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Configuration
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../context/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Context Class
+    Optimization API
   
 
     
@@ -1720,42 +1859,6 @@
 
               
             
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../basic_optimizer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Basic Optimizer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
               
                 
   
@@ -1781,10 +1884,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="">
             
   
   
@@ -1802,8 +1905,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_8_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1903,10 +2006,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Results.to_dataframe" class="md-nav__link">
+  <a href="#ropt.results.Results.to_pandas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        to_dataframe
+        to_pandas
       
     </span>
   </a>
@@ -1924,11 +2027,28 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.results.Results.transform_from_optimizer" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.AxisMetadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        AxisMetadata
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AxisMetadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.AxisMetadata.get_axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_axes
       
     </span>
   </a>
@@ -1949,23 +2069,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ResultField">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.ResultField.get_axes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_axes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1981,10 +2084,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.FunctionResults.transform_from_optimizer" class="md-nav__link">
+  <a href="#ropt.results.FunctionResults.function_key" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        function_key
       
     </span>
   </a>
@@ -1997,6 +2100,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.results.ScaledFunctionResults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ScaledFunctionResults
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.results.GradientResults" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2005,22 +2119,16 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GradientResults">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.GradientResults.transform_from_optimizer" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.ScaledGradientResults" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        ScaledGradientResults
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -2037,10 +2145,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Functions.create" class="md-nav__link">
+  <a href="#ropt.results.Functions.from_scaled" class="md-nav__link">
     <span class="md-ellipsis">
       
-        create
+        from_scaled
       
     </span>
   </a>
@@ -2065,10 +2173,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Gradients.create" class="md-nav__link">
+  <a href="#ropt.results.Gradients.from_scaled" class="md-nav__link">
     <span class="md-ellipsis">
       
-        create
+        from_scaled
       
     </span>
   </a>
@@ -2170,16 +2278,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.results.ConstraintInfo.from_scaled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_scaled
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.results.results_to_dataframe" class="md-nav__link">
+  <a href="#ropt.results.results_to_pandas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        results_to_dataframe
+        results_to_pandas
       
     </span>
   </a>
@@ -2267,131 +2386,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_4" >
         
           
-          <label class="md-nav__link" for="__nav_8_5" id="__nav_8_5_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Engine
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Optimization Engine
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../core/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Core Classes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../evaluation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Evaluation Classes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_6" id="__nav_8_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="">
             
   
   
@@ -2409,8 +2407,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2532,327 +2530,9 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_7" id="__nav_8_7_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Workflow Components
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_7">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Workflow Components
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_compute_steps/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Compute Steps
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_event_handlers/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Event Handlers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_evaluators/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Evaluators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_executors/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Executors
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_utils/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Utilities
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_8" id="__nav_8_8_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin System
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Plugin System
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plugin_bases/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin Bases
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -2872,7 +2552,7 @@
   <span class="md-ellipsis">
     
   
-    Plugin Manager
+    Plugin System
   
 
     
@@ -2893,14 +2573,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_plugins/" class="md-nav__link">
+      <a href="../utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Default Plugins
+    Utility Functions
   
 
     
@@ -2909,14 +2589,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -3035,10 +2707,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Results.to_dataframe" class="md-nav__link">
+  <a href="#ropt.results.Results.to_pandas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        to_dataframe
+        to_pandas
       
     </span>
   </a>
@@ -3056,11 +2728,28 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.results.Results.transform_from_optimizer" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.AxisMetadata" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        AxisMetadata
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AxisMetadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.AxisMetadata.get_axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_axes
       
     </span>
   </a>
@@ -3081,23 +2770,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ResultField">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.ResultField.get_axes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_axes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -3113,10 +2785,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.FunctionResults.transform_from_optimizer" class="md-nav__link">
+  <a href="#ropt.results.FunctionResults.function_key" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        function_key
       
     </span>
   </a>
@@ -3129,6 +2801,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.results.ScaledFunctionResults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ScaledFunctionResults
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.results.GradientResults" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3137,22 +2820,16 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="GradientResults">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.GradientResults.transform_from_optimizer" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.ScaledGradientResults" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        ScaledGradientResults
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -3169,10 +2846,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Functions.create" class="md-nav__link">
+  <a href="#ropt.results.Functions.from_scaled" class="md-nav__link">
     <span class="md-ellipsis">
       
-        create
+        from_scaled
       
     </span>
   </a>
@@ -3197,10 +2874,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Gradients.create" class="md-nav__link">
+  <a href="#ropt.results.Gradients.from_scaled" class="md-nav__link">
     <span class="md-ellipsis">
       
-        create
+        from_scaled
       
     </span>
   </a>
@@ -3302,16 +2979,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.results.ConstraintInfo.from_scaled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_scaled
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.results.results_to_dataframe" class="md-nav__link">
+  <a href="#ropt.results.results_to_pandas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        results_to_dataframe
+        results_to_pandas
       
     </span>
   </a>
@@ -3350,34 +3038,6 @@
 
 
 <h1 id="evaluation-results">Evaluation Results</h1>
-<p>Every batch evaluation produces a tuple of <a class="autorefs autorefs-internal" title="            ropt.results.Results
-
-
-  
-      dataclass
-  " href="#ropt.results.Results"><code>Results</code></a>
-objects: a <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> for objective and
-constraint values, and/or a <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
-
-
-  
-      dataclass
-  " href="#ropt.results.GradientResults"><code>GradientResults</code></a>
-for gradient estimates. Each is a frozen container of
-<a class="autorefs autorefs-internal" title="            ropt.results.ResultField
-
-
-  
-      dataclass
-  " href="#ropt.results.ResultField"><code>ResultField</code></a> sub-objects holding NumPy arrays
-with axis-name metadata.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for a tour of the access
-patterns.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3392,9 +3052,35 @@ patterns.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Data classes for storing intermediate optimization results.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for a narrative overview of
-the result hierarchy, axis metadata, domain transforms, and pandas/polars export.</p>
+        <p>The objects a batch evaluation produces.</p>
+<p>Every evaluation yields a tuple of <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a>: a
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> for objective and constraint
+values, a <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> for gradient
+estimates, or both. Each is a frozen container of
+<a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+
+
+  
+      dataclass
+  " href="#ropt.results.ResultField"><code>ResultField</code></a> sub-objects holding NumPy arrays with
+axis-name metadata.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for a narrative overview of
+the result hierarchy, axis metadata, scaling, and pandas/polars export.</p>
 
 
 
@@ -3434,7 +3120,7 @@ the result hierarchy, axis metadata, domain transforms, and pandas/polars export
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.AxisMetadata (ropt.results._result_field.AxisMetadata)" href="#ropt.results.AxisMetadata">AxisMetadata</a></code>, <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
 
 
@@ -3451,7 +3137,9 @@ the result hierarchy, axis metadata, domain transforms, and pandas/polars export
   
       dataclass
   " href="#ropt.results.GradientResults"><code>GradientResults</code></a>.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for a narrative overview.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for a narrative overview.</p>
+<p>The keys of <code>names</code> are <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a> values, or the
+name of a metadata key that defines a user axis.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3493,8 +3181,7 @@ the result hierarchy, axis metadata, domain transforms, and pandas/polars export
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Mapping from <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a> to label tuples
-      for DataFrame export.</p>
+                <p>Mapping from axis name to label tuples, for DataFrame export.</p>
               </div>
             </td>
           </tr>
@@ -3522,29 +3209,32 @@ the result hierarchy, axis metadata, domain transforms, and pandas/polars export
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.results.Results.to_dataframe" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">to_dataframe</span>
+<h3 id="ropt.results.Results.to_pandas" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">to_pandas</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_dataframe</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">select</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">unstack</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">AxisName</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_pandas</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">select</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">unstack</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Export a field to a pandas DataFrame.</p>
-<p>Exports the sub-fields of <code>field_name</code> as columns, named after the
-sub-field. Multi-dimensional sub-fields are stacked into rows indexed
-by a multi-index derived from the field's axis metadata; index levels
-are labeled using the <code>names</code> mapping (numeric indices if absent).
-<code>batch_id</code> is always prepended to the index. The <code>unstack</code>
-argument pivots selected axes into columns, producing tuple column
-names of the form <code>(sub-field, label, ...)</code>.</p>
-<p>See <a href="../../optimizer_setup/results/#exporting-to-pandas">Working with Results</a> for
+        <p>Export selected fields to a pandas DataFrame.</p>
+<p>Fields are named by a dotted path from this result, such as
+<code>"functions.objectives"</code>, <code>"scaled.variables"</code> or <code>"target_objective"</code>.
+A path may end in one or more mapping keys, as <code>"metadata.run.id"</code> does.
+Each selected path becomes a column of that name, in the order given.</p>
+<p>Multi-dimensional fields are stacked into rows indexed by a multi-index
+derived from the field's axis metadata; index levels are labeled using
+the <code>names</code> mapping (numeric indices if absent). <code>batch_id</code> is always
+prepended to the index. The <code>unstack</code> argument pivots selected axes into
+columns, producing tuple column names of the form <code>(path, label, ...)</code>.</p>
+<p>Paths whose value is <code>None</code>, and missing mapping keys, are skipped. A
+path that does not name a value raises a <code>ValueError</code>.</p>
+<p>See <a href="../../results/results/#exporting-to-pandas">Working with Results</a> for
 further details and examples.</p>
 
 
@@ -3561,30 +3251,14 @@ further details and examples.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>field_name</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The field to export.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
                 <code>select</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Sub-fields to include.</p>
+                <p>The dotted paths of the fields to export, in column order.</p>
               </div>
             </td>
             <td>
@@ -3596,7 +3270,7 @@ further details and examples.</p>
                 <code>unstack</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            AxisName (ropt.enums.AxisName)" href="../enums/#ropt.enums.AxisName">AxisName</a>] | None</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3626,7 +3300,7 @@ further details and examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A DataFrame with sub-fields as columns and axis indices as rows.</p>
+                <p>A DataFrame with the selected fields as columns.</p>
               </div>
             </td>
           </tr>
@@ -3645,21 +3319,31 @@ further details and examples.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#TypeError">TypeError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the <code>pandas</code> module is not installed.</p>
+                <p>If <code>select</code> is not an ordered sequence.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#AttributeError">AttributeError</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the field name is invalid.</p>
+                <p>If <code>select</code> names the same path more than once.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the <code>pandas</code> module is not installed.</p>
               </div>
             </td>
           </tr>
@@ -3685,26 +3369,20 @@ further details and examples.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_polars</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">select</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">unstack</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">AxisName</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">","</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">select</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">unstack</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">","</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Export a field to a polars DataFrame.</p>
+        <p>Export selected fields to a polars DataFrame.</p>
 <p>This is the polars counterpart of
-<a class="autorefs autorefs-internal" title="            to_dataframe" href="#ropt.results.Results.to_dataframe"><code>to_dataframe</code></a>. Polars has no index,
-so the frame is returned in long format: <code>batch_id</code> and the axis labels
-become regular columns, followed by one column per sub-field.</p>
-<p>Since polars column names must be strings, the tuple column names that
-<code>to_dataframe</code> produces for unstacked axes are joined into a single
-string using <code>sep</code>: the pandas column <code>(sub-field, label, ...)</code> becomes
-<code>"sub-field&lt;sep&gt;label&lt;sep&gt;..."</code>.</p>
-<p>See <a href="../../optimizer_setup/results/#exporting-to-polars">Working with Results</a> for
-further details and examples.</p>
+<a class="autorefs autorefs-internal" title="            to_pandas" href="#ropt.results.Results.to_pandas"><code>to_pandas</code></a>, returned in long
+format with tuple column names joined into a single string using
+<code>sep</code>. See <a href="../../results/results/#exporting-to-polars">Exporting to polars</a>
+for details.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3720,30 +3398,14 @@ further details and examples.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>field_name</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The field to export.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
                 <code>select</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Sub-fields to include.</p>
+                <p>The dotted paths of the fields to export, in column order.</p>
               </div>
             </td>
             <td>
@@ -3755,7 +3417,7 @@ further details and examples.</p>
                 <code>unstack</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            AxisName (ropt.enums.AxisName)" href="../enums/#ropt.enums.AxisName">AxisName</a>] | None</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3801,7 +3463,7 @@ further details and examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A DataFrame with axis labels and sub-fields as columns.</p>
+                <p>A DataFrame with axis labels and the selected fields as columns.</p>
               </div>
             </td>
           </tr>
@@ -3820,111 +3482,31 @@ further details and examples.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#TypeError">TypeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>select</code> is not an ordered sequence.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>select</code> names the same path more than once.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                   <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>If the <code>polars</code> module is not installed.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#AttributeError">AttributeError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the field name is invalid.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.results.Results.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Transform results from the optimizer domain to the user domain.</p>
-<p>Reverses variable, objective, and constraint transforms applied during
-optimization, restoring values to the user-defined domain.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The context used by the source of the results.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Results
-
-
-  
-      dataclass
-   (ropt.results._results.Results)" href="#ropt.results.Results">Results</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A new <code>Results</code> object in the user domain.</p>
               </div>
             </td>
           </tr>
@@ -3949,13 +3531,9 @@ optimization, restoring values to the user-defined domain.</p>
 
 
 
-<h2 id="ropt.results.ResultField" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.ResultField</span>
+<h2 id="ropt.results.AxisMetadata" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.AxisMetadata</span>
 
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
 
 </h2>
 
@@ -3964,9 +3542,7 @@ optimization, restoring values to the user-defined domain.</p>
 
 
 
-        <p>Base class for result field containers that carry axis metadata.</p>
-<p>See <a href="../../optimizer_setup/results/#axes-and-dimensionality">Working with Results</a> for
-how axis metadata is used.</p>
+        <p>Mixin for dataclasses whose fields carry axis metadata.</p>
 
 
 
@@ -3989,7 +3565,7 @@ how axis metadata is used.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.results.ResultField.get_axes" class="doc doc-heading">
+<h3 id="ropt.results.AxisMetadata.get_axes" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_axes</span>
 
 
@@ -3998,7 +3574,7 @@ how axis metadata is used.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_axes</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">AxisName</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_axes</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4048,11 +3624,11 @@ how axis metadata is used.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            AxisName (ropt.enums.AxisName)" href="../enums/#ropt.enums.AxisName">AxisName</a>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A tuple of <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a> values.</p>
+                <p>A tuple of axis names, each an <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a> value.</p>
               </div>
             </td>
           </tr>
@@ -4100,6 +3676,53 @@ how axis metadata is used.</p>
 
 
 
+<h2 id="ropt.results.ResultField" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.ResultField</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.AxisMetadata (ropt.results._result_field.AxisMetadata)" href="#ropt.results.AxisMetadata">AxisMetadata</a></code></p>
+
+
+
+        <p>Base class for result field containers that carry axis metadata.</p>
+<p>See <a href="../../results/results/#axes-and-dimensionality">Working with Results</a> for
+how axis metadata is used.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="ropt.results.FunctionResults" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.FunctionResults</span>
 
@@ -4123,7 +3746,44 @@ how axis metadata is used.</p>
 
 
         <p>Results of a function evaluation batch.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
+<p>Fields that have two domains appear twice: once here, in the domain that was
+configured, and once under <code>scaled</code>, in the domain the optimizer works in.
+The <code>target_objective</code> is the exception. It is a weighted total over
+objectives that may differ in both scale and direction, so it exists only in
+the optimizer's domain and has no scaled counterpart.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for usage details.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="ropt.results.FunctionResults--__tabbed_1_1" name="ropt.results.FunctionResults--__tabbed_1" type="radio" /><input id="ropt.results.FunctionResults--__tabbed_1_2" name="ropt.results.FunctionResults--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionResults--__tabbed_1_1">Variables</label><label for="ropt.results.FunctionResults--__tabbed_1_2">Target Objective</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>variables</code>: The vector of variable values at which the functions were
+evaluated:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>target_objective</code>: The single weighted value the optimizer minimizes:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\(()\)</span> — a zero-dimensional array.</li>
+<li>Axis types: none.</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4137,6 +3797,28 @@ how axis metadata is used.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.function_id">function_id</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>This evaluation's index within its batch.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.variables">variables</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variable vector that was evaluated.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="ropt.results.FunctionResults.evaluations">evaluations</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
@@ -4148,7 +3830,7 @@ how axis metadata is used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Per-realization evaluation data.</p>
+                <p>Per-realization values returned by the evaluator.</p>
               </div>
             </td>
           </tr>
@@ -4181,6 +3863,33 @@ how axis metadata is used.</p>
             <td>
               <div class="doc-md-description">
                 <p>Aggregated function values, or <code>None</code> if all failed.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.target_objective">target_objective</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value the optimizer minimizes, in its own domain.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.scaled">scaled</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.ScaledFunctionResults
+
+
+  
+      dataclass
+   (ropt.results._function_results.ScaledFunctionResults)" href="#ropt.results.ScaledFunctionResults">ScaledFunctionResults</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The same quantities as the optimizer works with them.</p>
               </div>
             </td>
           </tr>
@@ -4221,56 +3930,34 @@ how axis metadata is used.</p>
 
 
 
-<div class="doc doc-object doc-function">
+<div class="doc doc-object doc-attribute">
 
 
-<h3 id="ropt.results.FunctionResults.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
 
+<h3 id="ropt.results.FunctionResults.function_key" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">function_key</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionResults</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">function_key</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Transform results from optimizer space to user space.</p>
-<p>This applies inverse transformations to all transformable sub-fields
-(<code>evaluations</code>, <code>functions</code>, and <code>constraint_info</code> when present).
-Realization metadata is passed through unchanged.</p>
+        <p>Identify this function evaluation.</p>
+<p>A <code>function_id</code> is unique within its batch only, so a function
+evaluation is identified by its batch together with its index there.
+A <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The context used by the source of the results.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> carries the same
+value in its own <code>function_key</code>, which is how the two are paired.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -4284,16 +3971,141 @@ Realization metadata is passed through unchanged.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The batch ID and the index within that batch.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.ScaledFunctionResults" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.ScaledFunctionResults</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.ResultField
 
 
   
       dataclass
-   (ropt.results._function_results.FunctionResults)" href="#ropt.results.FunctionResults">FunctionResults</a></code>
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
+
+
+
+        <p>The scaled counterpart of the fields that have two domains.</p>
+<p>Each field mirrors the field of the same name on
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a>, expressed in the domain
+the optimizer works in.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="ropt.results.ScaledFunctionResults--__tabbed_1_1" name="ropt.results.ScaledFunctionResults--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.ScaledFunctionResults--__tabbed_1_1">Variables</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>variables</code>: The vector of variable values in the optimizer's domain:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ScaledFunctionResults.variables">variables</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The transformed results.</p>
+                <p>The variable vector the optimizer proposed.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ScaledFunctionResults.functions">functions</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Functions
+
+
+  
+      dataclass
+   (ropt.results._functions.Functions)" href="#ropt.results.Functions">Functions</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Scaled aggregates, or <code>None</code> if all realizations failed.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ScaledFunctionResults.constraint_info">constraint_info</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+   (ropt.results._constraint_info.ConstraintInfo)" href="#ropt.results.ConstraintInfo">ConstraintInfo</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Constraint differences in the optimizer's domain.</p>
               </div>
             </td>
           </tr>
@@ -4301,9 +4113,17 @@ Realization metadata is passed through unchanged.</p>
     </table>
 
 
-    </div>
 
-</div>
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
 
 
 
@@ -4341,7 +4161,92 @@ Realization metadata is passed through unchanged.</p>
 
 
         <p>Results of a gradient evaluation batch.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
+<p>Fields that have two domains appear twice: once here, in the domain that was
+configured, and once under <code>scaled</code>, in the domain the optimizer works in.
+The <code>target_gradient</code> is the exception. It differentiates a weighted total
+over objectives that may differ in both scale and direction, with respect to
+the scaled variables, so it exists only in the optimizer's domain and has no
+scaled counterpart.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for usage details.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.GradientResults--__tabbed_1_1" name="ropt.results.GradientResults--__tabbed_1" type="radio" /><input id="ropt.results.GradientResults--__tabbed_1_2" name="ropt.results.GradientResults--__tabbed_1" type="radio" /><input id="ropt.results.GradientResults--__tabbed_1_3" name="ropt.results.GradientResults--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientResults--__tabbed_1_1">Variables</label><label for="ropt.results.GradientResults--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientResults--__tabbed_1_3">Target Gradient</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>variables</code>: The vector of unperturbed variable values:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>perturbed_variables</code>: A three-dimensional array of perturbed variable
+values for each realization and perturbation:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_r, n_p, n_v)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>AxisName.PERTURBATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>target_gradient</code>: The gradient the optimizer descends:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4355,6 +4260,40 @@ Realization metadata is passed through unchanged.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientResults.function_key">function_key</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Identifies the function evaluation this gradient
+                 was computed from.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientResults.variables">variables</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variable vector that was perturbed.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientResults.perturbed_variables">perturbed_variables</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The perturbed vectors that were evaluated.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="ropt.results.GradientResults.evaluations">evaluations</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="            ropt.results.GradientEvaluations
@@ -4366,7 +4305,7 @@ Realization metadata is passed through unchanged.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Perturbed-variable evaluation data.</p>
+                <p>Per-perturbation values returned by the evaluator.</p>
               </div>
             </td>
           </tr>
@@ -4398,7 +4337,34 @@ Realization metadata is passed through unchanged.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Aggregated gradient values, or <code>None</code> if estimation failed.</p>
+                <p>Aggregated gradients, or <code>None</code> if estimation failed.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientResults.target_gradient">target_gradient</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The gradient the optimizer descends, in its own domain.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientResults.scaled">scaled</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.ScaledGradientResults
+
+
+  
+      dataclass
+   (ropt.results._gradient_results.ScaledGradientResults)" href="#ropt.results.ScaledGradientResults">ScaledGradientResults</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The same quantities as the optimizer works with them.</p>
               </div>
             </td>
           </tr>
@@ -4421,81 +4387,155 @@ Realization metadata is passed through unchanged.</p>
 
 
 
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
 
 
-<div class="doc doc-object doc-function">
+
+<h2 id="ropt.results.ScaledGradientResults" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.ScaledGradientResults</span>
 
 
-<h3 id="ropt.results.GradientResults.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
 
 
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientResults</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Transform results from optimizer space to user space.</p>
-<p>This applies inverse transformations to transformable sub-fields
-(<code>evaluations</code> and <code>gradients</code> when present). Realization metadata is
-passed through unchanged.</p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.ResultField
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
+
+
+
+        <p>The scaled counterpart of the fields that have two domains.</p>
+<p>Each field mirrors the field of the same name on
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a>, expressed in the domain
+the optimizer works in.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="ropt.results.ScaledGradientResults--__tabbed_1_1" name="ropt.results.ScaledGradientResults--__tabbed_1" type="radio" /><input id="ropt.results.ScaledGradientResults--__tabbed_1_2" name="ropt.results.ScaledGradientResults--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.ScaledGradientResults--__tabbed_1_1">Variables</label><label for="ropt.results.ScaledGradientResults--__tabbed_1_2">Perturbed Variables</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>variables</code>: The vector of unperturbed variable values in the
+optimizer's domain:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>perturbed_variables</code>: A three-dimensional array of perturbed variable
+values for each realization and perturbation:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_r, n_p, n_v)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>AxisName.PERTURBATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ScaledGradientResults.variables">variables</span></code></td>
             <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The context used by the source of the results.</p>
+                <p>The variable vector the optimizer proposed.</p>
               </div>
             </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ScaledGradientResults.perturbed_variables">perturbed_variables</span></code></td>
             <td>
-                <em>required</em>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The perturbed vectors in the optimizer's domain.</p>
+              </div>
             </td>
           </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ScaledGradientResults.gradients">gradients</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Gradients
 
 
   
       dataclass
-   (ropt.results._gradient_results.GradientResults)" href="#ropt.results.GradientResults">GradientResults</a></code>
+   (ropt.results._gradients.Gradients)" href="#ropt.results.Gradients">Gradients</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The transformed results.</p>
+                <p>Scaled gradients, or <code>None</code> if estimation failed.</p>
               </div>
             </td>
           </tr>
@@ -4503,9 +4543,17 @@ passed through unchanged.</p>
     </table>
 
 
-    </div>
 
-</div>
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
 
 
 
@@ -4543,20 +4591,22 @@ passed through unchanged.</p>
 
 
         <p>Aggregated objective and constraint function values.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
+<p>The same class carries both domains: the values the optimizer works with
+are found under <code>scaled</code>, the values as configured directly on the result.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for usage details.</p>
+<p>There is no target objective here: the quantity the optimizer minimizes is
+a weighted total over objectives that may differ in both scale and
+direction, so it has no counterpart in the configured domain. It is
+reported as <code>target_objective</code> on
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a>.</p>
 <p><strong>Result descriptions</strong></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Functions--__tabbed_1_1" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_2" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_3" name="ropt.results.Functions--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Functions--__tabbed_1_1">Weighted Objective</label><label for="ropt.results.Functions--__tabbed_1_2">Objectives</label><label for="ropt.results.Functions--__tabbed_1_3">Constraints</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="ropt.results.Functions--__tabbed_1_1" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_2" name="ropt.results.Functions--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Functions--__tabbed_1_1">Objectives</label><label for="ropt.results.Functions--__tabbed_1_2">Constraints</label></div>
 <div class="tabbed-content">
-<div class="tabbed-block">
-<p><code>target_objective</code>: The overall objective calculated as a weighted sum
-over the, possibly transformed, objectives. This is a single floating
-point value. It is defined as a <code>numpy</code> array of dimensions 0, hence it
-has no axes:</p>
-<ul>
-<li>Shape: <span class="arithmatex">\(()\)</span></li>
-<li>Axis type: <code>None</code></li>
-</ul>
-</div>
 <div class="tabbed-block">
 <p><code>objectives</code>: The calculated objective function values. This is a
 one-dimensional array of floating point values:</p>
@@ -4612,17 +4662,6 @@ one-dimensional array of floating point values:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Functions.target_objective">target_objective</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The target objective value used by the optimizer.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="ropt.results.Functions.objectives">objectives</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
@@ -4668,8 +4707,8 @@ one-dimensional array of floating point values:</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.results.Functions.create" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
+<h3 id="ropt.results.Functions.from_scaled" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">from_scaled</span>
 
 
   <span class="doc doc-labels">
@@ -4677,16 +4716,14 @@ one-dimensional array of floating point values:</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">target_objective</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Functions</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">from_scaled</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span> <span class="n">scaled</span><span class="p">:</span> <span class="n">Functions</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Functions</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Create a <code>Functions</code> object from pre-aggregated function values.</p>
+        <p>Derive the configured function values from the scaled ones.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4702,14 +4739,14 @@ one-dimensional array of floating point values:</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>target_objective</code>
+                <code>context</code>
             </td>
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+                  <code><span title="ropt.context.EnOptContext">EnOptContext</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The target objective used by the optimizer.</p>
+                <p>The context of the run.</p>
               </div>
             </td>
             <td>
@@ -4718,34 +4755,23 @@ one-dimensional array of floating point values:</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>objectives</code>
+                <code>scaled</code>
             </td>
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Functions
+
+
+  
+      dataclass
+   (ropt.results._functions.Functions)" href="#ropt.results.Functions">Functions</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Objective function values.</p>
+                <p>The values as the optimizer sees them.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>constraints</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Constraint function values.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -4772,7 +4798,7 @@ one-dimensional array of floating point values:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A new Functions object.</p>
+                <p>A new <code>Functions</code> object.</p>
               </div>
             </td>
           </tr>
@@ -4820,30 +4846,22 @@ one-dimensional array of floating point values:</p>
 
 
         <p>Aggregated objective and constraint gradients.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
-<p><strong>Result descriptions</strong></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Gradients--__tabbed_1_1" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_2" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_3" name="ropt.results.Gradients--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Gradients--__tabbed_1_1">Weighted Objective Gradient</label><label for="ropt.results.Gradients--__tabbed_1_2">Objective Gradients</label><label for="ropt.results.Gradients--__tabbed_1_3">Constraint Gradients</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p><code>target_objective</code>: The gradient of the target objective with
-respect to each variable:</p>
-<ul>
-<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
-<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
-</ul>
-</li>
-<li>Axis type:<ul>
-<li><a class="autorefs autorefs-internal" title="            VARIABLE
+<p>The same class carries both domains: the gradients the optimizer works with
+are found under <code>scaled</code>, differentiated with respect to the scaled
+variables, the gradients as configured directly on the result.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for usage details.</p>
+<p>There is no target gradient here: the quantity the optimizer descends is a
+weighted total over objectives that may differ in both scale and direction,
+so it has no counterpart in the configured domain. It is reported as
+<code>target_gradient</code> on <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
 
 
   
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
-</ul>
-</li>
-</ul>
-</div>
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a>.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="ropt.results.Gradients--__tabbed_1_1" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_2" name="ropt.results.Gradients--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Gradients--__tabbed_1_1">Objective Gradients</label><label for="ropt.results.Gradients--__tabbed_1_2">Constraint Gradients</label></div>
+<div class="tabbed-content">
 <div class="tabbed-block">
 <p><code>objectives</code>: The calculated gradients of each objective with respect to
 each variable. This is a two-dimensional array of floating point values:</p>
@@ -4916,17 +4934,6 @@ floating point values:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Gradients.target_objective">target_objective</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The gradient of the target objective.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="ropt.results.Gradients.objectives">objectives</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
@@ -4972,8 +4979,8 @@ floating point values:</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.results.Gradients.create" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
+<h3 id="ropt.results.Gradients.from_scaled" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">from_scaled</span>
 
 
   <span class="doc doc-labels">
@@ -4981,16 +4988,14 @@ floating point values:</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">target_objective</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gradients</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">from_scaled</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span> <span class="n">scaled</span><span class="p">:</span> <span class="n">Gradients</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gradients</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Create a <code>Gradients</code> object from pre-aggregated gradient values.</p>
+        <p>Derive the configured gradients from the scaled ones.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5006,14 +5011,14 @@ floating point values:</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>target_objective</code>
+                <code>context</code>
             </td>
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+                  <code><span title="ropt.context.EnOptContext">EnOptContext</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The gradient of the target objective.</p>
+                <p>The context of the run.</p>
               </div>
             </td>
             <td>
@@ -5022,34 +5027,23 @@ floating point values:</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>objectives</code>
+                <code>scaled</code>
             </td>
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Gradients
+
+
+  
+      dataclass
+   (ropt.results._gradients.Gradients)" href="#ropt.results.Gradients">Gradients</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Objective gradients.</p>
+                <p>The gradients as the optimizer sees them.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>constraints</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Constraint gradients.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -5124,30 +5118,10 @@ floating point values:</p>
 
 
         <p>Per-realization objective and constraint values for an evaluation batch.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="ropt.results.FunctionEvaluations--__tabbed_1_1" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_2" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_3" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_4" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_2">Objectives</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_3">Constraints</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_4">Metadata</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.FunctionEvaluations--__tabbed_1_1" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_2" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_3" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionEvaluations--__tabbed_1_1">Objectives</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_2">Constraints</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_3">Metadata</label></div>
 <div class="tabbed-content">
-<div class="tabbed-block">
-<p><code>variables</code>: The vector of variable values at which the functions
-were evaluated:</p>
-<ul>
-<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
-<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
-</ul>
-</li>
-<li>Axis type:<ul>
-<li><a class="autorefs autorefs-internal" title="            VARIABLE
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
-</ul>
-</li>
-</ul>
-</div>
 <div class="tabbed-block">
 <p><code>objectives</code>: The calculated objective function values for each
 realization. This is a two-dimensional array of floating point values
@@ -5211,9 +5185,9 @@ constraint:</p>
 </div>
 <div class="tabbed-block">
 <p><code>metadata</code>: Optional metadata associated with each realization,
-potentially provided by the evaluator. If provided, each value in the
-metadata dictionary must be a one-dimensional array of arbitrary type
-supported by <code>numpy</code> (including objects):</p>
+potentially provided by the evaluator. Each value is a one-dimensional
+array of any type supported by <code>numpy</code>, including objects, so each key
+may carry its own dtype:</p>
 <ul>
 <li>Shape: <span class="arithmatex">\((n_r,)\)</span>, where:<ul>
 <li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
@@ -5230,20 +5204,13 @@ supported by <code>numpy</code> (including objects):</p>
 </ul>
 </li>
 </ul>
+<p>An entry whose values are arrays rather than scalars has shape
+<span class="arithmatex">\((n_r, n_k)\)</span> and carries a second, user-defined axis named after its
+key. See <a href="../../results/results/#user-defined-axes">User-defined axes</a>.</p>
 </div>
 </div>
 </div>
 
-
-<details class="note" open>
-  <summary>Metadata data type.</summary>
-  <p>The data type of the metadata fields is not fixed. Each field in the
-<code>metadata</code> dictionary can have its own data type, which must be a
-one-dimensional array of any type supported by <code>numpy</code>, including object
-arrays. This allows for maximum flexibility in the kind of metadata that
-can be included, such as strings, integers, floats, or even complex
-objects.</p>
-</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -5255,17 +5222,6 @@ objects.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.FunctionEvaluations.variables">variables</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The variable vector.</p>
-              </div>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.FunctionEvaluations.objectives">objectives</span></code></td>
             <td>
@@ -5333,11 +5289,10 @@ objects.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionEvaluations</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionEvaluations</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5356,22 +5311,6 @@ objects.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The unperturbed variable vector.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td>
                 <code>objectives</code>
@@ -5492,65 +5431,10 @@ objects.</p>
 
 
         <p>Per-realization evaluation data for perturbed variables.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_4" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_5" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_4">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_5">Metadata</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Metadata</label></div>
 <div class="tabbed-content">
-<div class="tabbed-block">
-<p><code>variables</code>: The vector of unperturbed variable values:</p>
-<ul>
-<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
-<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
-</ul>
-</li>
-<li>Axis type:<ul>
-<li><a class="autorefs autorefs-internal" title="            VARIABLE
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="tabbed-block">
-<p><code>perturbed_variables</code>: A three-dimensional array of perturbed variable
-values for each realization and perturbation:</p>
-<ul>
-<li>Shape: <span class="arithmatex">\((n_r, n_p, n_v)\)</span>, where:<ul>
-<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
-<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
-<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
-</ul>
-</li>
-<li>Axis type:<ul>
-<li><a class="autorefs autorefs-internal" title="            REALIZATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
-<li><a class="autorefs autorefs-internal" title="            PERTURBATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>AxisName.PERTURBATION</code></a></li>
-<li><a class="autorefs autorefs-internal" title="            VARIABLE
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
-</ul>
-</li>
-</ul>
-</div>
 <div class="tabbed-block">
 <p><code>perturbed_objectives</code>: A three-dimensional array of perturbed
 calculated objective function values for each realization and
@@ -5627,9 +5511,9 @@ perturbation:</p>
 </div>
 <div class="tabbed-block">
 <p><code>metadata</code>: Optional metadata associated with each realization,
-potentially provided by the evaluator. If provided, each value in the
-metadata dictionary must be a two-dimensional array of arbitrary type
-supported by <code>numpy</code> (including objects):</p>
+potentially provided by the evaluator. Each value is a two-dimensional
+array of any type supported by <code>numpy</code>, including objects, so each key
+may carry its own dtype:</p>
 <ul>
 <li>Shape: <span class="arithmatex">\((n_r, n_p)\)</span>, where:<ul>
 <li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
@@ -5654,20 +5538,14 @@ supported by <code>numpy</code> (including objects):</p>
 </ul>
 </li>
 </ul>
+<p>An entry whose values are arrays rather than scalars has shape
+<span class="arithmatex">\((n_r, n_p, n_k)\)</span> and carries a third, user-defined axis named after
+its key. See
+<a href="../../results/results/#user-defined-axes">User-defined axes</a>.</p>
 </div>
 </div>
 </div>
 
-
-<details class="note" open>
-  <summary>Metadata data type.</summary>
-  <p>The data type of the metadata fields is not fixed. Each field in the
-<code>metadata</code> dictionary can have its own data type, which must be a
-two-dimensional array of any type supported by <code>numpy</code>, including object
-arrays. This allows for maximum flexibility in the kind of metadata that
-can be included, such as strings, integers, floats, or even complex
-objects.</p>
-</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -5680,37 +5558,13 @@ objects.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.variables">variables</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The unperturbed variable vector.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.perturbed_variables">perturbed_variables</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The perturbed variable values for each
-                   realization and perturbation.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="ropt.results.GradientEvaluations.perturbed_objectives">perturbed_objectives</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The objective function values for each
-                   realization and perturbation.</p>
+                <p>Objective values per realization and perturbation.</p>
               </div>
             </td>
           </tr>
@@ -5721,8 +5575,7 @@ objects.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The constraint function values for each
-                   realization and perturbation.</p>
+                <p>Constraint values per realization and perturbation.</p>
               </div>
             </td>
           </tr>
@@ -5733,8 +5586,7 @@ objects.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional metadata for each evaluated
-                   realization and perturbation.</p>
+                <p>Optional metadata per realization and perturbation.</p>
               </div>
             </td>
           </tr>
@@ -5772,12 +5624,10 @@ objects.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">perturbed_variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">perturbed_objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">perturbed_constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientEvaluations</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">perturbed_objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">perturbed_constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientEvaluations</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5798,39 +5648,6 @@ objects.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The unperturbed variable vector.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>perturbed_variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Perturbed variable values for each
-                   realization and perturbation.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
                 <code>perturbed_objectives</code>
             </td>
             <td>
@@ -5838,8 +5655,7 @@ objects.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Objective function values for each
-                   realization and perturbation.</p>
+                <p>Objective values per realization and perturbation.</p>
               </div>
             </td>
             <td>
@@ -5855,8 +5671,7 @@ objects.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Constraint function values for each
-                   realization and perturbation.</p>
+                <p>Constraint values per realization and perturbation.</p>
               </div>
             </td>
             <td>
@@ -5951,7 +5766,7 @@ objects.</p>
 
 
         <p>Per-realization activity, success, and weight information.</p>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Realizations--__tabbed_1_1" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_2" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_3" name="ropt.results.Realizations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Realizations--__tabbed_1_1">Evaluated Realizations</label><label for="ropt.results.Realizations--__tabbed_1_2">Objective Weights</label><label for="ropt.results.Realizations--__tabbed_1_3">Constraint Weights</label></div>
 <div class="tabbed-content">
@@ -6067,8 +5882,7 @@ constraint calculation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Weights for each objective in each realization,
-                    if available.</p>
+                <p>Objective weights per realization, if available.</p>
               </div>
             </td>
           </tr>
@@ -6079,8 +5893,7 @@ constraint calculation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Weights for each constraint in each realization,
-                    if available.</p>
+                <p>Constraint weights per realization, if available.</p>
               </div>
             </td>
           </tr>
@@ -6146,7 +5959,7 @@ and the magnitude of any violations.</p>
 <li><em>Violations:</em> the absolute value of the difference when a bound is
   violated, zero otherwise.</li>
 </ul>
-<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../results/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
 <p>The class stores the following information for bound, linear constraint, and
 non-linear constraint differences and violations as one-dimensional vectors:</p>
@@ -6393,7 +6206,7 @@ default to <code>None</code> and are only populated if bounds are present and fi
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><span title="ropt.context.EnOptContext">EnOptContext</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6460,10 +6273,106 @@ default to <code>None</code> and are only populated if bounds are present and fi
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A newly created <code>ConstraintInfo</code> object, or <code>None</code> if no bounds</p>
+                <p>A new <code>ConstraintInfo</code>, or <code>None</code> if no bounds are available.</p>
               </div>
             </td>
           </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.results.ConstraintInfo.from_scaled" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">from_scaled</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">from_scaled</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span> <span class="n">scaled</span><span class="p">:</span> <span class="n">ConstraintInfo</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstraintInfo</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Convert constraint differences to the domain the user configured.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><span title="ropt.context.EnOptContext">EnOptContext</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The context used by the source of the results.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scaled</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+   (ropt.results._constraint_info.ConstraintInfo)" href="#ropt.results.ConstraintInfo">ConstraintInfo</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The differences as the optimizer sees them.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
           <tr class="doc-section-item">
             <td>
                   <code><a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
@@ -6471,11 +6380,11 @@ default to <code>None</code> and are only populated if bounds are present and fi
 
   
       dataclass
-   (ropt.results._constraint_info.ConstraintInfo)" href="#ropt.results.ConstraintInfo">ConstraintInfo</a> | None</code>
+   (ropt.results._constraint_info.ConstraintInfo)" href="#ropt.results.ConstraintInfo">ConstraintInfo</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>are available.</p>
+                <p>The same differences expressed in unscaled units.</p>
               </div>
             </td>
           </tr>
@@ -6499,14 +6408,14 @@ default to <code>None</code> and are only populated if bounds are present and fi
 <div class="doc doc-object doc-function">
 
 
-<h2 id="ropt.results.results_to_dataframe" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.results.results_to_dataframe</span>
+<h2 id="ropt.results.results_to_pandas" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.results.results_to_pandas</span>
 
 
 </h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">results_to_dataframe</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">results_to_pandas</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Results</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">fields</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">fields</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"functions"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">],</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
 </span></code></pre></div>
@@ -6526,13 +6435,9 @@ default to <code>None</code> and are only populated if bounds are present and fi
 
   
       dataclass
-  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> objects. Fields are
-selected using dot notation (e.g., <code>evaluations.variables</code>); nested
-<code>metadata</code> entries are accessed as <code>evaluations.metadata.key</code>.
-Multi-dimensional fields are automatically unstacked into tuple-named
-columns.</p>
-<p>See <a href="../../optimizer_setup/results/#exporting-to-pandas">Working with Results</a> for
-further details and examples.</p>
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> objects. See
+<a href="../../results/results/#aggregating-multiple-results">Aggregating multiple results</a>
+for field selection and unstacking.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6577,11 +6482,11 @@ further details and examples.</p>
                 <code>fields</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Field names to include (dot notation for nested fields).</p>
+                <p>Field names to include, in column order (dot notation).</p>
               </div>
             </td>
             <td>
@@ -6623,7 +6528,7 @@ further details and examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A DataFrame with one row per result and requested fields as columns.</p>
+                <p>A DataFrame indexed by <code>batch_id</code> and by any axes that stay stacked.</p>
               </div>
             </td>
           </tr>
@@ -6646,8 +6551,17 @@ further details and examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>result_type</code> is invalid or results contain
-              unexpected types.</p>
+                <p>If an argument or a result has an unexpected type.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>fields</code> names the same path more than once.</p>
               </div>
             </td>
           </tr>
@@ -6679,7 +6593,7 @@ further details and examples.</p>
 </h2>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">results_to_polars</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Results</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">fields</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">fields</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"functions"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">],</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">","</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span>
@@ -6689,38 +6603,12 @@ further details and examples.</p>
 
         <p>Aggregate multiple results into a single polars DataFrame.</p>
 <p>This is the polars counterpart of
-<a class="autorefs autorefs-internal" title="            ropt.results.results_to_dataframe" href="#ropt.results.results_to_dataframe"><code>results_to_dataframe</code></a>. It concatenates the
-specified fields from a sequence of
-<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
-<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
-
-
-  
-      dataclass
-  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> objects. Fields are
-selected using dot notation (e.g., <code>evaluations.variables</code>); nested
-<code>metadata</code> entries are accessed as <code>evaluations.metadata.key</code>.
-Multi-dimensional fields are automatically unstacked into columns.</p>
-<p>Polars has no index and its column names must be strings, so the frame is
-returned in long format and the tuple column names produced by
-<code>results_to_dataframe</code> are joined into a single string using <code>sep</code>.</p>
-
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>Fields with different granularities (e.g. <code>gradients.objectives</code>, which
-varies only per batch, and <code>evaluations.perturbed_objectives</code>, which
-also varies per realization and perturbation) are joined on their shared
-key columns, so coarser values are repeated across the finer rows. The
-pandas export cannot align such fields and returns them as separate
-blocks of rows padded with missing values instead.</p>
-</details>        <p>See <a href="../../optimizer_setup/results/#exporting-to-polars">Working with Results</a> for
-further details and examples.</p>
+<a class="autorefs autorefs-internal" title="            ropt.results.results_to_pandas" href="#ropt.results.results_to_pandas"><code>results_to_pandas</code></a>, returned in
+long format with tuple column names joined into a single string using
+<code>sep</code>. Unlike the pandas export, fields with different granularities are
+aligned into one table rather than kept as separate blocks. See
+<a href="../../results/results/#exporting-to-polars">Exporting to polars</a>
+for details.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6765,11 +6653,11 @@ further details and examples.</p>
                 <code>fields</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Field names to include (dot notation for nested fields).</p>
+                <p>Field names to include, in column order (dot notation).</p>
               </div>
             </td>
             <td>
@@ -6827,7 +6715,7 @@ further details and examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A DataFrame with one row per result and requested fields as columns.</p>
+                <p>A DataFrame keyed by <code>batch_id</code> and by any axes that stay stacked.</p>
               </div>
             </td>
           </tr>
@@ -6850,8 +6738,17 @@ further details and examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>result_type</code> is invalid or results contain
-              unexpected types.</p>
+                <p>If an argument or a result has an unexpected type.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>fields</code> names the same path more than once.</p>
               </div>
             </td>
           </tr>
@@ -6907,7 +6804,7 @@ further details and examples.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../basic_optimizer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Basic Optimizer">
+          <a href="../config/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration Classes">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -6917,7 +6814,7 @@ further details and examples.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Basic Optimizer
+                Configuration Classes
               </div>
             </div>
           </a>

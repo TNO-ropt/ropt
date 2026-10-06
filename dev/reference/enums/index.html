@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../default_plugins/">
+        <link rel="prev" href="../utils/">
       
       
         <link rel="next" href="../exceptions/">
@@ -264,26 +264,6 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
-          
-  
-  
-  Optimizer Setup
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
         <a href="../../running/running/" class="md-tabs__link">
           
   
@@ -304,11 +284,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../workflows/workflows/" class="md-tabs__link">
+        <a href="../../results/results/" class="md-tabs__link">
           
   
   
-  Workflows
+  Results
 
         </a>
       </li>
@@ -324,11 +304,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../utilities/logging/" class="md-tabs__link">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
           
   
   
-  Utilities
+  Optimizer Setup
 
         </a>
       </li>
@@ -344,11 +324,31 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../tutorials/" class="md-tabs__link">
+        <a href="../../troubleshooting/" class="md-tabs__link">
           
   
   
-  Tutorials
+  Troubleshooting
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../advanced/plugin_discovery/" class="md-tabs__link">
+          
+  
+  
+  Plugins
 
         </a>
       </li>
@@ -366,7 +366,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../simple/" class="md-tabs__link">
+        <a href="../api/" class="md-tabs__link">
           
   
   
@@ -601,34 +601,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting_started/deterministic/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Deterministic Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../getting_started/ensemble/" class="md-nav__link">
         
   
@@ -657,6 +629,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../getting_started/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collecting Results with Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../getting_started/execution/" class="md-nav__link">
         
   
@@ -665,6 +665,34 @@
     
   
     Running in Parallel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
   
 
     
@@ -717,7 +745,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Setup
+    Running
   
 
     
@@ -730,6 +758,408 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/running/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluating in Parallel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/many_runs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Many Runs at Once
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/nested/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nested Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/initial_values/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reusing Results at the Starting Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Results
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results/results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results/exit_codes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exit Codes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -802,6 +1232,174 @@
   
   
     <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/objectives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Objectives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/constraints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constraints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/discrete/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discrete and Mixed-Integer Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing an Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../optimizer_setup/gradients/" class="md-nav__link">
         
   
@@ -810,6 +1408,34 @@
     
   
     Stochastic Gradients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/samplers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
   
 
     
@@ -879,296 +1505,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../optimizer_setup/results/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Working with Results
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Running
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Running
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../running/running/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Running Optimizations
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Workflows
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Workflows
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflows/workflows/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Workflows
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Writing Evaluation Callbacks
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflows/parallel/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Parallel Evaluation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1208,7 +1544,7 @@
   <span class="md-ellipsis">
     
   
-    Utilities
+    Troubleshooting
   
 
     
@@ -1224,7 +1560,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Utilities
+    Troubleshooting
   
 
           </label>
@@ -1237,14 +1573,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../utilities/logging/" class="md-nav__link">
+      <a href="../../troubleshooting/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Troubleshooting
   
 
     
@@ -1265,14 +1601,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../utilities/plugin_discovery/" class="md-nav__link">
+      <a href="../../troubleshooting/keyboard_interrupt/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Plugin Discovery
+    Keyboard Interrupts
   
 
     
@@ -1325,7 +1661,7 @@
   <span class="md-ellipsis">
     
   
-    Tutorials
+    Plugins
   
 
     
@@ -1341,7 +1677,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Tutorials
+    Plugins
   
 
           </label>
@@ -1354,14 +1690,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/" class="md-nav__link">
+      <a href="../../advanced/plugin_discovery/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overview
+    Plugin Discovery
   
 
     
@@ -1382,126 +1718,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../tutorials/optimize/" class="md-nav__link">
+      <a href="../../advanced/writing_plugins/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Your First Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/ensemble/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Ensemble Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/constrained/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Constrained Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/discrete/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Mixed-Integer Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/workflow/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Building a Workflow
+    Writing a Plugin
   
 
     
@@ -1586,99 +1810,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../simple/" class="md-nav__link">
+      <a href="../api/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Simple API
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Configuration
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../context/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Context Class
+    Optimization API
   
 
     
@@ -1720,42 +1859,6 @@
 
               
             
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../basic_optimizer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Basic Optimizer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
               
                 
   
@@ -1781,10 +1884,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_3" >
         
           
-          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="">
             
   
   
@@ -1802,8 +1905,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1902,131 +2005,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_4" >
         
           
-          <label class="md-nav__link" for="__nav_8_5" id="__nav_8_5_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Engine
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Optimization Engine
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../core/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Core Classes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../evaluation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Evaluation Classes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_6" id="__nav_8_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="">
             
   
   
@@ -2044,8 +2026,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2167,327 +2149,9 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_7" id="__nav_8_7_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Workflow Components
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_7">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Workflow Components
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_compute_steps/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Compute Steps
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_event_handlers/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Event Handlers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_evaluators/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Evaluators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_executors/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Executors
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../components_utils/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Utilities
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_8" id="__nav_8_8_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin System
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Plugin System
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plugin_bases/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin Bases
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -2507,7 +2171,7 @@
   <span class="md-ellipsis">
     
   
-    Plugin Manager
+    Plugin System
   
 
     
@@ -2528,14 +2192,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_plugins/" class="md-nav__link">
+      <a href="../utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Default Plugins
+    Utility Functions
   
 
     
@@ -2544,14 +2208,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2698,10 +2354,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.BoundaryType.TRUNCATE_BOTH" class="md-nav__link">
+  <a href="#ropt.enums.BoundaryType.TRUNCATE" class="md-nav__link">
     <span class="md-ellipsis">
       
-        TRUNCATE_BOTH
+        TRUNCATE
       
     </span>
   </a>
@@ -2709,10 +2365,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.BoundaryType.MIRROR_BOTH" class="md-nav__link">
+  <a href="#ropt.enums.BoundaryType.MIRROR" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MIRROR_BOTH
+        MIRROR
       
     </span>
   </a>
@@ -2903,6 +2559,61 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.STOPPED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STOPPED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.FINISHED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FINISHED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.EXECUTOR_SHUT_DOWN" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EXECUTOR_SHUT_DOWN
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.ABORTED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ABORTED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.ABORTED_ON_ERROR" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ABORTED_ON_ERROR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.enums.ExitCode.USER_ABORT" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2914,21 +2625,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.OPTIMIZER_FINISHED" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.message" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OPTIMIZER_FINISHED
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.EXECUTOR_STOPPED" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EXECUTOR_STOPPED
+        message
       
     </span>
   </a>
@@ -3173,10 +2873,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.BoundaryType.TRUNCATE_BOTH" class="md-nav__link">
+  <a href="#ropt.enums.BoundaryType.TRUNCATE" class="md-nav__link">
     <span class="md-ellipsis">
       
-        TRUNCATE_BOTH
+        TRUNCATE
       
     </span>
   </a>
@@ -3184,10 +2884,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.BoundaryType.MIRROR_BOTH" class="md-nav__link">
+  <a href="#ropt.enums.BoundaryType.MIRROR" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MIRROR_BOTH
+        MIRROR
       
     </span>
   </a>
@@ -3378,6 +3078,61 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.STOPPED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STOPPED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.FINISHED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FINISHED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.EXECUTOR_SHUT_DOWN" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EXECUTOR_SHUT_DOWN
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.ABORTED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ABORTED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.ABORTED_ON_ERROR" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ABORTED_ON_ERROR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.enums.ExitCode.USER_ABORT" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3389,21 +3144,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.OPTIMIZER_FINISHED" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.message" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OPTIMIZER_FINISHED
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.EXECUTOR_STOPPED" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EXECUTOR_STOPPED
+        message
       
     </span>
   </a>
@@ -3524,7 +3268,6 @@
 
 
 <h1 id="enumerations">Enumerations</h1>
-<p>Enumerations used throughout the configuration, event, and result APIs.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3539,7 +3282,13 @@
 
     <div class="doc doc-contents first">
 
-        <p>Enumerations used within the <code>ropt</code> library.</p>
+        <p>Enumerations used in the configuration, event and result APIs.</p>
+<p>A member of a string-valued enumeration is a <code>str</code>, so wherever one is accepted
+its value may be written instead:
+<a class="autorefs autorefs-internal" title="            VariableType" href="#ropt.enums.VariableType"><code>VariableType</code></a>,
+<a class="autorefs autorefs-internal" title="            BoundaryType" href="#ropt.enums.BoundaryType"><code>BoundaryType</code></a>,
+<a class="autorefs autorefs-internal" title="            PerturbationType" href="#ropt.enums.PerturbationType"><code>PerturbationType</code></a> and
+<a class="autorefs autorefs-internal" title="            AxisName" href="#ropt.enums.AxisName"><code>AxisName</code></a>.</p>
 
 
 
@@ -3571,7 +3320,7 @@
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="enum.IntEnum" href="https://docs.python.org/3/library/enum.html#enum.IntEnum">IntEnum</a></code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="enum.StrEnum" href="https://docs.python.org/3/library/enum.html#enum.StrEnum">StrEnum</a></code></p>
 
 
 
@@ -3611,7 +3360,7 @@ information allows optimization backends to adapt their behavior.</p>
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">REAL</span> <span class="o">=</span> <span class="mi">1</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">REAL</span> <span class="o">=</span> <span class="s1">'real'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3641,7 +3390,7 @@ information allows optimization backends to adapt their behavior.</p>
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">INTEGER</span> <span class="o">=</span> <span class="mi">2</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">INTEGER</span> <span class="o">=</span> <span class="s1">'integer'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3679,7 +3428,7 @@ information allows optimization backends to adapt their behavior.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="enum.IntEnum" href="https://docs.python.org/3/library/enum.html#enum.IntEnum">IntEnum</a></code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="enum.StrEnum" href="https://docs.python.org/3/library/enum.html#enum.StrEnum">StrEnum</a></code></p>
 
 
 
@@ -3722,7 +3471,7 @@ range. The chosen strategy is configured in the
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">NONE</span> <span class="o">=</span> <span class="mi">1</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">NONE</span> <span class="o">=</span> <span class="s1">'none'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3742,8 +3491,8 @@ range. The chosen strategy is configured in the
 
 
 
-<h4 id="ropt.enums.BoundaryType.TRUNCATE_BOTH" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">TRUNCATE_BOTH</span>
+<h4 id="ropt.enums.BoundaryType.TRUNCATE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">TRUNCATE</span>
 
 
   <span class="doc doc-labels">
@@ -3752,7 +3501,7 @@ range. The chosen strategy is configured in the
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">TRUNCATE_BOTH</span> <span class="o">=</span> <span class="mi">2</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">TRUNCATE</span> <span class="o">=</span> <span class="s1">'truncate'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3761,7 +3510,7 @@ range. The chosen strategy is configured in the
 <div class="arithmatex">\[
 \hat{v_i} = \begin{cases}
     l_i &amp; \text{if $v_i &lt; l_i$}, \\
-    b_i &amp; \text{if $v_i &gt; b_i$}, \\
+    u_i &amp; \text{if $v_i &gt; u_i$}, \\
     v_i &amp; \text{otherwise}
 \end{cases}
 \]</div>
@@ -3779,8 +3528,8 @@ range. The chosen strategy is configured in the
 
 
 
-<h4 id="ropt.enums.BoundaryType.MIRROR_BOTH" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">MIRROR_BOTH</span>
+<h4 id="ropt.enums.BoundaryType.MIRROR" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">MIRROR</span>
 
 
   <span class="doc doc-labels">
@@ -3789,7 +3538,7 @@ range. The chosen strategy is configured in the
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">MIRROR_BOTH</span> <span class="o">=</span> <span class="mi">3</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">MIRROR</span> <span class="o">=</span> <span class="s1">'mirror'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3798,7 +3547,7 @@ range. The chosen strategy is configured in the
 <div class="arithmatex">\[
 \hat{v_i} = \begin{cases}
     2l_i - v_i &amp; \text{if $v_i &lt; l_i$}, \\
-    2b_i - v_i &amp; \text{if $v_i &gt; b_i$}, \\
+    2u_i - v_i &amp; \text{if $v_i &gt; u_i$}, \\
     v_i        &amp; \text{otherwise}
 \end{cases}
 \]</div>
@@ -3834,7 +3583,7 @@ range. The chosen strategy is configured in the
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="enum.IntEnum" href="https://docs.python.org/3/library/enum.html#enum.IntEnum">IntEnum</a></code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="enum.StrEnum" href="https://docs.python.org/3/library/enum.html#enum.StrEnum">StrEnum</a></code></p>
 
 
 
@@ -3876,7 +3625,7 @@ enumeration defines the available scaling methods, configured in the
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ABSOLUTE</span> <span class="o">=</span> <span class="mi">1</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ABSOLUTE</span> <span class="o">=</span> <span class="s1">'absolute'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3906,7 +3655,7 @@ enumeration defines the available scaling methods, configured in the
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">RELATIVE</span> <span class="o">=</span> <span class="mi">2</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">RELATIVE</span> <span class="o">=</span> <span class="s1">'relative'</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3951,9 +3700,9 @@ the variables (see <a class="autorefs autorefs-internal" title="            Vari
 
 
 
-        <p>Enumerates the types of events emitted during optimization workflows.</p>
-<p>See <a href="../../workflows/workflows/#event-types">Optimization Workflows</a> for a
-description of when each event type fires and what data it carries.</p>
+        <p>Enumerates the types of events emitted during a run.</p>
+<p>See <a href="../../results/handlers/#writing-your-own-handler">Handling Results</a> for
+when each event type fires and what data it carries.</p>
 
 
 
@@ -3992,7 +3741,7 @@ description of when each event type fires and what data it carries.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emitted before evaluating new functions.</p>
+        <p>Emitted before a batch of function or gradient evaluations.</p>
 
     </div>
 
@@ -4022,7 +3771,7 @@ description of when each event type fires and what data it carries.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emitted after finishing the evaluation.</p>
+        <p>Emitted after that batch completes; carries the results produced.</p>
 
     </div>
 
@@ -4112,7 +3861,7 @@ description of when each event type fires and what data it carries.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emitted just before starting an evaluation.</p>
+        <p>Emitted before an evaluation without an optimizer begins.</p>
 
     </div>
 
@@ -4142,7 +3891,7 @@ description of when each event type fires and what data it carries.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emitted immediately after an evaluation finishes.</p>
+        <p>Emitted after an evaluation without an optimizer finishes.</p>
 
     </div>
 
@@ -4179,7 +3928,20 @@ description of when each event type fires and what data it carries.</p>
 
 
 
-        <p>Enumerates the reasons for terminating an optimization.</p>
+        <p>Enumerates the reasons a run ends.</p>
+<p>A run is an optimization or a single evaluation. It either <strong>stops</strong> or is
+<strong>aborted</strong>. It stops when a condition on the run is met — the optimizer
+converged, a budget ran out, a handler decided the results were good enough
+— so it ends at a point that satisfied a stated criterion. It is aborted
+when something cuts it off regardless of the state of the run, and the
+result is then whatever it had reached, not a considered endpoint.</p>
+<p>Each member carries a short description in
+<a class="autorefs autorefs-internal" title="            message
+
+
+  
+      property
+  " href="#ropt.enums.ExitCode.message"><code>message</code></a>, for reporting.</p>
 
 
 
@@ -4323,6 +4085,164 @@ description of when each event type fires and what data it carries.</p>
 
 
 
+<h4 id="ropt.enums.ExitCode.STOPPED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">STOPPED</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">STOPPED</span> <span class="o">=</span> <span class="mi">4</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returned when an event handler asked the run to stop.</p>
+<p>A graceful end at an evaluation boundary, on a criterion the caller
+supplied. A <code>report</code> callback is such a handler.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.ExitCode.FINISHED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">FINISHED</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">FINISHED</span> <span class="o">=</span> <span class="mi">5</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returned when the run terminated normally.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.ExitCode.EXECUTOR_SHUT_DOWN" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">EXECUTOR_SHUT_DOWN</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">EXECUTOR_SHUT_DOWN</span> <span class="o">=</span> <span class="mi">6</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returned when the executor could no longer run the evaluation.</p>
+<p>Not a failure: in practice the interpreter was shutting down and the worker
+pool was gone, so the run is released rather than left waiting. An executor
+that breaks raises <a class="autorefs autorefs-internal" title="            ExecutionError" href="../exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>
+instead.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.ExitCode.ABORTED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ABORTED</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ABORTED</span> <span class="o">=</span> <span class="mi">7</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returned when the run was cut off from outside, without regard to where
+it had got to.</p>
+<p>This is what closing a session reports for a run still under way.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.ExitCode.ABORTED_ON_ERROR" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ABORTED_ON_ERROR</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ABORTED_ON_ERROR</span> <span class="o">=</span> <span class="mi">8</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returned when another run this one shares a session with raised.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h4 id="ropt.enums.ExitCode.USER_ABORT" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">USER_ABORT</span>
 
@@ -4333,12 +4253,20 @@ description of when each event type fires and what data it carries.</p>
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">USER_ABORT</span> <span class="o">=</span> <span class="mi">4</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">USER_ABORT</span> <span class="o">=</span> <span class="mi">9</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when the optimization is aborted by the user.</p>
+        <p>Returned when <a class="autorefs autorefs-internal" title="            abort" href="../api/#ropt.Session.abort"><code>Session.abort</code></a> cut the run off.</p>
+<p>Set apart from <a class="autorefs autorefs-internal" title="            ABORTED
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="#ropt.enums.ExitCode.ABORTED"><code>ABORTED</code></a> so that an abort
+that was asked for can be told from one the library performed itself.</p>
 
     </div>
 
@@ -4353,52 +4281,46 @@ description of when each event type fires and what data it carries.</p>
 
 
 
-<h4 id="ropt.enums.ExitCode.OPTIMIZER_FINISHED" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">OPTIMIZER_FINISHED</span>
+<h4 id="ropt.enums.ExitCode.message" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">message</span>
 
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">OPTIMIZER_FINISHED</span> <span class="o">=</span> <span class="mi">5</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when an optimization step terminates normally.</p>
-
-    </div>
-
-</div>
+        <p>A short description of this exit code, for reporting.</p>
+<p>Note that <code>str()</code> and f-strings give the integer value, as they do for
+any <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum"><code>IntEnum</code></a>; use this or <code>name</code> to report a run.</p>
 
 
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="ropt.enums.ExitCode.EXECUTOR_STOPPED" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">EXECUTOR_STOPPED</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">EXECUTOR_STOPPED</span> <span class="o">=</span> <span class="mi">6</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Returned when the executor stopped before the evaluation could finish.</p>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A capitalized phrase with no trailing period.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
@@ -4436,31 +4358,21 @@ description of when each event type fires and what data it carries.</p>
 
 
         <p>Enumerates the semantic meaning of axes in data arrays.</p>
-<p>The optimization workflow includes variables, objectives, constraints,
-realizations, and the optimizer. Each of these components can have multiple
-instances, leading to multidimensional data arrays. In particular, the
-<a class="autorefs autorefs-internal" title="            ropt.results.Results
+<p>Labels what each dimension of a <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a> objects store optimization data (like
-variable values, objective function values, constraint values, etc.) in
-multidimensional NumPy arrays.</p>
-<p>The <code>AxisName</code> enumeration  provides standardized labels to identify what
-each dimension (axis) of these arrays represents. For example, an array
-might have dimensions corresponding to different realizations, different
-objective functions, or different variables.</p>
-<p>This information is stored as metadata within the <code>Results</code> object and can
-be accessed using methods like
+  " href="../results/#ropt.results.Results"><code>Results</code></a> field's
+multidimensional array represents, and is used to look up axis labels via
 <a class="autorefs autorefs-internal" title="            get_axes
 
 
   
       classmethod
-  " href="../results/#ropt.results.ResultField.get_axes"><code>get_axes</code></a> on result fields. It is
-used internally, for instance, during data export to correctly label axes
-or retrieve associated names (like variable names) from the configuration.</p>
+  " href="../results/#ropt.results.AxisMetadata.get_axes"><code>get_axes</code></a>. See
+<a href="../../results/results/#axes-and-dimensionality">Working with Results</a>
+for a full table of fields and their axes.</p>
 
 
 
@@ -4707,7 +4619,7 @@ or retrieve associated names (like variable names) from the configuration.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../default_plugins/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Default Plugins">
+          <a href="../utils/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Utility Functions">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -4717,7 +4629,7 @@ or retrieve associated names (like variable names) from the configuration.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Default Plugins
+                Utility Functions
               </div>
             </div>
           </a>

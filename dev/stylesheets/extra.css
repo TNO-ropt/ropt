@@ -34,3 +34,22 @@
 .highlight .cs {
     font-style: italic;
 }
+
+/* Check and cross icons in the backend capability tables */
+:root {
+    --ropt-supported-color: #2e7d32;
+    --ropt-unsupported-color: #c62828;
+}
+
+[data-md-color-scheme="slate"] {
+    --ropt-supported-color: #81c784;
+    --ropt-unsupported-color: #ef9a9a;
+}
+
+.md-typeset .supported {
+    color: var(--ropt-supported-color);
+}
+
+.md-typeset .unsupported {
+    color: var(--ropt-unsupported-color);
+}
