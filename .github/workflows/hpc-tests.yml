@@ -63,7 +63,7 @@ jobs:
             python3 -m venv /data/venv
             /data/venv/bin/pip install --quiet --upgrade pip
             /data/venv/bin/pip install --quiet "/data/src[hpc,cloudpickle]" \
-              pytest pytest-asyncio pytest-timeout
+              pytest pytest-timeout
           '
 
       - name: Install the pysqa configuration

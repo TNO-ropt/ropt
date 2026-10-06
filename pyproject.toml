@@ -98,7 +98,6 @@ dev = [
     "mypy",
     "pandas-stubs",
     "pytest",
-    "pytest-asyncio",
     "pytest-timeout",
     "ruff",
     "scipy-stubs",
