@@ -17,6 +17,7 @@ from ropt.components.concurrency import AbortSignal
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
+from ropt.exceptions import ExecutorStopped
 
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
@@ -191,6 +192,10 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
             variables=np.asarray(variables, dtype=np.float64),
             metadata=metadata,
         )
+    except ExecutorStopped:
+        # Reported on the result, as an optimization does, rather than raised
+        # into a program that is already shutting down.
+        return EvaluationResult(exit_code=ExitCode.EXECUTOR_SHUT_DOWN, results=())
     except Exception:
         # `signal.aborting` means this run was cut off rather than failing, so
         # `_fail` is skipped and the other runs are left alone.

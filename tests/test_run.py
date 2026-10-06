@@ -722,6 +722,50 @@ def test_evaluate_with_a_thread_pool(
     assert outcome.results.target_objective == pytest.approx(0.66)
 
 
+class _ShutdownPool:
+    # `concurrent.futures` refuses new work with `RuntimeError` once the
+    # interpreter is shutting down.
+    def __init__(self, *_args: Any, **_kwargs: Any) -> None: ...
+
+    @staticmethod
+    def submit(*_args: Any, **_kwargs: Any) -> None:
+        msg = "cannot schedule new futures after interpreter shutdown"
+        raise RuntimeError(msg)
+
+    def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
+
+
+def test_evaluate_on_a_shut_down_pool_reports_the_exit_code(
+    monkeypatch: pytest.MonkeyPatch,
+    pools: Callable[..., WorkerPool],
+    config: Any,
+    test_functions: Any,
+) -> None:
+    monkeypatch.setattr(
+        "ropt.components.executors._thread_executor.ThreadPoolExecutor",
+        _ShutdownPool,
+    )
+    outcome = pools(workers=1).evaluate(config, initial_values, test_functions[0])
+    assert outcome.exit_code is ExitCode.EXECUTOR_SHUT_DOWN
+    assert outcome.results is None
+
+
+def test_evaluate_batch_on_a_shut_down_pool_reports_the_exit_code(
+    monkeypatch: pytest.MonkeyPatch,
+    pools: Callable[..., WorkerPool],
+    config: Any,
+    test_functions: Any,
+) -> None:
+    monkeypatch.setattr(
+        "ropt.components.executors._thread_executor.ThreadPoolExecutor",
+        _ShutdownPool,
+    )
+    matrix = np.array([initial_values, np.zeros(initial_values.size)])
+    outcome = pools(workers=1).evaluate_batch(config, matrix, test_functions[0])
+    assert outcome.exit_code is ExitCode.EXECUTOR_SHUT_DOWN
+    assert outcome.results == ()
+
+
 _INNER_CONFIG: dict[str, Any] = {
     "optimizer": {"max_functions": 3},
     "backend": {"method": "slsqp", "max_iterations": 2},

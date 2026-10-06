@@ -307,9 +307,11 @@ receives, so everything is read the same way wherever it came from. Here
 `report` callback, where the optimizer chose the point.
 
 An evaluation is a single batch, so it produces either every result or none.
-That is why `exit_code` can only be `FINISHED`, or `USER_ABORT` and
+That is why `exit_code` can only be `FINISHED`; `USER_ABORT` or
 `ABORTED_ON_ERROR` when [`Session.abort`](#stopping-from-outside) or a failing
-run on the same session cut it off. An abort that arrives after the batch has
+run on the same session cut it off; or `EXECUTOR_SHUT_DOWN` when the pool it was
+evaluating on could no longer run the work. An abort that arrives after the
+batch has
 finished leaves it unaffected, and the evaluation reports `FINISHED`.
 
 The runnable script is
@@ -366,10 +368,18 @@ What *is* raised falls into three groups:
   raised or reached; see
   [Failure in one run](many_runs.md#failure-in-one-run).
 
-Catching [`RoptError`][ropt.exceptions.RoptError] catches all of `ropt`'s own
-errors at once. It deliberately does not cover the first and third groups:
+The [`RoptError`][ropt.exceptions.RoptError] types above are imported from
+`ropt` itself, and catching the base class catches all of them at once:
+
+```python
+from ropt import RoptError
+```
+
+It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
-function stay whatever you raised.
+function stay whatever you raised. The control-flow signals that `ropt` raises
+and catches itself are excluded as well, and stay in
+[`ropt.exceptions`][ropt.exceptions].
 
 ## A note on enums
 

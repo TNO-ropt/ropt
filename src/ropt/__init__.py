@@ -13,6 +13,11 @@ a run returns keeps its own module. The fields of a
 [`ropt.enums`][ropt.enums], and the classes describing the configuration
 dictionary in [`ropt.config`][ropt.config].
 
+Exceptions follow the same rule. Every error that can reach a caller derives
+from [`RoptError`][ropt.exceptions.RoptError] and is re-exported here; the
+control-flow signals that `ropt` raises and catches itself stay in
+[`ropt.exceptions`][ropt.exceptions].
+
 Nothing about a run depends on where it is called from. What it is started on
 says where its evaluations happen and which session it belongs to: a module
 function runs in-process and belongs to nothing, a [`Session`][ropt.Session]
@@ -39,6 +44,14 @@ from ropt.components.event_handlers import (
     ResultsHandler,
 )
 from ropt.enums import ExitCode
+from ropt.exceptions import (
+    AbortedError,
+    ExecutionError,
+    RoptError,
+    RunsFailedError,
+    UnsupportedError,
+    WorkflowError,
+)
 from ropt.results import (
     FunctionResults,
     GradientResults,
@@ -62,12 +75,14 @@ from ropt.run import (
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 __all__ = [
+    "AbortedError",
     "DataFrameHandler",
     "EvaluationFunction",
     "EvaluationFunctionContext",
     "EvaluationFunctionResult",
     "EvaluationResult",
     "EventHandler",
+    "ExecutionError",
     "ExitCode",
     "FunctionResults",
     "GradientResults",
@@ -75,8 +90,12 @@ __all__ = [
     "OptimizationResult",
     "Results",
     "ResultsHandler",
+    "RoptError",
+    "RunsFailedError",
     "Session",
+    "UnsupportedError",
     "WorkerPool",
+    "WorkflowError",
     "evaluate",
     "evaluate_batch",
     "optimize",

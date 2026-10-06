@@ -81,6 +81,31 @@ def test_offload_single_call_with_a_thread_pool(
     assert pools(workers=2).offload(partial(add, 3, 4)) == 7
 
 
+class _ShutdownPool:
+    # `concurrent.futures` refuses new work with `RuntimeError` once the
+    # interpreter is shutting down.
+    def __init__(self, *_args: Any, **_kwargs: Any) -> None: ...
+
+    @staticmethod
+    def submit(*_args: Any, **_kwargs: Any) -> None:
+        msg = "cannot schedule new futures after interpreter shutdown"
+        raise RuntimeError(msg)
+
+    def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
+
+
+def test_offload_on_a_shut_down_pool_raises_aborted_with_the_exit_code(
+    monkeypatch: pytest.MonkeyPatch, pools: Callable[..., WorkerPool]
+) -> None:
+    monkeypatch.setattr(
+        "ropt.components.executors._thread_executor.ThreadPoolExecutor",
+        _ShutdownPool,
+    )
+    with pytest.raises(AbortedError) as raised:
+        pools(workers=1).offload(partial(_square, 3))
+    assert raised.value.exit_code is ExitCode.EXECUTOR_SHUT_DOWN
+
+
 def test_offload_sequence_with_a_thread_pool(
     pools: Callable[..., WorkerPool],
 ) -> None:

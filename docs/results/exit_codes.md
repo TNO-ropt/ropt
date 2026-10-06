@@ -76,7 +76,7 @@ linear constraints as well as the nonlinear ones. See
 
 [`WorkerPool.offload`][ropt.WorkerPool.offload] returns whatever its
 callables return, so there is no result object to carry an exit code. A call
-abandoned by an abort raises
+that was abandoned raises
 [`AbortedError`][ropt.exceptions.AbortedError] instead, whose
-`exit_code` attribute distinguishes an abort that was asked for from one
-another run caused.
+`exit_code` attribute says why: an abort that was asked for, one another run
+caused, or `EXECUTOR_SHUT_DOWN` when the pool could no longer run the work.

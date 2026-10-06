@@ -576,7 +576,8 @@ failing run on the same session all reach it. `offload` returns whatever its
 callables return and so has nowhere to report a reason: a call that was
 abandoned raises [`AbortedError`][ropt.exceptions.AbortedError], whose
 `exit_code` distinguishes an abort that was asked for from one another run
-caused. Calls already on a worker run to their end, so an abort that costs the
+caused, and reports `EXECUTOR_SHUT_DOWN` when the pool could no longer run the
+work. Calls already on a worker run to their end, so an abort that costs the
 batch nothing lets it return its results.
 
 !!! warning "Offloaded work coordinates with nothing"

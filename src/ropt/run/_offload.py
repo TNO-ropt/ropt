@@ -16,7 +16,8 @@ from typing import TYPE_CHECKING, Any, cast
 
 from ropt.components.concurrency import AbortSignal
 from ropt.components.executors import ExecutorFailure, WorkItem, WorkNotRun
-from ropt.exceptions import AbortedError, ExecutionError
+from ropt.enums import ExitCode
+from ropt.exceptions import AbortedError, ExecutionError, ExecutorStopped
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -45,6 +46,10 @@ def _offload[T](
         if not functions:
             return ()
         return tuple(_run(executor, functions, signal))
+    except ExecutorStopped:
+        # `offload` has no result object to carry a reason, so a shutdown is
+        # reported the way an abort is rather than escaping.
+        raise AbortedError(ExitCode.EXECUTOR_SHUT_DOWN) from None
     except Exception:
         # `signal.aborting` means this call was cut off rather than failing, so
         # `_fail` is skipped and the other runs are left alone.

@@ -131,6 +131,8 @@ given, holding either that run's
 raised:
 
 ```python
+from ropt import RunsFailedError
+
 try:
     results = pool.optimize_many(config, start_points, objective)
 except RunsFailedError as failure:
