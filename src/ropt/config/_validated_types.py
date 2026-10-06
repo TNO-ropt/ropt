@@ -37,12 +37,6 @@ def _convert_2d_array(array: ArrayLike | None) -> NDArray[np.float64] | None:
     return immutable_array(array, dtype=np.float64, ndmin=2)
 
 
-def _convert_enum_array(array: ArrayLike | None) -> NDArray[np.ubyte] | None:
-    if array is None:
-        return array
-    return immutable_array(array, dtype=np.ubyte, ndmin=1)
-
-
 def _convert_tuple[T](value: T | Sequence[T]) -> tuple[T, ...]:
     if isinstance(value, str):
         return (value,)
@@ -64,9 +58,6 @@ Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
 
 Array2D = Annotated[NDArray[np.float64], BeforeValidator(_convert_2d_array)]
 """Convert to an immutable 2D numpy array of floating point values."""
-
-ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
-"""Convert to an immutable numpy array of numerical enumeration values."""
 
 Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
 """Convert to an immutable 1D numpy array of integer values."""

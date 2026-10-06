@@ -1,24 +1,32 @@
-"""Enumerations used in the configuration, event and result APIs."""
+"""Enumerations used in the configuration, event and result APIs.
+
+A member of a string-valued enumeration is a `str`, so wherever one is accepted
+its value may be written instead:
+[`VariableType`][ropt.enums.VariableType],
+[`BoundaryType`][ropt.enums.BoundaryType],
+[`PerturbationType`][ropt.enums.PerturbationType] and
+[`AxisName`][ropt.enums.AxisName].
+"""
 
 from enum import IntEnum, StrEnum
 from typing import Final
 
 
-class VariableType(IntEnum):
+class VariableType(StrEnum):
     """Enumerates the types of optimization variables.
 
     Specified in [`VariablesConfig`][ropt.config.VariablesConfig], this
     information allows optimization backends to adapt their behavior.
     """
 
-    REAL = 1
+    REAL = "real"
     "Continuous variables represented by real values."
 
-    INTEGER = 2
+    INTEGER = "integer"
     "Discrete variables represented by integer values."
 
 
-class BoundaryType(IntEnum):
+class BoundaryType(StrEnum):
     """Enumerates strategies for handling variable boundary violations.
 
     When variables are perturbed during optimization, their values might fall
@@ -28,10 +36,10 @@ class BoundaryType(IntEnum):
     [`GradientConfig`][ropt.config.GradientConfig].
     """
 
-    NONE = 1
+    NONE = "none"
     """Do not modify the value."""
 
-    TRUNCATE_BOTH = 2
+    TRUNCATE = "truncate"
     r"""Truncate the value $v_i$ at the lower or upper boundary ($l_i$, $u_i$):
 
     $$
@@ -43,7 +51,7 @@ class BoundaryType(IntEnum):
     $$
     """
 
-    MIRROR_BOTH = 3
+    MIRROR = "mirror"
     r"""Mirror the value $v_i$ at the lower or upper boundary ($l_i$, $u_i$):
 
     $$
@@ -56,7 +64,7 @@ class BoundaryType(IntEnum):
     """
 
 
-class PerturbationType(IntEnum):
+class PerturbationType(StrEnum):
     """Enumerates methods for scaling perturbation samples.
 
     Before a generated perturbation sample is added to a variable's current
@@ -65,10 +73,10 @@ class PerturbationType(IntEnum):
     [`GradientConfig`][ropt.config.GradientConfig].
     """
 
-    ABSOLUTE = 1
+    ABSOLUTE = "absolute"
     "Use the perturbation value as is."
 
-    RELATIVE = 2
+    RELATIVE = "relative"
     r"""Multiply the perturbation value $p_i$ by the range defined by the bounds
     of the variables $c_i$: $\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
     \times p_i$. The bounds will generally be defined in the configuration for

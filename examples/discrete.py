@@ -15,7 +15,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt import EvaluationFunctionContext, FunctionResults, optimize
-from ropt.enums import VariableType
 
 INITIAL_VALUES = [0.0, 0.0]
 
@@ -42,7 +41,7 @@ def main(*, linear: bool = False) -> None:
     config: dict[str, Any] = {
         "variables": {
             "variable_count": 2,
-            "types": VariableType.INTEGER,
+            "types": "integer",
             "lower_bounds": [0.0, 0.0],
             "upper_bounds": [10.0, 10.0],
         },

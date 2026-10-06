@@ -38,7 +38,7 @@ class OptimizationProblem:
         initial_values: The starting point, shape `(variable_count,)`.
         lower_bounds:   The lower bounds, shape `(variable_count,)`.
         upper_bounds:   The upper bounds, shape `(variable_count,)`.
-        variable_types: The type of each variable, shape `(variable_count,)`.
+        variable_types: The type of each variable, one entry per variable.
     """
 
     def __init__(
@@ -54,7 +54,11 @@ class OptimizationProblem:
         self.initial_values = initial_values[mask]
         self.lower_bounds = context.variables.lower_bounds[mask]
         self.upper_bounds = context.variables.upper_bounds[mask]
-        self.variable_types = context.variables.types[mask]
+        self.variable_types = tuple(
+            item
+            for item, is_free in zip(context.variables.types, mask, strict=True)
+            if is_free
+        )
 
         self._linear_constraints = (
             None

@@ -33,7 +33,6 @@ from ropt import (
     WorkerPool,
     session,
 )
-from ropt.enums import VariableType
 
 # --8<-- [start:configs]
 DIM = 4
@@ -57,7 +56,7 @@ OUTER_CONFIG: dict[str, Any] = {
         "mask": np.logical_not(MASK),
         "lower_bounds": 0.0,
         "upper_bounds": 10.0,
-        "types": VariableType.INTEGER,
+        "types": "integer",
     },
     "realizations": {"weights": [1.0]},
     "backend": {

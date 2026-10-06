@@ -14,7 +14,6 @@ from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt import EvaluationFunctionContext, FunctionResults, optimize
-from ropt.enums import VariableType
 
 DIM = 4
 REALIZATIONS = 10
@@ -26,12 +25,7 @@ CONFIG: dict[str, Any] = {
         "perturbation_magnitudes": 1e-6,
         "lower_bounds": 0.0,
         "upper_bounds": 10.0,
-        "types": [
-            VariableType.REAL,
-            VariableType.REAL,
-            VariableType.INTEGER,
-            VariableType.INTEGER,
-        ],
+        "types": ["real", "real", "integer", "integer"],
     },
     "backend": {
         "method": "differential_evolution",

@@ -20,13 +20,14 @@ variable. They are broadcasted to match the number of variables and default to
 $-\infty$ and $+\infty$, respectively. Use an infinity to leave a variable
 unbounded on that side.
 
-The optional `types` field allows assigning a
-[`VariableType`][ropt.enums.VariableType] to each variable (continuous or
-integer). If not provided, all variables default to continuous
-([`VariableType.REAL`][ropt.enums.VariableType.REAL]). Integer variables are
+The optional `types` field assigns a type to each variable, `"real"` for
+continuous or `"integer"` for discrete. If not provided, all variables default
+to continuous. Integer variables are
 only honored by methods that support them; in the SciPy backend that is
 `differential_evolution` (see
-[`SciPyBackend`][ropt.backend.scipy.SciPyBackend]).
+[`SciPyBackend`][ropt.backend.scipy.SciPyBackend]). The two strings are the
+values of [`VariableType`][ropt.enums.VariableType], whose members may be
+written in their place.
 
 The optional `mask` field is a boolean array that indicates which variables are
 free to change during optimization (default: all `True`, meaning all variables
@@ -59,19 +60,18 @@ list). Unless explicitly configured otherwise, the default sampler method is
 $N(0, 1)$.
 
 The generated perturbation values are scaled by `perturbation_magnitudes`
-(default: `0.005`) and can be modified based on `perturbation_types` (see
-[`PerturbationType`][ropt.enums.PerturbationType]):
+(default: `0.005`) and can be modified based on `perturbation_types` (the
+values of [`PerturbationType`][ropt.enums.PerturbationType]):
 
-- [`ABSOLUTE`][ropt.enums.PerturbationType.ABSOLUTE] (default): the
-  perturbation magnitude is added directly to the variable value.
-- [`RELATIVE`][ropt.enums.PerturbationType.RELATIVE]: the magnitude is scaled
-  based on the variable's bounds.
+- `"absolute"` (default): the perturbation magnitude is added directly to the
+  variable value.
+- `"relative"`: the magnitude is scaled based on the variable's bounds.
 
 Perturbed variables may violate the defined bounds. The `boundary_types` field
-specifies how to handle such violations (see
-[`BoundaryType`][ropt.enums.BoundaryType]). The default,
-[`MIRROR_BOTH`][ropt.enums.BoundaryType.MIRROR_BOTH], mirrors perturbations
-back into the valid range.
+specifies how to handle such violations (the values of
+[`BoundaryType`][ropt.enums.BoundaryType]). The default, `"mirror"`, mirrors
+perturbations back into the valid range. As with `types`, the enumeration
+members may be written in place of the strings.
 
 The `seed` value (default: `1`) ensures consistent results across repeated runs.
 To obtain unique results for each optimization run, modify the seed. A common

@@ -381,10 +381,18 @@ from `ropt`:
 from ropt import ExitCode
 ```
 
-The remaining ones name configuration values and result metadata, such as
-[`VariableType`][ropt.enums.VariableType] for integer variables, and are
-imported from [`ropt.enums`][ropt.enums]:
+The enumerations that name configuration values —
+[`VariableType`][ropt.enums.VariableType],
+[`BoundaryType`][ropt.enums.BoundaryType] and
+[`PerturbationType`][ropt.enums.PerturbationType] — are in
+[`ropt.enums`][ropt.enums]. Their members are strings, so a configuration
+accepts either the member or the value it equals:
 
 ```python
 from ropt.enums import VariableType
+
+config = {"variables": {"variable_count": 2, "types": VariableType.INTEGER}}
 ```
+
+Writing `"integer"` instead gives the same configuration. A validated
+configuration reports these fields as enum members, whichever form was written.

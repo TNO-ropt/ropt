@@ -19,7 +19,7 @@ DEFAULT_NUMBER_OF_PERTURBATIONS: Final = 5
 DEFAULT_PERTURBATION_MAGNITUDE: Final = 0.005
 """Default scaling factor applied to sampler-generated perturbation values."""
 
-DEFAULT_PERTURBATION_BOUNDARY_TYPE: Final = BoundaryType.MIRROR_BOTH
+DEFAULT_PERTURBATION_BOUNDARY_TYPE: Final = BoundaryType.MIRROR
 """Default boundary handling for perturbations that violate variable bounds."""
 
 DEFAULT_PERTURBATION_TYPE: Final = PerturbationType.ABSOLUTE

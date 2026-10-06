@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, model_validator
 from ropt._utils import (
     broadcast_1d_array,
     broadcast_arrays,
-    broadcast_keys,
+    broadcast_tuple,
     check_scales,
 )
 
@@ -67,10 +67,10 @@ class NonlinearConstraintsConfig(BaseModel):
                 "auto_scale": broadcast_1d_array(
                     self.auto_scale, "auto_scale", lower_bounds.size
                 ),
-                "realization_filters": broadcast_keys(
+                "realization_filters": broadcast_tuple(
                     self.realization_filters, "realization_filters", lower_bounds.size
                 ),
-                "function_estimators": broadcast_keys(
+                "function_estimators": broadcast_tuple(
                     self.function_estimators, "function_estimators", lower_bounds.size
                 ),
             }

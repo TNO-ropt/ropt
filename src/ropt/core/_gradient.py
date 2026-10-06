@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
+from ropt._utils import enum_mask
 from ropt.context import EnOptContext
 from ropt.enums import BoundaryType, PerturbationType
 from ropt.function_estimator import FunctionEstimator
@@ -15,7 +16,7 @@ def _apply_bounds(
     variables: NDArray[np.float64],
     lower_bounds: NDArray[np.float64],
     upper_bounds: NDArray[np.float64],
-    truncation_types: NDArray[np.ubyte],
+    truncation_types: tuple[BoundaryType, ...],
 ) -> NDArray[np.float64]:
     def mirror(
         variables: NDArray[np.float64],
@@ -29,12 +30,9 @@ def _apply_bounds(
 
     # Repeat the mirroring a few times, handling mirrored values that still
     # violate the bounds. If that is not sufficient, clip the values.
-    mask1 = np.logical_and(
-        truncation_types == BoundaryType.MIRROR_BOTH, variables < lower_bounds
-    )
-    mask2 = np.logical_and(
-        truncation_types == BoundaryType.MIRROR_BOTH, variables > upper_bounds
-    )
+    mirrored = enum_mask(truncation_types, BoundaryType.MIRROR)
+    mask1 = np.logical_and(mirrored, variables < lower_bounds)
+    mask2 = np.logical_and(mirrored, variables > upper_bounds)
     for _ in range(_MIRROR_REPEAT):
         variables = mirror(variables, mask1, variables < lower_bounds, lower_bounds)
         variables = mirror(variables, mask1, variables > upper_bounds, upper_bounds)
@@ -75,7 +73,7 @@ def _perturb_variables(
     for key in keys[1:]:
         samples += samplers[key].generate_samples()
     magnitudes = np.where(
-        context.variables.perturbation_types == PerturbationType.RELATIVE,
+        enum_mask(context.variables.perturbation_types, PerturbationType.RELATIVE),
         (context.variables.upper_bounds - context.variables.lower_bounds)
         * context.variables.perturbation_magnitudes,
         context.variables.perturbation_magnitudes,

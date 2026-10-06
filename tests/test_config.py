@@ -13,7 +13,7 @@ from ropt.config import (
     VariablesConfig,
 )
 from ropt.context import EnOptContext
-from ropt.enums import BoundaryType, PerturbationType
+from ropt.enums import BoundaryType, PerturbationType, VariableType
 
 initial_values = np.array([1, 2])
 
@@ -243,7 +243,7 @@ def test_check_config_perturbations(config: Any) -> None:
     config["variables"].update(
         {
             "perturbation_magnitudes": [1] * 2,
-            "boundary_types": [BoundaryType.TRUNCATE_BOTH] * 2,
+            "boundary_types": [BoundaryType.TRUNCATE] * 2,
             "perturbation_types": [PerturbationType.ABSOLUTE] * 2,
         }
     )
@@ -258,7 +258,7 @@ def test_check_config_perturbations(config: Any) -> None:
         EnOptContext.model_validate(config_copy)
 
     config_copy = copy.deepcopy(config)
-    config_copy["variables"]["boundary_types"] = [BoundaryType.TRUNCATE_BOTH] * 3
+    config_copy["variables"]["boundary_types"] = [BoundaryType.TRUNCATE] * 3
     with pytest.raises(
         ValueError, match="boundary_types cannot be broadcasted to a length of 2"
     ):
@@ -270,6 +270,31 @@ def test_check_config_perturbations(config: Any) -> None:
         ValueError, match="perturbation_types cannot be broadcasted to a length of 2"
     ):
         EnOptContext.model_validate(config_copy)
+
+
+def test_variable_enums_accept_their_string_values(config: Any) -> None:
+    config["variables"].update(
+        {
+            "lower_bounds": [0.0, 0.0],
+            "upper_bounds": [1.0, 1.0],
+            "types": ["integer", "real"],
+            "perturbation_types": ["relative", "absolute"],
+            "boundary_types": ["truncate", "mirror"],
+        }
+    )
+    variables = EnOptContext.model_validate(config).variables
+    assert variables.types == (VariableType.INTEGER, VariableType.REAL)
+    assert variables.perturbation_types == (
+        PerturbationType.RELATIVE,
+        PerturbationType.ABSOLUTE,
+    )
+    assert variables.boundary_types == (BoundaryType.TRUNCATE, BoundaryType.MIRROR)
+
+
+def test_variable_enums_reject_an_unknown_string(config: Any) -> None:
+    config["variables"]["types"] = ["integer", "complex"]
+    with pytest.raises(ValidationError, match=r"variables\.types\.1"):
+        EnOptContext.model_validate(config)
 
 
 def test_check_config_min_success(config: Any) -> None:

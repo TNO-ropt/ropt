@@ -34,12 +34,10 @@ section selects `differential_evolution`, the only method that will respect
 that; and `lower_bounds` / `upper_bounds` are mandatory, because that method
 searches within a box rather than stepping from a start point.
 
-[`VariableType`][ropt.enums.VariableType] comes from `ropt.enums`, not from
-`ropt` itself:
-
-```python
-from ropt.enums import VariableType
-```
+`types` takes the strings `"real"` and `"integer"`. These are the values of
+[`VariableType`][ropt.enums.VariableType], whose members are strings, so
+`VariableType.INTEGER` equals `"integer"`. The scripts use the strings; the
+members, imported from [`ropt.enums`][ropt.enums], are accepted in their place.
 
 The `types` field, and every other field of the variables section, is described
 under [`variables`](configuration_sections.md#variables).

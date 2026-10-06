@@ -31,15 +31,13 @@ the Configuration Reference.
 ## Configuration in one place
 
 ```python
-from ropt.enums import BoundaryType, PerturbationType
-
 CONFIG = {
     "variables": {
         "variable_count": 5,
         "perturbation_magnitudes": 1e-5,
-        "perturbation_types": PerturbationType.ABSOLUTE,  # or PerturbationType.RELATIVE
-        "boundary_types": BoundaryType.TRUNCATE_BOTH,     # see BoundaryType
-        "samplers": [0, 0, 1, 1, 1],                      # per-variable sampler index
+        "perturbation_types": "absolute",  # or "relative"
+        "boundary_types": "truncate",      # or "none", "mirror"
+        "samplers": [0, 0, 1, 1, 1],       # per-variable sampler index
     },
     "realizations": {"weights": [1.0] * 10},
     "gradient": {
@@ -57,24 +55,23 @@ CONFIG = {
 `perturbation_magnitudes` sets the scale of the sample applied to each
 variable. The `perturbation_types` field sets how that scale is interpreted:
 
-- [`PerturbationType.ABSOLUTE`][ropt.enums.PerturbationType.ABSOLUTE] — the
-  magnitude is added directly to the variable value.
-- [`PerturbationType.RELATIVE`][ropt.enums.PerturbationType.RELATIVE] — the
-  magnitude is multiplied by `upper_bound - lower_bound` before being applied.
-  Requires finite bounds.
+- `"absolute"` — the magnitude is added directly to the variable value.
+- `"relative"` — the magnitude is multiplied by `upper_bound - lower_bound`
+  before being applied. Requires finite bounds.
 
-See [`PerturbationType`][ropt.enums.PerturbationType].
+These are the values of [`PerturbationType`][ropt.enums.PerturbationType],
+whose members, imported from [`ropt.enums`][ropt.enums], may be written in
+their place.
 
 After a perturbed value is computed, it may fall outside the variable bounds.
 `boundary_types` controls the correction strategy:
 
-- [`BoundaryType.NONE`][ropt.enums.BoundaryType.NONE] — leave as-is.
-- [`BoundaryType.TRUNCATE_BOTH`][ropt.enums.BoundaryType.TRUNCATE_BOTH] —
-  clamp to the nearest bound.
-- [`BoundaryType.MIRROR_BOTH`][ropt.enums.BoundaryType.MIRROR_BOTH] — reflect
-  through the violated bound.
+- `"none"` — leave as-is.
+- `"truncate"` — clamp to the nearest bound.
+- `"mirror"` — reflect through the violated bound.
 
-See [`BoundaryType`][ropt.enums.BoundaryType].
+These are the values of [`BoundaryType`][ropt.enums.BoundaryType], whose
+members may be written in their place.
 
 ## Reproducibility
 

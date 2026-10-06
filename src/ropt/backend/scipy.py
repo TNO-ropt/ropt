@@ -24,6 +24,7 @@ from scipy.optimize import (
 )
 
 from ropt._logging import get_logger
+from ropt._utils import enum_mask
 from ropt.backend._base import Backend
 from ropt.backend.utils import resolve_verbosity, split_linear_constraints
 from ropt.config.options import OptionsSchemaModel
@@ -576,8 +577,8 @@ class SciPyBackend(Backend):
                 options.setdefault("verbose", min(level, _MAX_TRUST_CONSTR_VERBOSITY))
 
         if self._method in _SUPPORT_INTEGER and "integrality" not in options:
-            options["integrality"] = (
-                self._problem.variable_types == VariableType.INTEGER
+            options["integrality"] = enum_mask(
+                self._problem.variable_types, VariableType.INTEGER
             )
 
         return options

@@ -1,6 +1,5 @@
 """Utilities for checking and converting configuration and result values."""
 
-from enum import IntEnum
 from typing import Any
 
 import numpy as np
@@ -89,17 +88,15 @@ def broadcast_1d_array(array: NDArray[Any], name: str, size: int) -> NDArray[Any
         raise ValueError(msg) from err
 
 
-def broadcast_keys(
-    keys: tuple[str | None, ...], name: str, size: int
-) -> tuple[str | None, ...]:
+def broadcast_tuple[T](values: tuple[T, ...], name: str, size: int) -> tuple[T, ...]:
     if size == 0:
         return ()
-    if len(keys) == 1:
-        return keys * size
-    if len(keys) != size:
+    if len(values) == 1:
+        return values * size
+    if len(values) != size:
         msg = f"{name} cannot be broadcasted to a length of {size}"
         raise ValueError(msg)
-    return keys
+    return values
 
 
 def check_scales(scales: NDArray[np.float64], name: str, size: int) -> NDArray[Any]:
@@ -111,9 +108,7 @@ def check_scales(scales: NDArray[np.float64], name: str, size: int) -> NDArray[A
     return broadcast_1d_array(scales, name, size)
 
 
-def check_enum_values(value: NDArray[np.ubyte], enum_type: type[IntEnum]) -> None:
-    min_enum = min(item.value for item in enum_type)
-    max_enum = max(item.value for item in enum_type)
-    if np.any(value < min_enum) or np.any(value > max_enum):
-        msg = "invalid enumeration value"
-        raise ValueError(msg)
+def enum_mask[T](values: tuple[T, ...], target: T) -> NDArray[np.bool_]:
+    return np.fromiter(
+        (value == target for value in values), dtype=np.bool_, count=len(values)
+    )

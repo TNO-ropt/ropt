@@ -19,39 +19,39 @@ def test__apply_bounds() -> None:
     lower_bounds: NDArray[np.float64] = np.zeros(5, dtype=np.float64)
     upper_bounds: NDArray[np.float64] = np.ones(5, dtype=np.float64)
 
-    # TRUNCATE BOTH
-    expected_response_truncate_both: NDArray[np.float64] = np.array(
+    # TRUNCATE
+    expected_response_truncate: NDArray[np.float64] = np.array(
         [0.0, 0.2, 0.3, 0.4, 1.0],
     )
     response = _apply_bounds(
-        variables, lower_bounds, upper_bounds, np.array(BoundaryType.TRUNCATE_BOTH)
+        variables, lower_bounds, upper_bounds, (BoundaryType.TRUNCATE,) * 5
     )
-    assert expected_response_truncate_both == pytest.approx(response)
+    assert expected_response_truncate == pytest.approx(response)
 
-    # MIRROR_BOTH
-    expected_response_mirror_both: NDArray[np.float64] = np.array(
+    # MIRROR
+    expected_response_mirror: NDArray[np.float64] = np.array(
         [0.1, 0.2, 0.3, 0.4, 0.8],
     )
     response = _apply_bounds(
-        variables, lower_bounds, upper_bounds, np.array(BoundaryType.MIRROR_BOTH)
+        variables, lower_bounds, upper_bounds, (BoundaryType.MIRROR,) * 5
     )
-    assert expected_response_mirror_both == pytest.approx(response)
+    assert expected_response_mirror == pytest.approx(response)
 
     # MIRRORING STILL FAILS BOUNDS:
     variables = np.array([-1.1, 0.2, 0.3, 0.4, 2.2])
-    expected_response_mirror_both = np.array([0.9, 0.2, 0.3, 0.4, 0.2])
+    expected_response_mirror = np.array([0.9, 0.2, 0.3, 0.4, 0.2])
     response = _apply_bounds(
-        variables, lower_bounds, upper_bounds, np.array(BoundaryType.MIRROR_BOTH)
+        variables, lower_bounds, upper_bounds, (BoundaryType.MIRROR,) * 5
     )
-    assert expected_response_mirror_both == pytest.approx(response)
+    assert expected_response_mirror == pytest.approx(response)
 
     # MIRRORING STILL FAILS BOUNDS:
     variables = np.array([-100, 0.2, 0.3, 0.4, 100])
-    expected_response_mirror_both = np.array([0.0, 0.2, 0.3, 0.4, 1.0])
+    expected_response_mirror = np.array([0.0, 0.2, 0.3, 0.4, 1.0])
     response = _apply_bounds(
-        variables, lower_bounds, upper_bounds, np.array(BoundaryType.MIRROR_BOTH)
+        variables, lower_bounds, upper_bounds, (BoundaryType.MIRROR,) * 5
     )
-    assert expected_response_mirror_both == pytest.approx(response)
+    assert expected_response_mirror == pytest.approx(response)
 
 
 def test_variable_perturbation_enopt() -> None:

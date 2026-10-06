@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, model_validator
 
 from ropt._utils import (
     broadcast_1d_array,
-    broadcast_keys,
+    broadcast_tuple,
     check_scales,
     normalize,
 )
@@ -68,10 +68,10 @@ class ObjectiveFunctionsConfig(BaseModel):
                 "scales": check_scales(self.scales, "scales", weights.size),
                 "offsets": broadcast_1d_array(self.offsets, "offsets", weights.size),
                 "maximize": broadcast_1d_array(self.maximize, "maximize", weights.size),
-                "realization_filters": broadcast_keys(
+                "realization_filters": broadcast_tuple(
                     self.realization_filters, "realization_filters", weights.size
                 ),
-                "function_estimators": broadcast_keys(
+                "function_estimators": broadcast_tuple(
                     self.function_estimators, "function_estimators", weights.size
                 ),
             }

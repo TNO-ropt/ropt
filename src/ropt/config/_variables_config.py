@@ -5,20 +5,19 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from ropt._utils import (
     broadcast_1d_array,
-    broadcast_keys,
-    check_enum_values,
+    broadcast_tuple,
     check_scales,
+    enum_mask,
 )
 from ropt.enums import BoundaryType, PerturbationType, VariableType
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
     Array1DBool,
-    ArrayEnum,
     ItemOrTuple,
     Keys,
 )
@@ -71,13 +70,13 @@ class VariablesConfig(BaseModel):
     variable_count: int
     lower_bounds: Array1D = np.array(-np.inf)
     upper_bounds: Array1D = np.array(np.inf)
-    types: ArrayEnum = np.array(VariableType.REAL)
+    types: ItemOrTuple[VariableType] = (VariableType.REAL,)
     mask: Array1DBool = np.array(1)
     scales: Array1D = np.array(1.0)
     offsets: Array1D = np.array(0.0)
     perturbation_magnitudes: Array1D = np.array(DEFAULT_PERTURBATION_MAGNITUDE)
-    perturbation_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_TYPE)
-    boundary_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_BOUNDARY_TYPE)
+    perturbation_types: ItemOrTuple[PerturbationType] = (DEFAULT_PERTURBATION_TYPE,)
+    boundary_types: ItemOrTuple[BoundaryType] = (DEFAULT_PERTURBATION_BOUNDARY_TYPE,)
     samplers: Keys = ("0",)
     seed: ItemOrTuple[int] = (DEFAULT_SEED,)
 
@@ -88,47 +87,29 @@ class VariablesConfig(BaseModel):
         frozen=True,
     )
 
-    @field_validator("types", mode="after")
-    @classmethod
-    def _check_variable_types(cls, value: ArrayEnum) -> ArrayEnum:
-        check_enum_values(value, VariableType)
-        return value
-
-    @field_validator("perturbation_types", mode="after")
-    @classmethod
-    def _check_perturbation_types(cls, value: ArrayEnum) -> ArrayEnum:
-        check_enum_values(value, PerturbationType)
-        return value
-
-    @field_validator("boundary_types", mode="after")
-    @classmethod
-    def _check_boundary_types(cls, value: ArrayEnum) -> ArrayEnum:
-        check_enum_values(value, BoundaryType)
-        return value
-
     @model_validator(mode="after")
     def _broadcast_and_transform(self) -> Self:
         dim = self.variable_count
         lower_bounds = broadcast_1d_array(self.lower_bounds, "lower_bounds", dim)
         upper_bounds = broadcast_1d_array(self.upper_bounds, "upper_bounds", dim)
-        types = broadcast_1d_array(self.types, "types", dim)
+        types = broadcast_tuple(self.types, "types", dim)
         mask = broadcast_1d_array(self.mask, "mask", dim)
         scales = check_scales(self.scales, "scales", dim)
         offsets = broadcast_1d_array(self.offsets, "offsets", dim)
         perturbation_magnitudes = broadcast_1d_array(
             self.perturbation_magnitudes, "perturbation_magnitudes", dim
         )
-        perturbation_types = broadcast_1d_array(
+        perturbation_types = broadcast_tuple(
             self.perturbation_types, "perturbation_types", dim
         )
-        boundary_types = broadcast_1d_array(self.boundary_types, "boundary_types", dim)
-        samplers = broadcast_keys(self.samplers, "samplers", dim)
+        boundary_types = broadcast_tuple(self.boundary_types, "boundary_types", dim)
+        samplers = broadcast_tuple(self.samplers, "samplers", dim)
 
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."
             raise ValueError(msg)
 
-        relative = perturbation_types == PerturbationType.RELATIVE
+        relative = enum_mask(perturbation_types, PerturbationType.RELATIVE)
         if not np.all(
             np.logical_and(
                 np.isfinite(lower_bounds[relative]), np.isfinite(upper_bounds[relative])

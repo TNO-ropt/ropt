@@ -287,20 +287,18 @@ Expand the block below to see every field and its default value.
     automatically.
 
     ```python
-    from ropt.enums import BoundaryType, PerturbationType, VariableType
-
     CONFIG = {
         "variables": {
             "variable_count": ...,                            # required, no default
             "lower_bounds": -float("inf"),                    # default: -inf
             "upper_bounds": float("inf"),                     # default: +inf
-            "types": VariableType.REAL,                       # default: "real" (continuous)
+            "types": "real",                                  # default: continuous
             "mask": True,                                     # default: all free
             "scales": 1.0,                                    # default: no scaling
             "offsets": 0.0,                                   # default: no offset
             "perturbation_magnitudes": 0.005,
-            "perturbation_types": PerturbationType.ABSOLUTE,
-            "boundary_types": BoundaryType.MIRROR_BOTH,
+            "perturbation_types": "absolute",
+            "boundary_types": "mirror",
             "samplers": "0",                                  # default: use first sampler for all
             "seed": 1,
         },
@@ -358,6 +356,12 @@ Expand the block below to see every field and its default value.
         "names": {},                                          # default: none configured
     }
     ```
+
+    `types`, `perturbation_types` and `boundary_types` are shown as strings.
+    These are the values of [`VariableType`][ropt.enums.VariableType],
+    [`PerturbationType`][ropt.enums.PerturbationType] and
+    [`BoundaryType`][ropt.enums.BoundaryType] in [`ropt.enums`][ropt.enums],
+    whose members may be written in their place.
 
     Some sections above are set to `None` or `[]` because they are optional
     and problem-specific. When configured, their internal structure is as

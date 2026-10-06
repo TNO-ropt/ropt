@@ -9,7 +9,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
 
 from ropt._scaling import scale
-from ropt._utils import immutable_array
+from ropt._utils import enum_mask, immutable_array
 from ropt.config import (
     FunctionEstimatorConfig,
     GradientConfig,
@@ -292,7 +292,9 @@ class EnOptContext(BaseModel):
         # variables, so they are scaled with them. A relative
         # magnitude is a fraction of the bound range, which the affine map
         # leaves alone.
-        absolute = self.variables.perturbation_types == PerturbationType.ABSOLUTE
+        absolute = enum_mask(
+            self.variables.perturbation_types, PerturbationType.ABSOLUTE
+        )
         magnitudes = np.where(
             absolute,
             self.variables.perturbation_magnitudes / scales,
