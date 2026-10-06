@@ -158,6 +158,23 @@ def test_scales_default_to_one() -> None:
     assert context.get_constraint_scales() is None
 
 
+def test_revalidating_a_context_does_not_scale_it_again() -> None:
+    context = _context(
+        variables={
+            "variable_count": 2,
+            "lower_bounds": [0.0, 0.0],
+            "upper_bounds": [10.0, 10.0],
+            "scales": 2.0,
+        }
+    )
+    assert np.allclose(context.variables.upper_bounds, [5.0, 5.0])
+
+    # The after-validators scale in place, so running them again would halve
+    # the bounds of the context the caller already holds.
+    assert EnOptContext.model_validate(context) is context
+    assert np.allclose(context.variables.upper_bounds, [5.0, 5.0])
+
+
 # Auto-scaling estimates a factor from the first batch of evaluations. Two
 # realizations with weights 1 and 3 are used throughout, so that a plain average
 # and a weighted one give different answers.

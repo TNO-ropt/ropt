@@ -6,7 +6,13 @@ import threading
 from typing import TYPE_CHECKING, Any, Self
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    ModelWrapValidatorHandler,
+    PrivateAttr,
+    model_validator,
+)
 
 from ropt._scaling import scale
 from ropt._utils import enum_mask, immutable_array, update_fields
@@ -323,11 +329,18 @@ class EnOptContext(BaseModel):
 
         return self
 
-    @model_validator(mode="wrap")  # type: ignore[arg-type]
-    def _pass_context_unchanged(self, handler: Any) -> Any:  # ruff: ignore[any-type]
-        if isinstance(self, EnOptContext):
-            return self
-        return handler(self)
+    @model_validator(mode="wrap")
+    @classmethod
+    def _pass_context_unchanged(
+        cls,
+        value: Any,  # ruff: ignore[any-type]
+        handler: ModelWrapValidatorHandler[Self],
+    ) -> Self:
+        # Validating a built context again would run the after-validators a
+        # second time, and the scaling they apply is not idempotent.
+        if isinstance(value, cls):
+            return value
+        return handler(value)
 
     def lock(self) -> None:
         """Lock the object to prevent sharing and re-use.
