@@ -3403,7 +3403,8 @@ failing run on the same session all reach it. <code>offload</code> returns whate
 callables return and so has nowhere to report a reason: a call that was
 abandoned raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
 <code>exit_code</code> distinguishes an abort that was asked for from one another run
-caused. Calls already on a worker run to their end, so an abort that costs the
+caused, and reports <code>EXECUTOR_SHUT_DOWN</code> when the pool could no longer run the
+work. Calls already on a worker run to their end, so an abort that costs the
 batch nothing lets it return its results.</p>
 <div class="admonition warning">
 <p class="admonition-title">Offloaded work coordinates with nothing</p>

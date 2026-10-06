@@ -3915,6 +3915,10 @@ a run returns keeps its own module. The fields of a
 <a class="autorefs autorefs-internal" title="            ropt.results" href="../results/#ropt.results"><code>ropt.results</code></a>, the remaining enumerations in
 <a class="autorefs autorefs-internal" title="            ropt.enums" href="../enums/#ropt.enums"><code>ropt.enums</code></a>, and the classes describing the configuration
 dictionary in <a class="autorefs autorefs-internal" title="            ropt.config" href="../config/#ropt.config"><code>ropt.config</code></a>.</p>
+<p>Exceptions follow the same rule. Every error that can reach a caller derives
+from <a class="autorefs autorefs-internal" title="            RoptError" href="../exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> and is re-exported here; the
+control-flow signals that <code>ropt</code> raises and catches itself stay in
+<a class="autorefs autorefs-internal" title="            ropt.exceptions" href="../exceptions/#ropt.exceptions"><code>ropt.exceptions</code></a>.</p>
 <p>Nothing about a run depends on where it is called from. What it is started on
 says where its evaluations happen and which session it belongs to: a module
 function runs in-process and belongs to nothing, a <a class="autorefs autorefs-internal" title="            ropt.Session" href="#ropt.Session"><code>Session</code></a>
@@ -4533,7 +4537,7 @@ the evaluations workers.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="RunsFailedError">RunsFailedError</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            RunsFailedError (ropt.exceptions.RunsFailedError)" href="../exceptions/#ropt.exceptions.RunsFailedError">RunsFailedError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6185,7 +6189,7 @@ walkthrough.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="RunsFailedError">RunsFailedError</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            RunsFailedError (ropt.exceptions.RunsFailedError)" href="../exceptions/#ropt.exceptions.RunsFailedError">RunsFailedError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8442,7 +8446,7 @@ walkthrough.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="RunsFailedError">RunsFailedError</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            RunsFailedError (ropt.exceptions.RunsFailedError)" href="../exceptions/#ropt.exceptions.RunsFailedError">RunsFailedError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9225,7 +9229,7 @@ must be picklable for a process or job pool.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="AbortedError">AbortedError</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            AbortedError (ropt.exceptions.AbortedError)" href="../exceptions/#ropt.exceptions.AbortedError">AbortedError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -9235,7 +9239,7 @@ must be picklable for a process or job pool.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ExecutionError">ExecutionError</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExecutionError (ropt.exceptions.ExecutionError)" href="../exceptions/#ropt.exceptions.ExecutionError">ExecutionError</a></code>
             </td>
             <td>
               <div class="doc-md-description">

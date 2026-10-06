@@ -2911,9 +2911,11 @@ receives, so everything is read the same way wherever it came from. Here
 <code>result.variables</code> is just the point you supplied; it is only informative in a
 <code>report</code> callback, where the optimizer chose the point.</p>
 <p>An evaluation is a single batch, so it produces either every result or none.
-That is why <code>exit_code</code> can only be <code>FINISHED</code>, or <code>USER_ABORT</code> and
+That is why <code>exit_code</code> can only be <code>FINISHED</code>; <code>USER_ABORT</code> or
 <code>ABORTED_ON_ERROR</code> when <a href="#stopping-from-outside"><code>Session.abort</code></a> or a failing
-run on the same session cut it off. An abort that arrives after the batch has
+run on the same session cut it off; or <code>EXECUTOR_SHUT_DOWN</code> when the pool it was
+evaluating on could no longer run the work. An abort that arrives after the
+batch has
 finished leaves it unaffected, and the evaluation reports <code>FINISHED</code>.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/evaluate.py">examples/evaluate.py</a>,
@@ -2970,15 +2972,20 @@ it either way.</p>
   <a href="../many_runs/#failure-in-one-run">Failure in one run</a>.</p>
 </li>
 </ul>
-<p>Catching <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> catches all of <code>ropt</code>'s own
-errors at once. It deliberately does not cover the first and third groups:
+<p>The <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> types above are imported from
+<code>ropt</code> itself, and catching the base class catches all of them at once:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoptError</span>
+</span></code></pre></div>
+<p>It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
-function stay whatever you raised.</p>
+function stay whatever you raised. The control-flow signals that <code>ropt</code> raises
+and catches itself are excluded as well, and stay in
+<a class="autorefs autorefs-internal" title="            ropt.exceptions" href="../../reference/exceptions/#ropt.exceptions"><code>ropt.exceptions</code></a>.</p>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations.
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, the type of <code>result.exit_code</code>, is imported
 from <code>ropt</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
 </span></code></pre></div>
 <p>The enumerations that name configuration values —
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a>,
@@ -2986,9 +2993,9 @@ from <code>ropt</code>:</p>
 <a class="autorefs autorefs-internal" title="            PerturbationType" href="../../reference/enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a> — are in
 <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>. Their members are strings, so a configuration
 accepts either the member or the value it equals:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">VariableType</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"types"</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">}}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">VariableType</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"types"</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">}}</span>
 </span></code></pre></div>
 <p>Writing <code>"integer"</code> instead gives the same configuration. A validated
 configuration reports these fields as enum members, whichever form was written.</p>

@@ -2534,10 +2534,10 @@ linear constraints as well as the nonlinear ones. See
 <h2 id="work-that-has-no-result-object">Work that has no result object</h2>
 <p><a class="autorefs autorefs-internal" title="            offload" href="../../reference/api/#ropt.WorkerPool.offload"><code>WorkerPool.offload</code></a> returns whatever its
 callables return, so there is no result object to carry an exit code. A call
-abandoned by an abort raises
+that was abandoned raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead, whose
-<code>exit_code</code> attribute distinguishes an abort that was asked for from one
-another run caused.</p>
+<code>exit_code</code> attribute says why: an abort that was asked for, one another run
+caused, or <code>EXECUTOR_SHUT_DOWN</code> when the pool could no longer run the work.</p>
 
 
 
