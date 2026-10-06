@@ -7,7 +7,7 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt._utils import broadcast_1d_array, check_scales
+from ropt._utils import broadcast_1d_array, check_scales, update_fields
 from ropt.config._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
     Array2D,
@@ -57,11 +57,11 @@ class LinearConstraintsConfig(BaseModel):
             msg = "The lower bounds are larger than the upper bounds."
             raise ValueError(msg)
 
-        return self.model_copy(
-            update={
-                "coefficients": coefficients,
-                "lower_bounds": lower_bounds,
-                "upper_bounds": upper_bounds,
-                "scales": scales,
-            }
+        update_fields(
+            self,
+            coefficients=coefficients,
+            lower_bounds=lower_bounds,
+            upper_bounds=upper_bounds,
+            scales=scales,
         )
+        return self

@@ -1,5 +1,6 @@
 import copy
 import re
+import warnings
 from typing import Any
 
 import numpy as np
@@ -305,6 +306,32 @@ def test_variable_enums_accept_a_numpy_array(config: Any) -> None:
     config["variables"]["types"] = np.array("integer")
     variables = EnOptContext.model_validate(config).variables
     assert variables.types == (VariableType.INTEGER, VariableType.INTEGER)
+
+
+def test_variables_config_broadcasts_when_built_directly() -> None:
+    direct = VariablesConfig(variable_count=3, lower_bounds=-1.0)
+    validated = VariablesConfig.model_validate(
+        {"variable_count": 3, "lower_bounds": -1.0}
+    )
+    assert direct.lower_bounds.size == 3
+    assert direct.boundary_types == validated.boundary_types
+    assert direct.samplers == validated.samplers
+
+
+def test_context_defaults_and_scaling_apply_when_built_directly(config: Any) -> None:
+    config["variables"].update(
+        {"lower_bounds": [0.0, 0.0], "upper_bounds": [10.0, 10.0], "scales": 2.0}
+    )
+    with warnings.catch_warnings():
+        # Pydantic warns here if a validator returns a copy instead of `self`,
+        # which is also when its result is dropped.
+        warnings.simplefilter("error", UserWarning)
+        direct = EnOptContext(**config)
+    validated = EnOptContext.model_validate(config)
+    assert list(direct.samplers) == list(validated.samplers)
+    assert list(direct.function_estimators) == list(validated.function_estimators)
+    assert np.allclose(direct.variables.upper_bounds, [5.0, 5.0])
+    assert np.allclose(direct.variables.upper_bounds, validated.variables.upper_bounds)
 
 
 def test_check_config_min_success(config: Any) -> None:

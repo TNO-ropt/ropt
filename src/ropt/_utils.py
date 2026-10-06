@@ -4,6 +4,14 @@ from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
+from pydantic import BaseModel
+
+
+def update_fields(model: BaseModel, **updates: Any) -> None:  # ruff: ignore[any-type]
+    # Returning a copy from an after-validator instead is discarded when the
+    # model is built through `__init__` rather than validated.
+    for name, value in updates.items():
+        object.__setattr__(model, name, value)  # ruff: ignore[unnecessary-dunder-call]
 
 
 def normalize(array: NDArray[np.float64]) -> NDArray[np.float64]:

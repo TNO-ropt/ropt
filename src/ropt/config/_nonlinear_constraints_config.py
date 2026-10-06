@@ -12,6 +12,7 @@ from ropt._utils import (
     broadcast_arrays,
     broadcast_tuple,
     check_scales,
+    update_fields,
 )
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
@@ -59,19 +60,19 @@ class NonlinearConstraintsConfig(BaseModel):
         lower_bounds, upper_bounds = broadcast_arrays(
             self.lower_bounds, self.upper_bounds
         )
-        return self.model_copy(
-            update={
-                "lower_bounds": lower_bounds,
-                "upper_bounds": upper_bounds,
-                "scales": check_scales(self.scales, "scales", lower_bounds.size),
-                "auto_scale": broadcast_1d_array(
-                    self.auto_scale, "auto_scale", lower_bounds.size
-                ),
-                "realization_filters": broadcast_tuple(
-                    self.realization_filters, "realization_filters", lower_bounds.size
-                ),
-                "function_estimators": broadcast_tuple(
-                    self.function_estimators, "function_estimators", lower_bounds.size
-                ),
-            }
+        update_fields(
+            self,
+            lower_bounds=lower_bounds,
+            upper_bounds=upper_bounds,
+            scales=check_scales(self.scales, "scales", lower_bounds.size),
+            auto_scale=broadcast_1d_array(
+                self.auto_scale, "auto_scale", lower_bounds.size
+            ),
+            realization_filters=broadcast_tuple(
+                self.realization_filters, "realization_filters", lower_bounds.size
+            ),
+            function_estimators=broadcast_tuple(
+                self.function_estimators, "function_estimators", lower_bounds.size
+            ),
         )
+        return self

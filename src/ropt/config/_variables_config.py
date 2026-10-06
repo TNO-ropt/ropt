@@ -12,6 +12,7 @@ from ropt._utils import (
     broadcast_tuple,
     check_scales,
     enum_mask,
+    update_fields,
 )
 from ropt.enums import BoundaryType, PerturbationType, VariableType
 
@@ -118,17 +119,17 @@ class VariablesConfig(BaseModel):
             msg = "The variable bounds must be finite to use relative perturbations"
             raise ValueError(msg)
 
-        return self.model_copy(
-            update={
-                "types": types,
-                "lower_bounds": lower_bounds,
-                "upper_bounds": upper_bounds,
-                "mask": mask,
-                "scales": scales,
-                "offsets": offsets,
-                "perturbation_magnitudes": perturbation_magnitudes,
-                "perturbation_types": perturbation_types,
-                "boundary_types": boundary_types,
-                "samplers": samplers,
-            }
+        update_fields(
+            self,
+            types=types,
+            lower_bounds=lower_bounds,
+            upper_bounds=upper_bounds,
+            mask=mask,
+            scales=scales,
+            offsets=offsets,
+            perturbation_magnitudes=perturbation_magnitudes,
+            perturbation_types=perturbation_types,
+            boundary_types=boundary_types,
+            samplers=samplers,
         )
+        return self

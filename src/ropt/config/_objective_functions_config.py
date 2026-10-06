@@ -12,6 +12,7 @@ from ropt._utils import (
     broadcast_tuple,
     check_scales,
     normalize,
+    update_fields,
 )
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
@@ -62,17 +63,17 @@ class ObjectiveFunctionsConfig(BaseModel):
     @model_validator(mode="after")
     def _broadcast_and_normalize(self) -> Self:
         weights = normalize(self.weights)
-        return self.model_copy(
-            update={
-                "weights": normalize(self.weights),
-                "scales": check_scales(self.scales, "scales", weights.size),
-                "offsets": broadcast_1d_array(self.offsets, "offsets", weights.size),
-                "maximize": broadcast_1d_array(self.maximize, "maximize", weights.size),
-                "realization_filters": broadcast_tuple(
-                    self.realization_filters, "realization_filters", weights.size
-                ),
-                "function_estimators": broadcast_tuple(
-                    self.function_estimators, "function_estimators", weights.size
-                ),
-            }
+        update_fields(
+            self,
+            weights=normalize(self.weights),
+            scales=check_scales(self.scales, "scales", weights.size),
+            offsets=broadcast_1d_array(self.offsets, "offsets", weights.size),
+            maximize=broadcast_1d_array(self.maximize, "maximize", weights.size),
+            realization_filters=broadcast_tuple(
+                self.realization_filters, "realization_filters", weights.size
+            ),
+            function_estimators=broadcast_tuple(
+                self.function_estimators, "function_estimators", weights.size
+            ),
         )
+        return self

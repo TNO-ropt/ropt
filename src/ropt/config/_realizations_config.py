@@ -7,7 +7,7 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, NonNegativeInt, model_validator
 
-from ropt._utils import normalize
+from ropt._utils import normalize, update_fields
 
 from ._validated_types import Array1D  # ruff: ignore[typing-only-first-party-import]
 
@@ -45,9 +45,9 @@ class RealizationsConfig(BaseModel):
         realization_min_success = self.realization_min_success
         if realization_min_success is None or realization_min_success > weights.size:
             realization_min_success = weights.size
-        return self.model_copy(
-            update={
-                "weights": weights,
-                "realization_min_success": realization_min_success,
-            }
+        update_fields(
+            self,
+            weights=weights,
+            realization_min_success=realization_min_success,
         )
+        return self

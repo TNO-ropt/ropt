@@ -9,7 +9,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
 
 from ropt._scaling import scale
-from ropt._utils import enum_mask, immutable_array
+from ropt._utils import enum_mask, immutable_array, update_fields
 from ropt.config import (
     FunctionEstimatorConfig,
     GradientConfig,
@@ -217,7 +217,7 @@ class EnOptContext(BaseModel):
                 "0": get_plugin("sampler", method=sampler_config.method)(sampler_config)
             }
         if updates:
-            return self.model_copy(update=updates)
+            update_fields(self, **updates)
         return self
 
     @model_validator(mode="after")
@@ -311,13 +311,12 @@ class EnOptContext(BaseModel):
                 "perturbation_magnitudes": immutable_array(magnitudes),
             }
         )
-        object.__setattr__(self, "variables", updated_variables)  # ruff: ignore[unnecessary-dunder-call]
+        update_fields(self, variables=updated_variables)
 
         if self.linear_constraints is not None:
-            object.__setattr__(  # ruff: ignore[unnecessary-dunder-call]
+            update_fields(
                 self,
-                "linear_constraints",
-                _scale_linear_constraints(
+                linear_constraints=_scale_linear_constraints(
                     self.linear_constraints, scales, offsets, self.variables.mask
                 ),
             )
@@ -340,7 +339,7 @@ class EnOptContext(BaseModel):
             if self._locked:
                 msg = "The EnOptContext object has already been used."
                 raise WorkflowError(msg)
-            object.__setattr__(self, "_locked", True)  # ruff: ignore[unnecessary-dunder-call]
+            self._locked = True
 
 
 def _scale_linear_constraints(

@@ -11,6 +11,8 @@ from pydantic import (
     model_validator,
 )
 
+from ropt._utils import update_fields
+
 from .constants import DEFAULT_NUMBER_OF_PERTURBATIONS
 
 
@@ -54,6 +56,5 @@ class GradientConfig(BaseModel):
             or perturbation_min_success > self.number_of_perturbations
         ):
             perturbation_min_success = self.number_of_perturbations
-        return self.model_copy(
-            update={"perturbation_min_success": perturbation_min_success}
-        )
+        update_fields(self, perturbation_min_success=perturbation_min_success)
+        return self
