@@ -585,7 +585,7 @@ argument, because an aggregated frame always pivots the same way:
 A field with neither of those axes therefore gives exactly one row per result:
 
 ```python
-from ropt.results import results_to_pandas
+from ropt import results_to_pandas
 
 df = results_to_pandas(
     all_results,
@@ -764,7 +764,7 @@ batch_id  realization  evaluations.objectives,val  evaluations.objectives,cost
 Aggregating a sequence of results works the same way:
 
 ```python
-from ropt.results import results_to_polars
+from ropt import results_to_polars
 
 df = results_to_polars(
     all_results,

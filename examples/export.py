@@ -23,11 +23,13 @@ import numpy as np
 
 from ropt import (
     EvaluationFunctionResult,
+    FunctionResults,
     HistoryHandler,
     optimize,
+    results_to_pandas,
+    results_to_polars,
 )
 from ropt.enums import AxisName
-from ropt.results import FunctionResults, results_to_pandas, results_to_polars
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

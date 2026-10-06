@@ -88,7 +88,7 @@ which carries two things:
 ```python
 result = optimize(config, x0, objective)
 
-result.exit_code  # why the run stopped (an ropt.enums.ExitCode)
+result.exit_code  # why the run stopped (an ExitCode)
 result.results      # the best evaluation, or None if none was valid
 ```
 
@@ -135,7 +135,7 @@ Set `report_gradients=True` and the callback is also called with each
 evaluation. The callback then receives both kinds and has to tell them apart:
 
 ```python
-from ropt.results import FunctionResults
+from ropt import FunctionResults
 
 
 def report(result):
@@ -161,7 +161,7 @@ exit code `STOPPED`. Any other return value (including `None`) lets it
 continue.
 
 ```python
-from ropt.enums import ExitCode
+from ropt import ExitCode
 
 
 def report(result):
@@ -373,11 +373,18 @@ function stay whatever you raised.
 
 ## A note on enums
 
-A few config values and result fields use enumerations, such as
-[`VariableType`][ropt.enums.VariableType] for integer variables and
-[`ExitCode`][ropt.enums.ExitCode] for `result.exit_code`. These are
-**not** exported by `ropt` itself; import them from [`ropt.enums`][ropt.enums]:
+A few config values and result fields use enumerations.
+[`ExitCode`][ropt.enums.ExitCode], the type of `result.exit_code`, is imported
+from `ropt`:
 
 ```python
-from ropt.enums import ExitCode, VariableType
+from ropt import ExitCode
+```
+
+The remaining ones name configuration values and result metadata, such as
+[`VariableType`][ropt.enums.VariableType] for integer variables, and are
+imported from [`ropt.enums`][ropt.enums]:
+
+```python
+from ropt.enums import VariableType
 ```

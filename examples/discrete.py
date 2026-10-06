@@ -14,9 +14,8 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt import EvaluationFunctionContext, optimize
+from ropt import EvaluationFunctionContext, FunctionResults, optimize
 from ropt.enums import VariableType
-from ropt.results import FunctionResults
 
 INITIAL_VALUES = [0.0, 0.0]
 

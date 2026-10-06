@@ -16,7 +16,7 @@ from numpy.typing import NDArray
 from ropt import EvaluationFunctionContext, optimize
 
 if TYPE_CHECKING:
-    from ropt.results import FunctionResults, GradientResults
+    from ropt import FunctionResults, GradientResults
 
 DIM = 5
 CONFIG: dict[str, Any] = {

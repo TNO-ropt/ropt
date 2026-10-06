@@ -15,7 +15,7 @@ from numpy.typing import NDArray
 from ropt import EvaluationFunctionContext, optimize
 
 if TYPE_CHECKING:
-    from ropt.results import FunctionResults
+    from ropt import FunctionResults
 
 DIM = 3
 PERTURBATIONS = 4

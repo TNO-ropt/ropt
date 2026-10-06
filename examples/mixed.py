@@ -13,9 +13,8 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt import EvaluationFunctionContext, optimize
+from ropt import EvaluationFunctionContext, FunctionResults, optimize
 from ropt.enums import VariableType
-from ropt.results import FunctionResults
 
 DIM = 4
 REALIZATIONS = 10

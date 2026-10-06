@@ -24,11 +24,7 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt import (
-    EvaluationFunctionContext,
-    session,
-)
-from ropt.results import FunctionResults
+from ropt import EvaluationFunctionContext, FunctionResults, session
 
 DIM = 2
 REALIZATIONS = 5

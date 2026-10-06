@@ -4,10 +4,14 @@ Import the names used to run an optimization directly from this package, for
 example `from ropt import optimize, session`. See
 [Running Optimizations](../running/running.md) for a walkthrough.
 
-Enumerations used in the configuration and results (for example
-[`ExitCode`][ropt.enums.ExitCode] and
-[`VariableType`][ropt.enums.VariableType]) are not re-exported here; import them
-from [`ropt.enums`][ropt.enums].
+A name is re-exported here when a program written against `ropt` has to spell it
+out: the functions it calls, the classes it instantiates or subclasses, and the
+types it puts in its own signatures. A name that is only reached through a value
+a run returns keeps its own module. The fields of a
+[`FunctionResults`][ropt.results.FunctionResults] are in
+[`ropt.results`][ropt.results], the remaining enumerations in
+[`ropt.enums`][ropt.enums], and the classes describing the configuration
+dictionary in [`ropt.config`][ropt.config].
 
 Nothing about a run depends on where it is called from. What it is started on
 says where its evaluations happen and which session it belongs to: a module
@@ -34,11 +38,18 @@ from ropt.components.event_handlers import (
     HistoryHandler,
     ResultsHandler,
 )
+from ropt.enums import ExitCode
+from ropt.results import (
+    FunctionResults,
+    GradientResults,
+    Results,
+    results_to_pandas,
+    results_to_polars,
+)
 from ropt.run import (
     EvaluationFunction,
     EvaluationResult,
     OptimizationResult,
-    ReportCallback,
     Session,
     WorkerPool,
     evaluate,
@@ -57,9 +68,12 @@ __all__ = [
     "EvaluationFunctionResult",
     "EvaluationResult",
     "EventHandler",
+    "ExitCode",
+    "FunctionResults",
+    "GradientResults",
     "HistoryHandler",
     "OptimizationResult",
-    "ReportCallback",
+    "Results",
     "ResultsHandler",
     "Session",
     "WorkerPool",
@@ -67,5 +81,7 @@ __all__ = [
     "evaluate_batch",
     "optimize",
     "optimize_many",
+    "results_to_pandas",
+    "results_to_polars",
     "session",
 ]

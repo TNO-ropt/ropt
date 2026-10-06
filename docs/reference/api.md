@@ -40,4 +40,6 @@
 ## Callback types
 
 ::: ropt.EvaluationFunction
-::: ropt.ReportCallback
+::: ropt.run.ReportCallback
+    options:
+        show_root_full_path: false

@@ -25,11 +25,10 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt import EvaluationFunctionContext, optimize
+from ropt import EvaluationFunctionContext, FunctionResults, optimize
 from ropt.config import FunctionEstimatorConfig
 from ropt.function_estimator import FunctionEstimator
 from ropt.plugins import MethodSpec, register_plugin
-from ropt.results import FunctionResults
 
 DIM = 5
 UNCERTAINTY = 0.1

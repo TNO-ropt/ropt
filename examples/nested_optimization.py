@@ -29,10 +29,11 @@ from ropt import (
     DataFrameHandler,
     EvaluationFunction,
     EvaluationFunctionContext,
+    ExitCode,
     WorkerPool,
     session,
 )
-from ropt.enums import ExitCode, VariableType
+from ropt.enums import VariableType
 
 # --8<-- [start:configs]
 DIM = 4

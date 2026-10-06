@@ -17,8 +17,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt import optimize
-from ropt.enums import ExitCode
+from ropt import ExitCode, optimize
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
