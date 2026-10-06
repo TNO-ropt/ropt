@@ -1,4 +1,4 @@
-"""A custom function estimator with the high-level `ropt.simple` API.
+"""A custom function estimator with `ropt`.
 
 A function estimator reduces the objective values of all realizations to the
 single value the optimizer works with, together with the matching gradient. This
@@ -25,11 +25,11 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
+from ropt import EvaluationFunctionContext, optimize
 from ropt.config import FunctionEstimatorConfig
 from ropt.function_estimator import FunctionEstimator
 from ropt.plugins import MethodSpec, register_plugin
 from ropt.results import FunctionResults
-from ropt.simple import EvaluationFunctionContext, optimize
 
 DIM = 5
 UNCERTAINTY = 0.1

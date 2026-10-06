@@ -74,7 +74,7 @@ sampler defined in a script or a notebook is made selectable with
 [`register_plugin`][ropt.plugins.register_plugin].
 
 The runnable script is
-[examples/simple/sampler.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/sampler.py),
+[examples/sampler.py](https://github.com/TNO-ropt/ropt/blob/main/examples/sampler.py),
 which perturbs one variable at a time. With one perturbation per variable and a
 unit step, the gradient estimate is a forward finite difference — which shows
 that perturbations need not be random at all. Its second method scales each step

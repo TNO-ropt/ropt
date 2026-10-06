@@ -5,7 +5,7 @@ Every run reports why it ended. The reason is an
 rather than raised:
 
 ```python
-from ropt.simple import optimize
+from ropt import optimize
 
 result = optimize(config, x0, objective)
 print(result.exit_code.message)
@@ -74,7 +74,7 @@ linear constraints as well as the nonlinear ones. See
 
 ## Work that has no result object
 
-[`WorkerPool.offload`][ropt.simple.WorkerPool.offload] returns whatever its
+[`WorkerPool.offload`][ropt.WorkerPool.offload] returns whatever its
 callables return, so there is no result object to carry an exit code. A call
 abandoned by an abort raises
 [`AbortedError`][ropt.exceptions.AbortedError] instead, whose

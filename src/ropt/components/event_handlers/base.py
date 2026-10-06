@@ -23,7 +23,7 @@ class EventHandler(ABC):
 
     A concrete handler reacts to the events emitted by the run it is attached
     to, by implementing
-    [`handle_event`][ropt.simple.EventHandler.handle_event]. Handlers may store
+    [`handle_event`][ropt.EventHandler.handle_event]. Handlers may store
     state using dictionary-like access (`[]`).
 
     Note:

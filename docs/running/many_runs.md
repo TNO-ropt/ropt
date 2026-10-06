@@ -2,11 +2,11 @@
 
 Several optimizations can run together rather than one after another, each on
 its own driver thread, sharing one pool for their evaluations. Use
-[`optimize_many`][ropt.simple.optimize_many]. Any of `config`, `x0`, or
+[`optimize_many`][ropt.optimize_many]. Any of `config`, `x0`, or
 `objective` may be a single value (used for every run) or a list (one per run):
 
 ```python
-from ropt.simple import session
+from ropt import session
 
 with session() as s:
     # One run per start point.
@@ -49,12 +49,12 @@ One pool is one budget: `workers=10` means ten evaluations at a time across
 the whole batch of runs, not ten per run. Batch IDs stay distinct whatever you
 pass, since every run in the program draws them from one counter.
 
-[examples/simple/optimize_many.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/optimize_many.py)
+[examples/optimize_many.py](https://github.com/TNO-ropt/ropt/blob/main/examples/optimize_many.py)
 runs one optimization per start vector, capping how many go at once and tagging
 each with its own metadata:
 
 ```python
---8<-- "examples/simple/optimize_many.py:run"
+--8<-- "examples/optimize_many.py:run"
 ```
 
 ## Watching runs that overlap
@@ -127,7 +127,7 @@ The call then raises
 no single exception to re-raise and no single set of results to return, so the
 error carries both. `outcomes` has one entry per run, in the order the runs were
 given, holding either that run's
-[`OptimizationResult`][ropt.simple.OptimizationResult] or the exception it
+[`OptimizationResult`][ropt.OptimizationResult] or the exception it
 raised:
 
 ```python
@@ -154,7 +154,7 @@ a second interrupt abandons them.
 A failure reaches every run on the session, not only those of the call, so it
 also aborts runs that were
 started separately on the same session. A run started with the module-level
-[`optimize_many`][ropt.simple.optimize_many] has a session of its own, holding
+[`optimize_many`][ropt.optimize_many] has a session of its own, holding
 only the runs of that call.
 
 Pass `keep_going=True` to let a run finish anyway, which also lets the runs

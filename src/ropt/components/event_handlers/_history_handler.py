@@ -18,7 +18,7 @@ class HistoryHandler(EventHandler):
 
     Listens for `FINISHED_EVALUATION` events and appends every
     [`Results`][ropt.results.Results] object to a growing tuple accessible
-    via the [`results`][ropt.simple.HistoryHandler.results]
+    via the [`results`][ropt.HistoryHandler.results]
     property or `handler["results"]`.
 
     See [Result Handlers](../results/handlers.md#historyhandler) for full

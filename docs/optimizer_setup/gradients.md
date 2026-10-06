@@ -9,7 +9,7 @@ perturbed points.
 
 This page explains how perturbations, samplers, function estimators, and the
 gradient configuration work together. The runnable script is
-[examples/simple/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py),
+[examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py),
 which exercises this estimation with only `perturbation_magnitudes` and the
 realization weights set, leaving the sampler, the estimator and the remaining
 gradient settings at their defaults.
@@ -109,7 +109,7 @@ crashes), the gradient can still be computed when at least
 [`RealizationsConfig`][ropt.config.RealizationsConfig]
 to also tolerate failed realizations.
 
-[examples/simple/failures.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py)
+[examples/failures.py](https://github.com/TNO-ropt/ropt/blob/main/examples/failures.py)
 runs one problem twice: once with the default, where a single failing
 realization ends the run with `TOO_FEW_REALIZATIONS` and no result, and once
 with `realization_min_success` lowered, where the run finishes on the

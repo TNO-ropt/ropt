@@ -77,6 +77,6 @@ otherwise, an instance can be passed directly in the `function_estimators`
 section of the configuration.
 
 The runnable script is
-[examples/simple/function_estimator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/function_estimator.py),
+[examples/function_estimator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/function_estimator.py),
 which implements a weighted geometric mean, registers it, and selects it from
 the configuration as `"custom/geometric"`.

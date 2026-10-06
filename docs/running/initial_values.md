@@ -2,7 +2,7 @@
 
 An optimization begins by evaluating its start point. If those evaluations have
 already been performed — by an earlier run, or by one that was interrupted after
-them — pass them to [`optimize`][ropt.simple.optimize] as `f0` and `g0` and they
+them — pass them to [`optimize`][ropt.optimize] as `f0` and `g0` and they
 are not performed again.
 
 !!! note
@@ -13,13 +13,13 @@ are not performed again.
     where part of the start point must still be evaluated.
 
 The full script for this example is
-[examples/simple/initial_values.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/initial_values.py).
+[examples/initial_values.py](https://github.com/TNO-ropt/ropt/blob/main/examples/initial_values.py).
 It optimizes an ensemble of two realizations, then restarts from the best point
 with five.
 
 ## Where the results come from
 
-[`optimize`][ropt.simple.optimize] returns the best evaluation of a run on
+[`optimize`][ropt.optimize] returns the best evaluation of a run on
 `results`, and the gradient computed at that same point on `gradient`. Those are
 the two objects a run restarting from that point needs:
 
@@ -130,7 +130,7 @@ evaluation of each kind; every later point is evaluated normally.
 
 ## Several runs at once
 
-[`optimize_many`][ropt.simple.optimize_many] takes either one result shared by
+[`optimize_many`][ropt.optimize_many] takes either one result shared by
 every run, or a sequence with one per run, as it does for `config` and
 `metadata`. Sharing one result requires the runs to share `x0`, which is the
 case when the same point is optimized under several configurations:

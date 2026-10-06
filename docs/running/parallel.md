@@ -5,26 +5,26 @@ can be offloaded the same way. Both go through a **pool**.
 
 ## Running in parallel
 
-By default [`optimize`][ropt.simple.optimize] runs on the calling thread, one
+By default [`optimize`][ropt.optimize] runs on the calling thread, one
 evaluation at a time. To run the evaluations in parallel, open a
-[`session`][ropt.simple.session], build a **pool** on it and start the run on
+[`session`][ropt.session], build a **pool** on it and start the run on
 that pool:
 
 ```python
-from ropt.simple import session
+from ropt import session
 
 with session() as s:
     result = s.thread_pool(workers=8).optimize(config, x0, objective)
 ```
 
 The runnable script for this section is
-[examples/simple/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py),
+[examples/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py),
 which takes `-m` to swap its thread pool for a process pool.
 
 The session owns the pools built on it and releases their workers when its
 block ends, so most code needs no further cleanup. Nothing is implicit: a run
 evaluates on the pool it was started on, and on no other. A run started with
-the module-level [`optimize`][ropt.simple.optimize] evaluates inside your own
+the module-level [`optimize`][ropt.optimize] evaluates inside your own
 program and needs no session, wherever it is called from — including from a
 thread you started yourself.
 
@@ -91,7 +91,7 @@ Batch size follows from the problem, not from a setting: it is how many
 evaluations the optimizer requests at once. For a gradient-based run over an
 ensemble that is one per realization, plus their perturbations on the batches
 where a gradient is estimated. The second factor is `1` unless you use
-[`optimize_many`][ropt.simple.optimize_many], where it is the `limit` argument
+[`optimize_many`][ropt.optimize_many], where it is the `limit` argument
 (or the number of runs, if you set no limit).
 
 A worker is not free, so this is an upper bound rather than a target. Ask for
@@ -103,10 +103,10 @@ machine's core count.
     default, which spreads the batch as widely as the pool allows. Every
     transfer costs something, though, so when the evaluations are cheap the
     transfers can dominate. Pass `bundle_size=` to
-    [`WorkerPool.optimize`][ropt.simple.WorkerPool.optimize],
-    [`optimize_many`][ropt.simple.WorkerPool.optimize_many],
-    [`evaluate`][ropt.simple.WorkerPool.evaluate] or
-    [`evaluate_batch`][ropt.simple.WorkerPool.evaluate_batch] to send several
+    [`WorkerPool.optimize`][ropt.WorkerPool.optimize],
+    [`optimize_many`][ropt.WorkerPool.optimize_many],
+    [`evaluate`][ropt.WorkerPool.evaluate] or
+    [`evaluate_batch`][ropt.WorkerPool.evaluate_batch] to send several
     evaluations to a worker together, or `bundle_size=0` to send a whole batch
     at once. The evaluations in one bundle run after each other, so `0` gives up
     parallelism inside the batch entirely: it is for a run whose parallelism
@@ -176,7 +176,7 @@ with session() as s:
 
 ### Evaluating on threads { #thread-pool }
 
-A [`thread_pool`][ropt.simple.Session.thread_pool] runs the evaluations on
+A [`thread_pool`][ropt.Session.thread_pool] runs the evaluations on
 background threads inside your own process. Nothing is copied, so any Python
 function works as the objective and it can freely use the data around it:
 
@@ -197,7 +197,7 @@ past this pool — see [Which pool should I use?](#which-pool).
 
 ### Evaluating in worker processes { #process-pool }
 
-A [`process_pool`][ropt.simple.Session.process_pool] runs the evaluations in a
+A [`process_pool`][ropt.Session.process_pool] runs the evaluations in a
 handful of separate processes, reused across the run. Each has its own
 interpreter, so this is where heavy Python computation actually gets faster:
 
@@ -224,15 +224,15 @@ only come **back** through the return value; see
     anything they had launched themselves is not: a simulator or solver started
     by your objective keeps running, unattached, after your program is gone.
     Nothing reports this. If your objective launches external programs, use a
-    [`local_pool`][ropt.simple.Session.local_pool] instead, which was built for
+    [`local_pool`][ropt.Session.local_pool] instead, which was built for
     exactly this.
 
 ### Running each evaluation as a local job { #local-pool }
 
-A [`local_pool`][ropt.simple.Session.local_pool] runs each evaluation as a
+A [`local_pool`][ropt.Session.local_pool] runs each evaluation as a
 separate process on this machine, with its output captured to a file. It needs
 no extras and no configuration, and it is the same shape as an
-[`hpc_pool`][ropt.simple.Session.hpc_pool] minus the scheduler — so an objective
+[`hpc_pool`][ropt.Session.hpc_pool] minus the scheduler — so an objective
 that works on one works on the other:
 
 ```python
@@ -325,7 +325,7 @@ belongs on a cluster.
 
 ### Running on an HPC cluster
 
-An [`hpc_pool`][ropt.simple.Session.hpc_pool] submits each evaluation as a job to
+An [`hpc_pool`][ropt.Session.hpc_pool] submits each evaluation as a job to
 an HPC queue through [`pysqa`](https://pysqa.readthedocs.io/); it needs the
 `ropt[hpc]` extra. `workdir` is required and must be an existing absolute
 directory on a filesystem the compute nodes share. A job is a fresh command, so
@@ -341,7 +341,7 @@ with session() as s:
 ```
 
 The runnable script is
-[examples/simple/hpc.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/hpc.py).
+[examples/hpc.py](https://github.com/TNO-ropt/ropt/blob/main/examples/hpc.py).
 Pass it `--local` and it runs the identical optimization on a
 local pool, which is the stand-in described above, so the example works
 with or without a cluster to hand.
@@ -486,7 +486,7 @@ evaluation however many are left to do.
 !!! tip "If Ctrl-C seems to do nothing at all"
     Some third-party packages change a process-wide setting when imported that
     stops Ctrl-C from breaking into a program that is *waiting* — and it then
-    affects your whole program, not just `ropt`. Importing `ropt.simple` is
+    affects your whole program, not just `ropt`. Importing `ropt` is
     enough to trigger it. One line undoes it; see
     [Keyboard Interrupts](../troubleshooting/keyboard_interrupt.md).
 
@@ -539,7 +539,7 @@ submission script that does not redirect the job's output — with
 ## Offloading your own work
 
 You can hand **your own** functions to a pool with
-[`WorkerPool.offload`][ropt.simple.WorkerPool.offload]. It is useful when code
+[`WorkerPool.offload`][ropt.WorkerPool.offload]. It is useful when code
 you control — a custom handler, a custom component, or a helper you call between
 optimizations — has an expensive, self-contained piece of work you want to run
 on a pool instead of inline.
@@ -549,7 +549,7 @@ Pass a single callable to run one call and get its result back:
 ```python
 from functools import partial
 
-from ropt.simple import session
+from ropt import session
 
 with session() as s:
     result = s.process_pool(workers=4).offload(partial(expensive, data))
@@ -624,7 +624,7 @@ batch nothing lets it return its results.
 ## Configuring an HPC pool
 
 Everything below applies only to
-[`hpc_pool`][ropt.simple.Session.hpc_pool]. A job is a submission script with
+[`hpc_pool`][ropt.Session.hpc_pool]. A job is a submission script with
 your evaluation command in it, and that script comes either from an installed
 `pysqa` configuration or from a `template` you write; the two cannot be
 combined.
@@ -792,7 +792,7 @@ with `config_path`, `cluster` or `queue`; passing them together raises a
 
 ### Parameters
 
-[`hpc_pool`][ropt.simple.Session.hpc_pool] accepts the following parameters:
+[`hpc_pool`][ropt.Session.hpc_pool] accepts the following parameters:
 
 | Parameter     | Description                                                                |
 | ------------- | ------------------------------------------------------------------------- |

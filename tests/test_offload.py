@@ -13,20 +13,20 @@ from typing import TYPE_CHECKING, Any, override
 import numpy as np
 import pytest
 
+from ropt import session
 from ropt.components.concurrency import AbortSignal
 from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import AbortedError, ExecutionError
-from ropt.simple import session
-from ropt.simple._offload import _run
+from ropt.run._offload import _run
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
+    from ropt import WorkerPool
     from ropt.components.executors import Executor
     from ropt.events import EnOptEvent
-    from ropt.simple import WorkerPool
 
 
 @pytest.fixture(name="pools")

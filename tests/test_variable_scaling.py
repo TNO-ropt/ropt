@@ -12,6 +12,13 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt import (
+    EvaluationFunctionContext,
+    HistoryHandler,
+    ResultsHandler,
+    evaluate,
+    optimize,
+)
 from ropt._scaling import unscale_value
 from ropt.backend import OptimizationProblem
 from ropt.config import VariablesConfig
@@ -21,13 +28,6 @@ from ropt.results import (
     ConstraintInfo,
     FunctionResults,
     Gradients,
-)
-from ropt.simple import (
-    EvaluationFunctionContext,
-    HistoryHandler,
-    ResultsHandler,
-    evaluate,
-    optimize,
 )
 from ropt.utils import scales_and_offsets_from_bounds
 

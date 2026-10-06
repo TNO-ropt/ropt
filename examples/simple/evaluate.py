@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.simple import EvaluationFunctionContext, evaluate, evaluate_batch
+from ropt import EvaluationFunctionContext, evaluate, evaluate_batch
 
 DIM = 5
 CONFIG: dict[str, Any] = {

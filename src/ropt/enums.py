@@ -132,7 +132,7 @@ class ExitCode(IntEnum):
     """Returned when an event handler asked the run to stop.
 
     A graceful end at an evaluation boundary, on a criterion the caller
-    supplied. The `report` callback of `ropt.simple` is such a handler.
+    supplied. A `report` callback is such a handler.
     """
 
     FINISHED = 5
@@ -158,7 +158,7 @@ class ExitCode(IntEnum):
     """Returned when another run this one shares a session with raised."""
 
     USER_ABORT = 9
-    """Returned when [`Session.abort`][ropt.simple.Session.abort] cut the run off.
+    """Returned when [`Session.abort`][ropt.Session.abort] cut the run off.
 
     Set apart from [`ABORTED`][ropt.enums.ExitCode.ABORTED] so that an abort
     that was asked for can be told from one the library performed itself.

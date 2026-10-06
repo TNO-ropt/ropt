@@ -1,4 +1,4 @@
-"""Ensemble optimization with the high-level `ropt.simple` API.
+"""Ensemble optimization with `ropt`.
 
 An *ensemble* optimization minimizes the mean objective over a set of
 realizations with uncertain parameters. Compared to a deterministic run, the
@@ -13,8 +13,8 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
+from ropt import EvaluationFunctionContext, optimize
 from ropt.results import FunctionResults
-from ropt.simple import EvaluationFunctionContext, optimize
 
 # --8<-- [start:config]
 DIM = 5

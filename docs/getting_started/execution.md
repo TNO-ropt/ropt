@@ -2,14 +2,14 @@
 
 An optimization calls your evaluation function many times. By default these calls
 happen one after another, on the same thread that called
-[`optimize`][ropt.simple.optimize]. If each call is slow, you can run several at
+[`optimize`][ropt.optimize]. If each call is slow, you can run several at
 the same time by evaluating on a **pool**.
 
-Open a [`session`][ropt.simple.session], build a pool on it, and start the run
+Open a [`session`][ropt.session], build a pool on it, and start the run
 on that pool:
 
 ```python
-from ropt.simple import session
+from ropt import session
 
 with session() as s:
     result = s.thread_pool(workers=4).optimize(config, x0, objective)
@@ -17,7 +17,7 @@ with session() as s:
 
 The session owns the pool and releases its workers when the block ends, so
 there is nothing to close. The runnable script is
-[examples/simple/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py),
+[examples/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py),
 which evaluates one optimization on a thread pool, or on a process pool
 when it is passed `--multiprocessing`.
 

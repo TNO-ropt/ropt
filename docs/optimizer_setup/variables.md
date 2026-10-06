@@ -78,7 +78,7 @@ something that has to be applied consistently by hand. The details are under
     Results carry both domains: `variables` in the units configured here, and
     `scaled.variables` in the optimizer's. Only the first is comparable between
     runs that scale differently. The runnable demonstration is
-    [examples/simple/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py),
+    [examples/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py),
     and [Working with Results](../results/results.md#scaling-of-results)
     describes which fields have two domains.
 

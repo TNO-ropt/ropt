@@ -5,8 +5,8 @@ from typing import Any
 import numpy as np
 import pytest
 
+from ropt import optimize
 from ropt.exceptions import UnsupportedError
-from ropt.simple import optimize
 from ropt.utils import validate_backend_options
 
 pytestmark = [pytest.mark.slow]

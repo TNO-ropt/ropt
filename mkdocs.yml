@@ -145,7 +145,7 @@ nav:
       - "Plugin Discovery": advanced/plugin_discovery.md
       - "Writing a Plugin": advanced/writing_plugins.md
   - "Reference":
-      - "Simple API": reference/simple.md
+      - "Optimization API": reference/api.md
       - "Configuration Classes": reference/config.md
       - "Results & Events":
         - "Evaluation Results": reference/results.md

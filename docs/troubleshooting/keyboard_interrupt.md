@@ -30,7 +30,7 @@ any wait anywhere in the program.
 
 This is why the symptom is hard to place. Nothing in your code changed, no
 error is reported, and you need not have imported the culprit yourself — a
-package `ropt` imports on your behalf is enough. Importing `ropt.simple` alone
+package `ropt` imports on your behalf is enough. Importing `ropt` alone
 sets the flag (at the time of writing by way of polars, which `ropt` loads
 whenever it is installed).
 

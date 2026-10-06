@@ -1,4 +1,4 @@
-"""Ensemble optimization on an HPC cluster with the high-level `ropt.simple` API.
+"""Ensemble optimization on an HPC cluster with `ropt`.
 
 An HPC pool submits evaluations to a cluster queue (through `pysqa`), so a run
 started on one evaluates its ensemble as cluster jobs. This is what the example
@@ -24,11 +24,11 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.results import FunctionResults
-from ropt.simple import (
+from ropt import (
     EvaluationFunctionContext,
     session,
 )
+from ropt.results import FunctionResults
 
 DIM = 2
 REALIZATIONS = 5

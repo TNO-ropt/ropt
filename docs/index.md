@@ -72,8 +72,8 @@ optimization. It is covered in the
 [Optimizer Setup](optimizer_setup/key_concepts.md) section.
 
 *How* to run a configured optimization is covered in
-[Running Optimizations](running/running.md), which describes the `ropt.simple`
-API. It starts a run with a single function call and covers
+[Running Optimizations](running/running.md), which describes the functions the
+`ropt` package exports. They start a run with a single function call and cover
 [parallel evaluation](running/parallel.md),
 [many runs at once](running/many_runs.md),
 [nested optimization](running/nested.md), and custom result handling.

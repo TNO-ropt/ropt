@@ -1,4 +1,4 @@
-"""Adapt user evaluation functions to the low-level evaluation protocol."""
+"""Adapt user evaluation functions to the component evaluation protocol."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ class EvaluationFunction(Protocol):
             context:   The context identifying the evaluation.
 
         Returns:
-            An [`EvaluationFunctionResult`][ropt.simple.EvaluationFunctionResult],
+            An [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult],
             a scalar, or objectives followed by constraints.
         """
 
@@ -46,7 +46,7 @@ class EvaluationFunction(Protocol):
 def adapt_function(
     function: EvaluationFunction, n_obj: int, n_con: int
 ) -> EvaluationFunctionCallback:
-    """Wrap a user evaluation function to conform to the low-level protocol.
+    """Wrap a user evaluation function to conform to the component protocol.
 
     Args:
         function: The user-supplied evaluation function.

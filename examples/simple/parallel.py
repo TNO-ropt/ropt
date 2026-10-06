@@ -12,12 +12,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.simple import session
+from ropt import session
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.simple import EvaluationFunctionContext
+    from ropt import EvaluationFunctionContext
 
 DIM = 5
 CONFIG: dict[str, Any] = {

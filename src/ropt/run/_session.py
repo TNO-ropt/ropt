@@ -72,7 +72,7 @@ class Session:
     A session may be opened inside another, and pools from different sessions
     never interact. A session is single use — once closed it cannot be reopened.
 
-    [`abort`][ropt.simple.Session.abort] cuts off the runs that belong to it,
+    [`abort`][ropt.Session.abort] cuts off the runs that belong to it,
     which is what a caller on another thread — a signal handler, a user
     interface — calls to bring them down.
     """
@@ -124,7 +124,7 @@ class Session:
 
         Each run ends with `ExitCode.USER_ABORT`, keeping whatever its completed
         batches produced; one cut off during its first batch has no result. An
-        [`offload`][ropt.simple.WorkerPool.offload] in flight raises
+        [`offload`][ropt.WorkerPool.offload] in flight raises
         [`AbortedError`][ropt.exceptions.AbortedError] instead, since it has no
         result object to report a reason on.
 
@@ -199,7 +199,7 @@ class Session:
             report_gradients:     Whether `report` also receives gradient results.
 
         Returns:
-            An [`OptimizationResult`][ropt.simple.OptimizationResult].
+            An [`OptimizationResult`][ropt.OptimizationResult].
 
         Raises:
             WorkflowError: If this session has closed.
@@ -266,7 +266,7 @@ class Session:
             report_gradients:     Whether `report` also receives gradient results.
 
         Returns:
-            One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
+            One [`OptimizationResult`][ropt.OptimizationResult] per run.
 
         Raises:
             RunsFailedError: If any of the runs raised.
@@ -318,7 +318,7 @@ class Session:
             metadata:   Optional dictionary attached to the results.
 
         Returns:
-            An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
+            An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` is the [`FunctionResults`][ropt.results.FunctionResults]
             for the vector, or `None` if the evaluation was cut off.
 
@@ -367,7 +367,7 @@ class Session:
             metadata:   Optional dictionary attached to every result.
 
         Returns:
-            An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
+            An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` holds one
             [`FunctionResults`][ropt.results.FunctionResults] per vector, and is
             empty if the batch was cut off.
@@ -424,7 +424,7 @@ class Session:
 
         Releasing the pool terminates its worker processes and nothing else. A
         program an evaluation started itself keeps running, without an error
-        being raised; use [`local_pool`][ropt.simple.Session.local_pool] where
+        being raised; use [`local_pool`][ropt.Session.local_pool] where
         an evaluation launches external programs.
 
         Args:
@@ -462,7 +462,7 @@ class Session:
         interpreter of its own, which can be stopped outright and whose output
         is captured to a file, but there is no queueing system and nothing to
         install. This is the local stand-in for
-        [`hpc_pool`][ropt.simple.Session.hpc_pool]: the same job shape, so an
+        [`hpc_pool`][ropt.Session.hpc_pool]: the same job shape, so an
         evaluation function that works here works there.
 
         Each job is a fresh command rather than a re-import of your script, so
@@ -524,7 +524,7 @@ class Session:
         own command, so the evaluation function must live in a module the
         compute nodes can import, or the `ropt[cloudpickle]` extra must be
         installed. Develop against
-        [`local_pool`][ropt.simple.Session.local_pool] first: it has the same
+        [`local_pool`][ropt.Session.local_pool] first: it has the same
         shape and the same rule, without a cluster. The cluster is selected from
         `cluster`/`queue`: give a queue to search for its cluster, a cluster to
         use its default queue, or both to be explicit.
@@ -611,7 +611,7 @@ def session(*, keep_going: bool = False) -> Session:
         result = pool.optimize(config, x0, objective)
     ```
 
-    A run started with the module-level [`optimize`][ropt.simple.optimize]
+    A run started with the module-level [`optimize`][ropt.optimize]
     evaluates in-process and needs no session. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
@@ -623,6 +623,6 @@ def session(*, keep_going: bool = False) -> Session:
         keep_going: The default for the runs started on this session.
 
     Returns:
-        A context manager binding the [`Session`][ropt.simple.Session].
+        A context manager binding the [`Session`][ropt.Session].
     """
     return Session(keep_going=keep_going)

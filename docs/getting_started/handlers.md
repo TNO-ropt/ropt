@@ -1,6 +1,6 @@
 # Collecting Results with Handlers
 
-So far, [`optimize`][ropt.simple.optimize] returned only the single best result.
+So far, [`optimize`][ropt.optimize] returned only the single best result.
 In many cases you want
 to see every result to watch progress over the optimization. A **handler** does
 this: an object you attach with a `handlers=` argument that observes every
@@ -11,10 +11,10 @@ It collects the full result objects —
 [`GradientResults`][ropt.results.GradientResults] — rather than the summary `optimize` returns; see
 [Working with Results](../results/results.md).
 
-For instance, the [`HistoryHandler`][ropt.simple.HistoryHandler] collects all results:
+For instance, the [`HistoryHandler`][ropt.HistoryHandler] collects all results:
 
 ```python
-from ropt.simple import HistoryHandler, optimize
+from ropt import HistoryHandler, optimize
 
 history = HistoryHandler()
 result = optimize(config, x0, objective, handlers=[history])
@@ -30,12 +30,12 @@ accumulating results from all of them.
 
 ## Built-in handlers
 
-`ropt` ships a few ready-to-use handlers, all imported from `ropt.simple`:
+`ropt` ships a few ready-to-use handlers, all imported from `ropt`:
 
-- **[`HistoryHandler`][ropt.simple.HistoryHandler]** — keeps every result, as used above.
-- **[`ResultsHandler`][ropt.simple.ResultsHandler]** — keeps only one result: the best seen so far
+- **[`HistoryHandler`][ropt.HistoryHandler]** — keeps every result, as used above.
+- **[`ResultsHandler`][ropt.ResultsHandler]** — keeps only one result: the best seen so far
   (default), or the most recent.
-- **[`DataFrameHandler`][ropt.simple.DataFrameHandler]** — collects results into a `pandas` or `polars` table.
+- **[`DataFrameHandler`][ropt.DataFrameHandler]** — collects results into a `pandas` or `polars` table.
 
 See [Result handlers](../results/handlers.md) for the full
 list, and for what a handler shared between concurrent runs guarantees.

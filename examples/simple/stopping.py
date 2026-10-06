@@ -16,14 +16,14 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ropt import optimize
 from ropt.enums import ExitCode
-from ropt.simple import optimize
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+    from ropt import EvaluationFunctionContext
     from ropt.results import FunctionResults
-    from ropt.simple import EvaluationFunctionContext
 
 DIM = 5
 MAX_RESULTS = 4  # stop once this many results have arrived

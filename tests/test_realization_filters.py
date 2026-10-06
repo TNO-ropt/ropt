@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt import optimize
 from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.components.event_handlers import CallbackHandler
 from ropt.config._realization_filter_config import RealizationFilterConfig
@@ -19,7 +20,6 @@ from ropt.realization_filter.default import (
     _get_cvar_weights_from_percentile,
 )
 from ropt.results import FunctionResults, GradientResults, Results
-from ropt.simple import optimize
 
 initial_values = 3 * [0]
 

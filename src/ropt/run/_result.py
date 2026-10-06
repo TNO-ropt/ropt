@@ -1,4 +1,4 @@
-"""Result objects returned by the high-level API."""
+"""Result objects returned by a run."""
 
 from __future__ import annotations
 
@@ -35,8 +35,8 @@ class EvaluationResult[T]:
 
     What `results` holds depends on which method produced it: one
     [`FunctionResults`][ropt.results.FunctionResults] from
-    [`evaluate`][ropt.simple.evaluate], or `None` if the evaluation was cut off;
-    one per vector from [`evaluate_batch`][ropt.simple.evaluate_batch], or an
+    [`evaluate`][ropt.evaluate], or `None` if the evaluation was cut off;
+    one per vector from [`evaluate_batch`][ropt.evaluate_batch], or an
     empty tuple. An evaluation is a single batch, so it produces either every
     result or none.
 

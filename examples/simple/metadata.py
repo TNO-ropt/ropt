@@ -1,4 +1,4 @@
-"""Attach metadata to a run with the high-level `ropt.simple` API.
+"""Attach metadata to a run with `ropt`.
 
 Metadata comes from two independent sources. Passing a `metadata` dict to
 `optimize` tags the run: the same dict is copied onto every result as
@@ -16,7 +16,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.simple import (
+from ropt import (
     DataFrameHandler,
     EvaluationFunctionContext,
     EvaluationFunctionResult,

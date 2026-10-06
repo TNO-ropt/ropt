@@ -24,8 +24,8 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
+from ropt import EvaluationFunctionContext, optimize
 from ropt.results import FunctionResults
-from ropt.simple import EvaluationFunctionContext, optimize
 
 DIM = 5
 UNCERTAINTY = 0.1

@@ -5,7 +5,7 @@ one. Nothing else can reach that session, which is exactly what "outside a
 session" means: the run cannot be stopped from elsewhere, and no other run is
 aborted when it fails.
 
-Give a run a [`session`][ropt.simple.session], or one of its pools, when it
+Give a run a [`session`][ropt.session], or one of its pools, when it
 should be part of something larger.
 """
 
@@ -45,7 +45,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
 
     The evaluations run on the calling thread. See
     [Running Optimizations](../running/running.md) for a walkthrough, and
-    [`Session.optimize`][ropt.simple.Session.optimize] for the same run on a
+    [`Session.optimize`][ropt.Session.optimize] for the same run on a
     session you hold.
 
     Args:
@@ -61,7 +61,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         report_gradients:     Whether `report` also receives gradient results.
 
     Returns:
-        An [`OptimizationResult`][ropt.simple.OptimizationResult].
+        An [`OptimizationResult`][ropt.OptimizationResult].
     """
     with session() as opened:
         return opened.optimize(
@@ -99,7 +99,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     `function` is called by several threads at once and must tolerate that. See
     [Evaluating in Parallel](../running/parallel.md) for a
     walkthrough, and
-    [`WorkerPool.optimize_many`][ropt.simple.WorkerPool.optimize_many] to give
+    [`WorkerPool.optimize_many`][ropt.WorkerPool.optimize_many] to give
     the evaluations workers.
 
     Args:
@@ -120,7 +120,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         report_gradients:     Whether `report` also receives gradient results.
 
     Returns:
-        One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
+        One [`OptimizationResult`][ropt.OptimizationResult] per run.
 
     Raises:
         RunsFailedError: If any of the runs raised.
@@ -166,7 +166,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         metadata:  Optional dictionary attached to the results.
 
     Returns:
-        An [`EvaluationResult`][ropt.simple.EvaluationResult] whose `results` is
+        An [`EvaluationResult`][ropt.EvaluationResult] whose `results` is
         the [`FunctionResults`][ropt.results.FunctionResults] for the vector.
 
     Raises:
@@ -206,7 +206,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         metadata:  Optional dictionary attached to every result.
 
     Returns:
-        An [`EvaluationResult`][ropt.simple.EvaluationResult] whose `results`
+        An [`EvaluationResult`][ropt.EvaluationResult] whose `results`
         holds one [`FunctionResults`][ropt.results.FunctionResults] per vector.
 
     Raises:

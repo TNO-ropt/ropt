@@ -41,7 +41,7 @@ Two properties of `weights` matter here:
 - **A zero weight disables an objective.** It is still evaluated and still
   reported, but it does not influence the search. Weights may not be negative.
 
-[examples/simple/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py)
+[examples/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py)
 runs a two-objective problem, and gives the objectives names so that the
 exported table is readable.
 
@@ -97,7 +97,7 @@ optimum.
     lowers `target_objective` without improving the solution. Two runs that
     differ in this setting can only be compared through `functions.objectives`
     or their variables. The runnable demonstration is
-    [examples/simple/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py).
+    [examples/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py).
 
 An `offsets` entry is subtracted before the division. It cannot move the optimum
 or change the gradient, but it changes the magnitude the optimizer tests against

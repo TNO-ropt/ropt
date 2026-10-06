@@ -1,13 +1,13 @@
 # Running Optimizations
 
-The `ropt.simple` module covers running an optimization. Everything you need is
-imported from a single module:
+Everything needed to run an optimization is imported from the `ropt` package
+itself:
 
 ```python
-from ropt.simple import optimize
+from ropt import optimize
 ```
 
-You give [`optimize`][ropt.simple.optimize] three things:
+You give [`optimize`][ropt.optimize] three things:
 
 - a **config** dictionary that describes the problem — its variables,
   objectives, constraints and components, covered in
@@ -18,7 +18,7 @@ You give [`optimize`][ropt.simple.optimize] three things:
 
 ```python
 import numpy as np
-from ropt.simple import optimize
+from ropt import optimize
 
 config = {"variables": {"variable_count": 3, "perturbation_magnitudes": 1e-6}}
 
@@ -41,7 +41,7 @@ additional options.
 The evaluation function is a Python function with two arguments:
 
 ```python
-from ropt.simple import EvaluationFunctionContext
+from ropt import EvaluationFunctionContext
 
 
 def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> float:
@@ -50,7 +50,7 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
 
 - `variables` is a 1-D NumPy array: one set of variable values to evaluate.
 - `context` is an
-  [`EvaluationFunctionContext`][ropt.simple.EvaluationFunctionContext]
+  [`EvaluationFunctionContext`][ropt.EvaluationFunctionContext]
   that identifies *which* evaluation this is:
     - `context.realization` — the realization number, for a problem with an
       ensemble of realizations; `optimize` then minimizes the weighted average
@@ -69,7 +69,7 @@ There are three ways to return them:
 - a **single number** when there is one objective and no nonlinear constraints;
 - a **list** of numbers when there are several objectives or nonlinear
   constraints — put the objectives first, then the constraints;
-- an [`EvaluationFunctionResult`][ropt.simple.EvaluationFunctionResult]
+- an [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
   when you also want to attach `metadata`; it holds `objectives`, `constraints`
   and `metadata` in separate fields, so nothing has to be ordered.
 
@@ -82,7 +82,7 @@ which defaults to *all* of them — so a single `NaN` ends the run with
 
 ## The result
 
-`optimize` returns an [`OptimizationResult`][ropt.simple.OptimizationResult],
+`optimize` returns an [`OptimizationResult`][ropt.OptimizationResult],
 which carries two things:
 
 ```python
@@ -178,20 +178,20 @@ With [`optimize_many`](many_runs.md) this stops only the run
 whose callback returned `True`; the other runs continue.
 
 The runnable script is
-[examples/simple/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/stopping.py),
+[examples/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py),
 which stops a run after a fixed number of results and then reads the best point
 it had reached.
 
 !!! note "Nothing to stop on an evaluation"
-    [`evaluate`][ropt.simple.evaluate] and
-    [`evaluate_batch`][ropt.simple.evaluate_batch] take `report=` as well, but
+    [`evaluate`][ropt.evaluate] and
+    [`evaluate_batch`][ropt.evaluate_batch] take `report=` as well, but
     there the return value is **ignored**. An evaluation is a single batch with
     no optimizer loop to interrupt, so the callback reports and nothing more.
 
 ### Aborting a run from outside { #stopping-from-outside }
 
 The `report` callback runs inside the run it stops, which is no use to a signal
-handler or a user interface. [`Session.abort`][ropt.simple.Session.abort] is
+handler or a user interface. [`Session.abort`][ropt.Session.abort] is
 the one that is called from another thread: it cuts off every run that belongs
 to the session, and each ends with `USER_ABORT`, keeping the best result it had
 reached.
@@ -216,14 +216,14 @@ flight are still carried out and their workers are free only once they return.
 `abort()` reaches the runs that are under way at the moment of the call, and
 nothing more. A run started afterwards is unaffected, so a
 loop that abandons one attempt and starts another keeps working. An
-[`optimize_many`][ropt.simple.Session.optimize_many] counts as one run here: a
+[`optimize_many`][ropt.Session.optimize_many] counts as one run here: a
 run it has queued behind its `limit` is cut off as well, and reports `USER_ABORT`
 without evaluating anything. Leaving the session's `with` block aborts its runs
 as well, and then releases its pools, which is what refuses a run started after
 that. A run cut off that way reports `ABORTED` rather than `USER_ABORT`, since
 it was the block ending rather than a request to stop.
 
-A run started with the module-level [`optimize`][ropt.simple.optimize] belongs
+A run started with the module-level [`optimize`][ropt.optimize] belongs
 to no session you hold and cannot be aborted this way. It evaluates on the
 calling thread, which is the thread that would have to call `abort()`. Start it
 on a session or one of its pools to make it abortable.
@@ -248,12 +248,12 @@ You can attach arbitrary **metadata** to a run, from two sources:
   [Give each run an ID](many_runs.md).
 
 - **Per evaluation** — return an
-  [`EvaluationFunctionResult`][ropt.simple.EvaluationFunctionResult]
+  [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
   from the evaluation function with a `metadata` field. This value is stored per
   realization, next to the objective values:
 
   ```python
-  from ropt.simple import EvaluationFunctionResult
+  from ropt import EvaluationFunctionResult
 
   def objective(variables, context):
       value = ...
@@ -279,16 +279,16 @@ be tabulated as columns by the
 [`DataFrameHandler`](../results/handlers.md#dataframehandler). See
 [Working with Results](../results/results.md#metadata) for how
 each appears in the pandas export. The full runnable script is
-[examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py).
+[examples/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py).
 
 ## Evaluating without optimizing
 
 Sometimes you only want the objective value for a point, without running an
-optimizer. Use [`evaluate`][ropt.simple.evaluate] for one point and
-[`evaluate_batch`][ropt.simple.evaluate_batch] for several:
+optimizer. Use [`evaluate`][ropt.evaluate] for one point and
+[`evaluate_batch`][ropt.evaluate_batch] for several:
 
 ```python
-from ropt.simple import evaluate, evaluate_batch
+from ropt import evaluate, evaluate_batch
 
 single = evaluate(config, x, objective)
 batch = evaluate_batch(config, matrix, objective)
@@ -297,8 +297,8 @@ single.results  # one FunctionResults, or None if the evaluation was cut off
 batch.results   # one per row of the matrix, empty if the batch was cut off
 ```
 
-Both return an [`EvaluationResult`][ropt.simple.EvaluationResult], shaped like
-the [`OptimizationResult`][ropt.simple.OptimizationResult] that `optimize`
+Both return an [`EvaluationResult`][ropt.EvaluationResult], shaped like
+the [`OptimizationResult`][ropt.OptimizationResult] that `optimize`
 returns: `exit_code` indicates why the evaluation ended and `results` holds what it
 produced. What is on `results` is a
 [`FunctionResults`][ropt.results.FunctionResults], the same kind a handler
@@ -313,7 +313,7 @@ run on the same session cut it off. An abort that arrives after the batch has
 finished leaves it unaffected, and the evaluation reports `FINISHED`.
 
 The runnable script is
-[examples/simple/evaluate.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/evaluate.py),
+[examples/evaluate.py](https://github.com/TNO-ropt/ropt/blob/main/examples/evaluate.py),
 which evaluates a single vector and then a matrix of them.
 
 ## When something goes wrong
@@ -352,7 +352,7 @@ What *is* raised falls into three groups:
   checked as the run starts — and
   [`ExecutionError`][ropt.exceptions.ExecutionError] when the worker pool
   that runs your evaluations, or a call handed to
-  [`WorkerPool.offload`][ropt.simple.WorkerPool.offload], cannot start or breaks
+  [`WorkerPool.offload`][ropt.WorkerPool.offload], cannot start or breaks
   down, and [`AbortedError`][ropt.exceptions.AbortedError] when an abort
   abandoned an offloaded call.
 
@@ -360,7 +360,7 @@ What *is* raised falls into three groups:
   back from wherever the evaluation ran — including a worker thread or process
   — and are re-raised from the `optimize` call. Return `float("nan")` instead
   if a failed realization should be tolerated rather than fatal. With
-  [`optimize_many`][ropt.simple.optimize_many] there is no single exception to
+  [`optimize_many`][ropt.optimize_many] there is no single exception to
   re-raise, so the call raises
   [`RunsFailedError`][ropt.exceptions.RunsFailedError] carrying what every run
   raised or reached; see
@@ -376,7 +376,7 @@ function stay whatever you raised.
 A few config values and result fields use enumerations, such as
 [`VariableType`][ropt.enums.VariableType] for integer variables and
 [`ExitCode`][ropt.enums.ExitCode] for `result.exit_code`. These are
-**not** part of `ropt.simple`; import them from [`ropt.enums`][ropt.enums]:
+**not** exported by `ropt` itself; import them from [`ropt.enums`][ropt.enums]:
 
 ```python
 from ropt.enums import ExitCode, VariableType

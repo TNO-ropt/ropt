@@ -7,13 +7,13 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt import optimize
 from ropt.backend.utils import resolve_verbosity
 from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
 from ropt.config import BackendConfig
-from ropt.simple import optimize
 
 if TYPE_CHECKING:
     from pathlib import Path

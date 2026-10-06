@@ -15,16 +15,16 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt import HistoryHandler, session
 from ropt.components.concurrency import AbortSignal
 from ropt.exceptions import ExecutionError, WorkflowError
-from ropt.simple import HistoryHandler, session
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
     from numpy.typing import NDArray
 
-    from ropt.simple import EvaluationFunctionContext, Session, WorkerPool
+    from ropt import EvaluationFunctionContext, Session, WorkerPool
 
 
 @pytest.fixture(name="opened")

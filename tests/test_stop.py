@@ -15,20 +15,20 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
+from ropt import session
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
-from ropt.simple import session
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.results import FunctionResults
-    from ropt.simple import (
+    from ropt import (
         EvaluationFunctionContext,
         EvaluationResult,
         OptimizationResult,
         Session,
     )
+    from ropt.results import FunctionResults
 
 _INITIAL = np.array([0.0, 0.0, 0.1])
 

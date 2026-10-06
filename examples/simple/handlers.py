@@ -11,7 +11,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.simple import (
+from ropt import (
     EvaluationFunctionContext,
     HistoryHandler,
     session,

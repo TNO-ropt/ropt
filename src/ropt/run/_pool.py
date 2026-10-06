@@ -43,7 +43,7 @@ class WorkerPool:
     """The workers that a run's evaluations are given to.
 
     Built by a session factory such as
-    [`thread_pool`][ropt.simple.Session.thread_pool], and released when that
+    [`thread_pool`][ropt.Session.thread_pool], and released when that
     session closes. Starting a run on a pool sets both where the
     evaluations happen and which session the run belongs to. See
     [Running Optimizations](../running/running.md) for a walkthrough.
@@ -109,7 +109,7 @@ class WorkerPool:
             report_gradients:     Whether `report` also receives gradient results.
 
         Returns:
-            An [`OptimizationResult`][ropt.simple.OptimizationResult].
+            An [`OptimizationResult`][ropt.OptimizationResult].
 
         Raises:
             WorkflowError: If this pool's session has closed.
@@ -176,7 +176,7 @@ class WorkerPool:
             report_gradients:     Whether `report` also receives gradient results.
 
         Returns:
-            One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
+            One [`OptimizationResult`][ropt.OptimizationResult] per run.
 
         Raises:
             RunsFailedError: If any of the runs raised.
@@ -230,7 +230,7 @@ class WorkerPool:
             metadata:    Optional dictionary attached to the results.
 
         Returns:
-            An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
+            An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` is the [`FunctionResults`][ropt.results.FunctionResults]
             for the vector, or `None` if the evaluation was cut off.
 
@@ -281,7 +281,7 @@ class WorkerPool:
             metadata:    Optional dictionary attached to every result.
 
         Returns:
-            An [`EvaluationResult`][ropt.simple.EvaluationResult] whose
+            An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` holds one
             [`FunctionResults`][ropt.results.FunctionResults] per vector, and is
             empty if the batch was cut off.

@@ -1,4 +1,4 @@
-"""Build the low-level machinery behind a single high-level run."""
+"""Build the component machinery behind a single run."""
 
 from __future__ import annotations
 

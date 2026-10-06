@@ -24,8 +24,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from ropt import OptimizationResult
     from ropt.enums import ExitCode
-    from ropt.simple import OptimizationResult
 
 
 class RoptError(Exception):
@@ -67,7 +67,7 @@ class UnsupportedError(RoptError):
 class AbortedError(RoptError):
     """Work was cut off before it could finish.
 
-    Raised by [`WorkerPool.offload`][ropt.simple.WorkerPool.offload], which
+    Raised by [`WorkerPool.offload`][ropt.WorkerPool.offload], which
     returns whatever its callables return and so has nowhere to report a reason.
     An optimization or an evaluation carries its reason on the result object it
     returns instead, and does not raise this.
@@ -103,7 +103,7 @@ class RunsFailedError(RoptError):
 
     Attributes:
         outcomes: Per run, in the order the runs were given, its
-                  [`OptimizationResult`][ropt.simple.OptimizationResult] or the
+                  [`OptimizationResult`][ropt.OptimizationResult] or the
                   exception it raised.
     """
 

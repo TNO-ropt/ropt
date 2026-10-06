@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.simple import EvaluationFunctionContext, optimize
+from ropt import EvaluationFunctionContext, optimize
 
 if TYPE_CHECKING:
     from ropt.results import FunctionResults, GradientResults

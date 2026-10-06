@@ -1,14 +1,14 @@
 # Result Handlers
 
-An [`optimize`][ropt.simple.optimize] call returns only the best result. A
+An [`optimize`][ropt.optimize] call returns only the best result. A
 **handler** lets you collect or react to *every* result instead: it is an object
 that observes an optimization and processes its results as they arrive — keeping
 them, tabulating them, or invoking a callback.
 
 A handler is given [`Results`][ropt.results.Results] objects —
 [`FunctionResults`][ropt.results.FunctionResults] and
-[`GradientResults`][ropt.results.GradientResults] — which is what every other part of the
-simple API provides too: a `report` callback receives one per evaluation, and
+[`GradientResults`][ropt.results.GradientResults] — which is what every other part of
+`ropt` provides too: a `report` callback receives one per evaluation, and
 `optimize` puts the best one on the `results` field of what it returns.
 Everything a run produces is in them, at the field paths described in
 [Working with Results](results.md), which is the vocabulary the handlers below
@@ -26,7 +26,7 @@ Attach handlers to a run with the `handlers` argument. The same handler can be
 passed to several `optimize` calls, accumulating the results of each in turn:
 
 ```python
-from ropt.simple import HistoryHandler, optimize
+from ropt import HistoryHandler, optimize
 
 history = HistoryHandler()
 
@@ -45,12 +45,12 @@ Handlers that store results expose them through `handler["results"]` (and, for
 The same handler may also be given to runs that execute **concurrently** — the
 runs of an [`optimize_many`](../running/many_runs.md), or runs
 you start on threads of your own. A handler's
-[`handle_event`][ropt.simple.EventHandler.handle_event]
+[`handle_event`][ropt.EventHandler.handle_event]
 takes a lock around each call, so a second run waits for the first to finish
 rather than interleaving with it:
 
 ```python
-from ropt.simple import HistoryHandler, session
+from ropt import HistoryHandler, session
 
 history = HistoryHandler()
 with session() as s:
@@ -69,11 +69,11 @@ on which run reaches the handler first. Take the order from the results
 themselves — `batch_id`, or a `metadata` field you set per run — rather than
 from the order they arrive in.
 
-[examples/simple/handlers.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/handlers.py)
+[examples/handlers.py](https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py)
 feeds two handlers from the same set of concurrent runs:
 
 ```python
---8<-- "examples/simple/handlers.py:shared"
+--8<-- "examples/handlers.py:shared"
 ```
 
 !!! warning "Do not start a run from inside a handler that the run can reach"
@@ -81,10 +81,10 @@ feeds two handlers from the same set of concurrent runs:
     it does. If that run lists the same handler, the handler is entered a
     second time. The outcome depends on the run the handler starts, not on the
     call that is feeding the handler. A nested
-    [`optimize`][ropt.simple.optimize] emits on the thread that called it — the
+    [`optimize`][ropt.optimize] emits on the thread that called it — the
     one already inside the handler — so this raises a
     [`WorkflowError`][ropt.exceptions.WorkflowError]. A nested
-    [`optimize_many`][ropt.simple.optimize_many] emits on driver threads of its
+    [`optimize_many`][ropt.optimize_many] emits on driver threads of its
     own, which wait for a lock the first thread will not release until the run
     ends, and both stop. The same holds for two handlers that each start a run
     reaching the other. Give the inner run handlers of its own.
@@ -96,12 +96,11 @@ other. Take a [`threading.Lock`][threading.Lock] of your own inside both
 
 ## Built-in handlers
 
-The handlers below are re-exported from `ropt.simple`, ready to use as they
-are.
+The handlers below are exported from `ropt`, ready to use as they are.
 
 ### `ResultsHandler`
 
-[`ResultsHandler`][ropt.simple.ResultsHandler] keeps a single result, read via
+[`ResultsHandler`][ropt.ResultsHandler] keeps a single result, read via
 `handler["results"]`:
 
 - `what="best"` (default) keeps the result with the lowest weighted objective
@@ -122,14 +121,14 @@ one.
 
 ### `HistoryHandler`
 
-[`HistoryHandler`][ropt.simple.HistoryHandler] keeps *every* result it receives,
+[`HistoryHandler`][ropt.HistoryHandler] keeps *every* result it receives,
 in order, as a tuple. Read it with `handler.results`, which is an empty tuple
 until the first result arrives, or with `handler["results"]`, the raw stored
 value, which is `None` until then.
 
 ### `DataFrameHandler`
 
-[`DataFrameHandler`][ropt.simple.DataFrameHandler] collects results into named
+[`DataFrameHandler`][ropt.DataFrameHandler] collects results into named
 DataFrames, using either `polars` (the default) or `pandas` as its engine; the
 corresponding package must be installed. Define a table with
 `add_table(name, table_type, columns)`, where `table_type` is
@@ -139,7 +138,7 @@ objects, so `variables` and `scaled.variables` select different columns; see
 [Working with Results](results.md).
 
 ```python
-from ropt.simple import DataFrameHandler
+from ropt import DataFrameHandler
 
 tables = DataFrameHandler()
 tables.add_table(
@@ -221,7 +220,7 @@ produces. A handler of your own is for everything else: reacting to the start or
 the end of a run, writing results out in a format of your own, or keeping a
 summary that none of the built-ins keeps.
 
-Subclass [`EventHandler`][ropt.simple.EventHandler] and implement two members:
+Subclass [`EventHandler`][ropt.EventHandler] and implement two members:
 
 - `event_types` — the [`EnOptEventType`][ropt.enums.EnOptEventType] values this
   handler wants to receive. An event of any other type never reaches it.
@@ -231,7 +230,7 @@ Subclass [`EventHandler`][ropt.simple.EventHandler] and implement two members:
 ```python
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
-from ropt.simple import EventHandler, optimize
+from ropt import EventHandler, optimize
 
 
 class CountEvaluations(EventHandler):
@@ -266,8 +265,8 @@ with exit code `STOPPED`. The types a run emits are:
 | `START_EVALUATION`    | Before a batch of function or gradient evaluations.         |
 | `FINISHED_EVALUATION` | After that batch completes; carries its results.            |
 
-An [`evaluate`][ropt.simple.evaluate] or
-[`evaluate_batch`][ropt.simple.evaluate_batch] run has no optimizer, and emits
+An [`evaluate`][ropt.evaluate] or
+[`evaluate_batch`][ropt.evaluate_batch] run has no optimizer, and emits
 `START_ENSEMBLE_EVALUATOR` and `FINISHED_ENSEMBLE_EVALUATOR` around its single
 batch instead of the optimizer pair.
 

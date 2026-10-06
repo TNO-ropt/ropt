@@ -7,6 +7,7 @@ import pytest
 from numpy.typing import NDArray
 from pydantic import ValidationError
 
+from ropt import optimize
 from ropt.backend.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
@@ -21,7 +22,6 @@ from ropt.components.event_handlers import CallbackHandler
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.exceptions import UnsupportedError
-from ropt.simple import optimize
 from ropt.utils import validate_backend_options
 
 _REQUIRES_BOUNDS = _CONSTRAINT_REQUIRES_BOUNDS - {"differential_evolution"}

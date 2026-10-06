@@ -1,4 +1,4 @@
-"""Progress reporting for the high-level API.
+"""Progress reporting for an optimization run.
 
 A report callback is the small counterpart of a result handler: it is wired up
 as an ordinary handler, but as one belonging to a single run, which is why it is

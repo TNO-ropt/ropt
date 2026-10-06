@@ -1,7 +1,7 @@
-"""Constrained ensemble optimization with the high-level `ropt.simple` API.
+"""Constrained ensemble optimization with `ropt`.
 
 The problem adds a stochastic *nonlinear constraint* to the ensemble Rosenbrock
-function. In the high-level API a single objective callback returns the
+function. A single objective callback returns the
 objective **and** the constraint (objectives first, then constraints); the
 config declares the constraint bounds under `nonlinear_constraints`, and
 `constraint_tolerance` sets when a constraint counts as satisfied. A
@@ -17,8 +17,8 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
+from ropt import EvaluationFunctionContext, optimize
 from ropt.results import FunctionResults
-from ropt.simple import EvaluationFunctionContext, optimize
 
 DIM = 5
 REALIZATIONS = 10

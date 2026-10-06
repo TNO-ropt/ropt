@@ -17,13 +17,13 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ropt import optimize
 from ropt.enums import ExitCode
-from ropt.simple import optimize
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.simple import EvaluationFunctionContext
+    from ropt import EvaluationFunctionContext
 
 DIM = 3
 REALIZATIONS = 4

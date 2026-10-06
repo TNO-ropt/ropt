@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt import optimize
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -15,7 +16,6 @@ from ropt.components.event_handlers import CallbackHandler
 from ropt.enums import AxisName, EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import results_to_pandas
-from ropt.simple import optimize
 
 # Requires pandas:
 pytest.importorskip("pandas")

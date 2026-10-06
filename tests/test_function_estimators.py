@@ -5,11 +5,11 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt import optimize
 from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.config._function_estimator_config import FunctionEstimatorConfig
 from ropt.function_estimator import FunctionEstimator
 from ropt.function_estimator.default import DefaultFunctionEstimator
-from ropt.simple import optimize
 
 initial_values = 3 * [0]
 

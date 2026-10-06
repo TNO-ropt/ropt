@@ -1,4 +1,4 @@
-"""Tests for the sequential high-level ``optimize`` API."""
+"""Tests for the sequential ``optimize`` API."""
 
 # The monkeypatched tests here name their target as an attribute and assert it
 # was used. An earlier version patched a method by string and became a no-op the
@@ -16,17 +16,7 @@ from typing import TYPE_CHECKING, Any, override
 import numpy as np
 import pytest
 
-from ropt.components.event_handlers import EventHandler
-from ropt.components.executors import (
-    HPCExecutor,
-    LocalJobExecutor,
-    ProcessExecutor,
-    ThreadExecutor,
-)
-from ropt.enums import EnOptEventType, ExitCode
-from ropt.exceptions import ExecutionError, RunsFailedError, WorkflowError
-from ropt.results import FunctionResults
-from ropt.simple import (
+from ropt import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     HistoryHandler,
@@ -37,7 +27,17 @@ from ropt.simple import (
     optimize_many,
     session,
 )
-from ropt.simple._function import adapt_function
+from ropt.components.event_handlers import EventHandler
+from ropt.components.executors import (
+    HPCExecutor,
+    LocalJobExecutor,
+    ProcessExecutor,
+    ThreadExecutor,
+)
+from ropt.enums import EnOptEventType, ExitCode
+from ropt.exceptions import ExecutionError, RunsFailedError, WorkflowError
+from ropt.results import FunctionResults
+from ropt.run._function import adapt_function
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -45,9 +45,9 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from ropt import WorkerPool
     from ropt.components.executors import Executor
     from ropt.events import EnOptEvent
-    from ropt.simple import WorkerPool
 
 try:
     # The job path needs no extras of its own, so these tests run either way.

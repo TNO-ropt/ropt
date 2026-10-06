@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, Literal, override
 import numpy as np
 import pytest
 
+from ropt import optimize
 from ropt.backend import Backend
 from ropt.backend.utils import collect_native_output
 from ropt.components.evaluators import (
@@ -24,7 +25,6 @@ from ropt.components.evaluators import (
 )
 from ropt.exceptions import WorkflowError
 from ropt.plugins import register_plugin
-from ropt.simple import optimize
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -243,7 +243,7 @@ import sys
 import numpy as np
 from ropt.components.evaluators import EvaluationFunctionResult
 from ropt.plugins import register_plugin
-from ropt.simple import optimize
+from ropt import optimize
 sys.path.insert(0, {tests!r})
 from test_output_capture import _NativePrintingBackend, _objective
 

@@ -184,7 +184,7 @@ documentation table for them. The built-in SciPy backend uses it; see
 
 A backend runs in the caller's process, alongside whatever else is in it —
 including other optimizations, since
-[`optimize_many`][ropt.simple.optimize_many] runs several at once, each on its
+[`optimize_many`][ropt.optimize_many] runs several at once, each on its
 own thread with its own configuration. Anything a backend changes *per process*
 is therefore shared with unrelated runs, and cannot carry per-run
 settings.

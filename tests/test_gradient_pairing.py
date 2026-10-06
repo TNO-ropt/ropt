@@ -7,6 +7,7 @@ from typing import Any, cast
 import numpy as np
 import pytest
 
+from ropt import optimize
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
 from ropt.core import EnsembleEvaluator
@@ -22,7 +23,6 @@ from ropt.results import (
     ScaledFunctionResults,
     ScaledGradientResults,
 )
-from ropt.simple import optimize
 
 _INITIAL = np.array([0.0, 0.0, 0.1])
 

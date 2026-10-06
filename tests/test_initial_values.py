@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt import HistoryHandler, optimize, optimize_many
 from ropt.context import EnOptContext
 from ropt.core import EnsembleEvaluator
 from ropt.results import FunctionResults, GradientResults
-from ropt.simple import HistoryHandler, optimize, optimize_many
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray

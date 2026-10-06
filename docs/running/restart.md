@@ -8,7 +8,7 @@
     [Reusing Results at the Starting Point](initial_values.md).
 
 The full script for this example is
-[examples/simple/restart.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py).
+[examples/restart.py](https://github.com/TNO-ropt/ropt/blob/main/examples/restart.py).
 It restarts the same optimization several times, each time starting from the
 best point the previous run found.
 
@@ -16,7 +16,7 @@ best point the previous run found.
 
 A single optimization run can stop before truly converging — for example
 because it hit its iteration limit while still improving. Restarting
-runs [`optimize`][ropt.simple.optimize] again, using the previous result as the
+runs [`optimize`][ropt.optimize] again, using the previous result as the
 new start point. Since
 each call to `optimize` is independent, this is a loop in your own code;
 `ropt` needs nothing special to support it.
@@ -37,8 +37,8 @@ reported: list[FunctionResults] = []
 A **handler**, given with `handlers=`, receives the same results but is an
 object with state of its own. One handler can be given to several runs,
 including runs that execute concurrently, and does more than pass results on:
-[`HistoryHandler`][ropt.simple.HistoryHandler] stores every result it receives,
-and [`DataFrameHandler`][ropt.simple.DataFrameHandler] collects them into named
+[`HistoryHandler`][ropt.HistoryHandler] stores every result it receives,
+and [`DataFrameHandler`][ropt.DataFrameHandler] collects them into named
 DataFrames. [Result Handlers](../results/handlers.md) covers them.
 
 ## Restart in a loop

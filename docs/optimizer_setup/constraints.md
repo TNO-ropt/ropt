@@ -15,7 +15,7 @@ configuration, so `ropt` can evaluate them itself. A nonlinear constraint is not
 the objective and, in an ensemble, can differ between realizations.
 
 The runnable script for this page is
-[examples/simple/constrained.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/constrained.py).
+[examples/constrained.py](https://github.com/TNO-ropt/ropt/blob/main/examples/constrained.py).
 It adds a nonlinear constraint to the ensemble Rosenbrock problem of
 [Ensemble-Based Optimization](../getting_started/ensemble.md).
 
@@ -31,7 +31,7 @@ It adds a nonlinear constraint to the ensemble Rosenbrock problem of
 Both live in the configuration, next to the variables:
 
 ```python
---8<-- "examples/simple/constrained.py:config"
+--8<-- "examples/constrained.py:config"
 ```
 
 Bounds keep every variable in $[-5, 5]$. The `nonlinear_constraints` section
@@ -54,7 +54,7 @@ single number: **the objectives first, then the constraints**. With one
 objective and one constraint, that is a two-element list:
 
 ```python
---8<-- "examples/simple/constrained.py:objective"
+--8<-- "examples/constrained.py:objective"
 ```
 
 The order is positional — there are no names — so it must match the order in
@@ -68,12 +68,12 @@ Because the constraint is computed per realization and uses `A[r]`, it is
 
 ## Deciding when a constraint is satisfied
 
-A constraint is rarely met exactly, so [`optimize`][ropt.simple.optimize] takes a
+A constraint is rarely met exactly, so [`optimize`][ropt.optimize] takes a
 `constraint_tolerance`: a result counts as feasible when no constraint is
 violated by more than that amount.
 
 ```python
---8<-- "examples/simple/constrained.py:run"
+--8<-- "examples/constrained.py:run"
 ```
 
 `result.results` is only ever the best
@@ -87,7 +87,7 @@ the `report` callback receives. Its `nonlinear_violation` is zero where a
 constraint is met and positive by the amount it is exceeded:
 
 ```python
---8<-- "examples/simple/constrained.py:report"
+--8<-- "examples/constrained.py:report"
 ```
 
 ## Adding a linear constraint
@@ -98,7 +98,7 @@ lower and upper bounds make it an equality — this one forces the fourth and
 fifth variables to be equal:
 
 ```python
---8<-- "examples/simple/constrained.py:linear"
+--8<-- "examples/constrained.py:linear"
 ```
 
 The script adds it when run with `--linear`. One row per constraint, one

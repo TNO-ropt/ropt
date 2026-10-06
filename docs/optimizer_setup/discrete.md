@@ -7,9 +7,9 @@ differentiated, so the problem needs a method that searches without gradients,
 and that method needs bounds.
 
 There are two runnable scripts for this page:
-[examples/simple/discrete.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/discrete.py),
+[examples/discrete.py](https://github.com/TNO-ropt/ropt/blob/main/examples/discrete.py),
 where every variable is an integer, and
-[examples/simple/mixed.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/mixed.py),
+[examples/mixed.py](https://github.com/TNO-ropt/ropt/blob/main/examples/mixed.py),
 where continuous and integer variables appear in one problem.
 
 !!! warning
@@ -26,7 +26,7 @@ where continuous and integer variables appear in one problem.
 variable:
 
 ```python
---8<-- "examples/simple/discrete.py:config"
+--8<-- "examples/discrete.py:config"
 ```
 
 Three things go together. `types` marks the variables as integers; the `backend`
@@ -35,7 +35,7 @@ that; and `lower_bounds` / `upper_bounds` are mandatory, because that method
 searches within a box rather than stepping from a start point.
 
 [`VariableType`][ropt.enums.VariableType] comes from `ropt.enums`, not from
-`ropt.simple`:
+`ropt` itself:
 
 ```python
 from ropt.enums import VariableType
@@ -48,7 +48,7 @@ The objective is an ordinary evaluation function. It receives the variables as
 floats that happen to hold integral values:
 
 ```python
---8<-- "examples/simple/discrete.py:objective"
+--8<-- "examples/discrete.py:objective"
 ```
 
 The script imposes `x + y <= 10` as a nonlinear constraint by default, and as a
@@ -62,11 +62,11 @@ instead of a single value. `mixed.py` does this for the first four variables of
 an ensemble Rosenbrock problem, keeping two continuous and two integer:
 
 ```python
---8<-- "examples/simple/mixed.py:config"
+--8<-- "examples/mixed.py:config"
 ```
 
 Nothing else changes. The realizations, the objective and the call to
-[`optimize`][ropt.simple.optimize]
+[`optimize`][ropt.optimize]
 are the same as in [Ensemble-Based Optimization](../getting_started/ensemble.md)
 — being partly discrete is a property of the variables, not of the problem
 around them.

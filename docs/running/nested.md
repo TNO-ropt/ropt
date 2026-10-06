@@ -15,7 +15,7 @@ inner optimization over the remaining ones, returning the best value it reached.
     by changing a single line.
 
 Nothing in `ropt` is dedicated to this: the outer evaluation function
-calls [`optimize`][ropt.simple.optimize] itself. What needs care is the plumbing
+calls [`optimize`][ropt.optimize] itself. What needs care is the plumbing
 around it — which
 variables each layer owns, which pool each layer evaluates on, and how to
 get the results out.
@@ -51,7 +51,7 @@ are drawn: the outer one is inside your process, the inner one is not. The
 sections below work through each part.
 
 The runnable script for this page is
-[examples/simple/nested_optimization.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/nested_optimization.py).
+[examples/nested_optimization.py](https://github.com/TNO-ropt/ropt/blob/main/examples/nested_optimization.py).
 It needs the `polars` extra.
 
 ## Splitting the variables
@@ -60,7 +60,7 @@ Both layers describe the *same* variable vector; each is handed the half it may
 change. The `mask` field does this, and the two masks are complements:
 
 ```python
---8<-- "examples/simple/nested_optimization.py:configs"
+--8<-- "examples/nested_optimization.py:configs"
 ```
 
 A masked-out variable keeps the value it was given and is not passed to the
@@ -80,7 +80,7 @@ variables, merges them into a full vector, runs `optimize`, and returns the best
 objective it found:
 
 ```python
---8<-- "examples/simple/nested_optimization.py:inner"
+--8<-- "examples/nested_optimization.py:inner"
 ```
 
 `np.where(MASK, INITIAL_VALUES, variables)` builds the inner start point: the
@@ -102,7 +102,7 @@ Each layer evaluates on its own pool, and that is a requirement rather than
 a preference:
 
 ```python
---8<-- "examples/simple/nested_optimization.py:run"
+--8<-- "examples/nested_optimization.py:run"
 ```
 
 The outer pool is a **thread** pool. Outer evaluations therefore stay
@@ -112,7 +112,7 @@ refuses. The inner pool is a **process** pool, which is where the real
 work goes.
 
 That is also where a cluster belongs. Swapping the inner pool for an
-[`hpc_pool`][ropt.simple.Session.hpc_pool] is the whole change — the inner
+[`hpc_pool`][ropt.Session.hpc_pool] is the whole change — the inner
 evaluations become cluster jobs, and the layer above is untouched:
 
 ```python
@@ -181,7 +181,7 @@ belongs to.
 Reading the answer takes one more step than usual:
 
 ```python
---8<-- "examples/simple/nested_optimization.py:best"
+--8<-- "examples/nested_optimization.py:best"
 ```
 
 The outer result is not the place to look. The outer layer only ever sees its

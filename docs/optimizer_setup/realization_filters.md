@@ -65,7 +65,7 @@ instance can also be passed directly in the `realization_filters` section of
 the configuration, which needs no registration.
 
 The runnable script is
-[examples/simple/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py),
+[examples/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py),
 which implements a filter that puts all weight on the median realization,
 registers it, and selects it from the configuration as `"custom/median"`.
 

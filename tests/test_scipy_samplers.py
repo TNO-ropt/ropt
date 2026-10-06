@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt import optimize
 from ropt.components.event_handlers import CallbackHandler
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import GradientResults
 from ropt.sampler.scipy import SCIPY_SAMPLER_SUPPORTED_METHODS
-from ropt.simple import optimize
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray

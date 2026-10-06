@@ -25,14 +25,14 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.enums import ExitCode, VariableType
-from ropt.simple import (
+from ropt import (
     DataFrameHandler,
     EvaluationFunction,
     EvaluationFunctionContext,
     WorkerPool,
     session,
 )
+from ropt.enums import ExitCode, VariableType
 
 # --8<-- [start:configs]
 DIM = 4

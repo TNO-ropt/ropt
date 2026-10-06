@@ -1,4 +1,4 @@
-"""The batch IDs a high-level run draws from.
+"""The batch IDs a run draws from.
 
 One counter for the whole program, so that several runs reaching the same
 handler label their batches apart. The IDs are unique within a process: a

@@ -21,7 +21,7 @@ See [Installation](installation.md) for optional extras.
 ```python
 import numpy as np
 
-from ropt.simple import optimize
+from ropt import optimize
 
 # 1. Describe the problem: two variables.
 config = {
@@ -63,8 +63,8 @@ Every `ropt` optimization needs three things:
    [Running Optimizations](../running/running.md#the-evaluation-function).
 3. **A start point** — the variable values to start from.
 
-[`optimize`][ropt.simple.optimize] combines these three, runs the optimization,
-and returns an [`OptimizationResult`][ropt.simple.OptimizationResult]. Its
+[`optimize`][ropt.optimize] combines these three, runs the optimization,
+and returns an [`OptimizationResult`][ropt.OptimizationResult]. Its
 `results` field holds the best evaluation of the run, as a
 [`FunctionResults`][ropt.results.FunctionResults] — the same object a handler
 receives — and is `None` if the run found nothing valid.

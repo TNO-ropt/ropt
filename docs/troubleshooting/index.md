@@ -11,7 +11,7 @@ table of the section it belongs to.
 ## Results and exit codes
 
 **The returned result is the best *feasible* one.**
-[`optimize`][ropt.simple.optimize] returns the best result that satisfies every
+[`optimize`][ropt.optimize] returns the best result that satisfies every
 constraint to within `constraint_tolerance`, which defaults to `1e-10` and
 applies to bounds and linear constraints as well as nonlinear ones. If no
 evaluation satisfies them, the run ends normally with `result.results`
@@ -20,8 +20,8 @@ or not, still reaches the [handlers](../results/handlers.md) attached to the run
 
 **The return value is a summary, not the record of the run.** It holds a single
 result, the best feasible evaluation. The whole history is available instead:
-attach a [`HistoryHandler`][ropt.simple.HistoryHandler] or a
-[`DataFrameHandler`][ropt.simple.DataFrameHandler] to collect every result as it
+attach a [`HistoryHandler`][ropt.HistoryHandler] or a
+[`DataFrameHandler`][ropt.DataFrameHandler] to collect every result as it
 arrives. That history is also what remains when there is no best result to
 return.
 
@@ -37,7 +37,7 @@ config = {
 }
 ```
 
-[examples/simple/failures.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py)
+[examples/failures.py](https://github.com/TNO-ropt/ropt/blob/main/examples/failures.py)
 runs the same problem twice, once with the default and once allowing the
 failure, and prints the exit code and result of each.
 
@@ -81,7 +81,7 @@ the worker finishes. Return what you need instead; see
 [Handlers and separate processes](../results/handlers.md#handlers-and-separate-processes).
 
 **Several runs may call your objective at the same time.**
-[`optimize_many`][ropt.simple.optimize_many] always runs its optimizations
+[`optimize_many`][ropt.optimize_many] always runs its optimizations
 concurrently. Given a pool, their evaluations go there; given none, each run
 evaluates on its own driver thread, so your evaluation function is called from
 several threads at once and has to tolerate that. See
@@ -110,7 +110,7 @@ tolerated; see
 
 **A run evaluates on the pool it was started on, and no other.** Nothing is
 picked up from the surrounding code. A run started with the module-level
-[`optimize`][ropt.simple.optimize] evaluates inside your own program, on the
+[`optimize`][ropt.optimize] evaluates inside your own program, on the
 thread that called it — even if a pool exists next to it.
 
 **Threads cannot be interrupted.** Evaluations on a thread pool run to
@@ -152,9 +152,9 @@ waits until the handler has finished with it, and the next run waits for the
 lock. Keep a shared handler cheap.
 
 **A handler must not start a run that reaches it again.** The handler holds its
-own lock while it runs. A nested [`optimize`][ropt.simple.optimize] emits on
+own lock while it runs. A nested [`optimize`][ropt.optimize] emits on
 that same thread and raises; a nested
-[`optimize_many`][ropt.simple.optimize_many] emits on its own driver threads
+[`optimize_many`][ropt.optimize_many] emits on its own driver threads
 and blocks. See [Result
 Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 

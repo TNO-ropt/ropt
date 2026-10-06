@@ -6,11 +6,11 @@ import numpy as np
 import pytest
 from numpy.random import Generator, default_rng
 
+from ropt import optimize
 from ropt.config import SamplerConfig
 from ropt.context import EnOptContext
 from ropt.core._gradient import _perturb_variables
 from ropt.sampler import Sampler
-from ropt.simple import optimize
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray

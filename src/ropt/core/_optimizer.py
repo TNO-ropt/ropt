@@ -75,9 +75,9 @@ def _resolve_output_path(path: Path | None, output_dir: Path | None) -> Path | N
 class EnsembleOptimizer:
     """Backend for ensemble-based optimizations.
 
-    Direct use of this class is generally discouraged. Use the high-level
-    [`optimize`][ropt.simple.optimize] API instead, or build a custom workflow
-    from the optimization steps.
+    Direct use of this class is generally discouraged. Use
+    [`optimize`][ropt.optimize] instead, or build a custom workflow from the
+    optimization steps.
     """
 
     def __init__(

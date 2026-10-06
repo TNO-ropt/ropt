@@ -128,9 +128,9 @@ corresponding element unfiltered. Any other key must exist, or building the
 context fails with an error naming the unknown key.
 
 Two runnable scripts select a component by position this way:
-[examples/simple/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py)
+[examples/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py)
 and
-[examples/simple/function_estimator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/function_estimator.py),
+[examples/function_estimator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/function_estimator.py),
 each of which registers a custom component and points the objectives at it.
 
 ### Providing optimizer components
@@ -242,9 +242,9 @@ they are given instead of relying on position, which lets results be matched
 between runs whose ordering differs. That applies to the realization names; the
 others affect only how a printed table reads.
 
-[examples/simple/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py)
+[examples/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py)
 names variables, objectives and realizations before exporting to a frame, and
-[examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py)
+[examples/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py)
 names a metadata axis. The accepted axis names are listed under
 [`names`](configuration_sections.md#names), and
 [Working with Results](../results/results.md) shows how the labels appear in an

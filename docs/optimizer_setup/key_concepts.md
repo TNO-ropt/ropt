@@ -64,7 +64,7 @@ pages [Choosing an Optimizer](optimizer.md), [Samplers](samplers.md),
 [Realization Filters](realization_filters.md) and
 [Function Estimators](function_estimators.md) cover each kind in depth.
 
-[examples/simple/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py)
+[examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py)
 puts the central terms in one short script: a variable vector optimized across
 an ensemble of realizations, with perturbations driving the gradient estimate.
 

@@ -1,4 +1,4 @@
-"""Mixed-integer optimization with the high-level `ropt.simple` API.
+"""Mixed-integer optimization with `ropt`.
 
 Two of the four variables are continuous and two are discrete (integer-valued),
 so the problem is solved with a gradient-free *differential evolution* backend
@@ -13,9 +13,9 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
+from ropt import EvaluationFunctionContext, optimize
 from ropt.enums import VariableType
 from ropt.results import FunctionResults
-from ropt.simple import EvaluationFunctionContext, optimize
 
 DIM = 4
 REALIZATIONS = 10

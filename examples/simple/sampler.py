@@ -1,4 +1,4 @@
-"""A custom sampler with the high-level `ropt.simple` API.
+"""A custom sampler with `ropt`.
 
 A sampler draws the perturbations that `ropt` uses to estimate stochastic
 gradients. This example implements `OneAtATime`, which perturbs a single
@@ -29,10 +29,10 @@ import numpy as np
 from numpy.random import Generator, default_rng
 from numpy.typing import NDArray
 
+from ropt import EvaluationFunctionContext, optimize
 from ropt.config import SamplerConfig
 from ropt.plugins import MethodSpec, register_plugin
 from ropt.sampler import Sampler
-from ropt.simple import EvaluationFunctionContext, optimize
 
 DIM = 5
 UNCERTAINTY = 0.1

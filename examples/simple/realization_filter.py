@@ -1,4 +1,4 @@
-"""A custom realization filter with the high-level `ropt.simple` API.
+"""A custom realization filter with `ropt`.
 
 A realization filter reweights the realizations of an ensemble at each
 evaluation, letting the optimizer target a robust statistic instead of the mean.
@@ -17,11 +17,11 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
+from ropt import EvaluationFunctionContext, optimize
 from ropt.config import RealizationFilterConfig
 from ropt.plugins import MethodSpec, register_plugin
 from ropt.realization_filter import RealizationFilter
 from ropt.results import FunctionResults
-from ropt.simple import EvaluationFunctionContext, optimize
 
 DIM = 5
 UNCERTAINTY = 0.1

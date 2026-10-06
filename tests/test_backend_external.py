@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, ClassVar, cast, override
 import numpy as np
 import pytest
 
+from ropt import optimize
 from ropt._serialize import (
     CANNOT_DESERIALIZE,
     CANNOT_SERIALIZE,
@@ -33,7 +34,6 @@ from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, OptimizerStop
 from ropt.plugins import get_plugin, get_plugin_name, register_plugin
-from ropt.simple import optimize
 
 if TYPE_CHECKING:
     from ropt.plugins import MethodSpec

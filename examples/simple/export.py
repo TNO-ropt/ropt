@@ -1,4 +1,4 @@
-"""Export results to a pandas or polars frame with the `ropt.simple` API.
+"""Export results to a pandas or polars frame with `ropt`.
 
 A `Results` object holds everything one evaluated variable vector produced,
 with each field indexed by its own axes. `to_pandas` and `to_polars` turn a
@@ -21,20 +21,20 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.enums import AxisName
-from ropt.results import FunctionResults, results_to_pandas, results_to_polars
-from ropt.simple import (
+from ropt import (
     EvaluationFunctionResult,
     HistoryHandler,
     optimize,
 )
+from ropt.enums import AxisName
+from ropt.results import FunctionResults, results_to_pandas, results_to_polars
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from numpy.typing import NDArray
 
-    from ropt.simple import EvaluationFunctionContext
+    from ropt import EvaluationFunctionContext
 
 DIM = 3
 SHIFTS = np.array([0.9, 1.1])  # one uncertain shift per realization

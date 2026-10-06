@@ -417,7 +417,7 @@ sign with the per-realization values it summarizes, whether it is an average or
 a measure of dispersion.
 
 The runnable script is
-[examples/simple/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py),
+[examples/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py),
 which runs the same problem unscaled, with `auto_scale` on the objective, and
 with a variable scale, printing both domains each time. It shows that
 `auto_scale` divides the reported objective by a large factor while leaving the
@@ -430,15 +430,15 @@ Results carry two independent kinds of metadata, neither interpreted by `ropt`:
 
 - **Result metadata** — the `metadata` dict on every
   [`Results`][ropt.results.Results] object, identical for every result of a run.
-  It is set once when the run starts: pass a `metadata` dict to the simple-API
-  [`optimize`][ropt.simple.optimize] /
-  [`optimize_many`][ropt.simple.optimize_many] /
-  [`evaluate`][ropt.simple.evaluate] functions. Use it to tag or identify a
+  It is set once when the run starts: pass a `metadata` dict to the
+  [`optimize`][ropt.optimize] /
+  [`optimize_many`][ropt.optimize_many] /
+  [`evaluate`][ropt.evaluate] functions. Use it to tag or identify a
   run, for example `{"run_id": 7}`.
 - **Per-realization metadata** — the `metadata` dict on the `evaluations` field,
   with one array entry per realization. It is produced by the objective when it
   returns an
-  [`EvaluationFunctionResult`][ropt.simple.EvaluationFunctionResult]
+  [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
   with a `metadata` field.
 
 Result metadata is passed to the run and read back from `metadata`:
@@ -461,7 +461,7 @@ result.results.evaluations.metadata   # {'shift': array([...])}
 ```
 
 The full runnable script is
-[examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py).
+[examples/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py).
 
 ## Exporting to pandas
 
@@ -508,7 +508,7 @@ df = result.to_pandas(["variables", "evaluations.objectives"])
 ```
 
 The runnable script for this section is
-[examples/simple/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py),
+[examples/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py),
 which exports one result stacked, the same result unstacked, and then every
 result of the run in one frame. It uses polars by default and pandas with
 `--pandas`, so only one of the two needs to be installed.

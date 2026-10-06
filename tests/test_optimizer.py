@@ -8,13 +8,13 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
+from ropt import optimize
 from ropt.components.event_handlers import CallbackHandler
 from ropt.config import LinearConstraintsConfig
 from ropt.config.constants import DEFAULT_SEED
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.results import FunctionResults, GradientResults
-from ropt.simple import optimize
 from ropt.utils import validate_backend_options
 
 if TYPE_CHECKING:

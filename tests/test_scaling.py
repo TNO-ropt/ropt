@@ -14,6 +14,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt import optimize
 from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.components.event_handlers import CallbackHandler
 from ropt.context import EnOptContext
@@ -31,7 +32,6 @@ from ropt.results import (
     ScaledFunctionResults,
     ScaledGradientResults,
 )
-from ropt.simple import optimize
 
 
 def _context(**fields: Any) -> EnOptContext:

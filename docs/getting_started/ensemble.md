@@ -5,7 +5,7 @@ work through an *uncertain* problem: the objective depends on parameters we do
 not know exactly. We now have a set of functions, each with different parameters
 drawn from some (possibly unknown) probability distribution. Each member of the
 set is a **realization**. The full runnable script is
-[examples/simple/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py).
+[examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py).
 
 `ropt` optimizes the realizations together by combining them into a single
 **robust objective** — by default a weighted average over the realizations.
@@ -36,7 +36,7 @@ The config adds a `realizations` section: the `weights` list has one entry per
 realization that sets how much each contributes to the combined objective:
 
 ```python
---8<-- "examples/simple/ensemble.py:config"
+--8<-- "examples/ensemble.py:config"
 ```
 
 The weights need not sum to one; `ropt` normalizes them. Equal weights, as here,
@@ -51,7 +51,7 @@ coefficients are sampled once per realization, so that `a[r]` and `b[r]` are the
 coefficients for realization `r`:
 
 ```python
---8<-- "examples/simple/ensemble.py:draws"
+--8<-- "examples/ensemble.py:draws"
 ```
 
 ## 3. Write the evaluation function
@@ -62,7 +62,7 @@ argument identifies which one: `context.realization` is the realization number,
 which we use to index the parameter arrays:
 
 ```python
---8<-- "examples/simple/ensemble.py:objective"
+--8<-- "examples/ensemble.py:objective"
 ```
 
 The [Quickstart](quickstart.md) ignored this second argument; an ensemble
@@ -83,7 +83,7 @@ every evaluation, with the
 computed.
 
 ```python
---8<-- "examples/simple/ensemble.py:report"
+--8<-- "examples/ensemble.py:report"
 ```
 
 The callback belongs to one run and sees one evaluation at a time. To keep the
@@ -97,7 +97,7 @@ The call is the same as for a deterministic problem, with `INITIAL_VALUES` the
 start point defined above:
 
 ```python
---8<-- "examples/simple/ensemble.py:run"
+--8<-- "examples/ensemble.py:run"
 ```
 
 `ropt` evaluates all ten realizations at each point and averages them into the
@@ -105,11 +105,11 @@ robust objective, which is what it optimizes.
 
 ## 6. Read the result
 
-[`optimize`][ropt.simple.optimize] returns an
-[`OptimizationResult`][ropt.simple.OptimizationResult]:
+[`optimize`][ropt.optimize] returns an
+[`OptimizationResult`][ropt.OptimizationResult]:
 
 ```python
---8<-- "examples/simple/ensemble.py:result"
+--8<-- "examples/ensemble.py:result"
 ```
 
 - `result.exit_code` indicates why the run stopped (a member of the
