@@ -4,6 +4,20 @@
     options:
         members: []
 
+The remaining names imported from `ropt` are documented on their own pages:
+[`ExitCode`][ropt.enums.ExitCode];
+[`Results`][ropt.results.Results],
+[`FunctionResults`][ropt.results.FunctionResults],
+[`GradientResults`][ropt.results.GradientResults],
+[`results_to_pandas`][ropt.results.results_to_pandas] and
+[`results_to_polars`][ropt.results.results_to_polars];
+and [`RoptError`][ropt.exceptions.RoptError] with
+[`WorkflowError`][ropt.exceptions.WorkflowError],
+[`ExecutionError`][ropt.exceptions.ExecutionError],
+[`UnsupportedError`][ropt.exceptions.UnsupportedError],
+[`AbortedError`][ropt.exceptions.AbortedError] and
+[`RunsFailedError`][ropt.exceptions.RunsFailedError].
+
 ## Running optimizations
 
 ::: ropt.optimize
@@ -40,6 +54,4 @@
 ## Callback types
 
 ::: ropt.EvaluationFunction
-::: ropt.run.ReportCallback
-    options:
-        show_root_full_path: false
+::: ropt.ReportCallback

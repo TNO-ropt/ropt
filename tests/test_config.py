@@ -297,6 +297,16 @@ def test_variable_enums_reject_an_unknown_string(config: Any) -> None:
         EnOptContext.model_validate(config)
 
 
+def test_variable_enums_accept_a_numpy_array(config: Any) -> None:
+    config["variables"]["types"] = np.array(["integer", "real"])
+    variables = EnOptContext.model_validate(config).variables
+    assert variables.types == (VariableType.INTEGER, VariableType.REAL)
+
+    config["variables"]["types"] = np.array("integer")
+    variables = EnOptContext.model_validate(config).variables
+    assert variables.types == (VariableType.INTEGER, VariableType.INTEGER)
+
+
 def test_check_config_min_success(config: Any) -> None:
     def gen_config(pert_min: int | None, real_min: int | None) -> dict[str, Any]:
         config_copy: dict[str, Any] = copy.deepcopy(config)

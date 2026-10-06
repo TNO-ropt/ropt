@@ -38,6 +38,9 @@ def _convert_2d_array(array: ArrayLike | None) -> NDArray[np.float64] | None:
 
 
 def _convert_tuple[T](value: T | Sequence[T]) -> tuple[T, ...]:
+    if isinstance(value, np.ndarray):
+        # An ndarray is not a `Sequence`, so it would be wrapped whole.
+        return tuple(np.atleast_1d(value).tolist())
     if isinstance(value, str):
         return (value,)
     return tuple(value) if isinstance(value, AbstractSequence) else (value,)
@@ -66,7 +69,7 @@ Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_boo
 """Convert to an immutable 1D numpy array of boolean values."""
 
 type ItemOrTuple[T] = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
-"""Convert to single value to a tuple containing that value, passes sets unchanged."""
+"""Convert a single item, or a sequence or array to a tuple."""
 
 Keys = Annotated[tuple[str | None, ...], BeforeValidator(_convert_keys)]
-"""Convert a single key or a sequence of keys to a tuple of string keys."""
+"""Convert a single key or a sequence or array to a tuple."""

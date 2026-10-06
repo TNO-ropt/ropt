@@ -311,8 +311,7 @@ That is why `exit_code` can only be `FINISHED`; `USER_ABORT` or
 `ABORTED_ON_ERROR` when [`Session.abort`](#stopping-from-outside) or a failing
 run on the same session cut it off; or `EXECUTOR_SHUT_DOWN` when the pool it was
 evaluating on could no longer run the work. An abort that arrives after the
-batch has
-finished leaves it unaffected, and the evaluation reports `FINISHED`.
+batch has finished leaves it unaffected, and the evaluation reports `FINISHED`.
 
 The runnable script is
 [examples/evaluate.py](https://github.com/TNO-ropt/ropt/blob/main/examples/evaluate.py),

@@ -19,6 +19,12 @@ def test__apply_bounds() -> None:
     lower_bounds: NDArray[np.float64] = np.zeros(5, dtype=np.float64)
     upper_bounds: NDArray[np.float64] = np.ones(5, dtype=np.float64)
 
+    # NONE
+    response = _apply_bounds(
+        variables, lower_bounds, upper_bounds, (BoundaryType.NONE,) * 5
+    )
+    assert variables == pytest.approx(response)
+
     # TRUNCATE
     expected_response_truncate: NDArray[np.float64] = np.array(
         [0.0, 0.2, 0.3, 0.4, 1.0],

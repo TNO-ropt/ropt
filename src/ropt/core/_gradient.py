@@ -40,8 +40,12 @@ def _apply_bounds(
         variables = mirror(variables, mask2, variables > upper_bounds, upper_bounds)
         variables = mirror(variables, mask2, variables < lower_bounds, lower_bounds)
 
-    # Finally, fall back to clipping.
-    return np.clip(variables, lower_bounds, upper_bounds)
+    # Finally, fall back to clipping, except where no correction was asked for.
+    return np.where(
+        enum_mask(truncation_types, BoundaryType.NONE),
+        variables,
+        np.clip(variables, lower_bounds, upper_bounds),
+    )
 
 
 def _invert_linear_equations(
