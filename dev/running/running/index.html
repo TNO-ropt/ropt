@@ -2647,13 +2647,19 @@ additional options.</p>
 <li><code>context.realization</code> — the realization number, for a problem with an
   ensemble of realizations; <code>optimize</code> then minimizes the weighted average
   objective over all of them. See
-  <a href="../../getting_started/ensemble/">Ensemble-Based Optimization</a>. The field
-  you need most often.</li>
+  <a href="../../getting_started/ensemble/">Ensemble-Based Optimization</a>.</li>
+<li><code>context.perturbation</code> — the perturbation number, counted from 0, for an
+  evaluation at a perturbed point; <code>-1</code> for a function evaluation. <code>ropt</code>
+  evaluates perturbed points to estimate a
+  <a href="../../optimizer_setup/gradients/">gradient</a>.</li>
+<li><code>context.function_id</code> — the function evaluation number within the batch,
+  counted from 0; <code>-1</code> for an evaluation at a perturbed point.</li>
+<li><code>context.batch_id</code> — the batch number. <code>ropt</code> requests evaluations in
+  batches, and each batch in a program gets its own number.</li>
+<li><code>context.row_idx</code> — the position of the evaluation within its batch,
+  counted from 0.</li>
 <li><code>context.metadata</code> — the <code>metadata</code> dict the run was started with, if
   any (see <a href="#attaching-metadata">Attaching metadata</a>).</li>
-<li><code>context.batch_id</code>, <code>context.eval_idx</code>, <code>context.perturbation</code> — identify
-  the evaluation batch, its row, and (for a gradient perturbation) which
-  one; rarely needed directly.</li>
 </ul>
 </li>
 </ul>
@@ -2754,15 +2760,16 @@ evaluation. The callback then receives both kinds and has to tell them apart:</p
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> carries a <code>function_key</code>
-identifying the function evaluation it was computed from; the matching
+  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> records the function
+evaluation whose values were used to compute it. Its
+<a class="autorefs autorefs-internal" title="            uses" href="../../reference/results/#ropt.results.GradientResults.uses"><code>uses</code></a> method takes a
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> has the same value in its own
-<code>function_key</code>.</p>
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and returns whether it is that
+evaluation.</p>
 <h3 id="stopping-early-from-the-callback">Stopping early from the callback</h3>
 <p>The <code>report</code> callback doubles as a <strong>user-defined stopping criterion</strong>: return
 <code>True</code> and the optimization stops gracefully after the current evaluation, with

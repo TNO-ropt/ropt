@@ -2080,23 +2080,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="FunctionResults">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.FunctionResults.function_key" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        function_key
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -2118,6 +2101,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="GradientResults">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.GradientResults.uses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uses
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2781,23 +2781,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="FunctionResults">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.FunctionResults.function_key" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        function_key
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -2819,6 +2802,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="GradientResults">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.GradientResults.uses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        uses
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3928,67 +3928,6 @@ evaluated:</p>
 
 
 
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.results.FunctionResults.function_key" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">function_key</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">function_key</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Identify this function evaluation.</p>
-<p>A <code>function_id</code> is unique within its batch only, so a function
-evaluation is identified by its batch together with its index there.
-A <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
-
-
-  
-      dataclass
-  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> carries the same
-value in its own <code>function_key</code>, which is how the two are paired.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The batch ID and the index within that batch.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-
   </div>
 
     </div>
@@ -4260,14 +4199,16 @@ values for each realization and perturbation:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientResults.function_key">function_key</span></code></td>
+            <td><code><span title="ropt.results.GradientResults.source_key">source_key</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Identifies the function evaluation this gradient
-                 was computed from.</p>
+                <p>The batch and function ID of a function evaluation
+                 whose values were used to construct this gradient.
+                 Usually, but not necessarily, that function was
+                 evaluated at the same point as the gradient.</p>
               </div>
             </td>
           </tr>
@@ -4383,6 +4324,90 @@ values for each realization and perturbation:</p>
 
 <div class="doc doc-children">
 
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.results.GradientResults.uses" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">uses</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">uses</span><span class="p">(</span><span class="n">function</span><span class="p">:</span> <span class="n">FunctionResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return whether this gradient was constructed from a function evaluation.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>function</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+   (ropt.results._function_results.FunctionResults)" href="#ropt.results.FunctionResults">FunctionResults</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function evaluation to check.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the batch and function ID of <code>function</code> match <code>source_key</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 

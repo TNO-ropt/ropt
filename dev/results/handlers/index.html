@@ -2651,10 +2651,18 @@ other. Take a <a class="autorefs autorefs-external" href="https://docs.python.or
 </ul>
 <p>The gradient computed at the result it keeps, if there is one, is read via
 <code>handler["gradient"]</code>. A gradient usually reaches the handler in a later
-evaluation than the result it belongs to, and is matched on the <code>function_key</code>
-they share. It is <code>None</code> while that gradient has not arrived, and stays <code>None</code>
-for a point where no gradient was computed — the best point of a run often is
-one.</p>
+evaluation than that result, and is attached to it only if both of these hold:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            uses" href="../../reference/results/#ropt.results.GradientResults.uses"><code>GradientResults.uses</code></a> returns <code>True</code>
+  for the result, meaning the gradient was constructed from its values;</li>
+<li>the gradient is at the same point as the result.</li>
+</ul>
+<p>In general the first does not imply the second. The
+<a href="../../optimizer_setup/gradients/">stochastic gradient</a> that <code>ropt</code> currently
+estimates is always at the point of the function evaluation it was constructed
+from, so for this gradient the second test always passes. <code>handler["gradient"]</code>
+is <code>None</code> while that gradient has not arrived, and stays <code>None</code> for a point
+where no gradient was computed — the best point of a run often is one.</p>
 <h3 id="historyhandler"><code>HistoryHandler</code></h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.HistoryHandler" href="../../reference/api/#ropt.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
 in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
