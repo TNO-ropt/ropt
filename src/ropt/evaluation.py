@@ -34,6 +34,8 @@ class EvaluationBatchContext:
         active:        Boolean array indicating which rows require evaluation.
         realizations:  Realization index for each row.
         perturbations: Perturbation index for each row (< 0 means unperturbed).
+        function_ids:  Function evaluation index for each row (< 0 means the row
+                       is not a function evaluation).
         batch_id:      Integer identifying the current evaluation batch.
         metadata:      The metadata the run was started with, if any.
     """
@@ -41,7 +43,8 @@ class EvaluationBatchContext:
     context: EnOptContext
     active: NDArray[np.bool_]
     realizations: NDArray[np.intc]
-    perturbations: NDArray[np.intc] | None = None
+    perturbations: NDArray[np.intc]
+    function_ids: NDArray[np.intc]
     batch_id: int = 0
     metadata: dict[str, Any] | None = None
 

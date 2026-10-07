@@ -53,8 +53,8 @@ def test_gradient_of_a_combined_batch_keys_the_function_beside_it(
     )
     assert isinstance(function, FunctionResults)
     assert isinstance(gradient, GradientResults)
-    assert gradient.function_key == function.function_key
-    assert gradient.function_key == (function.batch_id, 0)
+    assert gradient.uses(function)
+    assert gradient.source_key == (function.batch_id, 0)
 
 
 def test_gradient_of_a_cached_function_keys_the_earlier_batch(
@@ -71,12 +71,12 @@ def test_gradient_of_a_cached_function_keys_the_earlier_batch(
     gradient = gradients[0]
     assert isinstance(function, FunctionResults)
     assert isinstance(gradient, GradientResults)
-    assert gradient.function_key == function.function_key
+    assert gradient.uses(function)
     # The pairing is what the batch id cannot express here.
-    assert gradient.batch_id != gradient.function_key[0]
+    assert gradient.batch_id != gradient.source_key[0]
 
 
-def test_function_results_of_one_batch_have_distinct_keys(
+def test_function_results_of_one_batch_are_numbered_in_order(
     config: Any, evaluator: Any
 ) -> None:
     ensemble = _ensemble(config, evaluator)
@@ -87,13 +87,14 @@ def test_function_results_of_one_batch_have_distinct_keys(
     assert all(isinstance(item, FunctionResults) for item in results)
     functions = cast("tuple[FunctionResults, ...]", results)
     assert [item.function_id for item in functions] == [0, 1, 2]
-    assert len({item.function_key for item in functions}) == 3
 
 
-def _function_results(batch_id: int, objective: float) -> FunctionResults:
+def _function_results(
+    batch_id: int, objective: float, *, function_id: int = 0
+) -> FunctionResults:
     return FunctionResults(
         batch_id=batch_id,
-        function_id=0,
+        function_id=function_id,
         metadata={},
         names={},
         variables=np.zeros(1),
@@ -105,13 +106,15 @@ def _function_results(batch_id: int, objective: float) -> FunctionResults:
     )
 
 
-def _gradient_results(batch_id: int, function_key: tuple[int, int]) -> GradientResults:
+def _gradient_results(
+    batch_id: int, source: FunctionResults, *, point: float = 0.0
+) -> GradientResults:
     return GradientResults(
         batch_id=batch_id,
-        function_key=function_key,
+        source_key=(source.batch_id, source.function_id),
         metadata={},
         names={},
-        variables=np.zeros(1),
+        variables=np.full(1, point),
         perturbed_variables=np.zeros((1, 1, 1)),
         evaluations=GradientEvaluations.create(
             perturbed_objectives=np.zeros((1, 1, 1))
@@ -120,7 +123,7 @@ def _gradient_results(batch_id: int, function_key: tuple[int, int]) -> GradientR
         gradients=None,
         target_gradient=None,
         scaled=ScaledGradientResults(
-            variables=np.zeros(1), perturbed_variables=np.zeros((1, 1, 1))
+            variables=np.full(1, point), perturbed_variables=np.zeros((1, 1, 1))
         ),
     )
 
@@ -133,10 +136,19 @@ def _event(*results: Any) -> EnOptEvent:
     )
 
 
+def test_gradient_uses_requires_matching_batch_and_function_id() -> None:
+    gradient = _gradient_results(1, _function_results(batch_id=0, objective=1.0))
+    assert gradient.uses(_function_results(batch_id=0, objective=2.0))
+    assert not gradient.uses(_function_results(batch_id=2, objective=1.0))
+    assert not gradient.uses(
+        _function_results(batch_id=0, objective=1.0, function_id=1)
+    )
+
+
 def test_results_handler_keeps_a_gradient_arriving_in_a_later_event() -> None:
     handler = ResultsHandler()
     results = _function_results(batch_id=0, objective=2.0)
-    gradient = _gradient_results(batch_id=1, function_key=results.function_key)
+    gradient = _gradient_results(batch_id=1, source=results)
     handler.handle_event(_event(results))
     assert handler["gradient"] is None
     handler.handle_event(_event(gradient))
@@ -146,7 +158,7 @@ def test_results_handler_keeps_a_gradient_arriving_in_a_later_event() -> None:
 def test_results_handler_drops_the_gradient_when_the_best_changes() -> None:
     handler = ResultsHandler()
     first = _function_results(batch_id=0, objective=2.0)
-    handler.handle_event(_event(first, _gradient_results(1, first.function_key)))
+    handler.handle_event(_event(first, _gradient_results(1, first)))
     assert handler["gradient"] is not None
     better = _function_results(batch_id=2, objective=1.0)
     handler.handle_event(_event(better))
@@ -154,12 +166,24 @@ def test_results_handler_drops_the_gradient_when_the_best_changes() -> None:
     assert handler["gradient"] is None
 
 
+@pytest.mark.parametrize(("point", "attached"), [(1e-16, True), (1e-14, False)])
+def test_results_handler_attaches_a_gradient_only_at_the_same_point(
+    point: float, *, attached: bool
+) -> None:
+    handler = ResultsHandler()
+    results = _function_results(batch_id=0, objective=2.0)
+    gradient = _gradient_results(1, results, point=point)
+    assert gradient.uses(results)
+    handler.handle_event(_event(results, gradient))
+    assert (handler["gradient"] is gradient) is attached
+
+
 def test_results_handler_ignores_a_gradient_of_another_result() -> None:
     handler = ResultsHandler()
     best = _function_results(batch_id=0, objective=1.0)
     handler.handle_event(_event(best))
     worse = _function_results(batch_id=2, objective=3.0)
-    handler.handle_event(_event(worse, _gradient_results(3, worse.function_key)))
+    handler.handle_event(_event(worse, _gradient_results(3, worse)))
     assert handler["results"] is best
     assert handler["gradient"] is None
 
@@ -167,7 +191,7 @@ def test_results_handler_ignores_a_gradient_of_another_result() -> None:
 def test_results_handler_clearing_the_result_clears_the_gradient() -> None:
     handler = ResultsHandler()
     results = _function_results(batch_id=0, objective=2.0)
-    handler.handle_event(_event(results, _gradient_results(1, results.function_key)))
+    handler.handle_event(_event(results, _gradient_results(1, results)))
     assert handler["gradient"] is not None
     handler["results"] = None
     handler.handle_event(_event(_function_results(batch_id=2, objective=5.0)))
@@ -182,7 +206,7 @@ def test_optimize_returns_the_gradient_at_the_best_result(
     result = optimize(config, _INITIAL, test_functions[0])
     assert result.results is not None
     assert result.gradient is not None
-    assert result.gradient.function_key == result.results.function_key
+    assert result.gradient.uses(result.results)
 
 
 def test_report_receives_gradients_only_when_asked(

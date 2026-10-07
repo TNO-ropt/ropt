@@ -77,11 +77,7 @@ class _InitialValueFiller:
         self, variables: NDArray[np.float64], context: EvaluationBatchContext
     ) -> EvaluationBatchResult:
         realizations = context.realizations
-        perturbations = (
-            np.full(realizations.shape, -1, dtype=np.intc)
-            if context.perturbations is None
-            else context.perturbations
-        )
+        perturbations = context.perturbations
         unperturbed = perturbations < 0
         function_rows = self._function_rows(variables, realizations, unperturbed)
         gradient_rows = self._gradient_rows(realizations, perturbations, unperturbed)

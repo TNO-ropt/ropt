@@ -108,6 +108,10 @@ def _get_function_results(
     evaluator_context = EvaluationBatchContext(
         context=context,
         realizations=realizations,
+        perturbations=np.full(realizations.size, -1, dtype=np.intc),
+        function_ids=np.repeat(
+            np.arange(variables.shape[0], dtype=np.intc), realization_num
+        ),
         active=realizations_to_evaluate[realizations],
         metadata=metadata,
     )
@@ -158,6 +162,9 @@ def _get_gradient_results(
         context=context,
         realizations=realizations,
         perturbations=np.tile(np.arange(perturbation_num), realization_num),
+        # Perturbed rows evaluate no function: the point they perturb may have
+        # been evaluated in an earlier batch, or not at all.
+        function_ids=np.full(realizations.size, -1, dtype=np.intc),
         active=realizations_to_evaluate[realizations],
         metadata=metadata,
     )
@@ -203,6 +210,12 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
             (
                 np.full(realization_num, -1),
                 np.tile(np.arange(perturbation_num), realization_num),
+            )
+        ),
+        function_ids=np.hstack(
+            (
+                np.zeros(realization_num, dtype=np.intc),
+                np.full(realization_num * perturbation_num, -1, dtype=np.intc),
             )
         ),
         active=realizations_to_evaluate[realizations],

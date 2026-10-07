@@ -153,7 +153,7 @@ def _make_gradient_results(
     )
     return GradientResults(
         batch_id=0,
-        function_key=(0, 0),
+        source_key=(0, 0),
         metadata={},
         names={},
         variables=np.array([0.0, 0.0]),

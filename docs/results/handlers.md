@@ -113,10 +113,18 @@ The handlers below are exported from `ropt`, ready to use as they are.
 
 The gradient computed at the result it keeps, if there is one, is read via
 `handler["gradient"]`. A gradient usually reaches the handler in a later
-evaluation than the result it belongs to, and is matched on the `function_key`
-they share. It is `None` while that gradient has not arrived, and stays `None`
-for a point where no gradient was computed — the best point of a run often is
-one.
+evaluation than that result, and is attached to it only if both of these hold:
+
+- [`GradientResults.uses`][ropt.results.GradientResults.uses] returns `True`
+  for the result, meaning the gradient was constructed from its values;
+- the gradient is at the same point as the result.
+
+In general the first does not imply the second. The
+[stochastic gradient](../optimizer_setup/gradients.md) that `ropt` currently
+estimates is always at the point of the function evaluation it was constructed
+from, so for this gradient the second test always passes. `handler["gradient"]`
+is `None` while that gradient has not arrived, and stays `None` for a point
+where no gradient was computed — the best point of a run often is one.
 
 
 ### `HistoryHandler`

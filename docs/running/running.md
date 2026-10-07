@@ -55,13 +55,19 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
     - `context.realization` — the realization number, for a problem with an
       ensemble of realizations; `optimize` then minimizes the weighted average
       objective over all of them. See
-      [Ensemble-Based Optimization](../getting_started/ensemble.md). The field
-      you need most often.
+      [Ensemble-Based Optimization](../getting_started/ensemble.md).
+    - `context.perturbation` — the perturbation number, counted from 0, for an
+      evaluation at a perturbed point; `-1` for a function evaluation. `ropt`
+      evaluates perturbed points to estimate a
+      [gradient](../optimizer_setup/gradients.md).
+    - `context.function_id` — the function evaluation number within the batch,
+      counted from 0; `-1` for an evaluation at a perturbed point.
+    - `context.batch_id` — the batch number. `ropt` requests evaluations in
+      batches, and each batch in a program gets its own number.
+    - `context.row_idx` — the position of the evaluation within its batch,
+      counted from 0.
     - `context.metadata` — the `metadata` dict the run was started with, if
       any (see [Attaching metadata](#attaching-metadata)).
-    - `context.batch_id`, `context.eval_idx`, `context.perturbation` — identify
-      the evaluation batch, its row, and (for a gradient perturbation) which
-      one; rarely needed directly.
 
 The function returns the objective value(s), followed by any constraint values.
 There are three ways to return them:
@@ -148,10 +154,11 @@ def report(result):
 optimize(config, x0, objective, report=report, report_gradients=True)
 ```
 
-A [`GradientResults`][ropt.results.GradientResults] carries a `function_key`
-identifying the function evaluation it was computed from; the matching
-[`FunctionResults`][ropt.results.FunctionResults] has the same value in its own
-`function_key`.
+A [`GradientResults`][ropt.results.GradientResults] records the function
+evaluation whose values were used to compute it. Its
+[`uses`][ropt.results.GradientResults.uses] method takes a
+[`FunctionResults`][ropt.results.FunctionResults] and returns whether it is that
+evaluation.
 
 ### Stopping early from the callback
 

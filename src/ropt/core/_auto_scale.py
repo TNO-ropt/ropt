@@ -35,11 +35,7 @@ def set_auto_scales(
     # Perturbed values are spread around the point of interest, so the scale is
     # estimated from the unperturbed values. A gradient-only batch has none, and
     # then the perturbed values are all there is to go on.
-    rows = (
-        np.ones(evaluator_context.realizations.shape, dtype=np.bool_)
-        if evaluator_context.perturbations is None
-        else evaluator_context.perturbations < 0
-    )
+    rows = evaluator_context.perturbations < 0
     if not rows.any():
         rows = np.ones(evaluator_context.realizations.shape, dtype=np.bool_)
     # Rows that were not evaluated hold zeros rather than results.

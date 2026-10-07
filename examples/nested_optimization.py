@@ -139,9 +139,9 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         # A whole inner batch goes to one worker: the parallelism comes from the
         # outer runs.
         bundle_size=0,
-        # Within a batch only (batch_id, eval_idx) is unique: several rows share
+        # Within a batch only (batch_id, row_idx) is unique: several rows share
         # a realization, so realization alone would not identify the caller.
-        metadata={"outer_batch": context.batch_id, "outer_eval": context.eval_idx},
+        metadata={"outer_batch": context.batch_id, "outer_eval": context.row_idx},
     )
     if result.exit_code is ExitCode.TOO_FEW_REALIZATIONS:
         memo[key] = float("nan")

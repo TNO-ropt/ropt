@@ -1019,6 +1019,8 @@ def _eval_args() -> tuple[NDArray[np.float64], EvaluationBatchContext]:
             context=EnOptContext.model_validate({"variables": {"variable_count": 1}}),
             active=np.ones(1, dtype=np.bool_),
             realizations=np.zeros(1, dtype=np.intc),
+            perturbations=np.full(1, -1, dtype=np.intc),
+            function_ids=np.zeros(1, dtype=np.intc),
         ),
     )
 

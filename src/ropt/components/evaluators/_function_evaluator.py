@@ -82,7 +82,7 @@ class FunctionEvaluator(Evaluator):
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
         metadata: dict[str, dict[int, Any]] = {}
 
-        for eval_idx, function_context in _active_evaluations(
+        for row_idx, function_context in _active_evaluations(
             evaluator_context, batch_id
         ):
             # The rows run on this thread, so this is the only place the batch
@@ -90,8 +90,8 @@ class FunctionEvaluator(Evaluator):
             if self._abort_signal is not None and self._abort_signal.aborting:
                 raise OptimizerStop(self._abort_signal.exit_code)
             _scatter_result(
-                eval_idx,
-                self._function(variables[eval_idx, :], function_context),
+                row_idx,
+                self._function(variables[row_idx, :], function_context),
                 results,
                 metadata,
                 no,

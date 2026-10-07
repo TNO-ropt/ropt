@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ._function_results import FunctionResults
     from ._gradient_evaluations import GradientEvaluations
     from ._gradients import Gradients
     from ._realizations import Realizations
@@ -125,8 +126,10 @@ class GradientResults(Results):
             - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
     Attributes:
-        function_key:        Identifies the function evaluation this gradient
-                             was computed from.
+        source_key:          The batch and function ID of a function evaluation
+                             whose values were used to construct this gradient.
+                             Usually, but not necessarily, that function was
+                             evaluated at the same point as the gradient.
         variables:           The variable vector that was perturbed.
         perturbed_variables: The perturbed vectors that were evaluated.
         evaluations:         Per-perturbation values returned by the evaluator.
@@ -136,7 +139,7 @@ class GradientResults(Results):
         scaled:              The same quantities as the optimizer works with them.
     """
 
-    function_key: tuple[int, int]
+    source_key: tuple[int, int]
     variables: NDArray[np.float64] = field(
         metadata={"__axes__": (AxisName.VARIABLE,)},
     )
@@ -156,3 +159,14 @@ class GradientResults(Results):
         self.perturbed_variables = _immutable_copy(self.perturbed_variables)
         self.target_gradient = _immutable_copy(self.target_gradient)
         assert (self.target_gradient is None) == (self.gradients is None)
+
+    def uses(self, function: FunctionResults) -> bool:
+        """Return whether this gradient was constructed from a function evaluation.
+
+        Args:
+            function: The function evaluation to check.
+
+        Returns:
+            Whether the batch and function ID of `function` match `source_key`.
+        """
+        return self.source_key == (function.batch_id, function.function_id)

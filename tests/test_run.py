@@ -357,7 +357,7 @@ def test_report_callback_stops_only_own_run(
 def test_adapt_function_rejects_scalar_for_multiple_objectives() -> None:
     callback = adapt_function(lambda _v, _c: 1.0, n_obj=2, n_con=0)
     context = EvaluationFunctionContext(
-        realization=0, perturbation=-1, batch_id=0, eval_idx=0
+        realization=0, perturbation=-1, function_id=0, batch_id=0, row_idx=0
     )
     with pytest.raises(ValueError, match="scalar return value"):
         callback(np.zeros(2), context)
@@ -366,7 +366,7 @@ def test_adapt_function_rejects_scalar_for_multiple_objectives() -> None:
 def test_adapt_function_rejects_wrong_shape() -> None:
     callback = adapt_function(lambda _v, _c: [1.0, 2.0, 3.0], n_obj=1, n_con=1)
     context = EvaluationFunctionContext(
-        realization=0, perturbation=-1, batch_id=0, eval_idx=0
+        realization=0, perturbation=-1, function_id=0, batch_id=0, row_idx=0
     )
     with pytest.raises(ValueError, match=r"shape \(2,\)"):
         callback(np.zeros(2), context)
@@ -375,7 +375,7 @@ def test_adapt_function_rejects_wrong_shape() -> None:
 def test_adapt_function_splits_objectives_and_constraints() -> None:
     callback = adapt_function(lambda _v, _c: [1.0, 2.0, 3.0], n_obj=1, n_con=2)
     context = EvaluationFunctionContext(
-        realization=0, perturbation=-1, batch_id=0, eval_idx=0
+        realization=0, perturbation=-1, function_id=0, batch_id=0, row_idx=0
     )
     result = callback(np.zeros(2), context)
     assert np.array_equal(result.objectives, [1.0])
@@ -973,7 +973,7 @@ def _nested_run(
         variables,
         _pid_sphere,
         handlers=[history],
-        metadata={"outer": context.eval_idx},
+        metadata={"outer": context.row_idx},
     )
     assert result.results is not None
     assert result.results.target_objective is not None

@@ -111,17 +111,3 @@ class FunctionResults(Results):
         self.variables = _immutable_copy(self.variables)
         self.target_objective = _immutable_copy(self.target_objective)
         assert (self.target_objective is None) == (self.functions is None)
-
-    @property
-    def function_key(self) -> tuple[int, int]:
-        """Identify this function evaluation.
-
-        A `function_id` is unique within its batch only, so a function
-        evaluation is identified by its batch together with its index there.
-        A [`GradientResults`][ropt.results.GradientResults] carries the same
-        value in its own `function_key`, which is how the two are paired.
-
-        Returns:
-            The batch ID and the index within that batch.
-        """
-        return (self.batch_id, self.function_id)

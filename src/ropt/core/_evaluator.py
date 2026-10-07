@@ -365,7 +365,7 @@ class EnsembleEvaluator:
         results = (
             GradientResults(
                 batch_id=g_eval_results.batch_id,
-                function_key=cached_function.function_key,
+                source_key=(cached_function.batch_id, cached_function.function_id),
                 metadata={},
                 names=self._context.names,
                 variables=self._unscale_variables(variables),
@@ -515,7 +515,7 @@ class EnsembleEvaluator:
 
         gradient_results = GradientResults(
             batch_id=g_eval_results.batch_id,
-            function_key=function_results.function_key,
+            source_key=(function_results.batch_id, function_results.function_id),
             metadata={},
             names=self._context.names,
             variables=self._unscale_variables(variables),

@@ -198,6 +198,8 @@ def _estimate(
     active: NDArray[np.bool_] | None = None,
 ) -> None:
     rows = objectives.shape[0]
+    if perturbations is None:
+        perturbations = np.full(rows, -1, dtype=np.intc)
     set_auto_scales(
         context,
         EvaluationBatchContext(
@@ -205,6 +207,7 @@ def _estimate(
             active=np.ones(rows, dtype=np.bool_) if active is None else active,
             realizations=np.arange(rows, dtype=np.intc) % 2,
             perturbations=perturbations,
+            function_ids=np.where(perturbations < 0, 0, -1).astype(np.intc),
         ),
         EvaluationBatchResult(objectives=objectives, constraints=constraints),
     )

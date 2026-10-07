@@ -106,9 +106,9 @@ class ParallelEvaluator(Evaluator):
         values = self._executor.run(
             [
                 WorkItem(
-                    function=self._function, args=(variables[eval_idx, :], run_context)
+                    function=self._function, args=(variables[row_idx, :], run_context)
                 )
-                for eval_idx, run_context in active
+                for row_idx, run_context in active
             ],
             bundle_size=self._bundle_size,
             abort_signal=self._abort_signal,
@@ -119,8 +119,8 @@ class ParallelEvaluator(Evaluator):
             isinstance(value, WorkNotRun) for value in values
         ):
             raise OptimizerStop(self._abort_signal.exit_code)
-        for (eval_idx, _), value in zip(active, values, strict=True):
-            _handle_result(eval_idx, value, results, metadata, no)
+        for (row_idx, _), value in zip(active, values, strict=True):
+            _handle_result(row_idx, value, results, metadata, no)
 
         return EvaluationBatchResult(
             batch_id=batch_id,
@@ -131,7 +131,7 @@ class ParallelEvaluator(Evaluator):
 
 
 def _handle_result(
-    eval_idx: int,
+    row_idx: int,
     value: Any,  # ruff: ignore[any-type]
     results: NDArray[np.float64],
     metadata: dict[str, dict[int, Any]],
@@ -146,4 +146,4 @@ def _handle_result(
             f"objects, got {type(value).__name__}."
         )
         raise WorkflowError(msg)
-    _scatter_result(eval_idx, value, results, metadata, objective_count)
+    _scatter_result(row_idx, value, results, metadata, objective_count)

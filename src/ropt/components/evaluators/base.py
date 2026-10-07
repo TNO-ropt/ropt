@@ -104,15 +104,18 @@ class EvaluationFunctionContext:
     Attributes:
         realization:  The realization index.
         perturbation: The perturbation index (`-1` when unperturbed).
+        function_id:  The function evaluation index within the batch (`-1` when
+                      the row is not a function evaluation).
         batch_id:     Integer identifying the current evaluation batch.
-        eval_idx:     Row index within the batch.
+        row_idx:      Row index within the batch.
         metadata:     The metadata the run was started with, if any.
     """
 
     realization: int
     perturbation: int
+    function_id: int
     batch_id: int
-    eval_idx: int
+    row_idx: int
     metadata: dict[str, Any] | None = None
 
 

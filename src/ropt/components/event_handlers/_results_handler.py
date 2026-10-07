@@ -129,7 +129,8 @@ class ResultsHandler(EventHandler):
         for item in event.results:
             if (
                 isinstance(item, GradientResults)
-                and item.function_key == selected.function_key
+                and item.uses(selected)
+                and _at_same_point(item, selected)
             ):
                 self["gradient"] = item
                 return
@@ -143,6 +144,13 @@ class ResultsHandler(EventHandler):
             A set of event types that are handled.
         """
         return {EnOptEventType.FINISHED_EVALUATION}
+
+
+def _at_same_point(gradient: GradientResults, function: FunctionResults) -> bool:
+    # The test the evaluator applies when it reuses a function result for a gradient.
+    return np.allclose(
+        gradient.scaled.variables, function.scaled.variables, rtol=0.0, atol=1e-15
+    )
 
 
 def _violates_constraint(results: Results, tolerance: float | None) -> bool:

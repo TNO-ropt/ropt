@@ -30,44 +30,38 @@ def _active_evaluations(
 ) -> Iterator[tuple[int, EvaluationFunctionContext]]:
     # Yields only the rows that must be evaluated. Inactive rows keep their
     # index, so results still scatter back to the row they came from.
-    for eval_idx, realization in enumerate(evaluator_context.realizations):
+    for row_idx, realization in enumerate(evaluator_context.realizations):
         if (
             evaluator_context.active is not None
-            and not evaluator_context.active[eval_idx]
+            and not evaluator_context.active[row_idx]
         ):
             continue
-        # An unperturbed evaluation is marked with -1, so the function can tell
-        # it apart from perturbation 0.
-        perturbation = (
-            -1
-            if evaluator_context.perturbations is None
-            else int(evaluator_context.perturbations[eval_idx])
-        )
         yield (
-            eval_idx,
+            row_idx,
             EvaluationFunctionContext(
                 realization=int(realization),
-                perturbation=perturbation,
+                perturbation=int(evaluator_context.perturbations[row_idx]),
+                function_id=int(evaluator_context.function_ids[row_idx]),
                 batch_id=batch_id,
-                eval_idx=eval_idx,
+                row_idx=row_idx,
                 metadata=evaluator_context.metadata,
             ),
         )
 
 
 def _scatter_result(
-    eval_idx: int,
+    row_idx: int,
     result: EvaluationFunctionResult,
     results: NDArray[np.float64],
     metadata: dict[str, dict[int, Any]],
     objective_count: int,
 ) -> None:
-    results[eval_idx, :objective_count] = result.objectives
+    results[row_idx, :objective_count] = result.objectives
     if result.constraints is not None:
-        results[eval_idx, objective_count:] = result.constraints
+        results[row_idx, objective_count:] = result.constraints
     if result.metadata is not None:
         for key, value in result.metadata.items():
-            metadata.setdefault(key, {})[eval_idx] = value
+            metadata.setdefault(key, {})[row_idx] = value
 
 
 def _build_metadata(
