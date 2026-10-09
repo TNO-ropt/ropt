@@ -749,6 +749,9 @@ class EnsembleEvaluator:
 
         objectives = evaluator_results.objectives
         assert objectives is not None
+        if np.all(_get_failed_function_realizations(objectives)):
+            # Nothing to weight, and the evaluation's values do not depend on weights.
+            return None, None
         constraints = evaluator_results.constraints
 
         objective_filters = self._context.objectives.realization_filters

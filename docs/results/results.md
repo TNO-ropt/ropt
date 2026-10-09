@@ -69,9 +69,11 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
       evaluated.
     - `objective_weights`: per-realization objective weights, or `None` when no
       [realization filter](../optimizer_setup/realization_filters.md) is
-      configured. A filter may change them from one batch to the next.
+      configured or every realization failed. A filter may change them from one
+      batch to the next.
     - `constraint_weights`: per-realization constraint weights, or `None` unless
-      nonlinear constraints and a realization filter are both configured.
+      nonlinear constraints and a realization filter are both configured and at
+      least one realization succeeded.
 - **`constraint_info`** ([`ConstraintInfo`][ropt.results.ConstraintInfo]) —
   constraint bound information. Present when bounds or constraints are defined.
   Contains two kinds of data for each constraint type (bound, linear, and

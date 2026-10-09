@@ -193,6 +193,9 @@ def _get_cvar_weights_from_percentile(
     failed_realizations: NDArray[np.bool_],
     percentile: float,
 ) -> NDArray[np.float64]:
+    if np.all(failed_realizations):
+        return np.zeros(values.size)
+
     values = np.where(failed_realizations, np.nan, values)
 
     indices = np.argsort(values)

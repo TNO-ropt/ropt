@@ -52,10 +52,11 @@ class RealizationFilter(ABC):
     ) -> NDArray[np.float64]:
         """Compute one weight per realization from current evaluation results.
 
-        Called once per function evaluation, and only if at least one objective
-        or nonlinear constraint refers to this filter. The weights returned by
-        a single call are applied to all of them, and are reused for the
-        gradients derived from that evaluation.
+        Called once per function evaluation in which at least one realization
+        succeeded, and only if at least one objective or nonlinear constraint
+        refers to this filter. The weights returned by a single call are applied
+        to all of them, and are reused for the gradients derived from that
+        evaluation.
 
         `objectives` and `constraints` are two-dimensional arrays with one row
         per realization and one column per objective or per nonlinear

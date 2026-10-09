@@ -12,8 +12,10 @@ from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.components.event_handlers import CallbackHandler
 from ropt.config._realization_filter_config import RealizationFilterConfig
 from ropt.context import EnOptContext
-from ropt.enums import EnOptEventType
+from ropt.core import EnsembleEvaluator
+from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
+from ropt.exceptions import TooFewRealizations
 from ropt.realization_filter import RealizationFilter
 from ropt.realization_filter.default import (
     DefaultRealizationFilter,
@@ -635,3 +637,56 @@ def test_filter_receives_the_configured_objective_scales(
     assert all(
         np.allclose(scales, [2.0, 4.0]) for scales in realization_filter.received
     )
+
+
+@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
+def test_run_with_a_cvar_filter_ends_with_too_few_realizations_when_all_failed(
+    config: Any,
+    eval_func: Any,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
+) -> None:
+    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["realization_filters"] = [
+        {"method": "cvar-objective", "options": {"sort": [0], "percentile": 0.4}}
+    ]
+    config["objectives"]["realization_filters"] = [0, 0]
+    failing = [lambda _0, _1: np.nan, lambda _0, _1: np.nan]
+    result = optimize(config, initial_values, eval_func(failing))
+    assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+
+
+def test_realization_filter_is_skipped_when_every_realization_failed(
+    evaluator: Any,
+) -> None:
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 1},
+            "realizations": {"weights": [1.0, 1.0], "realization_min_success": 0},
+            "objectives": {"weights": [1.0], "realization_filters": [0]},
+            "realization_filters": [
+                {
+                    "method": "cvar-objective",
+                    "options": {"sort": [0], "percentile": 0.5},
+                }
+            ],
+        }
+    )
+    ensemble = EnsembleEvaluator(context, evaluator([lambda _0, _1: np.nan]).eval)
+    (results,) = ensemble.calculate(
+        np.zeros(1), compute_functions=True, compute_gradients=False
+    )
+    assert isinstance(results, FunctionResults)
+    assert results.realizations.objective_weights is None
+    # The same NaN as without a filter, since realization_min_success is zero.
+    assert results.target_objective is not None
+    assert np.isnan(results.target_objective)
+
+
+def test_cvar_filter_raises_too_few_realizations_when_all_failed() -> None:
+    realization_filter = DefaultRealizationFilter(
+        RealizationFilterConfig(
+            method="cvar-objective", options={"sort": [0], "percentile": 1 / 3}
+        )
+    )
+    with pytest.raises(TooFewRealizations):
+        _weights(realization_filter, _filter_context(), np.full((3, 1), np.nan))
