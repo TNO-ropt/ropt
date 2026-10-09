@@ -2571,7 +2571,8 @@ too tight is a common reason for an empty result — see
 <a href="../../troubleshooting/">Troubleshooting</a>.</p>
 <p>To watch feasibility as the run proceeds, read <code>constraint_info</code> from the result
 the <code>report</code> callback receives. Its <code>nonlinear_violation</code> is zero where a
-constraint is met and positive by the amount it is exceeded:</p>
+constraint is met, positive by the amount it is exceeded, and <code>NaN</code> where the
+constraint value is <code>NaN</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">FunctionResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""Print any constraint violation, and the point that caused it.</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>

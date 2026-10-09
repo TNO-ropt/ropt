@@ -2922,8 +2922,8 @@ objects, one per variable vector evaluated in that batch.</p>
   
       dataclass
   " href="../../reference/results/#ropt.results.Functions"><code>Functions</code></a>) — aggregated values
-  derived from the per-realization evaluations (or <code>None</code> if all realizations
-  failed):<ul>
+  derived from the per-realization evaluations (or <code>None</code> if too few
+  realizations succeeded):<ul>
 <li><code>objectives</code>: individual objective values.</li>
 <li><code>constraints</code>: individual constraint values (if configured).</li>
 </ul>
@@ -2959,10 +2959,10 @@ objects, one per variable vector evaluated in that batch.</p>
   bound. For lower bounds, a negative difference means the value is below
   the bound (violated). For upper bounds, a positive difference means the
   value is above the bound (violated).</li>
-<li><strong>Violations</strong>: the absolute magnitude of any bound exceedance, or zero
-  when the constraint is satisfied. For example, if a constraint requires
-  <span class="arithmatex">\(g(\mathbf{x}) \leq 0\)</span> and the actual value is <span class="arithmatex">\(0.5\)</span>, the violation is
-  <span class="arithmatex">\(0.5\)</span>.</li>
+<li><strong>Violations</strong>: the absolute magnitude of any bound exceedance, zero
+  when the constraint is satisfied, or <code>NaN</code> when the value is <code>NaN</code>. For
+  example, if a constraint requires <span class="arithmatex">\(g(\mathbf{x}) \leq 0\)</span> and the actual
+  value is <span class="arithmatex">\(0.5\)</span>, the violation is <span class="arithmatex">\(0.5\)</span>.</li>
 </ul>
 <p>See the <a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
 
@@ -3041,11 +3041,15 @@ arrays.</p>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span>       <span class="c1"># per-constraint values</span>
 </span></code></pre></div>
 <p>If <code>functions</code> is <code>None</code>, the result represents a request that produced no
-valid values (for example, all realizations failed). <code>target_objective</code> is
-<code>None</code> exactly then, so a single guard covers both:</p>
+valid values (for example, fewer realizations succeeded than
+<a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
+requires). <code>target_objective</code> is <code>None</code> exactly then, so a single guard covers
+both:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">functions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
 </span></code></pre></div>
+<p>With <code>realization_min_success</code> set to zero, <code>functions</code> is not <code>None</code> even when
+all realizations failed: its values and <code>target_objective</code> are <code>NaN</code>.</p>
 <h2 id="axes-and-dimensionality">Axes and dimensionality</h2>
 <p>Much of the data within result objects is multi-dimensional. For example, the
 <code>objectives</code> field within
