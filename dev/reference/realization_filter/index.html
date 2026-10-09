@@ -2814,10 +2814,11 @@ set if this class has one. See <a class="autorefs autorefs-internal" title="    
     <div class="doc doc-contents ">
 
         <p>Compute one weight per realization from current evaluation results.</p>
-<p>Called once per function evaluation, and only if at least one objective
-or nonlinear constraint refers to this filter. The weights returned by
-a single call are applied to all of them, and are reused for the
-gradients derived from that evaluation.</p>
+<p>Called once per function evaluation in which at least one realization
+succeeded, and only if at least one objective or nonlinear constraint
+refers to this filter. The weights returned by a single call are applied
+to all of them, and are reused for the gradients derived from that
+evaluation.</p>
 <p><code>objectives</code> and <code>constraints</code> are two-dimensional arrays with one row
 per realization and one column per objective or per nonlinear
 constraint, in the order in which they are configured:

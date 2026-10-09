@@ -2483,7 +2483,9 @@ filtered differently. This one optimizes the conditional expectation of the wors
 </span></code></pre></div>
 <p>Omit both fields to leave every realization at its configured weight. At each
 evaluation a filter returns per-realization weights that replace
-<code>realizations.weights</code> for that evaluation. See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
+<code>realizations.weights</code> for that evaluation. An evaluation in which every
+realization failed is not filtered, and gives the same result as without a
+filter. See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
 key</a> for the indexing
 pattern, and <a href="../configuration_sections/#realization-filters"><code>realization_filters</code></a>
 for the fields of a filter configuration.</p>
