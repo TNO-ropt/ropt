@@ -85,7 +85,9 @@ class ResultsHandler(EventHandler):
             item
             for item in event.results
             if isinstance(item, FunctionResults)
-            and item.functions is not None
+            and item.target_objective is not None
+            # With realization_min_success = 0, a failed evaluation has a NaN target.
+            and not np.isnan(item.target_objective)
             and (self._filter(item) if self._filter else True)
             and not _violates_constraint(item, self._constraint_tolerance)
         )

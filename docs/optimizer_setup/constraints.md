@@ -84,7 +84,8 @@ too tight is a common reason for an empty result — see
 
 To watch feasibility as the run proceeds, read `constraint_info` from the result
 the `report` callback receives. Its `nonlinear_violation` is zero where a
-constraint is met and positive by the amount it is exceeded:
+constraint is met, positive by the amount it is exceeded, and `NaN` where the
+constraint value is `NaN`:
 
 ```python
 --8<-- "examples/constrained.py:report"

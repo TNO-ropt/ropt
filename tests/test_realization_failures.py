@@ -1,15 +1,21 @@
-"""Tests for realization-failure detection in `ropt.core._evaluator`."""
+"""Tests for detecting failed realizations and reporting failed evaluations."""
 
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 
+from ropt.components.compute_steps import EvaluationStep
+from ropt.components.evaluators import EvaluationFunctionContext
+from ropt.components.event_handlers import ResultsHandler
+from ropt.context import EnOptContext
 from ropt.core._evaluator import (
     _get_failed_function_realizations,
     _get_failed_gradient_realizations,
 )
 from ropt.results import (
+    ConstraintInfo,
     FunctionEvaluations,
     FunctionResults,
     Functions,
@@ -170,3 +176,45 @@ def _make_gradient_results(
             gradients=None if failed else object(),  # type: ignore[arg-type]
         ),
     )
+
+
+def _square_failing_below_zero(
+    variables: NDArray[np.float64], _: EvaluationFunctionContext
+) -> float:
+    return np.nan if variables[0] < 0.0 else float(variables[0] ** 2)
+
+
+@pytest.mark.parametrize(("what", "target"), [("best", 1.0), ("last", 4.0)])
+def test_results_handler_skips_an_evaluation_where_all_realizations_failed(
+    evaluator: Any, what: Literal["best", "last"], target: float
+) -> None:
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 1},
+            "realizations": {"realization_min_success": 0},
+        }
+    )
+    handler = ResultsHandler(what=what)
+    step = EvaluationStep(evaluator=evaluator([_square_failing_below_zero]))
+    step.add_event_handler(handler)
+    step.run(context=context, variables=[[-1.0], [1.0], [2.0], [-1.0]])
+    assert handler.result is not None
+    assert handler.result.target_objective == target
+
+
+@pytest.mark.parametrize(
+    ("lower", "upper", "violation"),
+    [
+        pytest.param(np.nan, np.nan, np.nan, id="nan-value"),
+        pytest.param(np.nan, -np.inf, 0.0, id="infinite-value-at-infinite-bound"),
+        pytest.param(-1.5, -3.5, 1.5, id="value-below-lower-bound"),
+    ],
+)
+def test_constraint_info_violation_is_nan_only_for_a_nan_value(
+    lower: float, upper: float, violation: float
+) -> None:
+    info = ConstraintInfo(
+        nonlinear_lower=np.array([lower]), nonlinear_upper=np.array([upper])
+    )
+    assert info.nonlinear_violation is not None
+    assert np.array_equal(info.nonlinear_violation, [violation], equal_nan=True)

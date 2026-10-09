@@ -29,7 +29,7 @@ class ConstraintInfo(ResultField):
     - _Upper bounds:_ a positive difference means the value is above the bound
       (violated).
     - _Violations:_ the absolute value of the difference when a bound is
-      violated, zero otherwise.
+      violated, `NaN` when the value is `NaN`, and zero otherwise.
 
     See [Working with Results](../results/results.md) for usage details.
 
@@ -119,24 +119,15 @@ class ConstraintInfo(ResultField):
         self.nonlinear_upper = _immutable_copy(self.nonlinear_upper)
         if self.bound_lower is not None and self.bound_upper is not None:
             self.bound_violation = _immutable_copy(
-                np.maximum(
-                    np.where(self.bound_lower < 0.0, -self.bound_lower, 0.0),
-                    np.where(self.bound_upper > 0.0, self.bound_upper, 0.0),
-                )
+                _violation(self.bound_lower, self.bound_upper)
             )
         if self.linear_lower is not None and self.linear_upper is not None:
             self.linear_violation = _immutable_copy(
-                np.maximum(
-                    np.where(self.linear_lower < 0.0, -self.linear_lower, 0.0),
-                    np.where(self.linear_upper > 0.0, self.linear_upper, 0.0),
-                )
+                _violation(self.linear_lower, self.linear_upper)
             )
         if self.nonlinear_lower is not None and self.nonlinear_upper is not None:
             self.nonlinear_violation = _immutable_copy(
-                np.maximum(
-                    np.where(self.nonlinear_lower < 0.0, -self.nonlinear_lower, 0.0),
-                    np.where(self.nonlinear_upper > 0.0, self.nonlinear_upper, 0.0),
-                )
+                _violation(self.nonlinear_lower, self.nonlinear_upper)
             )
 
     @classmethod
@@ -250,3 +241,13 @@ class ConstraintInfo(ResultField):
             nonlinear_lower=nonlinear_lower,
             nonlinear_upper=nonlinear_upper,
         )
+
+
+def _violation(
+    lower: NDArray[np.float64], upper: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    violation = np.maximum(
+        np.where(lower < 0.0, -lower, 0.0), np.where(upper > 0.0, upper, 0.0)
+    )
+    # Only a NaN value makes both NaN; inf - inf at an infinite bound makes one.
+    return np.where(np.isnan(lower) & np.isnan(upper), np.nan, violation)

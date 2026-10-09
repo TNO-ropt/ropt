@@ -59,8 +59,8 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
       nonlinear constraints are configured).
     - `metadata`: optional dict of per-realization metadata arrays.
 - **`functions`** ([`Functions`][ropt.results.Functions]) — aggregated values
-  derived from the per-realization evaluations (or `None` if all realizations
-  failed):
+  derived from the per-realization evaluations (or `None` if too few
+  realizations succeeded):
     - `objectives`: individual objective values.
     - `constraints`: individual constraint values (if configured).
 - **`realizations`** ([`Realizations`][ropt.results.Realizations]) — ensemble
@@ -81,10 +81,10 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
       bound. For lower bounds, a negative difference means the value is below
       the bound (violated). For upper bounds, a positive difference means the
       value is above the bound (violated).
-    - **Violations**: the absolute magnitude of any bound exceedance, or zero
-      when the constraint is satisfied. For example, if a constraint requires
-      $g(\mathbf{x}) \leq 0$ and the actual value is $0.5$, the violation is
-      $0.5$.
+    - **Violations**: the absolute magnitude of any bound exceedance, zero
+      when the constraint is satisfied, or `NaN` when the value is `NaN`. For
+      example, if a constraint requires $g(\mathbf{x}) \leq 0$ and the actual
+      value is $0.5$, the violation is $0.5$.
 
     See the [`ConstraintInfo`][ropt.results.ConstraintInfo] reference for
     the full list of fields.
@@ -139,13 +139,18 @@ result.functions.constraints       # per-constraint values
 ```
 
 If `functions` is `None`, the result represents a request that produced no
-valid values (for example, all realizations failed). `target_objective` is
-`None` exactly then, so a single guard covers both:
+valid values (for example, fewer realizations succeeded than
+[`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
+requires). `target_objective` is `None` exactly then, so a single guard covers
+both:
 
 ```python
 if result.functions is not None:
     print(result.target_objective)
 ```
+
+With `realization_min_success` set to zero, `functions` is not `None` even when
+all realizations failed: its values and `target_objective` are `NaN`.
 
 ## Axes and dimensionality
 
