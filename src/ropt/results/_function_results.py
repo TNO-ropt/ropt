@@ -40,7 +40,7 @@ class ScaledFunctionResults(ResultField):
 
     Attributes:
         variables:       The variable vector the optimizer proposed.
-        functions:       Scaled aggregates, or `None` if all realizations failed.
+        functions:       Scaled aggregates, or `None` if too few realizations succeeded.
         constraint_info: Constraint differences in the optimizer's domain.
     """
 
@@ -90,7 +90,8 @@ class FunctionResults(Results):
         variables:        The variable vector that was evaluated.
         evaluations:      Per-realization values returned by the evaluator.
         realizations:     Realization activity and weights.
-        functions:        Aggregated function values, or `None` if all failed.
+        functions:        Aggregated function values, or `None` if too few
+                          realizations succeeded.
         target_objective: The value the optimizer minimizes, in its own domain.
         scaled:           The same quantities as the optimizer works with them.
         constraint_info:  Constraint differences and violations, if applicable.

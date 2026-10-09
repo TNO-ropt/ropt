@@ -10,6 +10,7 @@ from ropt.components.compute_steps import EvaluationStep
 from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
+from ropt.core import EnsembleEvaluator
 from ropt.core._evaluator import (
     _get_failed_function_realizations,
     _get_failed_gradient_realizations,
@@ -218,3 +219,27 @@ def test_constraint_info_violation_is_nan_only_for_a_nan_value(
     )
     assert info.nonlinear_violation is not None
     assert np.array_equal(info.nonlinear_violation, [violation], equal_nan=True)
+
+
+@pytest.mark.parametrize("merge_realizations", [False, True])
+def test_gradient_is_nan_when_every_realization_failed(
+    evaluator: Any, *, merge_realizations: bool
+) -> None:
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 2},
+            "realizations": {"weights": [1.0, 1.0], "realization_min_success": 0},
+            "nonlinear_constraints": {"lower_bounds": [0.0], "upper_bounds": [1.0]},
+            "gradient": {"merge_realizations": merge_realizations},
+        }
+    )
+    failing = evaluator([lambda _0, _1: np.nan], [lambda _0, _1: np.nan])
+    _, gradient = EnsembleEvaluator(context, failing.eval).calculate(
+        np.zeros(2), compute_functions=True, compute_gradients=True
+    )
+    assert isinstance(gradient, GradientResults)
+    assert gradient.target_gradient is not None
+    assert gradient.gradients is not None
+    assert gradient.gradients.constraints is not None
+    assert np.all(np.isnan(gradient.target_gradient))
+    assert np.all(np.isnan(gradient.gradients.constraints))

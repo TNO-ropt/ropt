@@ -161,6 +161,9 @@ def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments, too-many
     gradients = np.full(
         (functions.shape[-1], variables.shape[-1]), np.nan, dtype=np.float64
     )
+    # Possible with realization_min_success = 0; as for the functions, it is NaN.
+    if np.all(failed_realizations):
+        return gradients
     delta_variables = perturbed_variables - np.expand_dims(variables, axis=1)
     delta_functions = perturbed_functions - np.expand_dims(functions, axis=1)
 
