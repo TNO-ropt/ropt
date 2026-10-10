@@ -39,7 +39,8 @@ There are two independent levels of concurrency here:
   This is built into `optimize_many` and does not depend on the pool;
   the `limit` argument caps how many run at the same time.
 - **The function evaluations** inside those runs all happen on the one pool
-  the call was started on, and the pool determines how they are parallelized. With
+  that `optimize_many` was started on, and the pool determines how they are
+  parallelized. With
   `thread_pool(workers=1)` the runs still progress together, but their
   evaluations are executed one at a time. A larger pool —
   `thread_pool(workers=n)`, or a process, local or HPC pool — runs several
@@ -71,7 +72,7 @@ runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
     appends to a list, updates a counter, or writes a file needs a lock of its
     own. Give each run its own callback when they must stay apart, or pass a
     [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) in
-    `handlers=`, which takes a lock around every call for you.
+    `handlers=`, which takes a lock around every event it handles.
 
 !!! warning "A shared handler makes the runs wait for each other"
     That lock is not free. A run that emits a result waits until the handler
@@ -85,7 +86,8 @@ runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
     `optimize_many` needs no pool. Without one, the runs still execute
     concurrently, but each evaluates inside your own program, on its own driver
     thread — so your evaluation function is called by several threads at once
-    and must tolerate that. Give the call a pool when it must not be.
+    and must tolerate that. Start `optimize_many` on a pool when it must not
+    be.
 
 !!! warning "Not every backend can take part"
     An optimizer that needs a working directory of its own, writes to a file
@@ -111,15 +113,15 @@ had reached. A run still queued behind `limit` is cut off before its first
 evaluation, and reports `ABORTED_ON_ERROR` with no result at all. Nothing is
 built for such a run, so an invalid configuration in one is never reported.
 
-A call that fails before it creates any run stops them too. `optimize_many`
-broadcasts its arguments first, so lists whose lengths disagree raise
-`ValueError`; `evaluate` and `evaluate_batch` raise on a vector of the wrong
-shape. Each aborts the other runs on the session before raising.
+Arguments that are rejected before any run is created stop them too.
+`optimize_many` broadcasts its arguments first, so lists whose lengths disagree
+raise `ValueError`; `evaluate` and `evaluate_batch` raise on a vector of the
+wrong shape. Each aborts the other runs on the session before raising.
 `RunsFailedError` is not raised in those cases, since no run exists to carry an
-outcome. A closed session is not a failure: the call is refused and nothing is
-aborted.
+outcome. A closed session is not a failure: the method raises
+[`WorkflowError`][ropt.exceptions.WorkflowError] and nothing is aborted.
 
-The call then raises
+`optimize_many` then raises
 [`RunsFailedError`][ropt.exceptions.RunsFailedError]. With several runs there is
 no single exception to re-raise and no single set of results to return, so the
 error carries both. `outcomes` has one entry per run, in the order the runs were
@@ -150,11 +152,11 @@ interrupt also aborts the runs that are still going and waits for them, so they
 end at their next evaluation boundary rather than continuing in the background;
 a second interrupt abandons them.
 
-A failure reaches every run on the session, not only those of the call, so it
-also aborts runs that were
+A failure reaches every run on the session, not only those started by the same
+`optimize_many`, so it also aborts runs that were
 started separately on the same session. A run started with the module-level
 [`optimize_many`][ropt.optimize_many] has a session of its own, holding
-only the runs of that call. A failure never reaches the runs of another session.
+only the runs it starts. A failure never reaches the runs of another session.
 
 Started from inside another run, from an evaluation function for instance,
 `optimize_many` is nested in that run. A failure then stops only the runs that

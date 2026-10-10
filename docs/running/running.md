@@ -220,7 +220,7 @@ An abort applies no criterion: the result is whatever the run had reached.
 A run is cut off at its next evaluation boundary, so the evaluations already in
 flight are still carried out and their workers are free only once they return.
 
-`abort()` reaches the runs that are under way at the moment of the call, and
+`abort()` reaches the runs that are under way at the moment it is called, and
 nothing more. A run started afterwards is unaffected, so a
 loop that abandons one attempt and starts another keeps working. An
 [`optimize_many`][ropt.Session.optimize_many] counts as one run here: a
@@ -344,10 +344,10 @@ What *is* raised falls into three groups:
 - **Mistakes in the configuration** surface as a `pydantic.ValidationError`
   from the `config` dictionary: an unknown field, a value of the wrong type, a
   method name no installed plugin provides, or a set of options the chosen
-  method does not accept. These are raised at the start of the call, before
+  method does not accept. These are raised when the run starts, before
   anything is evaluated.
 
-- **Mistakes in the call itself** raise a `ValueError` — a start point of the
+- **Mistakes in the call to `optimize` itself** raise a `ValueError` — a start point of the
   wrong shape, an evaluation function returning the wrong number of values —
   or one of the [`RoptError`][ropt.exceptions.RoptError] types:
   [`WorkflowError`][ropt.exceptions.WorkflowError] when a pool or handler
@@ -359,17 +359,17 @@ What *is* raised falls into three groups:
   as configured — a constraint it does not support, for instance, which is
   checked as the run starts — and
   [`ExecutionError`][ropt.exceptions.ExecutionError] when the worker pool
-  that runs your evaluations, or a call handed to
+  that runs your evaluations, or a callable handed to
   [`WorkerPool.offload`][ropt.WorkerPool.offload], cannot start or breaks
   down, and [`AbortedError`][ropt.exceptions.AbortedError] when an abort
-  abandoned an offloaded call.
+  abandoned an offloaded callable.
 
 - **Exceptions from your own evaluation function** are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process
   — and are re-raised from the `optimize` call. Return `float("nan")` instead
   if a failed realization should be tolerated rather than fatal. With
   [`optimize_many`][ropt.optimize_many] there is no single exception to
-  re-raise, so the call raises
+  re-raise, so `optimize_many` raises
   [`RunsFailedError`][ropt.exceptions.RunsFailedError] carrying what every run
   raised or reached; see
   [Failure in one run](many_runs.md#failure-in-one-run).

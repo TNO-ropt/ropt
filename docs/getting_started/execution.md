@@ -2,7 +2,7 @@
 
 An optimization calls your evaluation function many times. By default these calls
 happen one after another, on the same thread that called
-[`optimize`][ropt.optimize]. If each call is slow, you can run several at
+[`optimize`][ropt.optimize]. If each evaluation is slow, you can run several at
 the same time by evaluating on a **pool**.
 
 Open a [`session`][ropt.session], build a pool on it, and start the run

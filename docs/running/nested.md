@@ -223,8 +223,8 @@ outer evaluations that were computed, not for every outer evaluation.
 
 The inner runs are concurrent, and [one
 handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) collects them
-all: it takes a lock around every call, so the runs wait for each other rather
-than interleaving. Give every inner run the same
+all: it takes a lock around every event it handles, so the runs wait for each
+other rather than interleaving. Give every inner run the same
 [`DataFrameHandler`](../results/handlers.md#dataframehandler) and every inner evaluation
 from every inner run lands in one table, keyed by the outer evaluation it
 belongs to.

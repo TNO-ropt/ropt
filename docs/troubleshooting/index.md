@@ -143,7 +143,7 @@ the loop or function that uses it rather than around the whole program; see
 ## Running many at once
 
 **`optimize_many` really does run everything at once.** A handler given to all
-the runs takes a lock around every call, so it collects them safely, but a
+the runs takes a lock around every event it handles, so it collects them safely, but a
 single `report=` callback does not: it is called by several threads at the same
 time. Keep such a callback free of shared state, or give each run its own.
 

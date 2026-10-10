@@ -298,7 +298,8 @@ them apart. What differs is whether a process is a *worker* or a *job*:
 | Sending the objective | your script is re-imported, so a function defined in it can be found by name | a fresh command; needs an importable module or `ropt[cloudpickle]` |
 | Platform | anywhere | POSIX only |
 
-One question separates them: **is an evaluation a function call, or a job?** A call
+One question separates them: **is an evaluation a function call, or a job?** A
+function call
 is too short to pay for a process each time, so reuse a few workers and take a
 process pool. A job runs a simulator, writes files, and lasts long enough
 that one process start is negligible — take a local pool, or an HPC pool if it
@@ -544,7 +545,7 @@ you control — a custom handler, a custom component, or a helper you call betwe
 optimizations — has an expensive, self-contained piece of work you want to run
 on a pool instead of inline.
 
-Pass a single callable to run one call and get its result back:
+Pass a single callable to run it once and get its result back:
 
 ```python
 from functools import partial
@@ -577,8 +578,8 @@ run, from its evaluation function or a handler, is nested in that run: it is
 stopped with the run, and when it raises, only the code that started it receives
 the exception. See [When an inner run fails](nested.md#when-an-inner-run-fails).
 `offload` returns whatever its
-callables return and so has nowhere to report a reason: a call that was
-abandoned raises [`AbortedError`][ropt.exceptions.AbortedError], whose
+callables return and so has nowhere to report a reason: an `offload` whose
+callables were abandoned raises [`AbortedError`][ropt.exceptions.AbortedError], whose
 `exit_code` distinguishes an abort that was asked for from one another run
 caused, and reports `EXECUTOR_SHUT_DOWN` when the pool could no longer run the
 work. Calls already on a worker run to their end, so an abort that costs the
@@ -589,8 +590,8 @@ batch nothing lets it return its results.
     local, or HPC pool that is somewhere else. It may create handlers and
     pools of its own, but they are *its* handlers and *its* pools.
 
-    - **Results cannot be tracked across offloaded calls.** A handler created
-      inside one sees only that call's results and cannot be brought back:
+    - **Results cannot be tracked across offloaded callables.** A handler
+      created inside one sees only that callable's results and cannot be brought back:
       handlers cannot be moved between processes, so the return value is all
       that comes back. Following several concurrent pieces of work in one place
       is something [`optimize_many`](many_runs.md) can do and

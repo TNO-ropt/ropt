@@ -93,8 +93,8 @@ results rather than just look at them — or to collect them across several runs
 
 ## 5. Run it
 
-The call is the same as for a deterministic problem, with `INITIAL_VALUES` the
-start point defined above:
+The call to `optimize` is the same as for a deterministic problem, with
+`INITIAL_VALUES` the start point defined above:
 
 ```python
 --8<-- "examples/ensemble.py:run"
