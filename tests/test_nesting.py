@@ -16,15 +16,21 @@ import numpy as np
 import pytest
 
 from ropt import session
+from ropt.components.concurrency import parent_signal
 from ropt.enums import ExitCode
-from ropt.exceptions import AbortedError
+from ropt.exceptions import AbortedError, RunsFailedError
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
     from numpy.typing import NDArray
 
-    from ropt import EvaluationFunctionContext, Session, WorkerPool
+    from ropt import (
+        EvaluationFunctionContext,
+        OptimizationResult,
+        Session,
+        WorkerPool,
+    )
     from ropt.results import FunctionResults
 
 _INITIAL = np.array([0.0, 0.0, 0.1])
@@ -79,6 +85,14 @@ def _evaluate_batch_wrong_shape(opened: Session, _inner: WorkerPool) -> None:
     opened.evaluate_batch(_CONFIG, _INITIAL, _sphere)
 
 
+def _optimize_many(opened: Session, _inner: WorkerPool) -> None:
+    opened.optimize_many(_CONFIG, np.tile(_INITIAL, (2, 1)), _boom)
+
+
+def _optimize_many_mismatched(opened: Session, _inner: WorkerPool) -> None:
+    opened.optimize_many(_CONFIG, np.tile(_INITIAL, (2, 1)), [_sphere] * 3)
+
+
 @pytest.mark.parametrize(
     "fails",
     [
@@ -90,6 +104,8 @@ def _evaluate_batch_wrong_shape(opened: Session, _inner: WorkerPool) -> None:
         pytest.param(_evaluate_wrong_shape, id="evaluate_wrong_shape"),
         pytest.param(_evaluate_batch, id="evaluate_batch"),
         pytest.param(_evaluate_batch_wrong_shape, id="evaluate_batch_wrong_shape"),
+        pytest.param(_optimize_many, id="optimize_many"),
+        pytest.param(_optimize_many_mismatched, id="optimize_many_mismatched"),
     ],
 )
 @pytest.mark.timeout(60)
@@ -108,7 +124,7 @@ def test_caught_nested_failure_does_not_stop_the_run(
         ) -> float:
             try:
                 fails(opened, inner)
-            except ValueError as exc:
+            except (ValueError, RunsFailedError) as exc:
                 with lock:
                     caught.append(type(exc))
             return _sphere(variables, context)
@@ -207,6 +223,87 @@ def test_failing_nested_offload_cuts_off_what_is_nested_in_it() -> None:
 
     assert result.exit_code == ExitCode.FINISHED
     assert outcomes == [ExitCode.ABORTED_ON_ERROR]
+
+
+def _waits_until_cut_off(
+    variables: NDArray[np.float64], context: EvaluationFunctionContext
+) -> float:
+    # Evaluated in-process, so the parent signal here is the signal of this run.
+    signal = parent_signal()
+    assert signal is not None
+    cut_off = threading.Event()
+    signal.add_callback(cut_off.set)
+    assert cut_off.wait(timeout=30)
+    return _sphere(variables, context)
+
+
+@pytest.mark.timeout(60)
+def test_failing_run_of_a_nested_optimize_many_cuts_off_only_the_runs_of_that_call() -> (
+    None
+):
+    outcomes: list[tuple[OptimizationResult | Exception, ...]] = []
+
+    with session() as opened:
+        outer = opened.thread_pool(workers=1)
+
+        def objective(
+            variables: NDArray[np.float64], context: EvaluationFunctionContext
+        ) -> float:
+            try:
+                opened.optimize_many(
+                    _CONFIG, np.tile(_INITIAL, (2, 1)), [_boom, _waits_until_cut_off]
+                )
+            except RunsFailedError as exc:
+                outcomes.append(exc.outcomes)
+            return _sphere(variables, context)
+
+        result = outer.optimize(_CONFIG, _INITIAL, objective)
+
+    assert result.exit_code == ExitCode.FINISHED
+    assert outcomes
+    for failed, cut_off in outcomes:
+        assert isinstance(failed, ValueError)
+        assert not isinstance(cut_off, Exception)
+        assert cut_off.exit_code == ExitCode.ABORTED_ON_ERROR
+
+
+@pytest.mark.timeout(60)
+def test_nested_optimize_many_is_cut_off_with_its_parent() -> None:
+    # The offload it is nested in has failed before the call starts, so its runs
+    # are cut off at once instead of running.
+    failed = threading.Event()
+    done = threading.Event()
+    exit_codes: list[ExitCode] = []
+
+    with session() as opened:
+        outer = opened.thread_pool(workers=1)
+        middle = opened.thread_pool(workers=2)
+
+        def _optimizes_after_the_failure() -> None:
+            try:
+                assert failed.wait(timeout=30)
+                results = opened.optimize_many(
+                    _CONFIG, np.tile(_INITIAL, (2, 1)), _sphere
+                )
+                exit_codes.extend(result.exit_code for result in results)
+            finally:
+                done.set()
+
+        work: list[Callable[[], object]] = [_optimizes_after_the_failure, _boom]
+
+        def objective(
+            variables: NDArray[np.float64], context: EvaluationFunctionContext
+        ) -> float:
+            with contextlib.suppress(ValueError):
+                middle.offload(work)
+            failed.set()
+            return _sphere(variables, context)
+
+        result = outer.evaluate(_CONFIG, _INITIAL, objective)
+        assert done.wait(timeout=30)
+
+    assert result.exit_code == ExitCode.FINISHED
+    assert exit_codes == [ExitCode.ABORTED_ON_ERROR] * 2
 
 
 def _start_plain(target: Callable[[], None]) -> threading.Thread:

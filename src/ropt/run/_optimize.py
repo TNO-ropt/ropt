@@ -11,6 +11,7 @@ sharing one executor, whose workers are spread over the runs.
 
 from __future__ import annotations
 
+from contextvars import copy_context
 from functools import partial
 from typing import TYPE_CHECKING, cast
 
@@ -91,8 +92,6 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         return OptimizationResult(
             exit_code=optimize_many_signal.exit_code, results=None
         )
-    # A run of `optimize_many` runs on a thread of its own, so its failure stops
-    # the session.
     failure_stops_session = parent_signal() is None
     signal = AbortSignal()
     try:
@@ -111,6 +110,9 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         )
     except Exception:
         # No abort can reach a run being built, so this needs no exemption.
+        if optimize_many_signal is not None:
+            # Stops the other runs of the same `optimize_many` call.
+            optimize_many_signal.abort(ExitCode.ABORTED_ON_ERROR)
         if failure_stops_session:
             session._fail()  # ruff: ignore[private-member-access]
         raise
@@ -132,6 +134,9 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         if not signal.aborting:
             # Stops the runs and offloads started from this run's code.
             signal.abort(ExitCode.ABORTED_ON_ERROR)
+            if optimize_many_signal is not None:
+                # Stops the other runs of the same `optimize_many` call.
+                optimize_many_signal.abort(ExitCode.ABORTED_ON_ERROR)
             if failure_stops_session:
                 session._fail()  # ruff: ignore[private-member-access]
         raise
@@ -167,6 +172,7 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     # Refused here rather than per run: a closed session makes the call invalid,
     # and leaving it to the runs would report it as every one of them failing.
     session._require_open()  # ruff: ignore[private-member-access]
+    parent = parent_signal()
     try:
         runs, reports, metadatas, bundle_sizes, f0s, g0s = broadcast_arguments(
             config,
@@ -179,9 +185,10 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
             g0=g0,
         )
     except Exception:
-        # Arguments that do not agree are a failed call, and stop the rest of
-        # the session as a failed run does.
-        session._fail()  # ruff: ignore[private-member-access]
+        # Arguments that do not agree fail the call before any run starts.
+        failure_stops_session = parent is None
+        if failure_stops_session:
+            session._fail()  # ruff: ignore[private-member-access]
         raise
     # One signal for the whole call, so an abort or a failure also reaches the
     # runs that have not started yet.
@@ -214,10 +221,14 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
             run_g0,
         ) in zip(runs, reports, metadatas, bundle_sizes, f0s, g0s, strict=True)
     ]
+    # Each run starts in a copy of the caller's context, so it has the same
+    # parent signal as the call itself.
+    jobs = [partial(copy_context().run, job) for job in jobs]
     # Dedicated threads, not a shared thread pool: each run blocks its thread
     # while waiting for evaluations that would queue behind it in such a pool.
     try:
-        outcomes = run_concurrent(jobs, limit, interrupt=optimize_many_signal.abort)
+        with optimize_many_signal.aborts_with(parent):
+            outcomes = run_concurrent(jobs, limit, interrupt=optimize_many_signal.abort)
     finally:
         session._deregister(optimize_many_signal)  # ruff: ignore[private-member-access]
     for outcome in outcomes:

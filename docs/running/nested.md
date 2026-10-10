@@ -99,14 +99,14 @@ to it.
 ## When an inner run fails { #when-an-inner-run-fails }
 
 A run started from inside another run is **nested** in it, and the outer run is
-its **parent**. That covers a run started with `optimize`, `evaluate` or
-`evaluate_batch`, and an [`offload`][ropt.WorkerPool.offload], when the
-start is made in the same process from an evaluation function, an event handler,
-a report callback, or a function that an `offload` runs.
+its **parent**. That covers a run started with `optimize`, `optimize_many`,
+`evaluate` or `evaluate_batch`, and an [`offload`][ropt.WorkerPool.offload],
+when the start is made in the same process from an evaluation function, an event
+handler, a report callback, or a function that an `offload` runs.
 
-A nested run that raises stops nothing else. Its exception is raised in the
-code that started it, here the outer evaluation function, which can catch it
-and return `NaN` for that realization:
+A nested run that raises does not stop the other runs of the session. Its
+exception is raised in the code that started it, here the outer evaluation
+function, which can catch it and return `NaN` for that realization:
 
 ```python
 try:
@@ -124,6 +124,11 @@ A nested run is stopped when its parent is, whether by
 [`Session.abort`](running.md#stopping-from-outside), a closing session, or a
 failure. When a nested run raises, the runs and offloads started from its own
 code are stopped.
+
+The runs started by one nested `optimize_many` stop each other: when one of them
+raises, the others end with `ABORTED_ON_ERROR`, and
+[`RunsFailedError`][ropt.exceptions.RunsFailedError] is raised in the code that
+started them.
 
 An inner `offload` raises [`AbortedError`][ropt.exceptions.AbortedError] when
 it is cut off or its pool can no longer run the work. Returning `NaN` for that

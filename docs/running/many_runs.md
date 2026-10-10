@@ -156,6 +156,12 @@ started separately on the same session. A run started with the module-level
 [`optimize_many`][ropt.optimize_many] has a session of its own, holding
 only the runs of that call. A failure never reaches the runs of another session.
 
+Started from inside another run, from an evaluation function for instance,
+`optimize_many` is nested in that run. A failure then stops only the runs that
+this `optimize_many` started, arguments that do not agree stop nothing, and
+`RunsFailedError` is raised in the code that started it. See
+[When an inner run fails](nested.md#when-an-inner-run-fails).
+
 [`Session.abort`](running.md#stopping-from-outside) also reaches every run on
 the session, and those runs end with `USER_ABORT` instead, so the exit code
 distinguishes an abort that was asked for from one that a failing run caused.
