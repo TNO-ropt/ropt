@@ -1347,8 +1347,8 @@ def test_optimize_many_without_a_pool(config: Any, test_functions: Any) -> None:
 def test_optimize_many_carries_the_outcome_of_every_run_when_one_fails(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
-    # The runs that did not fail were cut off by the one that did, so what they
-    # reached is only reachable through the carrier.
+    # The runs that did not fail were aborted when the other one did, so what
+    # they reached is only reachable through the carrier.
     def boom(_v: Any, _c: Any) -> float:
         msg = "boom"
         raise ValueError(msg)
@@ -1373,7 +1373,7 @@ def test_optimize_many_carries_the_outcome_of_every_run_when_one_fails(
 
 
 @pytest.mark.timeout(60)
-def test_optimize_many_cuts_off_queued_runs_when_one_fails(
+def test_optimize_many_aborts_queued_runs_when_one_fails(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
     calls = 0
@@ -1403,7 +1403,7 @@ def test_optimize_many_cuts_off_queued_runs_when_one_fails(
 
 
 @pytest.mark.timeout(60)
-def test_optimize_many_cuts_off_a_queued_run_before_validating_its_config(
+def test_optimize_many_aborts_a_queued_run_before_validating_its_config(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
     def boom(_v: Any, _c: Any) -> float:
@@ -1426,7 +1426,7 @@ def test_optimize_many_cuts_off_a_queued_run_before_validating_its_config(
 
 
 @pytest.mark.timeout(60)
-def test_optimize_many_cuts_off_queued_runs_when_one_cannot_be_built(
+def test_optimize_many_aborts_queued_runs_when_one_cannot_be_built(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     calls = 0

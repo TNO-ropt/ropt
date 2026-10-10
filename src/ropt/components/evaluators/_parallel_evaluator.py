@@ -53,7 +53,7 @@ class ParallelEvaluator(Evaluator):
             executor:          The executor to dispatch evaluations to.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
             bundle_size:       Evaluations per worker task, `None` for the executor's own.
-            abort_signal:      An optional signal that abandons a running batch.
+            abort_signal:      An optional signal that aborts a running batch.
         """
         super().__init__()
         self._function = function
@@ -86,7 +86,7 @@ class ParallelEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            OptimizerStop: If the stop signal abandoned the batch.
+            OptimizerStop: If the abort signal aborted the batch.
         """
         batch_id = self._batch_id_callback()
 
@@ -113,7 +113,7 @@ class ParallelEvaluator(Evaluator):
             bundle_size=self._bundle_size,
             abort_signal=self._abort_signal,
         )
-        # Work is only left unrun when the signal abandoned the batch, so the
+        # A `WorkNotRun` only appears when the signal aborted the batch, so the
         # rows that did come back describe a batch nobody is waiting for.
         if self._abort_signal is not None and any(
             isinstance(value, WorkNotRun) for value in values

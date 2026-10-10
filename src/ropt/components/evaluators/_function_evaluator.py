@@ -47,7 +47,7 @@ class FunctionEvaluator(Evaluator):
         Args:
             function:          The function used for objectives and constraints.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
-            abort_signal:      An optional signal that abandons a running batch.
+            abort_signal:      An optional signal that aborts a running batch.
         """
         super().__init__()
         self._function = function
@@ -70,7 +70,7 @@ class FunctionEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            OptimizerStop: If the abort signal abandoned the batch.
+            OptimizerStop: If the abort signal aborted the batch.
         """
         batch_id = self._batch_id_callback()
         no = evaluator_context.context.objectives.weights.size
@@ -86,7 +86,7 @@ class FunctionEvaluator(Evaluator):
             evaluator_context, batch_id
         ):
             # The rows run on this thread, so this is the only place the batch
-            # can be abandoned part way.
+            # can be aborted part way.
             if self._abort_signal is not None and self._abort_signal.aborting:
                 raise OptimizerStop(self._abort_signal.exit_code)
             _scatter_result(

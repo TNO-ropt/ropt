@@ -199,7 +199,7 @@ it had reached.
 
 The `report` callback runs inside the run it stops, which is no use to a signal
 handler or a user interface. [`Session.abort`][ropt.Session.abort] is
-the one that is called from another thread: it cuts off every run that belongs
+the one that is called from another thread: it aborts every run that belongs
 to the session, and each ends with `USER_ABORT`, keeping the best result it had
 reached.
 
@@ -210,24 +210,25 @@ with session() as s:
     result = pool.optimize(config, x0, objective)
 
 if result.exit_code is ExitCode.USER_ABORT:
-    print("cut off early, best so far:", result.results)
+    print("aborted early, best so far:", result.results)
 ```
 
 The two are not the same kind of ending, which is why they have different exit
 codes. A `report` callback stops the run *on a criterion*, at a point it chose.
 An abort applies no criterion: the result is whatever the run had reached.
 
-A run is cut off at its next evaluation boundary, so the evaluations already in
-flight are still carried out and their workers are free only once they return.
+An aborted run ends at its next evaluation boundary, so the evaluations already
+in flight are still carried out and their workers are free only once they
+return.
 
 `abort()` reaches the runs that are under way at the moment it is called, and
 nothing more. A run started afterwards is unaffected, so a
 loop that abandons one attempt and starts another keeps working. An
 [`optimize_many`][ropt.Session.optimize_many] counts as one run here: a
-run it has queued behind its `limit` is cut off as well, and reports `USER_ABORT`
+run it has queued behind its `limit` is aborted as well, and reports `USER_ABORT`
 without evaluating anything. Leaving the session's `with` block aborts its runs
 as well, and then releases its pools, which is what refuses a run started after
-that. A run cut off that way reports `ABORTED` rather than `USER_ABORT`, since
+that. A run aborted that way reports `ABORTED` rather than `USER_ABORT`, since
 it was the block ending rather than a request to stop.
 
 A run started with the module-level [`optimize`][ropt.optimize] belongs
@@ -300,8 +301,8 @@ from ropt import evaluate, evaluate_batch
 single = evaluate(config, x, objective)
 batch = evaluate_batch(config, matrix, objective)
 
-single.results  # one FunctionResults, or None if the evaluation was cut off
-batch.results   # one per row of the matrix, empty if the batch was cut off
+single.results  # one FunctionResults, or None if the evaluation was aborted
+batch.results   # one per row of the matrix, empty if the batch was aborted
 ```
 
 Both return an [`EvaluationResult`][ropt.EvaluationResult], shaped like
@@ -316,7 +317,7 @@ receives, so everything is read the same way wherever it came from. Here
 An evaluation is a single batch, so it produces either every result or none.
 That is why `exit_code` can only be `FINISHED`; `USER_ABORT` or
 `ABORTED_ON_ERROR` when [`Session.abort`](#stopping-from-outside) or a failing
-run on the same session cut it off; or `EXECUTOR_SHUT_DOWN` when the pool it was
+run on the same session aborted it; or `EXECUTOR_SHUT_DOWN` when the pool it was
 evaluating on could no longer run the work. An abort that arrives after the
 batch has finished leaves it unaffected, and the evaluation reports `FINISHED`.
 
@@ -362,7 +363,7 @@ What *is* raised falls into three groups:
   that runs your evaluations, or a callable handed to
   [`WorkerPool.offload`][ropt.WorkerPool.offload], cannot start or breaks
   down, and [`AbortedError`][ropt.exceptions.AbortedError] when an abort
-  abandoned an offloaded callable.
+  kept an offloaded callable from running.
 
 - **Exceptions from your own evaluation function** are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process

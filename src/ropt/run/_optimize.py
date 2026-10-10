@@ -87,7 +87,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     report_gradients: bool = False,
 ) -> OptimizationResult:
     if optimize_many_signal is not None and optimize_many_signal.aborting:
-        # Cut off before anything is built, so an invalid config in a run that
+        # Aborted before anything is built, so an invalid config in a run that
         # never starts is not reported beside the failure that stopped it.
         return OptimizationResult(
             exit_code=optimize_many_signal.exit_code, results=None
@@ -111,7 +111,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     except Exception:
         # No abort can reach a run being built, so this needs no exemption.
         if optimize_many_signal is not None:
-            # Stops the other runs of the same `optimize_many` call.
+            # Aborts the other runs that the same `optimize_many` started.
             optimize_many_signal.abort(ExitCode.ABORTED_ON_ERROR)
         if failure_stops_session:
             session._fail()  # ruff: ignore[private-member-access]
@@ -130,12 +130,12 @@ def _optimize(  # ruff: ignore[too-many-arguments]
                 metadata=metadata,
             )
     except Exception:
-        # `signal.aborting` means this run was cut off rather than failing.
+        # `signal.aborting` means this run was aborted rather than failing.
         if not signal.aborting:
-            # Stops the runs and offloads started from this run's code.
+            # Aborts the runs and offloads started from this run's code.
             signal.abort(ExitCode.ABORTED_ON_ERROR)
             if optimize_many_signal is not None:
-                # Stops the other runs of the same `optimize_many` call.
+                # Aborts the other runs that the same `optimize_many` started.
                 optimize_many_signal.abort(ExitCode.ABORTED_ON_ERROR)
             if failure_stops_session:
                 session._fail()  # ruff: ignore[private-member-access]

@@ -195,9 +195,9 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
         # into a program that is already shutting down.
         return EvaluationResult(exit_code=ExitCode.EXECUTOR_SHUT_DOWN, results=())
     except Exception:
-        # `signal.aborting` means this run was cut off rather than failing.
+        # `signal.aborting` means this run was aborted rather than failing.
         if not signal.aborting:
-            # Stops the runs and offloads started from this run's code.
+            # Aborts the runs and offloads started from this run's code.
             signal.abort(ExitCode.ABORTED_ON_ERROR)
             if failure_stops_session:
                 session._fail()  # ruff: ignore[private-member-access]

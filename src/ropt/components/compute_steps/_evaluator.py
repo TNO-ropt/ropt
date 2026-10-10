@@ -89,9 +89,9 @@ class EvaluationStep(ComputeStep[None]):
         try:
             results = self._evaluate(context, variables, metadata)
         except OptimizerStop:
-            # The batch was abandoned on this step's signal. There is nothing to
+            # The batch was aborted on this step's signal. There is nothing to
             # report, and the caller reads the signal for why.
-            _logger.info("Evaluation abandoned")
+            _logger.info("Evaluation aborted")
             return
         _logger.info("Evaluation finished")
         self._emit_event(

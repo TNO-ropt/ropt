@@ -1580,7 +1580,7 @@ def test_the_payload_gate_refuses_a_waiter_when_a_slot_frees_after_the_abort() -
         pytest.param(partial(ProcessExecutor, workers=1), id="process"),
     ],
 )
-def test_a_stopped_signal_abandons_a_batch_before_it_starts(
+def test_a_batch_given_an_aborted_signal_does_not_run(
     build: Callable[[], ExecutorBase],
 ) -> None:
     signal = AbortSignal()

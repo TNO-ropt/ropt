@@ -32,14 +32,14 @@ class AbortSignal:
     A step is given one at construction and polls it at the same points it
     polls its own [`stop`][ropt.components.compute_steps.ComputeStep.stop]
     request, so one signal reaches any number of steps at once. The two differ
-    in kind: `stop` ends a run on a criterion it was given, while a signal cuts
-    it off without consulting it. They also differ in lifetime, since `stop` is
+    in kind: `stop` ends a run on a criterion it was given, while a signal aborts
+    it without consulting it. They also differ in lifetime, since `stop` is
     cleared by the next `run` and a signal is not: a step that starts while the
-    signal is aborting is cut off from the outset.
+    signal is aborting is aborted from the outset.
 
     Code that cannot poll registers a callback instead, which is how a blocked
     [`Executor.run`][ropt.components.executors.Executor.run] is woken rather
-    than left waiting for work it is about to abandon.
+    than left waiting for work that will not run.
 
     A signal can abort with a parent signal, and can be the parent signal of the
     runs and offloads started while it is marked as one: see `aborts_with` and
@@ -56,7 +56,7 @@ class AbortSignal:
         self._exit_code = ExitCode.ABORTED
 
     def abort(self, exit_code: ExitCode = ExitCode.ABORTED) -> None:
-        """Cut off everything observing this signal.
+        """Abort everything observing this signal.
 
         Calling this more than once has no further effect: the first call
         decides the exit code, so a later abort for another reason cannot

@@ -186,9 +186,9 @@ def test_caught_failure_of_an_offload_on_the_run_thread_does_not_stop_the_run(
 
 
 @pytest.mark.timeout(60)
-def test_failing_nested_offload_cuts_off_what_is_nested_in_it() -> None:
+def test_failing_nested_offload_aborts_what_is_nested_in_it() -> None:
     # The middle offload has failed before the innermost one starts, so the
-    # innermost one is cut off at once instead of running.
+    # innermost one is aborted at once instead of running.
     failed = threading.Event()
     done = threading.Event()
     outcomes: list[object] = []
@@ -225,20 +225,20 @@ def test_failing_nested_offload_cuts_off_what_is_nested_in_it() -> None:
     assert outcomes == [ExitCode.ABORTED_ON_ERROR]
 
 
-def _waits_until_cut_off(
+def _waits_until_aborted(
     variables: NDArray[np.float64], context: EvaluationFunctionContext
 ) -> float:
     # Evaluated in-process, so the parent signal here is the signal of this run.
     signal = parent_signal()
     assert signal is not None
-    cut_off = threading.Event()
-    signal.add_callback(cut_off.set)
-    assert cut_off.wait(timeout=30)
+    aborted = threading.Event()
+    signal.add_callback(aborted.set)
+    assert aborted.wait(timeout=30)
     return _sphere(variables, context)
 
 
 @pytest.mark.timeout(60)
-def test_failing_run_of_a_nested_optimize_many_cuts_off_only_the_runs_of_that_call() -> (
+def test_failing_run_of_a_nested_optimize_many_aborts_only_the_runs_of_that_call() -> (
     None
 ):
     outcomes: list[tuple[OptimizationResult | Exception, ...]] = []
@@ -251,7 +251,7 @@ def test_failing_run_of_a_nested_optimize_many_cuts_off_only_the_runs_of_that_ca
         ) -> float:
             try:
                 opened.optimize_many(
-                    _CONFIG, np.tile(_INITIAL, (2, 1)), [_boom, _waits_until_cut_off]
+                    _CONFIG, np.tile(_INITIAL, (2, 1)), [_boom, _waits_until_aborted]
                 )
             except RunsFailedError as exc:
                 outcomes.append(exc.outcomes)
@@ -261,16 +261,16 @@ def test_failing_run_of_a_nested_optimize_many_cuts_off_only_the_runs_of_that_ca
 
     assert result.exit_code == ExitCode.FINISHED
     assert outcomes
-    for failed, cut_off in outcomes:
+    for failed, aborted in outcomes:
         assert isinstance(failed, ValueError)
-        assert not isinstance(cut_off, Exception)
-        assert cut_off.exit_code == ExitCode.ABORTED_ON_ERROR
+        assert not isinstance(aborted, Exception)
+        assert aborted.exit_code == ExitCode.ABORTED_ON_ERROR
 
 
 @pytest.mark.timeout(60)
-def test_nested_optimize_many_is_cut_off_with_its_parent() -> None:
+def test_nested_optimize_many_is_aborted_with_its_parent() -> None:
     # The offload it is nested in has failed before the call starts, so its runs
-    # are cut off at once instead of running.
+    # are aborted at once instead of running.
     failed = threading.Event()
     done = threading.Event()
     exit_codes: list[ExitCode] = []

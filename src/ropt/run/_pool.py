@@ -221,7 +221,7 @@ class WorkerPool:
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` is the [`FunctionResults`][ropt.results.FunctionResults]
-            for the vector, or `None` if the evaluation was cut off.
+            for the vector, or `None` if the evaluation was aborted.
 
         Raises:
             ValueError:    If `variables` is not a single vector.
@@ -269,7 +269,7 @@ class WorkerPool:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` holds one
             [`FunctionResults`][ropt.results.FunctionResults] per vector, and is
-            empty if the batch was cut off.
+            empty if the batch was aborted.
 
         Raises:
             ValueError:    If `variables` is not a 2-D matrix.
@@ -312,7 +312,7 @@ class WorkerPool:
             The single result, or a tuple of results in the order of `work`.
 
         Raises:
-            AbortedError:   If an abort abandoned one of the calls.
+            AbortedError:   If an abort kept one of the callables from running.
             ExecutionError: If the machinery could not run a call.
             WorkflowError:  If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]

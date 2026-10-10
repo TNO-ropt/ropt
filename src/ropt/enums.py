@@ -117,7 +117,7 @@ class ExitCode(IntEnum):
     **aborted**. It stops when a condition on the run is met — the optimizer
     converged, a budget ran out, a handler decided the results were good enough
     — so it ends at a point that satisfied a stated criterion. It is aborted
-    when something cuts it off regardless of the state of the run, and the
+    when something ends it regardless of the state of the run, and the
     result is then whatever it had reached, not a considered endpoint.
 
     Each member carries a short description in
@@ -156,7 +156,7 @@ class ExitCode(IntEnum):
     """
 
     ABORTED = 7
-    """Returned when the run was cut off from outside, without regard to where
+    """Returned when the run was aborted from outside, without regard to where
     it had got to.
 
     This is what closing a session reports for a run still under way.
@@ -166,7 +166,7 @@ class ExitCode(IntEnum):
     """Returned when another run this one shares a session with raised."""
 
     USER_ABORT = 9
-    """Returned when [`Session.abort`][ropt.Session.abort] cut the run off.
+    """Returned when [`Session.abort`][ropt.Session.abort] aborted the run.
 
     Set apart from [`ABORTED`][ropt.enums.ExitCode.ABORTED] so that an abort
     that was asked for can be told from one the library performed itself.

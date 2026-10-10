@@ -1,4 +1,4 @@
-"""Tests for cutting off the runs that are using a session's pools."""
+"""Tests for aborting the runs that are using a session's pools."""
 
 # An abort takes effect at a run's next evaluation boundary, so every test here
 # gets its ordering from a barrier or from the evaluation function itself:
@@ -92,7 +92,7 @@ def _fails_at(barrier: threading.Barrier) -> Any:
 
 def _waits_then_raises(barrier: threading.Barrier, release: threading.Event) -> Any:
     # Raises only once the abort has landed, so what it raises is a consequence
-    # of being cut off rather than a failure of its own.
+    # of being aborted rather than a failure of its own.
     waited = False
 
     def objective(
@@ -123,7 +123,7 @@ def _one() -> int:
 @pytest.mark.timeout(60)
 def test_session_abort_keeps_the_results_of_completed_batches() -> None:
     # Aborting from the report callback lands after a batch has finished, so
-    # that batch's results survive while the next one is abandoned.
+    # that batch's results survive and the next one does not run.
     with session() as opened:
         pool = opened.thread_pool(workers=1)
 
@@ -139,7 +139,7 @@ def test_session_abort_keeps_the_results_of_completed_batches() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_session_abort_abandons_the_batch_in_flight() -> None:
+def test_session_abort_aborts_the_batch_in_flight() -> None:
     # Aborted from inside the first evaluation. What the run keeps depends on
     # which batches had finished, but the call count is what shows the rest of
     # the work was dropped rather than run out.
@@ -191,7 +191,7 @@ def test_session_abort_leaves_an_evaluation_batch_without_results() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_an_in_process_evaluation_batch_is_cut_off_between_its_rows() -> None:
+def test_an_in_process_evaluation_batch_is_aborted_between_its_rows() -> None:
     # Without a pool the rows are evaluated one after another on the calling
     # thread, so that loop is the only place the abort can be observed.
     matrix = np.array([_INITIAL, np.zeros(_INITIAL.size), np.ones(_INITIAL.size)])
@@ -258,7 +258,7 @@ def test_a_nested_run_that_fails_does_not_abort_the_run_that_started_it() -> Non
 
 
 @pytest.mark.timeout(60)
-def test_session_abort_cuts_off_every_run_in_progress() -> None:
+def test_session_abort_aborts_every_run_in_progress() -> None:
     runs = 3
     started = threading.Barrier(runs + 1)
 
@@ -284,7 +284,7 @@ def test_session_abort_cuts_off_every_run_in_progress() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_closing_a_session_cuts_off_a_run_on_another_thread() -> None:
+def test_closing_a_session_aborts_a_run_on_another_thread() -> None:
     started = threading.Barrier(2)
     outcome: list[OptimizationResult] = []
 
@@ -366,7 +366,7 @@ def test_a_failing_run_aborts_the_others_on_its_session() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_session_abort_cuts_off_the_runs_queued_behind_the_limit() -> None:
+def test_session_abort_aborts_the_runs_queued_behind_the_limit() -> None:
     # One at a time, so the four behind the first are still queued when the
     # abort arrives. Each run counts its own evaluations, which is what shows
     # that none of the four reached one.
@@ -401,10 +401,10 @@ def test_session_abort_cuts_off_the_runs_queued_behind_the_limit() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_a_run_cut_off_by_an_abort_does_not_report_a_failure() -> None:
-    # The evaluation raises because its run was cut off. Reporting that as a
+def test_an_aborted_run_does_not_report_a_failure() -> None:
+    # The evaluation raises because its run was aborted. Reporting that as a
     # failure would abort a run that started after the abort and is innocent.
-    cut_off = threading.Barrier(2, timeout=30)
+    aborted_started = threading.Barrier(2, timeout=30)
     running = threading.Barrier(2, timeout=30)
     release = threading.Event()
     outcome: list[OptimizationResult] = []
@@ -417,7 +417,7 @@ def test_a_run_cut_off_by_an_abort_does_not_report_a_failure() -> None:
         def _aborted_run() -> None:
             try:
                 aborted_pool.optimize(
-                    _CONFIG, _INITIAL, _waits_then_raises(cut_off, release)
+                    _CONFIG, _INITIAL, _waits_then_raises(aborted_started, release)
                 )
             except ValueError as exc:
                 raised.append(exc)
@@ -427,7 +427,7 @@ def test_a_run_cut_off_by_an_abort_does_not_report_a_failure() -> None:
 
         aborted_driver = threading.Thread(target=_aborted_run)
         aborted_driver.start()
-        cut_off.wait(timeout=30)
+        aborted_started.wait(timeout=30)
         opened.abort()
         fresh_driver = threading.Thread(target=_fresh_run)
         fresh_driver.start()
@@ -586,7 +586,7 @@ def test_an_evaluation_of_the_wrong_shape_aborts_the_runs_beside_it(
 @pytest.mark.timeout(60)
 def test_a_failing_run_aborts_an_offload_beside_it() -> None:
     # The second call is still queued behind the single worker when the other
-    # run fails, so the abort abandons it.
+    # run fails, so the abort keeps it from running.
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
     raised: list[AbortedError] = []

@@ -242,11 +242,11 @@ def test_an_offload_that_completes_despite_an_abort_returns_its_results() -> Non
 
 
 @pytest.mark.parametrize("exit_code", [ExitCode.ABORTED, ExitCode.ABORTED_ON_ERROR])
-def test_an_abandoned_offload_call_carries_why_it_was_cut_off(
+def test_an_aborted_offload_reports_why_it_was_aborted(
     exit_code: ExitCode,
 ) -> None:
-    # A signal that is already stopping abandons every call before it starts,
-    # which is what an abort arriving mid-batch leaves behind. Driving `_run`
+    # A signal that is already aborting keeps every call from starting, which is
+    # what an abort arriving mid-batch leaves behind. Driving `_run`
     # directly is what makes the ordering certain: through `offload` the worker
     # may drain the queue before the collecting thread is scheduled to drop it.
     signal = AbortSignal()

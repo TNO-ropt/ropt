@@ -35,7 +35,7 @@ class EvaluationResult[T]:
 
     What `results` holds depends on which method produced it: one
     [`FunctionResults`][ropt.results.FunctionResults] from
-    [`evaluate`][ropt.evaluate], or `None` if the evaluation was cut off;
+    [`evaluate`][ropt.evaluate], or `None` if the evaluation was aborted;
     one per vector from [`evaluate_batch`][ropt.evaluate_batch], or an
     empty tuple. An evaluation is a single batch, so it produces either every
     result or none.

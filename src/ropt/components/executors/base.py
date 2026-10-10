@@ -82,7 +82,8 @@ class WorkNotRun:
     """A work item was never attempted.
 
     Returned in the work item's position when the batch it belonged to was
-    abandoned, so nothing about the item or the executor failed.
+    aborted before the item ran, so nothing about the item or the executor
+    failed.
 
     Attributes:
         message: Why it was not attempted.
@@ -160,10 +161,10 @@ class Executor(ABC):
         waiting for the rest of the batch. With `collect_errors` it is placed in
         the call's position instead, and every call keeps its place.
 
-        An `abort_signal` that fires abandons the batch: queued calls are never
+        An `abort_signal` that fires aborts the batch: queued calls are never
         started, started ones are cancelled where the mechanism allows it, and
-        each abandoned call gets a `WorkNotRun`. Calls already running on a
-        worker thread or process run to their end, and so does a call the
+        each call that did not run gets a `WorkNotRun`. Calls already running on
+        a worker thread or process run to their end, and so does a call the
         mechanism has handed to a worker but can no longer withdraw, which gets
         its result rather than a `WorkNotRun`. See
         [Releasing a batch](../advanced/parallel.md#releasing-a-batch).
@@ -179,7 +180,7 @@ class Executor(ABC):
             calls:          The work items to run.
             bundle_size:    Calls per worker task, `0` for all of them.
             collect_errors: Whether an exception is returned instead of raised.
-            abort_signal:   An optional signal that abandons the batch.
+            abort_signal:   An optional signal that aborts the batch.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -242,7 +243,7 @@ class ExecutorBase(Executor):
             calls:          The work items to run.
             bundle_size:    Calls per worker task, `0` for all of them.
             collect_errors: Whether an exception is returned instead of raised.
-            abort_signal:   An optional signal that abandons the batch.
+            abort_signal:   An optional signal that aborts the batch.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -271,8 +272,8 @@ class ExecutorBase(Executor):
             )
 
         self._run_bundles(bundles, store, abort_signal)
-        # A batch that was abandoned leaves its remaining slots empty, and an
-        # empty slot is indistinguishable from a call that returned None.
+        # An aborted batch leaves the slots of the calls that did not run empty,
+        # and an empty slot is indistinguishable from a call that returned None.
         for index, bundle in enumerate(bundles):
             if index not in stored:
                 offset = index * size
@@ -312,7 +313,7 @@ class ExecutorBase(Executor):
         Args:
             bundles:      The bundles to run.
             store:        Callback taking a bundle index and its result.
-            abort_signal: An optional signal that abandons the batch.
+            abort_signal: An optional signal that aborts the batch.
         """
 
 

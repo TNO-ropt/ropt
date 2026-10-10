@@ -49,9 +49,9 @@ def _offload[T](
         # reported the way an abort is rather than escaping.
         raise AbortedError(ExitCode.EXECUTOR_SHUT_DOWN) from None
     except Exception:
-        # `signal.aborting` means this offload was cut off rather than failing.
+        # `signal.aborting` means this offload was aborted rather than failing.
         if not signal.aborting:
-            # Stops the runs and offloads started from the offloaded functions.
+            # Aborts the runs and offloads started from the offloaded functions.
             signal.abort(ExitCode.ABORTED_ON_ERROR)
             if failure_stops_session:
                 session._fail()  # ruff: ignore[private-member-access]
@@ -70,10 +70,10 @@ def _run(
         bundle_size=1,
         abort_signal=signal,
     )
-    abandoned = any(isinstance(value, WorkNotRun) for value in values)
-    # Both conditions: an abort that arrived after every call had run leaves
-    # nothing abandoned, and is not reported as one.
-    if abandoned and signal.aborting:
+    not_run = any(isinstance(value, WorkNotRun) for value in values)
+    # Both conditions: an abort that arrived after every call had run kept
+    # none from running, and is not reported as one.
+    if not_run and signal.aborting:
         raise AbortedError(signal.exit_code)
     for value in values:
         if isinstance(value, (ExecutorFailure, WorkNotRun)):

@@ -109,7 +109,7 @@ runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 A run that raises aborts the other runs on its session. Each of those ends at
 its next evaluation boundary with `ABORTED_ON_ERROR`, keeping the best result it
-had reached. A run still queued behind `limit` is cut off before its first
+had reached. A run still queued behind `limit` is aborted before its first
 evaluation, and reports `ABORTED_ON_ERROR` with no result at all. Nothing is
 built for such a run, so an invalid configuration in one is never reported.
 
@@ -143,14 +143,14 @@ except RunsFailedError as failure:
 ```
 
 Without this the work the other runs did would be thrown away along with the run
-that failed, which matters more now that they are cut off deliberately. The
+that failed, which matters more now that they are aborted deliberately. The
 first exception is chained, so a traceback still shows what went wrong. A
 `KeyboardInterrupt` or `SystemExit` propagates unchanged instead of being
 collected into `RunsFailedError`, since it means the program is ending rather
 than a run reporting a problem. The
 interrupt also aborts the runs that are still going and waits for them, so they
 end at their next evaluation boundary rather than continuing in the background;
-a second interrupt abandons them.
+a second interrupt stops waiting for them.
 
 A failure reaches every run on the session, not only those started by the same
 `optimize_many`, so it also aborts runs that were

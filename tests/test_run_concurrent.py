@@ -137,7 +137,7 @@ def test_run_concurrent_waits_for_its_jobs_when_an_interrupt_breaks_the_wait(
         assert sorted(finished) == [0, 1]
 
 
-def test_run_concurrent_abandons_its_jobs_when_no_interrupt_is_given(
+def test_run_concurrent_stops_waiting_for_its_jobs_when_no_interrupt_is_given(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     stop = threading.Event()

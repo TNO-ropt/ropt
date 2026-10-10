@@ -131,7 +131,7 @@ raises, the others end with `ABORTED_ON_ERROR`, and
 started them.
 
 An inner `offload` raises [`AbortedError`][ropt.exceptions.AbortedError] when
-it is cut off or its pool can no longer run the work. Returning `NaN` for that
+it is aborted or its pool can no longer run the work. Returning `NaN` for that
 counts the realization as failed, so catch only the exceptions that your own
 inner code raises.
 

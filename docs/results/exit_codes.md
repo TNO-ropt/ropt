@@ -28,7 +28,7 @@ A run either **stops** or is **aborted**, and the exit code indicates which. It
 stops when a condition on the run is met — the optimizer converged, a budget ran
 out, a [`report` callback](../running/running.md#stopping-early-from-the-callback)
 returned `True` — so it ends at a point that satisfied a stated criterion. It is
-aborted when something cuts it off regardless of the state of the run, and what
+aborted when something ends it regardless of the state of the run, and what
 comes back is then whatever it had reached rather than a chosen endpoint.
 
 | Exit code               | Meaning                                                                                              |
@@ -38,9 +38,9 @@ comes back is then whatever it had reached rather than a chosen endpoint.
 | `MAX_BATCHES_REACHED`   | The configured maximum number of evaluation batches was reached.                                     |
 | `STOPPED`               | A `report` callback returned `True`, ending the run at the next evaluation boundary.                 |
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
-| `ABORTED`               | The run was cut off from outside, as closing a session does to a run still under way. |
-| `ABORTED_ON_ERROR`      | Another run on the same session raised, and this one was cut off with it.                            |
-| `USER_ABORT`            | [`Session.abort`](../running/running.md#stopping-from-outside) cut the run off.                      |
+| `ABORTED`               | The run was aborted from outside, as closing a session does to a run still under way. |
+| `ABORTED_ON_ERROR`      | Another run on the same session raised, and this one was aborted with it.                            |
+| `USER_ABORT`            | [`Session.abort`](../running/running.md#stopping-from-outside) aborted the run.                      |
 | `EXECUTOR_SHUT_DOWN`    | The pool the run was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
 | `UNKNOWN`               | The zero value of the enumeration. No run reports it.                                                |
 
@@ -58,7 +58,7 @@ An **optimization** can end with any of the codes above.
 An **evaluation** is a single batch with no optimizer loop around it, so it
 reports only `FINISHED`, `USER_ABORT`, `ABORTED` or `ABORTED_ON_ERROR`. It is
 also all or nothing: either every vector was evaluated, or the batch was
-abandoned and `results` is empty. An abort that arrives once the batch has
+aborted and `results` is empty. An abort that arrives once the batch has
 finished leaves it unaffected, and the evaluation reports `FINISHED`.
 
 ## An exit code is not a result
@@ -76,7 +76,7 @@ linear constraints as well as the nonlinear ones. See
 
 [`WorkerPool.offload`][ropt.WorkerPool.offload] returns whatever its
 callables return, so there is no result object to carry an exit code. An
-`offload` whose callables were abandoned raises
+`offload` with a callable that an abort kept from running raises
 [`AbortedError`][ropt.exceptions.AbortedError] instead, whose
 `exit_code` attribute says why: an abort that was asked for, one another run
 caused, or `EXECUTOR_SHUT_DOWN` when the pool could no longer run the work.

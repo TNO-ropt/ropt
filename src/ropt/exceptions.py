@@ -65,7 +65,7 @@ class UnsupportedError(RoptError):
 
 
 class AbortedError(RoptError):
-    """Work was cut off before it could finish.
+    """Work was aborted before it could finish.
 
     Raised by [`WorkerPool.offload`][ropt.WorkerPool.offload], which
     returns whatever its callables return and so has nowhere to report a reason.
@@ -73,17 +73,17 @@ class AbortedError(RoptError):
     returns instead, and does not raise this.
 
     Attributes:
-        exit_code: Why the work was cut off.
+        exit_code: Why the work was aborted.
     """
 
     def __init__(self, exit_code: ExitCode) -> None:
         """Initialize the error.
 
         Args:
-            exit_code: Why the work was cut off.
+            exit_code: Why the work was aborted.
         """
         self.exit_code = exit_code
-        msg = f"The work was cut off before it could finish: {exit_code.name}."
+        msg = f"The work was aborted before it could finish: {exit_code.name}."
         super().__init__(msg)
 
 
@@ -96,9 +96,9 @@ class RunsFailedError(RoptError):
     failed. The first exception is chained, so a traceback still shows what
     went wrong.
 
-    The runs that did not fail were cut off when this one did and ended with
+    The runs that did not raise were aborted when one did, and ended with
     `ExitCode.ABORTED_ON_ERROR`. Each kept whatever its completed batches had
-    produced; one cut off during its first batch has no result.
+    produced; one aborted during its first batch has no result.
 
     Attributes:
         outcomes: Per run, in the order the runs were given, its

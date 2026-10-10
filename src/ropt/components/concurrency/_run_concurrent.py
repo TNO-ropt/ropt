@@ -32,10 +32,10 @@ def run_concurrent[T](
     and the exception it raised is returned in its place. What a failure means
     is left to the caller.
 
-    An interrupt that breaks the wait abandons the jobs still running. Pass
-    `interrupt` to be called at that point: the jobs are then waited for, which
-    takes as long as they take to observe it, and a second interrupt abandons
-    them after all.
+    An interrupt that breaks the wait stops waiting for the jobs still running.
+    Pass `interrupt` to be called at that point: the jobs are then waited for,
+    which takes as long as they take to observe it, and a second interrupt stops
+    waiting for them after all.
 
     Args:
         jobs:      The zero-argument callables to run, one outcome each.
@@ -68,7 +68,8 @@ def run_concurrent[T](
     except BaseException:
         # A thread cannot be interrupted, so the jobs are asked to stop and then
         # waited for. Daemon threads, so a second interrupt breaking this join
-        # abandons what is still running instead of holding up the interpreter.
+        # stops waiting for what is still running instead of holding up the
+        # interpreter.
         if interrupt is not None:
             interrupt()
             for thread in threads:

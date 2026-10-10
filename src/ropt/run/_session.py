@@ -72,7 +72,7 @@ class Session:
     A session may be opened inside another, and pools from different sessions
     never interact. A session is single use — once closed it cannot be reopened.
 
-    [`abort`][ropt.Session.abort] cuts off the runs that belong to it,
+    [`abort`][ropt.Session.abort] aborts the runs that belong to it,
     which is what a caller on another thread — a signal handler, a user
     interface — calls to bring them down.
     """
@@ -115,10 +115,10 @@ class Session:
             pool._release()  # ruff: ignore[private-member-access]
 
     def abort(self) -> None:
-        """Cut off the runs that belong to this session.
+        """Abort the runs that belong to this session.
 
         Each run ends with `ExitCode.USER_ABORT`, keeping whatever its completed
-        batches produced; one cut off during its first batch has no result. An
+        batches produced; one aborted during its first batch has no result. An
         [`offload`][ropt.WorkerPool.offload] in flight raises
         [`AbortedError`][ropt.exceptions.AbortedError] instead, since it has no
         result object to report a reason on.
@@ -296,7 +296,7 @@ class Session:
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` is the [`FunctionResults`][ropt.results.FunctionResults]
-            for the vector, or `None` if the evaluation was cut off.
+            for the vector, or `None` if the evaluation was aborted.
 
         Raises:
             ValueError:    If `variables` is not a single vector.
@@ -342,7 +342,7 @@ class Session:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` holds one
             [`FunctionResults`][ropt.results.FunctionResults] per vector, and is
-            empty if the batch was cut off.
+            empty if the batch was aborted.
 
         Raises:
             ValueError:    If `variables` is not a 2-D matrix.
