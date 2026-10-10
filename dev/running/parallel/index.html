@@ -1130,6 +1130,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../failures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Failures and Aborts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../nested/" class="md-nav__link">
         
   
@@ -2916,10 +2944,10 @@ evaluation function, and one pool may serve several. Runs of
 size for every run or as a sequence with one per run:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">pool</span><span class="o">.</span><span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="p">[</span><span class="n">cheap</span><span class="p">,</span> <span class="n">costly</span><span class="p">],</span> <span class="n">bundle_size</span><span class="o">=</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 </span></code></pre></div>
-<p>Every pool honours it, including a thread pool: a bundle is one worker
-task, so <code>bundle_size=0</code> on a thread pool runs the whole batch on a single
-thread. It is a pool argument only: a run started without one evaluates
-inline, where a bundle has nothing to save.</p>
+<p>Every pool honours it, including a thread pool: a bundle goes to one worker
+as a whole, so <code>bundle_size=0</code> on a thread pool runs the whole batch on a
+single thread. It is a pool argument only: a run started without one
+evaluates inline, where a bundle has nothing to save.</p>
 <p>A pool also takes a <code>bundle_size</code> of its own, used by any run that does
 not state one.</p>
 </div>
@@ -2971,11 +2999,11 @@ past this pool — see <a href="#which-pool">Which pool should I use?</a>.</p>
 <h3 id="process-pool">Evaluating in worker processes</h3>
 <p>A <a class="autorefs autorefs-internal" title="            process_pool" href="../../reference/api/#ropt.Session.process_pool"><code>process_pool</code></a> runs the evaluations in a
 handful of separate processes, reused across the run. Each has its own
-interpreter, so this is where heavy Python computation actually gets faster:</p>
+interpreter, so this is where heavy Python code actually runs faster:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
-<p>This pool applies when the computation is <strong>Python code</strong>, or when each
+<p>This pool applies when the evaluation is <strong>Python code</strong>, or when each
 evaluation needs its own copy of something a library keeps globally. An
 objective that mostly runs an external program gains nothing here that a thread
 pool would not have given more cheaply.</p>
@@ -3199,7 +3227,7 @@ call.</p>
 <td>a few reused processes</td>
 <td>copied</td>
 <td>yes</td>
-<td>each evaluation is heavy <strong>Python computation</strong></td>
+<td>each evaluation runs heavy <strong>Python code</strong></td>
 </tr>
 <tr>
 <td><code>local_pool</code></td>
@@ -3398,19 +3426,18 @@ functions:</p>
 <p>As with the evaluation function on a process, local, or HPC pool, the
 callables and their arguments are <strong>copied to the workers</strong>, since they run in
 separate processes.</p>
-<p>An offload belongs to its pool's session like a run does, so
-<a href="../running/#stopping-from-outside"><code>Session.abort</code></a>, a closing session, and a
-failing run on the same session all reach it. An offload started from inside a
-run, from its evaluation function or a handler, is nested in that run: it is
-aborted with the run, and when it raises, only the code that started it receives
-the exception. See <a href="../nested/#when-an-inner-run-fails">When an inner run fails</a>.
-<code>offload</code> returns whatever its
-callables return and so has nowhere to report a reason: an <code>offload</code> with a
-callable that an abort kept from running raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
-<code>exit_code</code> distinguishes an abort that was asked for from one another run
-caused, and reports <code>EXECUTOR_SHUT_DOWN</code> when the pool could no longer run the
-work. Calls already on a worker run to their end, so an abort that costs the
-batch nothing lets it return its results.</p>
+<p><code>offload</code> starts one task per callable, on its pool's session;
+<a href="../failures/">Failures and Aborts</a> describes tasks and how a failure or an abort
+reaches them. When a callable raises, <code>offload</code> aborts the other callables and
+raises the exception at once. <code>offload</code> returns whatever its callables return
+and so has nowhere to report a reason: when an abort kept one of its callables
+from running, <code>offload</code> raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>,
+whose <code>exit_code</code> distinguishes an abort that was asked for from one that a
+failure caused, and reports <code>EXECUTOR_SHUT_DOWN</code> when the pool could no longer
+run the work. On a thread or process pool, a callable that is already running
+when the abort arrives runs to its end, so an abort that arrives after the last
+callable has started costs nothing, and <code>offload</code> returns the results. On a
+local or HPC pool, running callables are cancelled as well.</p>
 <div class="admonition warning">
 <p class="admonition-title">Offloaded work coordinates with nothing</p>
 <p>An offloaded callable runs wherever its pool puts it, and on a process,

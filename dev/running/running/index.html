@@ -1024,6 +1024,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../failures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Failures and Aborts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../nested/" class="md-nav__link">
         
   
@@ -2817,9 +2845,10 @@ reached.</p>
 <p>The two are not the same kind of ending, which is why they have different exit
 codes. A <code>report</code> callback stops the run <em>on a criterion</em>, at a point it chose.
 An abort applies no criterion: the result is whatever the run had reached.</p>
-<p>An aborted run ends at its next evaluation boundary, so the evaluations already
-in flight are still carried out and their workers are free only once they
-return.</p>
+<p>An aborted run ends at its next evaluation boundary. With no pool, or on a thread
+or process pool, the evaluations already in flight are still carried out, and
+their workers are free only once they return. On a local or HPC pool they are
+cancelled.</p>
 <p><code>abort()</code> reaches the runs that are under way at the moment it is called, and
 nothing more. A run started afterwards is unaffected, so a
 loop that abandons one attempt and starts another keeps working. An
@@ -2933,7 +2962,7 @@ still returns normally, and indicates why in <code>result.exit_code</code> —
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value, for
 instance, or <code>ABORTED_ON_ERROR</code> when another run on the same session raised and
 brought this one down with it (see
-<a href="../many_runs/#failure-in-one-run">Failure in one run</a>).
+<a href="../failures/">Failures and Aborts</a>).
 <a href="../../results/exit_codes/">Exit Codes</a> lists them all, and explains why a
 reason and a result are independent: <code>result.results</code> is <code>None</code> when no feasible
 result was ever recorded, whatever the reason the run ended, and a run that fails
@@ -2988,6 +3017,12 @@ configuration errors belong to pydantic, and errors from your evaluation
 function stay whatever you raised. The control-flow signals that <code>ropt</code> raises
 and catches itself are excluded as well, and stay in
 <a class="autorefs autorefs-internal" title="            ropt.exceptions" href="../../reference/exceptions/#ropt.exceptions"><code>ropt.exceptions</code></a>.</p>
+<p><code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code>, <code>optimize_many</code> and <code>offload</code> start
+<strong>tasks</strong>, which can be under way at the same time. When a task raises an
+exception, every task started from inside it is aborted, and the exception is
+raised in the code that started the task. If that code is your script, every
+other task on the session is aborted as well. <a href="../failures/">Failures and Aborts</a>
+describes each case.</p>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations.
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, the type of <code>result.exit_code</code>, is imported

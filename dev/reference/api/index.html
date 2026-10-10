@@ -858,6 +858,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../running/failures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Failures and Aborts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../running/nested/" class="md-nav__link">
         
   
@@ -5278,10 +5306,11 @@ most code needs no further cleanup:</p>
 <p>A run started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="#ropt.optimize"><code>optimize</code></a>
 evaluates in-process and needs no session. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-<p>A run that fails aborts the other runs on the session, which is what makes a
-script stop at the first problem. Its exception is raised where the run was
-started. A run or offload started from inside another run only raises; see
-<a href="../../running/nested/#when-an-inner-run-fails">When an inner run fails</a>.</p>
+<p>A task that fails aborts the other tasks on the session, which is what makes
+a script stop at the first problem, and its exception is raised where the
+task was started. A task started from inside another task does not abort the
+rest of the session. <a href="../../running/failures/">Failures and Aborts</a> defines
+tasks and describes each case.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -6765,7 +6794,8 @@ that releases the GIL. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per worker task, <code>0</code> for a whole batch.</p>
+                <p>Evaluations sent to a worker together, <code>0</code> for a whole
+         batch.</p>
               </div>
             </td>
             <td>
@@ -6910,7 +6940,8 @@ an evaluation launches external programs.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per worker task, <code>0</code> for a batch.</p>
+                <p>Evaluations sent to a worker together, <code>0</code> for
+                 a batch.</p>
               </div>
             </td>
             <td>
@@ -7819,8 +7850,8 @@ evaluations happen and which session the run belongs to. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per worker task, <code>None</code> for the
-                  pool's own.</p>
+                <p>Evaluations sent to a worker together, <code>None</code>
+                  for the pool's own.</p>
               </div>
             </td>
             <td>
@@ -8155,8 +8186,8 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per worker task, shared or one per
-                  run.</p>
+                <p>Evaluations sent to a worker together, shared
+                  or one per run.</p>
               </div>
             </td>
             <td>
@@ -8470,7 +8501,8 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per worker task, <code>None</code> for the pool's own.</p>
+                <p>Evaluations sent to a worker together, <code>None</code> for the
+         pool's own.</p>
               </div>
             </td>
             <td>
@@ -8755,7 +8787,8 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per worker task, <code>None</code> for the pool's own.</p>
+                <p>Evaluations sent to a worker together, <code>None</code> for the
+         pool's own.</p>
               </div>
             </td>
             <td>
