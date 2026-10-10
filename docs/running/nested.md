@@ -98,15 +98,11 @@ to it.
 
 ## When an inner run fails { #when-an-inner-run-fails }
 
-A run started from inside another run is **nested** in it, and the outer run is
-its **parent**. That covers a run started with `optimize`, `optimize_many`,
-`evaluate` or `evaluate_batch`, and an [`offload`][ropt.WorkerPool.offload],
-when the start is made in the same process from an evaluation function, an event
-handler, a report callback, or a function that an `offload` runs.
-
-A nested run that raises does not abort the other runs of the session. Its
-exception is raised in the code that started it, here the outer evaluation
-function, which can catch it and return `NaN` for that realization:
+The inner run is started from the outer evaluation function, so it is
+[nested](failures.md#nested-tasks) in the outer run. An exception it
+raises is raised in the outer evaluation function and aborts nothing outside the
+inner run. The evaluation function can catch it and return `NaN` for that
+realization:
 
 ```python
 try:
@@ -116,36 +112,9 @@ except RuntimeError:
 ```
 
 An exception that the outer evaluation function does not catch ends the outer
-run, as any exception from an evaluation function does. A run started outside
-every other run aborts the other runs of its session as soon as it raises; see
-[Failure in one run](many_runs.md#failure-in-one-run).
-
-A nested run is aborted when its parent is, whether by
-[`Session.abort`](running.md#stopping-from-outside), a closing session, or a
-failure. When a nested run raises, the runs and offloads started from its own
-code are aborted.
-
-The runs started by one nested `optimize_many` abort each other: when one of them
-raises, the others end with `ABORTED_ON_ERROR`, and
-[`RunsFailedError`][ropt.exceptions.RunsFailedError] is raised in the code that
-started them.
-
-An inner `offload` raises [`AbortedError`][ropt.exceptions.AbortedError] when
-it is aborted or its pool can no longer run the work. Returning `NaN` for that
-counts the realization as failed, so catch only the exceptions that your own
-inner code raises.
-
-!!! note "Threads that the evaluation function starts"
-    A run started from a thread that the evaluation function starts itself is
-    not nested, and aborts the other runs of the session when it raises. Start
-    the thread through `contextvars.copy_context().run` to make it nested:
-
-    ```python
-    import contextvars
-    import threading
-
-    thread = threading.Thread(target=contextvars.copy_context().run, args=(work,))
-    ```
+run, as any exception from an evaluation function does. When the outer run is
+aborted, the inner runs are aborted with it. See
+[Failures and Aborts](failures.md) for the rules that apply to every task.
 
 ## Two pools, not one { #two-pools-not-one }
 

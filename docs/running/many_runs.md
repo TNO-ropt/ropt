@@ -107,19 +107,15 @@ runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 ## Failure in one run
 
-A run that raises aborts the other runs on its session. Each of those ends at
-its next evaluation boundary with `ABORTED_ON_ERROR`, keeping the best result it
-had reached. A run still queued behind `limit` is aborted before its first
-evaluation, and reports `ABORTED_ON_ERROR` with no result at all. Nothing is
-built for such a run, so an invalid configuration in one is never reported.
-
-Arguments that are rejected before any run is created abort them too.
-`optimize_many` broadcasts its arguments first, so lists whose lengths disagree
-raise `ValueError`; `evaluate` and `evaluate_batch` raise on a vector of the
-wrong shape. Each aborts the other runs on the session before raising.
-`RunsFailedError` is not raised in those cases, since no run exists to carry an
-outcome. A closed session is not a failure: the method raises
-[`WorkflowError`][ropt.exceptions.WorkflowError] and nothing is aborted.
+A run that raises aborts the other runs of the same `optimize_many`. When
+`optimize_many` was called from your script, it also aborts every other task on
+the session, such as another optimization or an `offload` in progress;
+[Failures and Aborts](failures.md) defines tasks and gives the rules for every
+case. Each aborted run ends at its next evaluation boundary with
+`ABORTED_ON_ERROR`, keeping the best result it had reached. A run still queued
+behind `limit` is aborted before its first evaluation, and reports
+`ABORTED_ON_ERROR` with no result at all. Nothing is built for such a run, so an
+invalid configuration in one is never reported.
 
 `optimize_many` then raises
 [`RunsFailedError`][ropt.exceptions.RunsFailedError]. With several runs there is
@@ -152,17 +148,10 @@ interrupt also aborts the runs that are still going and waits for them, so they
 end at their next evaluation boundary rather than continuing in the background;
 a second interrupt stops waiting for them.
 
-A failure reaches every run on the session, not only those started by the same
-`optimize_many`, so it also aborts runs that were
-started separately on the same session. A run started with the module-level
-[`optimize_many`][ropt.optimize_many] has a session of its own, holding
-only the runs it starts. A failure never reaches the runs of another session.
-
-Started from inside another run, from an evaluation function for instance,
-`optimize_many` is nested in that run. A failure then aborts only the runs that
-this `optimize_many` started, arguments that do not agree abort nothing, and
-`RunsFailedError` is raised in the code that started it. See
-[When an inner run fails](nested.md#when-an-inner-run-fails).
+Arguments that do not agree are rejected before any run is created, and count
+as a failure: `optimize_many` broadcasts its arguments first, so lists whose
+lengths disagree raise `ValueError`. `RunsFailedError` is not raised in that
+case, since no run exists to carry an outcome.
 
 [`Session.abort`](running.md#stopping-from-outside) also reaches every run on
 the session, and those runs end with `USER_ABORT` instead, so the exit code

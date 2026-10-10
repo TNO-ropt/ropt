@@ -2,8 +2,9 @@
 
 Each opens a session of its own for the length of the call, so a run always has
 one. Nothing else can reach that session, which is exactly what "outside a
-session" means: the run cannot be aborted from elsewhere, and no other run is
-aborted when it fails.
+session" means: no `Session.abort` reaches the run directly, and its failure
+aborts only what it started. Started from inside another run or offload, it is
+still nested there and is aborted with it.
 
 Give a run a [`session`][ropt.session], or one of its pools, when it
 should be part of something larger.

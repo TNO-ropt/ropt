@@ -369,7 +369,8 @@ class Session:
 
         Args:
             workers:     The number of worker threads.
-            bundle_size: Evaluations per worker task, `0` for a whole batch.
+            bundle_size: Evaluations sent to a worker together, `0` for a whole
+                         batch.
 
         Returns:
             A pool backed by worker threads.
@@ -401,7 +402,8 @@ class Session:
         Args:
             workers:             The number of worker processes.
             max_tasks_per_child: Evaluations before a worker is replaced.
-            bundle_size:         Evaluations per worker task, `0` for a batch.
+            bundle_size:         Evaluations sent to a worker together, `0` for
+                                 a batch.
 
         Returns:
             A pool backed by worker processes.
@@ -586,10 +588,11 @@ def session() -> Session:
     evaluates in-process and needs no session. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
-    A run that fails aborts the other runs on the session, which is what makes a
-    script stop at the first problem. Its exception is raised where the run was
-    started. A run or offload started from inside another run only raises; see
-    [When an inner run fails](../running/nested.md#when-an-inner-run-fails).
+    A task that fails aborts the other tasks on the session, which is what makes
+    a script stop at the first problem, and its exception is raised where the
+    task was started. A task started from inside another task does not abort the
+    rest of the session. [Failures and Aborts](../running/failures.md) defines
+    tasks and describes each case.
 
     Returns:
         A context manager binding the [`Session`][ropt.Session].

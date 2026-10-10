@@ -98,8 +98,8 @@ class WorkerPool:
             handlers:             Optional handlers, called in the order listed.
             report:               Optional callback invoked per evaluation.
             constraint_tolerance: The tolerance within which a constraint holds.
-            bundle_size:          Evaluations per worker task, `None` for the
-                                  pool's own.
+            bundle_size:          Evaluations sent to a worker together, `None`
+                                  for the pool's own.
             metadata:             Optional dictionary attached to every result.
             f0:                   Optional function results at `x0`.
             g0:                   Optional gradient results at `x0`.
@@ -159,8 +159,8 @@ class WorkerPool:
             report:               Optional callback, shared or one per run.
             limit:                The maximum number of runs at once.
             constraint_tolerance: The tolerance within which a constraint holds.
-            bundle_size:          Evaluations per worker task, shared or one per
-                                  run.
+            bundle_size:          Evaluations sent to a worker together, shared
+                                  or one per run.
             metadata:             Optional dictionary attached to every result.
             f0:                   Optional function results at `x0`, shared or
                                   one per run.
@@ -215,7 +215,8 @@ class WorkerPool:
             function:    The per-realization evaluation function.
             handlers:    Optional handlers, called in the order listed.
             report:      Optional callback invoked with the results.
-            bundle_size: Evaluations per worker task, `None` for the pool's own.
+            bundle_size: Evaluations sent to a worker together, `None` for the
+                         pool's own.
             metadata:    Optional dictionary attached to the results.
 
         Returns:
@@ -262,7 +263,8 @@ class WorkerPool:
             function:    The per-realization evaluation function.
             handlers:    Optional handlers, called in the order listed.
             report:      Optional callback invoked with each evaluation.
-            bundle_size: Evaluations per worker task, `None` for the pool's own.
+            bundle_size: Evaluations sent to a worker together, `None` for the
+                         pool's own.
             metadata:    Optional dictionary attached to every result.
 
         Returns:

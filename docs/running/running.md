@@ -217,9 +217,10 @@ The two are not the same kind of ending, which is why they have different exit
 codes. A `report` callback stops the run *on a criterion*, at a point it chose.
 An abort applies no criterion: the result is whatever the run had reached.
 
-An aborted run ends at its next evaluation boundary, so the evaluations already
-in flight are still carried out and their workers are free only once they
-return.
+An aborted run ends at its next evaluation boundary. With no pool, or on a thread
+or process pool, the evaluations already in flight are still carried out, and
+their workers are free only once they return. On a local or HPC pool they are
+cancelled.
 
 `abort()` reaches the runs that are under way at the moment it is called, and
 nothing more. A run started afterwards is unaffected, so a
@@ -332,7 +333,7 @@ still returns normally, and indicates why in `result.exit_code` —
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value, for
 instance, or `ABORTED_ON_ERROR` when another run on the same session raised and
 brought this one down with it (see
-[Failure in one run](many_runs.md#failure-in-one-run)).
+[Failures and Aborts](failures.md)).
 [Exit Codes](../results/exit_codes.md) lists them all, and explains why a
 reason and a result are independent: `result.results` is `None` when no feasible
 result was ever recorded, whatever the reason the run ended, and a run that fails
@@ -387,6 +388,13 @@ configuration errors belong to pydantic, and errors from your evaluation
 function stay whatever you raised. The control-flow signals that `ropt` raises
 and catches itself are excluded as well, and stay in
 [`ropt.exceptions`][ropt.exceptions].
+
+`optimize`, `evaluate`, `evaluate_batch`, `optimize_many` and `offload` start
+**tasks**, which can be under way at the same time. When a task raises an
+exception, every task started from inside it is aborted, and the exception is
+raised in the code that started the task. If that code is your script, every
+other task on the session is aborted as well. [Failures and Aborts](failures.md)
+describes each case.
 
 ## A note on enums
 

@@ -50,9 +50,9 @@ class WorkflowError(RoptError):
 class ExecutionError(RoptError):
     """The execution infrastructure failed at runtime.
 
-    For example an executor that cannot start, a broken process pool, a task
-    that cannot be serialized, an HPC setup or submission problem, or an
-    evaluation whose worker died before producing a result.
+    For example an executor that cannot start, a broken process pool, a function
+    that cannot be serialized for a worker, an HPC setup or submission problem,
+    or an evaluation whose worker died before producing a result.
     """
 
 

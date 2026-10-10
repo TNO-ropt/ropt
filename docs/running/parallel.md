@@ -132,10 +132,10 @@ machine's core count.
     pool.optimize_many(config, x0, [cheap, costly], bundle_size=[25, 1])
     ```
 
-    Every pool honours it, including a thread pool: a bundle is one worker
-    task, so `bundle_size=0` on a thread pool runs the whole batch on a single
-    thread. It is a pool argument only: a run started without one evaluates
-    inline, where a bundle has nothing to save.
+    Every pool honours it, including a thread pool: a bundle goes to one worker
+    as a whole, so `bundle_size=0` on a thread pool runs the whole batch on a
+    single thread. It is a pool argument only: a run started without one
+    evaluates inline, where a bundle has nothing to save.
 
     A pool also takes a `bundle_size` of its own, used by any run that does
     not state one.
@@ -199,14 +199,14 @@ past this pool — see [Which pool should I use?](#which-pool).
 
 A [`process_pool`][ropt.Session.process_pool] runs the evaluations in a
 handful of separate processes, reused across the run. Each has its own
-interpreter, so this is where heavy Python computation actually gets faster:
+interpreter, so this is where heavy Python code actually runs faster:
 
 ```python
 with session() as s:
     result = s.process_pool(workers=4).optimize(config, x0, objective)
 ```
 
-This pool applies when the computation is **Python code**, or when each
+This pool applies when the evaluation is **Python code**, or when each
 evaluation needs its own copy of something a library keeps globally. An
 objective that mostly runs an external program gains nothing here that a thread
 pool would not have given more cheaply.
@@ -380,7 +380,7 @@ Once that is settled, the choice is about speed, and about what
 | --- | --- | --- | --- | --- |
 | none | the calling thread, one at a time | shared | no | evaluations are fast |
 | `thread_pool` | background threads, one process | shared | no — one interpreter | each evaluation mostly **waits** (external tool, I/O), or spends its time in `numpy` |
-| `process_pool` | a few reused processes | copied | yes | each evaluation is heavy **Python computation** |
+| `process_pool` | a few reused processes | copied | yes | each evaluation runs heavy **Python code** |
 | `local_pool` | one process per evaluation | copied | yes | each evaluation is a self-contained **job** on this machine |
 | `hpc_pool` | jobs on a cluster | copied | yes | each evaluation is a big **cluster job** |
 
@@ -571,19 +571,18 @@ As with the evaluation function on a process, local, or HPC pool, the
 callables and their arguments are **copied to the workers**, since they run in
 separate processes.
 
-An offload belongs to its pool's session like a run does, so
-[`Session.abort`](running.md#stopping-from-outside), a closing session, and a
-failing run on the same session all reach it. An offload started from inside a
-run, from its evaluation function or a handler, is nested in that run: it is
-aborted with the run, and when it raises, only the code that started it receives
-the exception. See [When an inner run fails](nested.md#when-an-inner-run-fails).
-`offload` returns whatever its
-callables return and so has nowhere to report a reason: an `offload` with a
-callable that an abort kept from running raises [`AbortedError`][ropt.exceptions.AbortedError], whose
-`exit_code` distinguishes an abort that was asked for from one another run
-caused, and reports `EXECUTOR_SHUT_DOWN` when the pool could no longer run the
-work. Calls already on a worker run to their end, so an abort that costs the
-batch nothing lets it return its results.
+`offload` starts one task per callable, on its pool's session;
+[Failures and Aborts](failures.md) describes tasks and how a failure or an abort
+reaches them. When a callable raises, `offload` aborts the other callables and
+raises the exception at once. `offload` returns whatever its callables return
+and so has nowhere to report a reason: when an abort kept one of its callables
+from running, `offload` raises [`AbortedError`][ropt.exceptions.AbortedError],
+whose `exit_code` distinguishes an abort that was asked for from one that a
+failure caused, and reports `EXECUTOR_SHUT_DOWN` when the pool could no longer
+run the work. On a thread or process pool, a callable that is already running
+when the abort arrives runs to its end, so an abort that arrives after the last
+callable has started costs nothing, and `offload` returns the results. On a
+local or HPC pool, running callables are cancelled as well.
 
 !!! warning "Offloaded work coordinates with nothing"
     An offloaded callable runs wherever its pool puts it, and on a process,
