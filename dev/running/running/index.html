@@ -2803,7 +2803,7 @@ no optimizer loop to interrupt, so the callback reports and nothing more.</p>
 <h3 id="stopping-from-outside">Aborting a run from outside</h3>
 <p>The <code>report</code> callback runs inside the run it stops, which is no use to a signal
 handler or a user interface. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> is
-the one that is called from another thread: it cuts off every run that belongs
+the one that is called from another thread: it aborts every run that belongs
 to the session, and each ends with <code>USER_ABORT</code>, keeping the best result it had
 reached.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
@@ -2812,22 +2812,23 @@ reached.</p>
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
 </span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">USER_ABORT</span><span class="p">:</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"cut off early, best so far:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"aborted early, best so far:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The two are not the same kind of ending, which is why they have different exit
 codes. A <code>report</code> callback stops the run <em>on a criterion</em>, at a point it chose.
 An abort applies no criterion: the result is whatever the run had reached.</p>
-<p>A run is cut off at its next evaluation boundary, so the evaluations already in
-flight are still carried out and their workers are free only once they return.</p>
-<p><code>abort()</code> reaches the runs that are under way at the moment of the call, and
+<p>An aborted run ends at its next evaluation boundary, so the evaluations already
+in flight are still carried out and their workers are free only once they
+return.</p>
+<p><code>abort()</code> reaches the runs that are under way at the moment it is called, and
 nothing more. A run started afterwards is unaffected, so a
 loop that abandons one attempt and starts another keeps working. An
 <a class="autorefs autorefs-internal" title="            optimize_many" href="../../reference/api/#ropt.Session.optimize_many"><code>optimize_many</code></a> counts as one run here: a
-run it has queued behind its <code>limit</code> is cut off as well, and reports <code>USER_ABORT</code>
+run it has queued behind its <code>limit</code> is aborted as well, and reports <code>USER_ABORT</code>
 without evaluating anything. Leaving the session's <code>with</code> block aborts its runs
 as well, and then releases its pools, which is what refuses a run started after
-that. A run cut off that way reports <code>ABORTED</code> rather than <code>USER_ABORT</code>, since
-it was the block ending rather than a request to stop.</p>
+that. A run aborted that way reports <code>ABORTED</code> rather than <code>USER_ABORT</code>, since
+it was the block ending rather than a request to abort.</p>
 <p>A run started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> belongs
 to no session you hold and cannot be aborted this way. It evaluates on the
 calling thread, which is the thread that would have to call <code>abort()</code>. Start it
@@ -2891,8 +2892,8 @@ optimizer. Use <a class="autorefs autorefs-internal" title="            ropt.eva
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_batch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">single</span><span class="o">.</span><span class="n">results</span>  <span class="c1"># one FunctionResults, or None if the evaluation was cut off</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">batch</span><span class="o">.</span><span class="n">results</span>   <span class="c1"># one per row of the matrix, empty if the batch was cut off</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">single</span><span class="o">.</span><span class="n">results</span>  <span class="c1"># one FunctionResults, or None if the evaluation was aborted</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">batch</span><span class="o">.</span><span class="n">results</span>   <span class="c1"># one per row of the matrix, empty if the batch was aborted</span>
 </span></code></pre></div>
 <p>Both return an <a class="autorefs autorefs-internal" title="            ropt.EvaluationResult
 
@@ -2920,7 +2921,7 @@ receives, so everything is read the same way wherever it came from. Here
 <p>An evaluation is a single batch, so it produces either every result or none.
 That is why <code>exit_code</code> can only be <code>FINISHED</code>; <code>USER_ABORT</code> or
 <code>ABORTED_ON_ERROR</code> when <a href="#stopping-from-outside"><code>Session.abort</code></a> or a failing
-run on the same session cut it off; or <code>EXECUTOR_SHUT_DOWN</code> when the pool it was
+run on the same session aborted it; or <code>EXECUTOR_SHUT_DOWN</code> when the pool it was
 evaluating on could no longer run the work. An abort that arrives after the
 batch has finished leaves it unaffected, and the evaluation reports <code>FINISHED</code>.</p>
 <p>The runnable script is
@@ -2945,11 +2946,11 @@ it either way.</p>
 <p><strong>Mistakes in the configuration</strong> surface as a <code>pydantic.ValidationError</code>
   from the <code>config</code> dictionary: an unknown field, a value of the wrong type, a
   method name no installed plugin provides, or a set of options the chosen
-  method does not accept. These are raised at the start of the call, before
+  method does not accept. These are raised when the run starts, before
   anything is evaluated.</p>
 </li>
 <li>
-<p><strong>Mistakes in the call itself</strong> raise a <code>ValueError</code> — a start point of the
+<p><strong>Mistakes in the call to <code>optimize</code> itself</strong> raise a <code>ValueError</code> — a start point of the
   wrong shape, an evaluation function returning the wrong number of values —
   or one of the <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> types:
   <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> when a pool or handler
@@ -2961,10 +2962,10 @@ it either way.</p>
   as configured — a constraint it does not support, for instance, which is
   checked as the run starts — and
   <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> when the worker pool
-  that runs your evaluations, or a call handed to
+  that runs your evaluations, or a callable handed to
   <a class="autorefs autorefs-internal" title="            offload" href="../../reference/api/#ropt.WorkerPool.offload"><code>WorkerPool.offload</code></a>, cannot start or breaks
   down, and <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> when an abort
-  abandoned an offloaded call.</p>
+  kept an offloaded callable from running.</p>
 </li>
 <li>
 <p><strong>Exceptions from your own evaluation function</strong> are not caught. They travel
@@ -2972,7 +2973,7 @@ it either way.</p>
   — and are re-raised from the <code>optimize</code> call. Return <code>float("nan")</code> instead
   if a failed realization should be tolerated rather than fatal. With
   <a class="autorefs autorefs-internal" title="            ropt.optimize_many" href="../../reference/api/#ropt.optimize_many"><code>optimize_many</code></a> there is no single exception to
-  re-raise, so the call raises
+  re-raise, so <code>optimize_many</code> raises
   <a class="autorefs autorefs-internal" title="            RunsFailedError" href="../../reference/exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a> carrying what every run
   raised or reached; see
   <a href="../many_runs/#failure-in-one-run">Failure in one run</a>.</p>

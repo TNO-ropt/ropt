@@ -2930,7 +2930,7 @@ or the selected plugin does not support the requested method.</p>
 
 
 
-        <p>Work was cut off before it could finish.</p>
+        <p>Work was aborted before it could finish.</p>
 <p>Raised by <a class="autorefs autorefs-internal" title="            offload" href="../api/#ropt.WorkerPool.offload"><code>WorkerPool.offload</code></a>, which
 returns whatever its callables return and so has nowhere to report a reason.
 An optimization or an evaluation carries its reason on the result object it
@@ -2953,7 +2953,7 @@ returns instead, and does not raise this.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Why the work was cut off.</p>
+                <p>Why the work was aborted.</p>
               </div>
             </td>
           </tr>
@@ -3014,7 +3014,7 @@ returns instead, and does not raise this.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Why the work was cut off.</p>
+                <p>Why the work was aborted.</p>
               </div>
             </td>
             <td>
@@ -3066,9 +3066,9 @@ exception to re-raise nor a single set of results to return. This carries
 both, so the work the other runs did is not thrown away with the one that
 failed. The first exception is chained, so a traceback still shows what
 went wrong.</p>
-<p>The runs that did not fail were cut off when this one did and ended with
+<p>The runs that did not raise were aborted when one did, and ended with
 <code>ExitCode.ABORTED_ON_ERROR</code>. Each kept whatever its completed batches had
-produced; one cut off during its first batch has no result.</p>
+produced; one aborted during its first batch has no result.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>

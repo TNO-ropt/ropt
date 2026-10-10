@@ -3102,7 +3102,8 @@ them apart. What differs is whether a process is a <em>worker</em> or a <em>job<
 </tr>
 </tbody>
 </table>
-<p>One question separates them: <strong>is an evaluation a function call, or a job?</strong> A call
+<p>One question separates them: <strong>is an evaluation a function call, or a job?</strong> A
+function call
 is too short to pay for a process each time, so reuse a few workers and take a
 process pool. A job runs a simulator, writes files, and lasts long enough
 that one process start is negligible — take a local pool, or an HPC pool if it
@@ -3378,7 +3379,7 @@ submission script that does not redirect the job's output — with
 you control — a custom handler, a custom component, or a helper you call between
 optimizations — has an expensive, self-contained piece of work you want to run
 on a pool instead of inline.</p>
-<p>Pass a single callable to run one call and get its result back:</p>
+<p>Pass a single callable to run it once and get its result back:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
@@ -3399,9 +3400,13 @@ callables and their arguments are <strong>copied to the workers</strong>, since 
 separate processes.</p>
 <p>An offload belongs to its pool's session like a run does, so
 <a href="../running/#stopping-from-outside"><code>Session.abort</code></a>, a closing session, and a
-failing run on the same session all reach it. <code>offload</code> returns whatever its
-callables return and so has nowhere to report a reason: a call that was
-abandoned raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
+failing run on the same session all reach it. An offload started from inside a
+run, from its evaluation function or a handler, is nested in that run: it is
+aborted with the run, and when it raises, only the code that started it receives
+the exception. See <a href="../nested/#when-an-inner-run-fails">When an inner run fails</a>.
+<code>offload</code> returns whatever its
+callables return and so has nowhere to report a reason: an <code>offload</code> with a
+callable that an abort kept from running raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
 <code>exit_code</code> distinguishes an abort that was asked for from one another run
 caused, and reports <code>EXECUTOR_SHUT_DOWN</code> when the pool could no longer run the
 work. Calls already on a worker run to their end, so an abort that costs the
@@ -3412,8 +3417,8 @@ batch nothing lets it return its results.</p>
 local, or HPC pool that is somewhere else. It may create handlers and
 pools of its own, but they are <em>its</em> handlers and <em>its</em> pools.</p>
 <ul>
-<li><strong>Results cannot be tracked across offloaded calls.</strong> A handler created
-  inside one sees only that call's results and cannot be brought back:
+<li><strong>Results cannot be tracked across offloaded callables.</strong> A handler
+  created inside one sees only that callable's results and cannot be brought back:
   handlers cannot be moved between processes, so the return value is all
   that comes back. Following several concurrent pieces of work in one place
   is something <a href="../many_runs/"><code>optimize_many</code></a> can do and

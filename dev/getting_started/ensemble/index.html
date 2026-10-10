@@ -2625,8 +2625,8 @@ results rather than just look at them — or to collect them across several runs
 — use a handler instead; see
 <a href="../handlers/">Collecting Results with Handlers</a>.</p>
 <h2 id="5-run-it">5. Run it</h2>
-<p>The call is the same as for a deterministic problem, with <code>INITIAL_VALUES</code> the
-start point defined above:</p>
+<p>The call to <code>optimize</code> is the same as for a deterministic problem, with
+<code>INITIAL_VALUES</code> the start point defined above:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>ropt</code> evaluates all ten realizations at each point and averages them into the

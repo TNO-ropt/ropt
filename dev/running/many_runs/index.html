@@ -2463,7 +2463,8 @@ identifier that is attached to its results (and shows up in a
   This is built into <code>optimize_many</code> and does not depend on the pool;
   the <code>limit</code> argument caps how many run at the same time.</li>
 <li><strong>The function evaluations</strong> inside those runs all happen on the one pool
-  the call was started on, and the pool determines how they are parallelized. With
+  that <code>optimize_many</code> was started on, and the pool determines how they are
+  parallelized. With
   <code>thread_pool(workers=1)</code> the runs still progress together, but their
   evaluations are executed one at a time. A larger pool —
   <code>thread_pool(workers=n)</code>, or a process, local or HPC pool — runs several
@@ -2497,7 +2498,7 @@ on its own thread. Nothing serializes those calls, so a callback that
 appends to a list, updates a counter, or writes a file needs a lock of its
 own. Give each run its own callback when they must stay apart, or pass a
 <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">handler</a> in
-<code>handlers=</code>, which takes a lock around every call for you.</p>
+<code>handlers=</code>, which takes a lock around every event it handles.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">A shared handler makes the runs wait for each other</p>
@@ -2512,7 +2513,8 @@ a file, talking to a database — holds up every run feeding it.</p>
 <p><code>optimize_many</code> needs no pool. Without one, the runs still execute
 concurrently, but each evaluates inside your own program, on its own driver
 thread — so your evaluation function is called by several threads at once
-and must tolerate that. Give the call a pool when it must not be.</p>
+and must tolerate that. Start <code>optimize_many</code> on a pool when it must not
+be.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Not every backend can take part</p>
@@ -2533,17 +2535,17 @@ unless you want the runs' reports interleaved on the terminal.</p>
 <h2 id="failure-in-one-run">Failure in one run</h2>
 <p>A run that raises aborts the other runs on its session. Each of those ends at
 its next evaluation boundary with <code>ABORTED_ON_ERROR</code>, keeping the best result it
-had reached. A run still queued behind <code>limit</code> is cut off before its first
+had reached. A run still queued behind <code>limit</code> is aborted before its first
 evaluation, and reports <code>ABORTED_ON_ERROR</code> with no result at all. Nothing is
 built for such a run, so an invalid configuration in one is never reported.</p>
-<p>A call that fails before it creates any run stops them too. <code>optimize_many</code>
-broadcasts its arguments first, so lists whose lengths disagree raise
-<code>ValueError</code>; <code>evaluate</code> and <code>evaluate_batch</code> raise on a vector of the wrong
-shape. Each aborts the other runs on the session before raising.
+<p>Arguments that are rejected before any run is created abort them too.
+<code>optimize_many</code> broadcasts its arguments first, so lists whose lengths disagree
+raise <code>ValueError</code>; <code>evaluate</code> and <code>evaluate_batch</code> raise on a vector of the
+wrong shape. Each aborts the other runs on the session before raising.
 <code>RunsFailedError</code> is not raised in those cases, since no run exists to carry an
-outcome. A closed session is not a failure: the call is refused and nothing is
-aborted.</p>
-<p>The call then raises
+outcome. A closed session is not a failure: the method raises
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> and nothing is aborted.</p>
+<p><code>optimize_many</code> then raises
 <a class="autorefs autorefs-internal" title="            RunsFailedError" href="../../reference/exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a>. With several runs there is
 no single exception to re-raise and no single set of results to return, so the
 error carries both. <code>outcomes</code> has one entry per run, in the order the runs were
@@ -2567,19 +2569,24 @@ raised:</p>
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> ended with </span><span class="si">{</span><span class="n">outcome</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Without this the work the other runs did would be thrown away along with the run
-that failed, which matters more now that they are cut off deliberately. The
+that failed, which matters more now that they are aborted deliberately. The
 first exception is chained, so a traceback still shows what went wrong. A
 <code>KeyboardInterrupt</code> or <code>SystemExit</code> propagates unchanged instead of being
 collected into <code>RunsFailedError</code>, since it means the program is ending rather
 than a run reporting a problem. The
 interrupt also aborts the runs that are still going and waits for them, so they
 end at their next evaluation boundary rather than continuing in the background;
-a second interrupt abandons them.</p>
-<p>A failure reaches every run on the session, not only those of the call, so it
-also aborts runs that were
+a second interrupt stops waiting for them.</p>
+<p>A failure reaches every run on the session, not only those started by the same
+<code>optimize_many</code>, so it also aborts runs that were
 started separately on the same session. A run started with the module-level
 <a class="autorefs autorefs-internal" title="            ropt.optimize_many" href="../../reference/api/#ropt.optimize_many"><code>optimize_many</code></a> has a session of its own, holding
-only the runs of that call. A failure never reaches the runs of another session.</p>
+only the runs it starts. A failure never reaches the runs of another session.</p>
+<p>Started from inside another run, from an evaluation function for instance,
+<code>optimize_many</code> is nested in that run. A failure then aborts only the runs that
+this <code>optimize_many</code> started, arguments that do not agree abort nothing, and
+<code>RunsFailedError</code> is raised in the code that started it. See
+<a href="../nested/#when-an-inner-run-fails">When an inner run fails</a>.</p>
 <p><a href="../running/#stopping-from-outside"><code>Session.abort</code></a> also reaches every run on
 the session, and those runs end with <code>USER_ABORT</code> instead, so the exit code
 distinguishes an abort that was asked for from one that a failing run caused.

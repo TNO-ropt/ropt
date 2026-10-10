@@ -943,6 +943,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#when-an-inner-run-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When an inner run fails
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#two-pools-not-one" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2421,6 +2432,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#when-an-inner-run-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When an inner run fails
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#two-pools-not-one" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2605,24 +2627,65 @@ evaluation reports <code>NaN</code> for it. That is the same value an ordinary e
 function returns for a realization that failed, so the outer run applies its own
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 to it.</p>
+<h2 id="when-an-inner-run-fails">When an inner run fails</h2>
+<p>A run started from inside another run is <strong>nested</strong> in it, and the outer run is
+its <strong>parent</strong>. That covers a run started with <code>optimize</code>, <code>optimize_many</code>,
+<code>evaluate</code> or <code>evaluate_batch</code>, and an <a class="autorefs autorefs-internal" title="            offload" href="../../reference/api/#ropt.WorkerPool.offload"><code>offload</code></a>,
+when the start is made in the same process from an evaluation function, an event
+handler, a report callback, or a function that an <code>offload</code> runs.</p>
+<p>A nested run that raises does not abort the other runs of the session. Its
+exception is raised in the code that started it, here the outer evaluation
+function, which can catch it and return <code>NaN</code> for that realization:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">inner_config</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">inner_function</span><span class="p">)</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
+</span></code></pre></div>
+<p>An exception that the outer evaluation function does not catch ends the outer
+run, as any exception from an evaluation function does. A run started outside
+every other run aborts the other runs of its session as soon as it raises; see
+<a href="../many_runs/#failure-in-one-run">Failure in one run</a>.</p>
+<p>A nested run is aborted when its parent is, whether by
+<a href="../running/#stopping-from-outside"><code>Session.abort</code></a>, a closing session, or a
+failure. When a nested run raises, the runs and offloads started from its own
+code are aborted.</p>
+<p>The runs started by one nested <code>optimize_many</code> abort each other: when one of them
+raises, the others end with <code>ABORTED_ON_ERROR</code>, and
+<a class="autorefs autorefs-internal" title="            RunsFailedError" href="../../reference/exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a> is raised in the code that
+started them.</p>
+<p>An inner <code>offload</code> raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> when
+it is aborted or its pool can no longer run the work. Returning <code>NaN</code> for that
+counts the realization as failed, so catch only the exceptions that your own
+inner code raises.</p>
+<div class="admonition note">
+<p class="admonition-title">Threads that the evaluation function starts</p>
+<p>A run started from a thread that the evaluation function starts itself is
+not nested, and aborts the other runs of the session when it raises. Start
+the thread through <code>contextvars.copy_context().run</code> to make it nested:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">contextvars</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">contextvars</span><span class="o">.</span><span class="n">copy_context</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">work</span><span class="p">,))</span>
+</span></code></pre></div>
+</div>
 <h2 id="two-pools-not-one">Two pools, not one</h2>
 <p>Each layer evaluates on its own pool, and that is a requirement rather than
 a preference:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># A plain dict reaches the outer evaluations because they run on threads, in</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># this process; on a process pool each worker would get an empty copy.</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">memo</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">OUTER_CONFIG</span><span class="p">,</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">INITIAL_VALUES</span><span class="p">,</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">partial</span><span class="p">(</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>            <span class="n">inner_optimization</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>            <span class="n">tables</span><span class="o">=</span><span class="n">tables</span><span class="p">,</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>            <span class="n">function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">),</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>            <span class="n">memo</span><span class="o">=</span><span class="n">memo</span><span class="p">,</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        <span class="p">),</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># A plain dict reaches the outer evaluations because they run on threads, in</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># this process; on a process pool each worker would get an empty copy.</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">memo</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>        <span class="n">OUTER_CONFIG</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        <span class="n">INITIAL_VALUES</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>        <span class="n">partial</span><span class="p">(</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>            <span class="n">inner_optimization</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>            <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>            <span class="n">tables</span><span class="o">=</span><span class="n">tables</span><span class="p">,</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>            <span class="n">function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">),</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>            <span class="n">memo</span><span class="o">=</span><span class="n">memo</span><span class="p">,</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>        <span class="p">),</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    <span class="p">)</span>
 </span></code></pre></div>
 <p>The outer pool is a <strong>thread</strong> pool. Outer evaluations therefore stay
 inside this process, where the inner pool and the shared handler are live
@@ -2632,7 +2695,7 @@ work goes.</p>
 <p>That is also where a cluster belongs. Swapping the inner pool for an
 <a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/api/#ropt.Session.hpc_pool"><code>hpc_pool</code></a> is the whole change — the inner
 evaluations become cluster jobs, and the layer above is untouched:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">inner_pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">inner_pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Sending whole <em>optimizations</em> to the cluster, by putting the <strong>outer</strong>
 evaluations on processes or HPC, is possible but gives something different. Each
@@ -2677,14 +2740,14 @@ outer evaluations that were computed, not for every outer evaluation.</p>
 <h2 id="collecting-results-from-runs-that-overlap">Collecting results from runs that overlap</h2>
 <p>The inner runs are concurrent, and <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">one
 handler</a> collects them
-all: it takes a lock around every call, so the runs wait for each other rather
-than interleaving. Give every inner run the same
+all: it takes a lock around every event it handles, so the runs wait for each
+other rather than interleaving. Give every inner run the same
 <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a> and every inner evaluation
 from every inner run lands in one table, keyed by the outer evaluation it
 belongs to.</p>
 <p>Reading the answer takes one more step than usual:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">best</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">"Objective"</span><span class="p">)</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">best</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Variable,</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span><span class="p">)]</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">best</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">"Objective"</span><span class="p">)</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">best</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Variable,</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span><span class="p">)]</span>
 </span></code></pre></div>
 <p>The outer result is not the place to look. The outer layer only ever sees its
 own variables and holds the inner ones at their initial values, so the optimum

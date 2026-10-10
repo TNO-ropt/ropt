@@ -2666,7 +2666,7 @@ the loop or function that uses it rather than around the whole program; see
 </table>
 <h2 id="running-many-at-once">Running many at once</h2>
 <p><strong><code>optimize_many</code> really does run everything at once.</strong> A handler given to all
-the runs takes a lock around every call, so it collects them safely, but a
+the runs takes a lock around every event it handles, so it collects them safely, but a
 single <code>report=</code> callback does not: it is called by several threads at the same
 time. Keep such a callback free of shared state, or give each run its own.</p>
 <p><strong>A slow shared handler holds up every run.</strong> The run that emitted a result

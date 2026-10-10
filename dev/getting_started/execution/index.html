@@ -2321,7 +2321,7 @@
 <h1 id="running-in-parallel">Running in Parallel</h1>
 <p>An optimization calls your evaluation function many times. By default these calls
 happen one after another, on the same thread that called
-<a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>. If each call is slow, you can run several at
+<a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>. If each evaluation is slow, you can run several at
 the same time by evaluating on a <strong>pool</strong>.</p>
 <p>Open a <a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a>, build a pool on it, and start the run
 on that pool:</p>

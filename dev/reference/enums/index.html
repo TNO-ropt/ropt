@@ -3933,7 +3933,7 @@ when each event type fires and what data it carries.</p>
 <strong>aborted</strong>. It stops when a condition on the run is met — the optimizer
 converged, a budget ran out, a handler decided the results were good enough
 — so it ends at a point that satisfied a stated criterion. It is aborted
-when something cuts it off regardless of the state of the run, and the
+when something ends it regardless of the state of the run, and the
 result is then whatever it had reached, not a considered endpoint.</p>
 <p>Each member carries a short description in
 <a class="autorefs autorefs-internal" title="            message
@@ -4196,7 +4196,7 @@ instead.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when the run was cut off from outside, without regard to where
+        <p>Returned when the run was aborted from outside, without regard to where
 it had got to.</p>
 <p>This is what closing a session reports for a run still under way.</p>
 
@@ -4258,7 +4258,7 @@ it had got to.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when <a class="autorefs autorefs-internal" title="            abort" href="../api/#ropt.Session.abort"><code>Session.abort</code></a> cut the run off.</p>
+        <p>Returned when <a class="autorefs autorefs-internal" title="            abort" href="../api/#ropt.Session.abort"><code>Session.abort</code></a> aborted the run.</p>
 <p>Set apart from <a class="autorefs autorefs-internal" title="            ABORTED
 
 
