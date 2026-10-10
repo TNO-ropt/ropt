@@ -31,14 +31,9 @@ def _offload[T](
     session: Session,
     executor: Executor,
     work: Callable[[], T] | Sequence[Callable[[], T]],
-    *,
-    keep_going: bool | None,
 ) -> T | tuple[T, ...]:
     signal = AbortSignal()
-    session._register(  # ruff: ignore[private-member-access]
-        signal,
-        keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
-    )
+    session._register(signal)  # ruff: ignore[private-member-access]
     try:
         if callable(work):
             return cast("T", _run(executor, [work], signal)[0])

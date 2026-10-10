@@ -155,7 +155,7 @@ def test_run_starting_while_a_session_closes_refused() -> None:
 
     signal.add_callback(_start_a_run)
     with closing:
-        closing._register(signal, keep_going=False)  # ruff: ignore[private-member-access]
+        closing._register(signal)  # ruff: ignore[private-member-access]
     assert outcomes == ["refused"]
 
 

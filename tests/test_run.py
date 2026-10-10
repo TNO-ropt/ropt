@@ -1456,28 +1456,6 @@ def test_optimize_many_cuts_off_queued_runs_when_one_cannot_be_built(
 
 
 @pytest.mark.timeout(60)
-def test_optimize_many_with_keep_going_starts_queued_runs_when_one_fails(
-    pools: Callable[..., WorkerPool], config: Any
-) -> None:
-    calls = 0
-    lock = threading.Lock()
-
-    def boom(_v: Any, _c: Any) -> float:
-        nonlocal calls
-        with lock:
-            calls += 1
-        msg = "boom"
-        raise ValueError(msg)
-
-    starts = np.tile(initial_values, (5, 1))
-    pool = pools(workers=2)
-    with pytest.raises(RunsFailedError):
-        pool.optimize_many(config, starts, boom, limit=1, keep_going=True)
-    with lock:
-        assert calls == 5
-
-
-@pytest.mark.timeout(60)
 def test_optimize_many_leaves_the_pool_usable_after_a_failure(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:

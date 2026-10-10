@@ -83,7 +83,6 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     constraint_tolerance: float,
     bundle_size: int | None,
-    keep_going: bool | None,
     metadata: dict[str, Any] | None,
     parent_signal: AbortSignal | None,
     f0: FunctionResults | None = None,
@@ -115,10 +114,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         raise
     # Left outside the guard above: registration raises because the session is
     # closed, which is not this run failing.
-    session._register(  # ruff: ignore[private-member-access]
-        signal,
-        keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
-    )
+    session._register(signal)  # ruff: ignore[private-member-access]
     cut_off = None
     if parent_signal is not None:
         # Runs at once when the parent is already aborting, which is what cuts
@@ -163,7 +159,6 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     limit: int | None,
     constraint_tolerance: float,
     bundle_size: int | Sequence[int | None] | None,
-    keep_going: bool | None,
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None,
     f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
     g0: GradientResults | Sequence[GradientResults | None] | None = None,
@@ -188,14 +183,10 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
         # the session as a failed run does.
         session._fail()  # ruff: ignore[private-member-access]
         raise
-    # One signal for the whole call, so an abort reaches the runs that have not
-    # started yet. It carries the call's own `keep_going`, so a failure cuts off
-    # a run still queued behind `limit` as it cuts off one already running.
+    # One signal for the whole call, so an abort or a failure also reaches the
+    # runs that have not started yet.
     parent_signal = AbortSignal()
-    session._register(  # ruff: ignore[private-member-access]
-        parent_signal,
-        keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
-    )
+    session._register(parent_signal)  # ruff: ignore[private-member-access]
     jobs: list[Callable[[], OptimizationResult]] = [
         partial(
             _optimize,
@@ -208,7 +199,6 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
             report=run_report,
             constraint_tolerance=constraint_tolerance,
             bundle_size=run_bundle_size,
-            keep_going=keep_going,
             metadata=run_metadata,
             parent_signal=parent_signal,
             f0=run_f0,

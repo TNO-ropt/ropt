@@ -6,7 +6,6 @@
 
 from __future__ import annotations
 
-import contextlib
 import threading
 from functools import partial
 from typing import TYPE_CHECKING, Any
@@ -20,6 +19,8 @@ from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from numpy.typing import NDArray
 
     from ropt import (
@@ -335,73 +336,15 @@ def test_an_abort_does_not_reach_another_session() -> None:
     assert result.exit_code == ExitCode.FINISHED
 
 
-def _run_beside_a_failure(
-    *, keep_going: bool | None, failure_keeps_going: bool | None = None
-) -> OptimizationResult:
+@pytest.mark.timeout(60)
+def test_a_failing_run_aborts_the_others_on_its_session() -> None:
     # One run fails while a second is held inside an evaluation, so the second
-    # is certainly still going when the failure lands. Returns the second.
+    # is certainly still going when the failure lands.
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
     outcome: list[OptimizationResult] = []
 
     with session() as opened:
-        pool = opened.thread_pool(workers=2)
-
-        def _survivor() -> None:
-            outcome.append(
-                pool.optimize(
-                    _CONFIG,
-                    _INITIAL,
-                    _waits_then_holds(started, release),
-                    keep_going=keep_going,
-                )
-            )
-
-        driver = threading.Thread(target=_survivor)
-        driver.start()
-        try:
-            with pytest.raises(ValueError, match="boom"):
-                pool.optimize(
-                    _CONFIG,
-                    _INITIAL,
-                    _fails_at(started),
-                    keep_going=failure_keeps_going,
-                )
-        finally:
-            release.set()
-            driver.join(timeout=30)
-
-    assert not driver.is_alive()
-    return outcome[0]
-
-
-@pytest.mark.timeout(60)
-def test_a_failing_run_aborts_the_others_on_its_session() -> None:
-    result = _run_beside_a_failure(keep_going=None)
-    assert result.exit_code == ExitCode.ABORTED_ON_ERROR
-
-
-@pytest.mark.timeout(60)
-def test_keep_going_lets_a_run_finish_when_another_fails() -> None:
-    result = _run_beside_a_failure(keep_going=True)
-    assert result.exit_code == ExitCode.FINISHED
-
-
-@pytest.mark.timeout(60)
-def test_a_failing_run_that_keeps_going_still_aborts_the_others() -> None:
-    # The flag exempts a run from being aborted, never from aborting the rest:
-    # a run that may outlive a failure must not be able to hide its own.
-    result = _run_beside_a_failure(keep_going=None, failure_keeps_going=True)
-    assert result.exit_code == ExitCode.ABORTED_ON_ERROR
-
-
-@pytest.mark.timeout(60)
-def test_a_run_takes_keep_going_from_its_session() -> None:
-    started = threading.Barrier(2, timeout=30)
-    release = threading.Event()
-    outcome: list[OptimizationResult] = []
-
-    with session(keep_going=True) as opened:
         pool = opened.thread_pool(workers=2)
 
         def _survivor() -> None:
@@ -418,69 +361,8 @@ def test_a_run_takes_keep_going_from_its_session() -> None:
             release.set()
             driver.join(timeout=30)
 
-    assert outcome[0].exit_code == ExitCode.FINISHED
-
-
-@pytest.mark.timeout(60)
-def test_keep_going_on_a_run_overrides_its_session() -> None:
-    started = threading.Barrier(2, timeout=30)
-    release = threading.Event()
-    outcome: list[OptimizationResult] = []
-
-    with session(keep_going=True) as opened:
-        pool = opened.thread_pool(workers=2)
-
-        def _survivor() -> None:
-            outcome.append(
-                pool.optimize(
-                    _CONFIG,
-                    _INITIAL,
-                    _waits_then_holds(started, release),
-                    keep_going=False,
-                )
-            )
-
-        driver = threading.Thread(target=_survivor)
-        driver.start()
-        try:
-            with pytest.raises(ValueError, match="boom"):
-                pool.optimize(_CONFIG, _INITIAL, _fails_at(started))
-        finally:
-            release.set()
-            driver.join(timeout=30)
-
+    assert not driver.is_alive()
     assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
-
-
-@pytest.mark.timeout(60)
-def test_session_abort_reaches_a_run_that_keeps_going() -> None:
-    # Opting out is about a sibling's failure, not about being cut off on
-    # request, and the exit code says which of the two happened.
-    started = threading.Barrier(2, timeout=30)
-    release = threading.Event()
-    outcome: list[OptimizationResult] = []
-
-    with session() as opened:
-        pool = opened.thread_pool(workers=1)
-
-        def _survivor() -> None:
-            outcome.append(
-                pool.optimize(
-                    _CONFIG,
-                    _INITIAL,
-                    _waits_then_holds(started, release),
-                    keep_going=True,
-                )
-            )
-
-        driver = threading.Thread(target=_survivor)
-        driver.start()
-        started.wait(timeout=30)
-        opened.abort()
-        release.set()
-        driver.join(timeout=30)
-
-    assert outcome[0].exit_code == ExitCode.USER_ABORT
 
 
 @pytest.mark.timeout(60)
@@ -558,9 +440,8 @@ def test_a_run_cut_off_by_an_abort_does_not_report_a_failure() -> None:
     assert outcome[0].exit_code == ExitCode.FINISHED
 
 
-def _evaluate_beside_a_failure(
-    *, session_keep_going: bool, keep_going: bool | None
-) -> EvaluationResult[tuple[FunctionResults, ...]]:
+@pytest.mark.timeout(60)
+def test_a_failing_run_aborts_an_evaluation_beside_it() -> None:
     # One worker and one vector per bundle, so the second row is still queued
     # when the other run fails; each run has a pool of its own so that the two
     # can overlap on one worker each.
@@ -569,18 +450,14 @@ def _evaluate_beside_a_failure(
     matrix = np.array([_INITIAL, np.zeros(_INITIAL.size)])
     outcome: list[EvaluationResult[tuple[FunctionResults, ...]]] = []
 
-    with session(keep_going=session_keep_going) as opened:
+    with session() as opened:
         evaluating = opened.thread_pool(workers=1)
         failing = opened.thread_pool(workers=1)
 
         def _survivor() -> None:
             outcome.append(
                 evaluating.evaluate_batch(
-                    _CONFIG,
-                    matrix,
-                    _waits_then_holds(started, release),
-                    bundle_size=1,
-                    keep_going=keep_going,
+                    _CONFIG, matrix, _waits_then_holds(started, release), bundle_size=1
                 )
             )
 
@@ -594,21 +471,8 @@ def _evaluate_beside_a_failure(
             driver.join(timeout=30)
 
     assert not driver.is_alive()
-    return outcome[0]
-
-
-@pytest.mark.timeout(60)
-def test_an_evaluation_takes_keep_going_from_its_session() -> None:
-    outcome = _evaluate_beside_a_failure(session_keep_going=True, keep_going=None)
-    assert outcome.exit_code == ExitCode.FINISHED
-    assert len(outcome.results) == 2
-
-
-@pytest.mark.timeout(60)
-def test_keep_going_on_an_evaluation_overrides_its_session() -> None:
-    outcome = _evaluate_beside_a_failure(session_keep_going=True, keep_going=False)
-    assert outcome.exit_code == ExitCode.ABORTED_ON_ERROR
-    assert outcome.results == ()
+    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
+    assert outcome[0].results == ()
 
 
 @pytest.mark.timeout(60)
@@ -720,22 +584,23 @@ def test_an_evaluation_of_the_wrong_shape_aborts_the_runs_beside_it(
 
 
 @pytest.mark.timeout(60)
-def test_an_offload_takes_keep_going_from_its_session() -> None:
+def test_a_failing_run_aborts_an_offload_beside_it() -> None:
     # The second call is still queued behind the single worker when the other
-    # run fails, which is what `keep_going` has to exempt it from.
+    # run fails, so the abort abandons it.
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
-    values: list[tuple[int, ...]] = []
+    raised: list[AbortedError] = []
 
-    with session(keep_going=True) as opened:
+    with session() as opened:
         offloading = opened.thread_pool(workers=1)
         failing = opened.thread_pool(workers=1)
+        work: list[Callable[[], int]] = [partial(_hold_at, started, release), _one]
 
         def _survivor() -> None:
-            with contextlib.suppress(AbortedError):
-                values.append(
-                    offloading.offload([partial(_hold_at, started, release), _one])
-                )
+            try:
+                offloading.offload(work)
+            except AbortedError as exc:
+                raised.append(exc)
 
         driver = threading.Thread(target=_survivor)
         driver.start()
@@ -746,4 +611,5 @@ def test_an_offload_takes_keep_going_from_its_session() -> None:
             release.set()
             driver.join(timeout=30)
 
-    assert values == [(0, 1)]
+    assert not driver.is_alive()
+    assert [exc.exit_code for exc in raised] == [ExitCode.ABORTED_ON_ERROR]

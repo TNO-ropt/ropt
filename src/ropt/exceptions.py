@@ -97,9 +97,8 @@ class RunsFailedError(RoptError):
     went wrong.
 
     The runs that did not fail were cut off when this one did and ended with
-    `ExitCode.ABORTED_ON_ERROR`, unless they were started with
-    `keep_going=True`. Each kept whatever its completed batches had produced;
-    one cut off during its first batch has no result.
+    `ExitCode.ABORTED_ON_ERROR`. Each kept whatever its completed batches had
+    produced; one cut off during its first batch has no result.
 
     Attributes:
         outcomes: Per run, in the order the runs were given, its

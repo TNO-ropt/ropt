@@ -77,18 +77,13 @@ class Session:
     interface — calls to bring them down.
     """
 
-    def __init__(self, *, keep_going: bool = False) -> None:
-        """Initialize the session.
-
-        Args:
-            keep_going: The default for the runs started on this session.
-        """
+    def __init__(self) -> None:
+        """Initialize the session."""
         # A driver thread may build its own pool while the session is closing.
         self._lock = threading.Lock()
         self._pools: list[WorkerPool] | None = None
         self._entered = False
-        self._keep_going = keep_going
-        self._signals: dict[AbortSignal, bool] = {}
+        self._signals: set[AbortSignal] = set()
 
     def __enter__(self) -> Self:
         """Open the session.
@@ -128,40 +123,33 @@ class Session:
         [`AbortedError`][ropt.exceptions.AbortedError] instead, since it has no
         result object to report a reason on.
 
-        This reaches every run under way, `keep_going` or not: that flag exempts
-        a run from the abort a failing run triggers, not from one that was asked
-        for. Calling it is thread-safe, and safe on a session with no runs. See
+        This reaches every run under way. Calling it is thread-safe, and safe on
+        a session with no runs. See
         [Aborting a run from outside](../running/running.md#stopping-from-outside)
         for which runs are reached and when.
         """
-        with self._lock:
-            signals = list(self._signals)
-        for signal in signals:
-            signal.abort(ExitCode.USER_ABORT)
+        self._abort_all(ExitCode.USER_ABORT)
 
     def _fail(self) -> None:
         # A run that failed brings down the rest, which is what makes a script
-        # stop at the first problem. `keep_going` exempts a run from being
-        # aborted, never from aborting the others.
+        # stop at the first problem.
+        self._abort_all(ExitCode.ABORTED_ON_ERROR)
+
+    def _abort_all(self, exit_code: ExitCode) -> None:
         with self._lock:
-            signals = [
-                signal for signal, keep_going in self._signals.items() if not keep_going
-            ]
+            signals = list(self._signals)
         for signal in signals:
-            signal.abort(ExitCode.ABORTED_ON_ERROR)
+            signal.abort(exit_code)
 
-    def _resolve_keep_going(self, *, keep_going: bool | None) -> bool:
-        return self._keep_going if keep_going is None else keep_going
-
-    def _register(self, signal: AbortSignal, *, keep_going: bool) -> None:
+    def _register(self, signal: AbortSignal) -> None:
         with self._lock:
             if self._pools is None:
                 raise WorkflowError(_CLOSED)
-            self._signals[signal] = keep_going
+            self._signals.add(signal)
 
     def _deregister(self, signal: AbortSignal) -> None:
         with self._lock:
-            self._signals.pop(signal, None)
+            self._signals.discard(signal)
 
     def optimize(  # ruff: ignore[too-many-arguments]
         self,
@@ -172,7 +160,6 @@ class Session:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         constraint_tolerance: float = 1e-10,
-        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
         f0: FunctionResults | None = None,
         g0: GradientResults | None = None,
@@ -191,8 +178,6 @@ class Session:
             handlers:             Optional handlers, called in the order listed.
             report:               Optional callback invoked per evaluation.
             constraint_tolerance: The tolerance within which a constraint holds.
-            keep_going:           Whether to run on when another run in this
-                                  session fails, `None` for the session's own.
             metadata:             Optional dictionary attached to every result.
             f0:                   Optional function results at `x0`.
             g0:                   Optional gradient results at `x0`.
@@ -214,7 +199,6 @@ class Session:
             report=report,
             constraint_tolerance=constraint_tolerance,
             bundle_size=None,
-            keep_going=keep_going,
             metadata=metadata,
             parent_signal=None,
             f0=f0,
@@ -232,7 +216,6 @@ class Session:
         report: ReportCallback | Sequence[ReportCallback] | None = None,
         limit: int | None = None,
         constraint_tolerance: float = 1e-10,
-        keep_going: bool | None = None,
         metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
         f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
         g0: GradientResults | Sequence[GradientResults | None] | None = None,
@@ -255,9 +238,6 @@ class Session:
             report:               Optional callback, shared or one per run.
             limit:                The maximum number of runs at once.
             constraint_tolerance: The tolerance within which a constraint holds.
-            keep_going:           Whether a run carries on when another run in
-                                  this session fails, `None` for the session's
-                                  own.
             metadata:             Optional dictionary attached to every result.
             f0:                   Optional function results at `x0`, shared or
                                   one per run.
@@ -285,7 +265,6 @@ class Session:
             limit=limit,
             constraint_tolerance=constraint_tolerance,
             bundle_size=None,
-            keep_going=keep_going,
             metadata=metadata,
             f0=f0,
             g0=g0,
@@ -300,7 +279,6 @@ class Session:
         *,
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
-        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[FunctionResults | None]:
         """Evaluate a single variable vector in-process, without optimizing.
@@ -308,14 +286,12 @@ class Session:
         See [Running Optimizations](../running/running.md) for a walkthrough.
 
         Args:
-            config:     The optimization configuration.
-            variables:  The variable vector to evaluate.
-            function:   The per-realization evaluation function.
-            handlers:   Optional handlers, called in the order listed.
-            report:     Optional callback invoked with the results.
-            keep_going: Whether to run on when another run in this session
-                        fails, `None` for the session's own.
-            metadata:   Optional dictionary attached to the results.
+            config:    The optimization configuration.
+            variables: The variable vector to evaluate.
+            function:  The per-realization evaluation function.
+            handlers:  Optional handlers, called in the order listed.
+            report:    Optional callback invoked with the results.
+            metadata:  Optional dictionary attached to the results.
 
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
@@ -335,7 +311,6 @@ class Session:
             handlers=handlers,
             report=report,
             bundle_size=None,
-            keep_going=keep_going,
             metadata=metadata,
         )
 
@@ -347,7 +322,6 @@ class Session:
         *,
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
-        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[tuple[FunctionResults, ...]]:
         """Evaluate a batch of variable vectors in-process, without optimizing.
@@ -357,14 +331,12 @@ class Session:
         walkthrough.
 
         Args:
-            config:     The optimization configuration.
-            variables:  The variable vectors to evaluate, one per row.
-            function:   The per-realization evaluation function.
-            handlers:   Optional handlers, called in the order listed.
-            report:     Optional callback invoked with each evaluation.
-            keep_going: Whether to run on when another run in this session
-                        fails, `None` for the session's own.
-            metadata:   Optional dictionary attached to every result.
+            config:    The optimization configuration.
+            variables: The variable vectors to evaluate, one per row.
+            function:  The per-realization evaluation function.
+            handlers:  Optional handlers, called in the order listed.
+            report:    Optional callback invoked with each evaluation.
+            metadata:  Optional dictionary attached to every result.
 
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
@@ -385,7 +357,6 @@ class Session:
             handlers=handlers,
             report=report,
             bundle_size=None,
-            keep_going=keep_going,
             metadata=metadata,
         )
 
@@ -598,7 +569,7 @@ class Session:
                 raise WorkflowError(_CLOSED)
 
 
-def session(*, keep_going: bool = False) -> Session:
+def session() -> Session:
     """Open a session that owns the pools built on it.
 
     Build pools with the session's factories, and start on them the runs that
@@ -615,14 +586,11 @@ def session(*, keep_going: bool = False) -> Session:
     evaluates in-process and needs no session. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
-    By default a run that fails stops the other runs on the session, which is
-    what makes a script stop at the first problem. Pass `keep_going=True` to let
-    them finish instead; a failure is still raised to its own caller.
-
-    Args:
-        keep_going: The default for the runs started on this session.
+    A run that fails stops the other runs on the session, which is what makes a
+    script stop at the first problem. Its exception is raised where the run was
+    started.
 
     Returns:
         A context manager binding the [`Session`][ropt.Session].
     """
-    return Session(keep_going=keep_going)
+    return Session()

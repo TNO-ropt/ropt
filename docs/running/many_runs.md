@@ -109,10 +109,7 @@ A run that raises aborts the other runs on its session. Each of those ends at
 its next evaluation boundary with `ABORTED_ON_ERROR`, keeping the best result it
 had reached. A run still queued behind `limit` is cut off before its first
 evaluation, and reports `ABORTED_ON_ERROR` with no result at all. Nothing is
-built for such a run, so an invalid configuration in one is never reported. This
-is the default because most runs are started from a script with nobody watching:
-a problem ends the script rather than the remaining runs continuing towards
-output that will not be used.
+built for such a run, so an invalid configuration in one is never reported.
 
 A call that fails before it creates any run stops them too. `optimize_many`
 broadcasts its arguments first, so lists whose lengths disagree raise
@@ -157,22 +154,9 @@ A failure reaches every run on the session, not only those of the call, so it
 also aborts runs that were
 started separately on the same session. A run started with the module-level
 [`optimize_many`][ropt.optimize_many] has a session of its own, holding
-only the runs of that call.
+only the runs of that call. A failure never reaches the runs of another session.
 
-Pass `keep_going=True` to let a run finish anyway, which also lets the runs
-queued behind `limit` start:
-
-```python
-results = pool.optimize_many(config, start_points, objective, keep_going=True)
-```
-
-or `session(keep_going=True)` to make that the default for everything on the
-session, which a single run can still override with `keep_going=False`.
-
-The flag decides only whether a run is *aborted*. A run that keeps going still
-aborts the others if it fails itself, and its exception still reaches its
-caller, so the flag does not suppress the failure.
-[`Session.abort`](running.md#stopping-from-outside) reaches every run whatever
-the flag says, and those end with `USER_ABORT` instead: the exit code
-distinguishes an abort that was asked for from one another run caused. See
-[Exit Codes](../results/exit_codes.md) for what each one means.
+[`Session.abort`](running.md#stopping-from-outside) also reaches every run on
+the session, and those runs end with `USER_ABORT` instead, so the exit code
+distinguishes an abort that was asked for from one that a failing run caused.
+See [Exit Codes](../results/exit_codes.md) for what each one means.

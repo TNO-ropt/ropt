@@ -82,7 +82,6 @@ class WorkerPool:
         report: ReportCallback | None = None,
         constraint_tolerance: float = 1e-10,
         bundle_size: int | None = None,
-        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
         f0: FunctionResults | None = None,
         g0: GradientResults | None = None,
@@ -101,8 +100,6 @@ class WorkerPool:
             constraint_tolerance: The tolerance within which a constraint holds.
             bundle_size:          Evaluations per worker task, `None` for the
                                   pool's own.
-            keep_going:           Whether to run on when another run in this
-                                  session fails, `None` for the session's own.
             metadata:             Optional dictionary attached to every result.
             f0:                   Optional function results at `x0`.
             g0:                   Optional gradient results at `x0`.
@@ -124,7 +121,6 @@ class WorkerPool:
             report=report,
             constraint_tolerance=constraint_tolerance,
             bundle_size=bundle_size,
-            keep_going=keep_going,
             metadata=metadata,
             parent_signal=None,
             f0=f0,
@@ -143,7 +139,6 @@ class WorkerPool:
         limit: int | None = None,
         constraint_tolerance: float = 1e-10,
         bundle_size: int | Sequence[int | None] | None = None,
-        keep_going: bool | None = None,
         metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
         f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
         g0: GradientResults | Sequence[GradientResults | None] | None = None,
@@ -166,8 +161,6 @@ class WorkerPool:
             constraint_tolerance: The tolerance within which a constraint holds.
             bundle_size:          Evaluations per worker task, shared or one per
                                   run.
-            keep_going:           Whether to run on when another run in this
-                                  session fails, `None` for the session's own.
             metadata:             Optional dictionary attached to every result.
             f0:                   Optional function results at `x0`, shared or
                                   one per run.
@@ -195,7 +188,6 @@ class WorkerPool:
             limit=limit,
             constraint_tolerance=constraint_tolerance,
             bundle_size=bundle_size,
-            keep_going=keep_going,
             metadata=metadata,
             f0=f0,
             g0=g0,
@@ -211,7 +203,6 @@ class WorkerPool:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         bundle_size: int | None = None,
-        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[FunctionResults | None]:
         """Evaluate a single variable vector on this pool, without optimizing.
@@ -225,8 +216,6 @@ class WorkerPool:
             handlers:    Optional handlers, called in the order listed.
             report:      Optional callback invoked with the results.
             bundle_size: Evaluations per worker task, `None` for the pool's own.
-            keep_going:  Whether to run on when another run in this session
-                         fails, `None` for the session's own.
             metadata:    Optional dictionary attached to the results.
 
         Returns:
@@ -247,7 +236,6 @@ class WorkerPool:
             handlers=handlers,
             report=report,
             bundle_size=bundle_size,
-            keep_going=keep_going,
             metadata=metadata,
         )
 
@@ -260,7 +248,6 @@ class WorkerPool:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         bundle_size: int | None = None,
-        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[tuple[FunctionResults, ...]]:
         """Evaluate a batch of variable vectors on this pool, without optimizing.
@@ -276,8 +263,6 @@ class WorkerPool:
             handlers:    Optional handlers, called in the order listed.
             report:      Optional callback invoked with each evaluation.
             bundle_size: Evaluations per worker task, `None` for the pool's own.
-            keep_going:  Whether to run on when another run in this session
-                         fails, `None` for the session's own.
             metadata:    Optional dictionary attached to every result.
 
         Returns:
@@ -299,25 +284,17 @@ class WorkerPool:
             handlers=handlers,
             report=report,
             bundle_size=bundle_size,
-            keep_going=keep_going,
             metadata=metadata,
         )
 
     @overload
-    def offload[T](
-        self, work: Callable[[], T], *, keep_going: bool | None = None
-    ) -> T: ...
+    def offload[T](self, work: Callable[[], T]) -> T: ...
 
     @overload
-    def offload[T](
-        self, work: Sequence[Callable[[], T]], *, keep_going: bool | None = None
-    ) -> tuple[T, ...]: ...
+    def offload[T](self, work: Sequence[Callable[[], T]]) -> tuple[T, ...]: ...
 
     def offload[T](
-        self,
-        work: Callable[[], T] | Sequence[Callable[[], T]],
-        *,
-        keep_going: bool | None = None,
+        self, work: Callable[[], T] | Sequence[Callable[[], T]]
     ) -> T | tuple[T, ...]:
         """Run one or more arbitrary callables on this pool's workers.
 
@@ -329,9 +306,7 @@ class WorkerPool:
         See [Running Optimizations](../running/running.md) for a walkthrough.
 
         Args:
-            work:       A single zero-argument callable, or a sequence of them.
-            keep_going: Whether to run on when another run in this session
-                        fails, `None` for the session's own.
+            work: A single zero-argument callable, or a sequence of them.
 
         Returns:
             The single result, or a tuple of results in the order of `work`.
@@ -341,4 +316,4 @@ class WorkerPool:
             ExecutionError: If the machinery could not run a call.
             WorkflowError:  If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
-        return _offload(self._session, self._live_executor, work, keep_going=keep_going)
+        return _offload(self._session, self._live_executor, work)

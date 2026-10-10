@@ -69,7 +69,6 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     bundle_size: int | None,
-    keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[FunctionResults | None]:
     try:
@@ -88,7 +87,6 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         handlers=handlers,
         report=report,
         bundle_size=bundle_size,
-        keep_going=keep_going,
         metadata=metadata,
     )
     return EvaluationResult(
@@ -107,7 +105,6 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     bundle_size: int | None,
-    keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     try:
@@ -126,7 +123,6 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
         handlers=handlers,
         report=report,
         bundle_size=bundle_size,
-        keep_going=keep_going,
         metadata=metadata,
     )
 
@@ -162,7 +158,6 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     bundle_size: int | None,
-    keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     signal = AbortSignal()
@@ -182,10 +177,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
         raise
     # Left outside the guard above: registration raises because the session is
     # closed, which is not this run failing.
-    session._register(  # ruff: ignore[private-member-access]
-        signal,
-        keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
-    )
+    session._register(signal)  # ruff: ignore[private-member-access]
     try:
         step.run(
             context=context,
