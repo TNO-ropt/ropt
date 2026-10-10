@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from ropt.components.compute_steps import EvaluationStep
-from ropt.components.concurrency import AbortSignal
+from ropt.components.concurrency import AbortSignal, parent_signal
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
@@ -74,9 +74,10 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     try:
         array = _as_vector(variables)
     except Exception:
-        # Arguments that do not fit are a failed call, and stop the rest of the
-        # session as a failed run does.
-        session._fail()  # ruff: ignore[private-member-access]
+        # Arguments that do not fit fail the evaluation before it starts.
+        failure_stops_session = parent_signal() is None
+        if failure_stops_session:
+            session._fail()  # ruff: ignore[private-member-access]
         raise
     outcome = _run_evaluation(
         session,
@@ -110,9 +111,10 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     try:
         array = _as_matrix(variables)
     except Exception:
-        # Arguments that do not fit are a failed call, and stop the rest of the
-        # session as a failed run does.
-        session._fail()  # ruff: ignore[private-member-access]
+        # Arguments that do not fit fail the evaluation before it starts.
+        failure_stops_session = parent_signal() is None
+        if failure_stops_session:
+            session._fail()  # ruff: ignore[private-member-access]
         raise
     return _run_evaluation(
         session,
@@ -160,6 +162,8 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     bundle_size: int | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
+    parent = parent_signal()
+    failure_stops_session = parent is None
     signal = AbortSignal()
     try:
         context, step, history = _build_evaluation(
@@ -173,26 +177,30 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
         )
     except Exception:
         # No abort can reach a run being built, so this needs no exemption.
-        session._fail()  # ruff: ignore[private-member-access]
+        if failure_stops_session:
+            session._fail()  # ruff: ignore[private-member-access]
         raise
     # Left outside the guard above: registration raises because the session is
     # closed, which is not this run failing.
     session._register(signal)  # ruff: ignore[private-member-access]
     try:
-        step.run(
-            context=context,
-            variables=np.asarray(variables, dtype=np.float64),
-            metadata=metadata,
-        )
+        with signal.aborts_with(parent), signal.as_parent():
+            step.run(
+                context=context,
+                variables=np.asarray(variables, dtype=np.float64),
+                metadata=metadata,
+            )
     except ExecutorStopped:
         # Reported on the result, as an optimization does, rather than raised
         # into a program that is already shutting down.
         return EvaluationResult(exit_code=ExitCode.EXECUTOR_SHUT_DOWN, results=())
     except Exception:
-        # `signal.aborting` means this run was cut off rather than failing, so
-        # `_fail` is skipped and the other runs are left alone.
+        # `signal.aborting` means this run was cut off rather than failing.
         if not signal.aborting:
-            session._fail()  # ruff: ignore[private-member-access]
+            # Stops the runs and offloads started from this run's code.
+            signal.abort(ExitCode.ABORTED_ON_ERROR)
+            if failure_stops_session:
+                session._fail()  # ruff: ignore[private-member-access]
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]

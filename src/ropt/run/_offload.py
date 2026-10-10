@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
 
-from ropt.components.concurrency import AbortSignal
+from ropt.components.concurrency import AbortSignal, parent_signal
 from ropt.components.executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError, ExecutionError, ExecutorStopped
@@ -32,24 +32,29 @@ def _offload[T](
     executor: Executor,
     work: Callable[[], T] | Sequence[Callable[[], T]],
 ) -> T | tuple[T, ...]:
+    parent = parent_signal()
+    failure_stops_session = parent is None
     signal = AbortSignal()
     session._register(signal)  # ruff: ignore[private-member-access]
     try:
-        if callable(work):
-            return cast("T", _run(executor, [work], signal)[0])
-        functions = list(work)
-        if not functions:
-            return ()
-        return tuple(_run(executor, functions, signal))
+        with signal.aborts_with(parent):
+            if callable(work):
+                return cast("T", _run(executor, [work], signal)[0])
+            functions = list(work)
+            if not functions:
+                return ()
+            return tuple(_run(executor, functions, signal))
     except ExecutorStopped:
         # `offload` has no result object to carry a reason, so a shutdown is
         # reported the way an abort is rather than escaping.
         raise AbortedError(ExitCode.EXECUTOR_SHUT_DOWN) from None
     except Exception:
-        # `signal.aborting` means this call was cut off rather than failing, so
-        # `_fail` is skipped and the other runs are left alone.
+        # `signal.aborting` means this offload was cut off rather than failing.
         if not signal.aborting:
-            session._fail()  # ruff: ignore[private-member-access]
+            # Stops the runs and offloads started from the offloaded functions.
+            signal.abort(ExitCode.ABORTED_ON_ERROR)
+            if failure_stops_session:
+                session._fail()  # ruff: ignore[private-member-access]
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]

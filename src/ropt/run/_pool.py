@@ -122,7 +122,7 @@ class WorkerPool:
             constraint_tolerance=constraint_tolerance,
             bundle_size=bundle_size,
             metadata=metadata,
-            parent_signal=None,
+            optimize_many_signal=None,
             f0=f0,
             g0=g0,
             report_gradients=report_gradients,

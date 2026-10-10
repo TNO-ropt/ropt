@@ -17,9 +17,10 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 
 from ropt.components.compute_steps import OptimizationStep
-from ropt.components.concurrency import AbortSignal, run_concurrent
+from ropt.components.concurrency import AbortSignal, parent_signal, run_concurrent
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
+from ropt.enums import ExitCode
 from ropt.exceptions import RunsFailedError
 
 from ._broadcast import broadcast_arguments
@@ -40,11 +41,6 @@ if TYPE_CHECKING:
     from ._function import EvaluationFunction
     from ._report import ReportCallback
     from ._session import Session
-
-
-def _cut_off(signal: AbortSignal, parent_signal: AbortSignal) -> None:
-    # Registered before the parent aborts, so the reason is read when it fires.
-    signal.abort(parent_signal.exit_code)
 
 
 def _build_optimization(  # ruff: ignore[too-many-arguments]
@@ -84,15 +80,20 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     constraint_tolerance: float,
     bundle_size: int | None,
     metadata: dict[str, Any] | None,
-    parent_signal: AbortSignal | None,
+    optimize_many_signal: AbortSignal | None,
     f0: FunctionResults | None = None,
     g0: GradientResults | None = None,
     report_gradients: bool = False,
 ) -> OptimizationResult:
-    if parent_signal is not None and parent_signal.aborting:
+    if optimize_many_signal is not None and optimize_many_signal.aborting:
         # Cut off before anything is built, so an invalid config in a run that
         # never starts is not reported beside the failure that stopped it.
-        return OptimizationResult(exit_code=parent_signal.exit_code, results=None)
+        return OptimizationResult(
+            exit_code=optimize_many_signal.exit_code, results=None
+        )
+    # A run of `optimize_many` runs on a thread of its own, so its failure stops
+    # the session.
+    failure_stops_session = parent_signal() is None
     signal = AbortSignal()
     try:
         context, step, result_handler = _build_optimization(
@@ -110,33 +111,32 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         )
     except Exception:
         # No abort can reach a run being built, so this needs no exemption.
-        session._fail()  # ruff: ignore[private-member-access]
+        if failure_stops_session:
+            session._fail()  # ruff: ignore[private-member-access]
         raise
     # Left outside the guard above: registration raises because the session is
     # closed, which is not this run failing.
     session._register(signal)  # ruff: ignore[private-member-access]
-    cut_off = None
-    if parent_signal is not None:
-        # Runs at once when the parent is already aborting, which is what cuts
-        # off a run that was still queued when the abort arrived.
-        cut_off = partial(_cut_off, signal, parent_signal)
-        parent_signal.add_callback(cut_off)
+    parent = (
+        optimize_many_signal if optimize_many_signal is not None else parent_signal()
+    )
     try:
-        exit_code = step.run(
-            context=context,
-            variables=np.asarray(x0, dtype=np.float64),
-            metadata=metadata,
-        )
+        with signal.aborts_with(parent), signal.as_parent():
+            exit_code = step.run(
+                context=context,
+                variables=np.asarray(x0, dtype=np.float64),
+                metadata=metadata,
+            )
     except Exception:
-        # `signal.aborting` means this run was cut off rather than failing, so
-        # `_fail` is skipped and the other runs are left alone.
+        # `signal.aborting` means this run was cut off rather than failing.
         if not signal.aborting:
-            session._fail()  # ruff: ignore[private-member-access]
+            # Stops the runs and offloads started from this run's code.
+            signal.abort(ExitCode.ABORTED_ON_ERROR)
+            if failure_stops_session:
+                session._fail()  # ruff: ignore[private-member-access]
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]
-        if parent_signal is not None and cut_off is not None:
-            parent_signal.remove_callback(cut_off)
     results = result_handler["results"]
     if results is None or results.functions is None:
         return OptimizationResult(exit_code=exit_code, results=None)
@@ -185,8 +185,8 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
         raise
     # One signal for the whole call, so an abort or a failure also reaches the
     # runs that have not started yet.
-    parent_signal = AbortSignal()
-    session._register(parent_signal)  # ruff: ignore[private-member-access]
+    optimize_many_signal = AbortSignal()
+    session._register(optimize_many_signal)  # ruff: ignore[private-member-access]
     jobs: list[Callable[[], OptimizationResult]] = [
         partial(
             _optimize,
@@ -200,7 +200,7 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
             constraint_tolerance=constraint_tolerance,
             bundle_size=run_bundle_size,
             metadata=run_metadata,
-            parent_signal=parent_signal,
+            optimize_many_signal=optimize_many_signal,
             f0=run_f0,
             g0=run_g0,
             report_gradients=report_gradients,
@@ -217,9 +217,9 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     # Dedicated threads, not a shared thread pool: each run blocks its thread
     # while waiting for evaluations that would queue behind it in such a pool.
     try:
-        outcomes = run_concurrent(jobs, limit, interrupt=parent_signal.abort)
+        outcomes = run_concurrent(jobs, limit, interrupt=optimize_many_signal.abort)
     finally:
-        session._deregister(parent_signal)  # ruff: ignore[private-member-access]
+        session._deregister(optimize_many_signal)  # ruff: ignore[private-member-access]
     for outcome in outcomes:
         # A KeyboardInterrupt or SystemExit means the program is ending, so it
         # is re-raised rather than collected into `RunsFailedError`.

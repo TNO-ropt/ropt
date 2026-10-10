@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import contextlib
 import threading
+from contextvars import ContextVar
+from functools import partial
 from typing import TYPE_CHECKING
 
 from ropt._logging import get_logger
 from ropt.enums import ExitCode
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Generator
 
 _logger = get_logger(__name__)
 
@@ -38,6 +40,10 @@ class AbortSignal:
     Code that cannot poll registers a callback instead, which is how a blocked
     [`Executor.run`][ropt.components.executors.Executor.run] is woken rather
     than left waiting for work it is about to abandon.
+
+    A signal can abort with a parent signal, and can be the parent signal of the
+    runs and offloads started while it is marked as one: see `aborts_with` and
+    `as_parent`.
 
     Setting the signal is thread-safe, and it cannot be reset.
     """
@@ -118,3 +124,63 @@ class AbortSignal:
         """
         with self._lock, contextlib.suppress(ValueError):
             self._callbacks.remove(callback)
+
+    @contextlib.contextmanager
+    def aborts_with(self, parent: AbortSignal | None) -> Generator[None]:
+        """Abort this signal when `parent` aborts, for as long as the block runs.
+
+        This signal takes the exit code of `parent`. A `parent` that is already
+        aborting aborts it at once.
+
+        Args:
+            parent: The signal to abort with, or `None` for none.
+
+        Yields:
+            Nothing; `parent` no longer reaches this signal once the block ends.
+        """
+        if parent is None:
+            yield
+            return
+        abort = partial(self._abort_with, parent)
+        parent.add_callback(abort)
+        try:
+            yield
+        finally:
+            parent.remove_callback(abort)
+
+    def _abort_with(self, parent: AbortSignal) -> None:
+        # Registered before `parent` aborts, so its exit code is read when it fires.
+        self.abort(parent.exit_code)
+
+    @contextlib.contextmanager
+    def as_parent(self) -> Generator[None]:
+        """Make this the parent signal of runs and offloads started in the block.
+
+        Inside the block, [`parent_signal`][ropt.components.concurrency.parent_signal]
+        returns this signal.
+
+        Yields:
+            Nothing; the previous parent signal returns when the block ends.
+        """
+        token = _parent.set(self)
+        try:
+            yield
+        finally:
+            _parent.reset(token)
+
+
+# A context variable rather than a thread-local, so that a thread started with
+# `contextvars.copy_context().run` inherits it.
+_parent: ContextVar[AbortSignal | None] = ContextVar("parent_signal", default=None)
+
+
+def parent_signal() -> AbortSignal | None:
+    """Return the parent signal of a run or offload started from the calling code.
+
+    That is the signal of the run or offload whose code is running: its
+    evaluation function, an event handler, or an offloaded function.
+
+    Returns:
+        The parent signal, or `None` for code that no run or offload is running.
+    """
+    return _parent.get()

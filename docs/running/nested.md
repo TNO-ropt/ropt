@@ -96,6 +96,52 @@ function returns for a realization that failed, so the outer run applies its own
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
 to it.
 
+## When an inner run fails { #when-an-inner-run-fails }
+
+A run started from inside another run is **nested** in it, and the outer run is
+its **parent**. That covers a run started with `optimize`, `evaluate` or
+`evaluate_batch`, and an [`offload`][ropt.WorkerPool.offload], when the
+start is made in the same process from an evaluation function, an event handler,
+a report callback, or a function that an `offload` runs.
+
+A nested run that raises stops nothing else. Its exception is raised in the
+code that started it, here the outer evaluation function, which can catch it
+and return `NaN` for that realization:
+
+```python
+try:
+    result = pool.optimize(inner_config, start, inner_function)
+except RuntimeError:
+    return float("nan")
+```
+
+An exception that the outer evaluation function does not catch ends the outer
+run, as any exception from an evaluation function does. A run started outside
+every other run stops the other runs of its session as soon as it raises; see
+[Failure in one run](many_runs.md#failure-in-one-run).
+
+A nested run is stopped when its parent is, whether by
+[`Session.abort`](running.md#stopping-from-outside), a closing session, or a
+failure. When a nested run raises, the runs and offloads started from its own
+code are stopped.
+
+An inner `offload` raises [`AbortedError`][ropt.exceptions.AbortedError] when
+it is cut off or its pool can no longer run the work. Returning `NaN` for that
+counts the realization as failed, so catch only the exceptions that your own
+inner code raises.
+
+!!! note "Threads that the evaluation function starts"
+    A run started from a thread that the evaluation function starts itself is
+    not nested, and stops the other runs of the session when it raises. Start
+    the thread through `contextvars.copy_context().run` to make it nested:
+
+    ```python
+    import contextvars
+    import threading
+
+    thread = threading.Thread(target=contextvars.copy_context().run, args=(work,))
+    ```
+
 ## Two pools, not one { #two-pools-not-one }
 
 Each layer evaluates on its own pool, and that is a requirement rather than

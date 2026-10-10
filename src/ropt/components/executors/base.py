@@ -206,7 +206,11 @@ class ExecutorBase(Executor):
     A subclass whose workers are threads in this process sets
     `_thread_state.running_work_item` for as long as a work item runs on one,
     and `run` refuses a caller that has it set. Workers in another interpreter
-    cannot reach the executor, so it stays `False` there.
+    cannot reach the executor, so it stays `False` there. Such a subclass also
+    runs the work item inside the
+    [`as_parent`][ropt.components.concurrency.AbortSignal.as_parent] block of
+    the `abort_signal` that `run` was given, so that a run or offload started
+    from the work item takes the one that sent it as its parent.
     """
 
     def __init__(self, *, bundle_size: int = 1) -> None:

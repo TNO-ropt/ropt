@@ -31,7 +31,7 @@ import pytest
 
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.components.compute_steps import OptimizationStep
-from ropt.components.concurrency import AbortSignal
+from ropt.components.concurrency import AbortSignal, parent_signal
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -281,6 +281,17 @@ def test_submitting_from_a_worker_thread_is_refused() -> None:
 
     message = executor.run([WorkItem(function=_submit_back)])[0]
     assert "already running on it" in message
+
+
+@pytest.mark.parametrize(
+    "abort_signal", [AbortSignal(), None], ids=["signal", "no_signal"]
+)
+def test_thread_executor_runs_work_with_its_abort_signal_as_parent(
+    abort_signal: AbortSignal | None,
+) -> None:
+    executor = ThreadExecutor(workers=1)
+    values = executor.run([WorkItem(function=parent_signal)], abort_signal=abort_signal)
+    assert values == [abort_signal]
 
 
 def _teardown_threads() -> set[threading.Thread]:

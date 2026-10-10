@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 
 from ropt.components.compute_steps import EvaluationStep, OptimizationStep
-from ropt.components.concurrency import AbortSignal
+from ropt.components.concurrency import AbortSignal, parent_signal
 from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
@@ -913,6 +913,58 @@ def test_abort_signal_does_not_raise_a_late_callback_that_raises(
     with caplog.at_level(logging.ERROR):
         signal.add_callback(_raises)
     assert "boom" in caplog.text
+
+
+def test_abort_signal_aborts_with_its_parent_inside_the_block() -> None:
+    parent = AbortSignal()
+    signal = AbortSignal()
+    with signal.aborts_with(parent):
+        parent.abort(ExitCode.USER_ABORT)
+    assert signal.exit_code == ExitCode.USER_ABORT
+
+
+def test_abort_signal_does_not_abort_with_its_parent_after_the_block() -> None:
+    parent = AbortSignal()
+    signal = AbortSignal()
+    with signal.aborts_with(parent):
+        pass
+    parent.abort()
+    assert not signal.aborting
+
+
+def test_abort_signal_aborts_at_once_with_a_parent_that_is_aborting() -> None:
+    parent = AbortSignal()
+    parent.abort(ExitCode.ABORTED_ON_ERROR)
+    signal = AbortSignal()
+    with signal.aborts_with(parent):
+        assert signal.exit_code == ExitCode.ABORTED_ON_ERROR
+
+
+def test_abort_signal_accepts_no_parent_to_abort_with() -> None:
+    signal = AbortSignal()
+    with signal.aborts_with(None):
+        pass
+    assert not signal.aborting
+
+
+def test_parent_signal_is_none_outside_every_block() -> None:
+    assert parent_signal() is None
+
+
+def test_abort_signal_is_the_parent_signal_inside_its_block() -> None:
+    signal = AbortSignal()
+    with signal.as_parent():
+        assert parent_signal() is signal
+    assert parent_signal() is None
+
+
+def test_abort_signal_as_parent_restores_the_outer_parent_signal() -> None:
+    outer = AbortSignal()
+    inner = AbortSignal()
+    with outer.as_parent():
+        with inner.as_parent():
+            assert parent_signal() is inner
+        assert parent_signal() is outer
 
 
 _EVALUATION_EVENTS = {

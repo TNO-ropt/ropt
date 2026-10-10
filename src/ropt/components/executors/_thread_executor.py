@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import queue
 from concurrent.futures import Future, ThreadPoolExecutor
+from contextlib import nullcontext
 from functools import partial
 from typing import TYPE_CHECKING, Any, override
 
@@ -123,6 +124,7 @@ class ThreadExecutor(ExecutorBase):
         # Runs on the pool thread, so it marks that thread, not the submitter.
         self._thread_state.running_work_item = True
         try:
-            return _run_bundle(calls)
+            with nullcontext() if abort_signal is None else abort_signal.as_parent():
+                return _run_bundle(calls)
         finally:
             self._thread_state.running_work_item = False

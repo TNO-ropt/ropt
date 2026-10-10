@@ -200,7 +200,7 @@ class Session:
             constraint_tolerance=constraint_tolerance,
             bundle_size=None,
             metadata=metadata,
-            parent_signal=None,
+            optimize_many_signal=None,
             f0=f0,
             g0=g0,
             report_gradients=report_gradients,
@@ -588,7 +588,8 @@ def session() -> Session:
 
     A run that fails stops the other runs on the session, which is what makes a
     script stop at the first problem. Its exception is raised where the run was
-    started.
+    started. A run or offload started from inside another run only raises; see
+    [When an inner run fails](../running/nested.md#when-an-inner-run-fails).
 
     Returns:
         A context manager binding the [`Session`][ropt.Session].
