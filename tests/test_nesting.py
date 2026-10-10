@@ -110,7 +110,7 @@ def _optimize_many_mismatched(opened: Session, _inner: WorkerPool) -> None:
     ],
 )
 @pytest.mark.timeout(60)
-def test_caught_nested_failure_does_not_stop_the_run(
+def test_caught_nested_failure_does_not_abort_the_run(
     fails: Callable[[Session, WorkerPool], None],
 ) -> None:
     lock = threading.Lock()
@@ -166,7 +166,7 @@ def _offload_from_a_report_callback(
     ],
 )
 @pytest.mark.timeout(60)
-def test_caught_failure_of_an_offload_on_the_run_thread_does_not_stop_the_run(
+def test_caught_failure_of_an_offload_on_the_run_thread_does_not_abort_the_run(
     run: Callable[[Session, Callable[[], None]], ExitCode],
 ) -> None:
     caught: list[type[Exception]] = []

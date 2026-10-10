@@ -92,7 +92,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         return OptimizationResult(
             exit_code=optimize_many_signal.exit_code, results=None
         )
-    failure_stops_session = parent_signal() is None
+    failure_aborts_session = parent_signal() is None
     signal = AbortSignal()
     try:
         context, step, result_handler = _build_optimization(
@@ -113,7 +113,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         if optimize_many_signal is not None:
             # Aborts the other runs that the same `optimize_many` started.
             optimize_many_signal.abort(ExitCode.ABORTED_ON_ERROR)
-        if failure_stops_session:
+        if failure_aborts_session:
             session._fail()  # ruff: ignore[private-member-access]
         raise
     # Left outside the guard above: registration raises because the session is
@@ -137,7 +137,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
             if optimize_many_signal is not None:
                 # Aborts the other runs that the same `optimize_many` started.
                 optimize_many_signal.abort(ExitCode.ABORTED_ON_ERROR)
-            if failure_stops_session:
+            if failure_aborts_session:
                 session._fail()  # ruff: ignore[private-member-access]
         raise
     finally:
@@ -186,8 +186,8 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
         )
     except Exception:
         # Arguments that do not agree fail the call before any run starts.
-        failure_stops_session = parent is None
-        if failure_stops_session:
+        failure_aborts_session = parent is None
+        if failure_aborts_session:
             session._fail()  # ruff: ignore[private-member-access]
         raise
     # One signal for the whole call, so an abort or a failure also reaches the

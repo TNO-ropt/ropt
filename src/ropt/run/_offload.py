@@ -33,7 +33,7 @@ def _offload[T](
     work: Callable[[], T] | Sequence[Callable[[], T]],
 ) -> T | tuple[T, ...]:
     parent = parent_signal()
-    failure_stops_session = parent is None
+    failure_aborts_session = parent is None
     signal = AbortSignal()
     session._register(signal)  # ruff: ignore[private-member-access]
     try:
@@ -53,7 +53,7 @@ def _offload[T](
         if not signal.aborting:
             # Aborts the runs and offloads started from the offloaded functions.
             signal.abort(ExitCode.ABORTED_ON_ERROR)
-            if failure_stops_session:
+            if failure_aborts_session:
                 session._fail()  # ruff: ignore[private-member-access]
         raise
     finally:

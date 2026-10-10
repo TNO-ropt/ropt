@@ -75,8 +75,8 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         array = _as_vector(variables)
     except Exception:
         # Arguments that do not fit fail the evaluation before it starts.
-        failure_stops_session = parent_signal() is None
-        if failure_stops_session:
+        failure_aborts_session = parent_signal() is None
+        if failure_aborts_session:
             session._fail()  # ruff: ignore[private-member-access]
         raise
     outcome = _run_evaluation(
@@ -112,8 +112,8 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
         array = _as_matrix(variables)
     except Exception:
         # Arguments that do not fit fail the evaluation before it starts.
-        failure_stops_session = parent_signal() is None
-        if failure_stops_session:
+        failure_aborts_session = parent_signal() is None
+        if failure_aborts_session:
             session._fail()  # ruff: ignore[private-member-access]
         raise
     return _run_evaluation(
@@ -163,7 +163,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     parent = parent_signal()
-    failure_stops_session = parent is None
+    failure_aborts_session = parent is None
     signal = AbortSignal()
     try:
         context, step, history = _build_evaluation(
@@ -177,7 +177,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
         )
     except Exception:
         # No abort can reach a run being built, so this needs no exemption.
-        if failure_stops_session:
+        if failure_aborts_session:
             session._fail()  # ruff: ignore[private-member-access]
         raise
     # Left outside the guard above: registration raises because the session is
@@ -199,7 +199,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
         if not signal.aborting:
             # Aborts the runs and offloads started from this run's code.
             signal.abort(ExitCode.ABORTED_ON_ERROR)
-            if failure_stops_session:
+            if failure_aborts_session:
                 session._fail()  # ruff: ignore[private-member-access]
         raise
     finally:

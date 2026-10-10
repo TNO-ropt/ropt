@@ -269,8 +269,8 @@ def test_session_abort_aborts_every_run_in_progress() -> None:
             started.wait(timeout=30)
             opened.abort()
 
-        stopper = threading.Thread(target=abort_once_all_have_started)
-        stopper.start()
+        abort_thread = threading.Thread(target=abort_once_all_have_started)
+        abort_thread.start()
         try:
             results = pool.optimize_many(
                 _CONFIG,
@@ -278,7 +278,7 @@ def test_session_abort_aborts_every_run_in_progress() -> None:
                 [_waits_once(started) for _ in range(runs)],
             )
         finally:
-            stopper.join(timeout=30)
+            abort_thread.join(timeout=30)
 
     assert [result.exit_code for result in results] == [ExitCode.USER_ABORT] * runs
 

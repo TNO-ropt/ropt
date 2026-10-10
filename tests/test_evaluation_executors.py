@@ -1490,7 +1490,7 @@ def test_an_abort_keeps_the_error_of_work_already_running() -> None:
 
 @pytest.mark.slow
 @pytest.mark.timeout(60)
-def test_a_stop_wakes_a_run_waiting_for_a_payload_slot(tmp_path: Path) -> None:
+def test_an_abort_wakes_a_run_waiting_for_a_payload_slot(tmp_path: Path) -> None:
     # One worker gives two payload slots, and the first run holds both: one with
     # the worker, one queued behind it. The second run has nothing in flight, so
     # it waits on the slots rather than on a result of its own, and only the
