@@ -88,7 +88,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
 ) -> OptimizationResult:
     if optimize_many_signal is not None and optimize_many_signal.aborting:
         # Aborted before anything is built, so an invalid config in a run that
-        # never starts is not reported beside the failure that stopped it.
+        # never starts is not reported beside the failure that aborted it.
         return OptimizationResult(
             exit_code=optimize_many_signal.exit_code, results=None
         )

@@ -575,7 +575,7 @@ An offload belongs to its pool's session like a run does, so
 [`Session.abort`](running.md#stopping-from-outside), a closing session, and a
 failing run on the same session all reach it. An offload started from inside a
 run, from its evaluation function or a handler, is nested in that run: it is
-stopped with the run, and when it raises, only the code that started it receives
+aborted with the run, and when it raises, only the code that started it receives
 the exception. See [When an inner run fails](nested.md#when-an-inner-run-fails).
 `offload` returns whatever its
 callables return and so has nowhere to report a reason: an `offload` with a

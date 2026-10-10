@@ -113,7 +113,7 @@ had reached. A run still queued behind `limit` is aborted before its first
 evaluation, and reports `ABORTED_ON_ERROR` with no result at all. Nothing is
 built for such a run, so an invalid configuration in one is never reported.
 
-Arguments that are rejected before any run is created stop them too.
+Arguments that are rejected before any run is created abort them too.
 `optimize_many` broadcasts its arguments first, so lists whose lengths disagree
 raise `ValueError`; `evaluate` and `evaluate_batch` raise on a vector of the
 wrong shape. Each aborts the other runs on the session before raising.
@@ -159,8 +159,8 @@ started separately on the same session. A run started with the module-level
 only the runs it starts. A failure never reaches the runs of another session.
 
 Started from inside another run, from an evaluation function for instance,
-`optimize_many` is nested in that run. A failure then stops only the runs that
-this `optimize_many` started, arguments that do not agree stop nothing, and
+`optimize_many` is nested in that run. A failure then aborts only the runs that
+this `optimize_many` started, arguments that do not agree abort nothing, and
 `RunsFailedError` is raised in the code that started it. See
 [When an inner run fails](nested.md#when-an-inner-run-fails).
 

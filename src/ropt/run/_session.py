@@ -2,8 +2,8 @@
 
 A **session** is what a pool belongs to. Its factories are the only way to build
 a pool with workers, and closing the session releases every pool it built, so
-most code needs no further cleanup. It is also what a run's stop requests reach:
-each run registers a signal while it lasts, and `stop()` sets them all.
+most code needs no further cleanup. It is also what an abort reaches: each run
+registers a signal while it lasts, and `abort()` aborts them all.
 
 A run is started on the session or on one of its pools, so what it belongs to is
 stated at the call site and never discovered from the surroundings. Any number
@@ -586,7 +586,7 @@ def session() -> Session:
     evaluates in-process and needs no session. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
-    A run that fails stops the other runs on the session, which is what makes a
+    A run that fails aborts the other runs on the session, which is what makes a
     script stop at the first problem. Its exception is raised where the run was
     started. A run or offload started from inside another run only raises; see
     [When an inner run fails](../running/nested.md#when-an-inner-run-fails).

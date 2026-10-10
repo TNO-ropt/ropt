@@ -84,10 +84,10 @@ class ThreadExecutor(ExecutorBase):
             while futures:
                 item = done.get()
                 if item is None:
-                    # Dropping a bundle that is still queued is what a stop can
-                    # do here. One already on a worker cannot be interrupted, so
-                    # it is waited for and its outcome kept: discarding it would
-                    # lose whatever it raised.
+                    # Dropping a bundle that is still queued is what an abort
+                    # can do here. One already on a worker cannot be
+                    # interrupted, so it is waited for and its outcome kept:
+                    # discarding it would lose whatever it raised.
                     for future in list(futures):
                         future.cancel()
                     continue

@@ -229,7 +229,7 @@ run it has queued behind its `limit` is aborted as well, and reports `USER_ABORT
 without evaluating anything. Leaving the session's `with` block aborts its runs
 as well, and then releases its pools, which is what refuses a run started after
 that. A run aborted that way reports `ABORTED` rather than `USER_ABORT`, since
-it was the block ending rather than a request to stop.
+it was the block ending rather than a request to abort.
 
 A run started with the module-level [`optimize`][ropt.optimize] belongs
 to no session you hold and cannot be aborted this way. It evaluates on the

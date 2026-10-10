@@ -2,7 +2,8 @@
 
 # A run or offload started from code that another one executes is nested in it.
 # Its failure is raised to that code, which may handle it; only when the
-# exception escapes does the outer one fail and stop the session.
+# exception escapes does the outer one fail and abort the other runs of the
+# session.
 
 from __future__ import annotations
 

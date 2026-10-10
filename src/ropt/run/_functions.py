@@ -2,7 +2,7 @@
 
 Each opens a session of its own for the length of the call, so a run always has
 one. Nothing else can reach that session, which is exactly what "outside a
-session" means: the run cannot be stopped from elsewhere, and no other run is
+session" means: the run cannot be aborted from elsewhere, and no other run is
 aborted when it fails.
 
 Give a run a [`session`][ropt.session], or one of its pools, when it

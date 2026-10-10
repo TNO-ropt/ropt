@@ -42,7 +42,7 @@ _ON_WORKER = (
 
 _STOPPED = "The executor can no longer run this work."
 
-_NOT_RUN = "The work item was not run: the batch was stopped."
+_NOT_RUN = "The work item was not run: the batch was aborted."
 
 
 @dataclass(kw_only=True)
