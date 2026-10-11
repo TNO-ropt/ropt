@@ -1,8 +1,9 @@
 """Tests for aborting the runs that are using a session's pools."""
 
-# An abort takes effect at a run's next evaluation boundary, so every test here
-# gets its ordering from a barrier or from the evaluation function itself:
-# waiting for the effect would only make the assertions likely to hold.
+# An aborted run raises `AbortedError`: at once on a pool, and at its next
+# evaluation boundary without one. Every test here gets its ordering from a
+# barrier or from the evaluation function itself: waiting for the effect would
+# only make the assertions likely to hold.
 
 from __future__ import annotations
 
@@ -14,7 +15,7 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt import session
+from ropt import aborting, session
 from ropt.components.concurrency import parent_signal
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
@@ -26,7 +27,6 @@ if TYPE_CHECKING:
 
     from ropt import (
         EvaluationFunctionContext,
-        EvaluationResult,
         OptimizationResult,
         Session,
     )
@@ -44,6 +44,14 @@ _CONFIG: dict[str, Any] = {
 
 def _sphere(variables: NDArray[np.float64], _: EvaluationFunctionContext) -> float:
     return float(np.sum((variables - 0.5) ** 2))
+
+
+def _records_abort(run: Callable[[], object], codes: list[ExitCode]) -> None:
+    # An aborted run raises; one that finishes records nothing.
+    try:
+        run()
+    except AbortedError as exc:
+        codes.append(exc.exit_code)
 
 
 def _waits_once(barrier: threading.Barrier) -> Any:
@@ -128,6 +136,57 @@ def _records_its_signal_then_raises(
     return objective
 
 
+def test_aborting_is_false_outside_any_task() -> None:
+    assert not aborting()
+
+
+@pytest.mark.timeout(60)
+def test_aborting_turns_true_in_an_evaluation_function_once_its_run_is_aborted() -> (
+    None
+):
+    seen: list[tuple[bool, bool]] = []
+
+    with session() as opened:
+
+        def objective(
+            variables: NDArray[np.float64], context: EvaluationFunctionContext
+        ) -> float:
+            before = aborting()
+            opened.abort()
+            seen.append((before, aborting()))
+            return _sphere(variables, context)
+
+        with pytest.raises(AbortedError):
+            opened.optimize(_CONFIG, _INITIAL, objective)
+
+    assert seen[0] == (False, True)
+
+
+@pytest.mark.timeout(60)
+def test_aborting_turns_true_in_an_offloaded_function_once_its_offload_is_aborted() -> (
+    None
+):
+    # The offload does not wait for the function, so the function signals when
+    # it has looked.
+    seen: list[tuple[bool, bool]] = []
+    looked = threading.Event()
+
+    with session() as opened:
+
+        def _work() -> int:
+            before = aborting()
+            opened.abort()
+            seen.append((before, aborting()))
+            looked.set()
+            return 0
+
+        with pytest.raises(AbortedError):
+            opened.offload(_work)
+        assert looked.wait(timeout=30)
+
+    assert seen == [(False, True)]
+
+
 @pytest.mark.parametrize("error", [KeyboardInterrupt, SystemExit])
 def test_an_optimization_ended_by_a_base_exception_aborts_the_work_it_started(
     error: type[BaseException],
@@ -167,28 +226,25 @@ def _one() -> int:
 
 
 @pytest.mark.timeout(60)
-def test_session_abort_keeps_the_results_of_completed_batches() -> None:
-    # Aborting from the report callback lands after a batch has finished, so
-    # that batch's results survive and the next one does not run.
+def test_session_abort_between_batches_raises() -> None:
+    # Aborting from the report callback lands after a batch has finished, and
+    # the run raises rather than returning what it had reached.
     with session() as opened:
         pool = opened.thread_pool(workers=1)
 
         def _abort_on_first_result(_: FunctionResults) -> None:
             opened.abort()
 
-        result = pool.optimize(
-            _CONFIG, _INITIAL, _sphere, report=_abort_on_first_result
-        )
+        with pytest.raises(AbortedError) as raised:
+            pool.optimize(_CONFIG, _INITIAL, _sphere, report=_abort_on_first_result)
 
-    assert result.exit_code == ExitCode.USER_ABORT
-    assert result.results is not None
+    assert raised.value.exit_code is ExitCode.USER_ABORT
 
 
 @pytest.mark.timeout(60)
 def test_session_abort_aborts_the_batch_in_flight() -> None:
-    # Aborted from inside the first evaluation. What the run keeps depends on
-    # which batches had finished, but the call count is what shows the rest of
-    # the work was dropped rather than run out.
+    # Aborted from inside the first evaluation. The call count is what shows the
+    # rest of the work was dropped rather than run out.
     with session() as opened:
         pool = opened.thread_pool(workers=1)
         calls = 0
@@ -205,9 +261,10 @@ def test_session_abort_aborts_the_batch_in_flight() -> None:
                 opened.abort()
             return _sphere(variables, context)
 
-        result = pool.optimize(_CONFIG, _INITIAL, objective)
+        with pytest.raises(AbortedError) as raised:
+            pool.optimize(_CONFIG, _INITIAL, objective)
 
-    assert result.exit_code == ExitCode.USER_ABORT
+    assert raised.value.exit_code is ExitCode.USER_ABORT
     # A run that was let alone evaluates the vector and a perturbation per
     # variable, many times over; this one stopped almost immediately.
     with lock:
@@ -215,7 +272,7 @@ def test_session_abort_aborts_the_batch_in_flight() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_session_abort_leaves_an_evaluation_batch_without_results() -> None:
+def test_session_abort_of_an_evaluation_batch_raises() -> None:
     # One worker and one vector per bundle, so the two rows behind the one that
     # aborts are still queued and are dropped. A batch is all or nothing, so
     # the row that did run is not reported either.
@@ -230,10 +287,10 @@ def test_session_abort_leaves_an_evaluation_batch_without_results() -> None:
             opened.abort()
             return _sphere(variables, context)
 
-        outcome = pool.evaluate_batch(_CONFIG, matrix, objective, bundle_size=1)
+        with pytest.raises(AbortedError) as raised:
+            pool.evaluate_batch(_CONFIG, matrix, objective, bundle_size=1)
 
-    assert outcome.exit_code == ExitCode.USER_ABORT
-    assert outcome.results == ()
+    assert raised.value.exit_code is ExitCode.USER_ABORT
 
 
 @pytest.mark.timeout(60)
@@ -253,15 +310,15 @@ def test_an_in_process_evaluation_batch_is_aborted_between_its_rows() -> None:
             opened.abort()
             return _sphere(variables, context)
 
-        outcome = opened.evaluate_batch(_CONFIG, matrix, objective)
+        with pytest.raises(AbortedError) as raised:
+            opened.evaluate_batch(_CONFIG, matrix, objective)
 
-    assert outcome.exit_code == ExitCode.USER_ABORT
-    assert outcome.results == ()
+    assert raised.value.exit_code is ExitCode.USER_ABORT
     assert calls == 1
 
 
 @pytest.mark.timeout(60)
-def test_an_evaluation_aborted_while_its_vector_runs_has_no_results() -> None:
+def test_an_evaluation_aborted_while_its_vector_runs_raises() -> None:
     # The single vector is already on a worker when the abort arrives. A worker
     # cannot be interrupted, and the evaluation does not wait for it.
     with session() as opened:
@@ -273,10 +330,10 @@ def test_an_evaluation_aborted_while_its_vector_runs_has_no_results() -> None:
             opened.abort()
             return _sphere(variables, context)
 
-        outcome = pool.evaluate(_CONFIG, _INITIAL, objective)
+        with pytest.raises(AbortedError) as raised:
+            pool.evaluate(_CONFIG, _INITIAL, objective)
 
-    assert outcome.exit_code == ExitCode.USER_ABORT
-    assert outcome.results is None
+    assert raised.value.exit_code is ExitCode.USER_ABORT
 
 
 @pytest.mark.timeout(60)
@@ -307,18 +364,17 @@ def test_a_nested_run_that_fails_does_not_abort_the_run_that_started_it() -> Non
 def test_session_abort_aborts_every_run_in_progress() -> None:
     runs = 3
     started = threading.Barrier(runs + 1)
-    lock = threading.Lock()
-    results: list[OptimizationResult] = []
+    codes: list[ExitCode] = []
 
     with session() as opened:
         pool = opened.thread_pool(workers=runs)
-
-        def _run() -> None:
-            result = pool.optimize(_CONFIG, _INITIAL, _waits_once(started))
-            with lock:
-                results.append(result)
-
-        drivers = [threading.Thread(target=_run) for _ in range(runs)]
+        run = partial(pool.optimize, _CONFIG, _INITIAL)
+        drivers = [
+            threading.Thread(
+                target=_records_abort, args=(partial(run, _waits_once(started)), codes)
+            )
+            for _ in range(runs)
+        ]
         for driver in drivers:
             driver.start()
         try:
@@ -328,21 +384,18 @@ def test_session_abort_aborts_every_run_in_progress() -> None:
             for driver in drivers:
                 driver.join(timeout=30)
 
-    assert [result.exit_code for result in results] == [ExitCode.USER_ABORT] * runs
+    assert codes == [ExitCode.USER_ABORT] * runs
 
 
 @pytest.mark.timeout(60)
 def test_closing_a_session_aborts_a_run_on_another_thread() -> None:
     started = threading.Barrier(2)
-    outcome: list[OptimizationResult] = []
+    codes: list[ExitCode] = []
 
     with session() as opened:
         pool = opened.thread_pool(workers=1)
-
-        def run() -> None:
-            outcome.append(pool.optimize(_CONFIG, _INITIAL, _waits_once(started)))
-
-        driver = threading.Thread(target=run)
+        run = partial(pool.optimize, _CONFIG, _INITIAL, _waits_once(started))
+        driver = threading.Thread(target=_records_abort, args=(run, codes))
         driver.start()
         # The run is inside its first evaluation, so the block below closes on
         # a run that is genuinely in progress.
@@ -350,7 +403,7 @@ def test_closing_a_session_aborts_a_run_on_another_thread() -> None:
 
     driver.join(timeout=30)
     assert not driver.is_alive()
-    assert [result.exit_code for result in outcome] == [ExitCode.ABORTED]
+    assert codes == [ExitCode.ABORTED]
 
 
 @pytest.mark.timeout(60)
@@ -390,17 +443,14 @@ def test_a_failing_run_aborts_the_others_on_its_session() -> None:
     # is certainly still going when the failure lands.
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
-    outcome: list[OptimizationResult] = []
+    codes: list[ExitCode] = []
 
     with session() as opened:
         pool = opened.thread_pool(workers=2)
-
-        def _survivor() -> None:
-            outcome.append(
-                pool.optimize(_CONFIG, _INITIAL, _waits_then_holds(started, release))
-            )
-
-        driver = threading.Thread(target=_survivor)
+        run = partial(
+            pool.optimize, _CONFIG, _INITIAL, _waits_then_holds(started, release)
+        )
+        driver = threading.Thread(target=_records_abort, args=(run, codes))
         driver.start()
         try:
             with pytest.raises(ValueError, match="boom"):
@@ -410,7 +460,7 @@ def test_a_failing_run_aborts_the_others_on_its_session() -> None:
             driver.join(timeout=30)
 
     assert not driver.is_alive()
-    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
+    assert codes == [ExitCode.ABORTED_ON_ERROR]
 
 
 @pytest.mark.timeout(60)
@@ -499,20 +549,19 @@ def test_a_failing_run_aborts_an_evaluation_beside_it() -> None:
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
     matrix = np.array([_INITIAL, np.zeros(_INITIAL.size)])
-    outcome: list[EvaluationResult[tuple[FunctionResults, ...]]] = []
+    codes: list[ExitCode] = []
 
     with session() as opened:
         evaluating = opened.thread_pool(workers=1)
         failing = opened.thread_pool(workers=1)
-
-        def _survivor() -> None:
-            outcome.append(
-                evaluating.evaluate_batch(
-                    _CONFIG, matrix, _waits_then_holds(started, release), bundle_size=1
-                )
-            )
-
-        driver = threading.Thread(target=_survivor)
+        run = partial(
+            evaluating.evaluate_batch,
+            _CONFIG,
+            matrix,
+            _waits_then_holds(started, release),
+            bundle_size=1,
+        )
+        driver = threading.Thread(target=_records_abort, args=(run, codes))
         driver.start()
         try:
             with pytest.raises(ValueError, match="boom"):
@@ -522,8 +571,7 @@ def test_a_failing_run_aborts_an_evaluation_beside_it() -> None:
             driver.join(timeout=30)
 
     assert not driver.is_alive()
-    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
-    assert outcome[0].results == ()
+    assert codes == [ExitCode.ABORTED_ON_ERROR]
 
 
 @pytest.mark.timeout(60)
@@ -533,20 +581,15 @@ def test_an_evaluation_that_cannot_be_built_aborts_the_runs_beside_it() -> None:
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
     broken = {**_CONFIG, "objectives": {"weights": [0.75, -0.25]}}
-    outcome: list[OptimizationResult] = []
+    codes: list[ExitCode] = []
 
     with session() as opened:
         surviving = opened.thread_pool(workers=1)
         failing = opened.thread_pool(workers=1)
-
-        def _survivor() -> None:
-            outcome.append(
-                surviving.optimize(
-                    _CONFIG, _INITIAL, _waits_then_holds(started, release)
-                )
-            )
-
-        driver = threading.Thread(target=_survivor)
+        run = partial(
+            surviving.optimize, _CONFIG, _INITIAL, _waits_then_holds(started, release)
+        )
+        driver = threading.Thread(target=_records_abort, args=(run, codes))
         driver.start()
         try:
             started.wait(timeout=30)
@@ -557,7 +600,7 @@ def test_an_evaluation_that_cannot_be_built_aborts_the_runs_beside_it() -> None:
             driver.join(timeout=30)
 
     assert not driver.is_alive()
-    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
+    assert codes == [ExitCode.ABORTED_ON_ERROR]
 
 
 @pytest.mark.timeout(60)
@@ -566,19 +609,14 @@ def test_a_session_offload_with_an_invalid_limit_aborts_the_runs_beside_it() -> 
     # so this thread is the barrier's second party rather than the failing call.
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
-    outcome: list[OptimizationResult] = []
+    codes: list[ExitCode] = []
 
     with session() as opened:
         surviving = opened.thread_pool(workers=1)
-
-        def _survivor() -> None:
-            outcome.append(
-                surviving.optimize(
-                    _CONFIG, _INITIAL, _waits_then_holds(started, release)
-                )
-            )
-
-        driver = threading.Thread(target=_survivor)
+        run = partial(
+            surviving.optimize, _CONFIG, _INITIAL, _waits_then_holds(started, release)
+        )
+        driver = threading.Thread(target=_records_abort, args=(run, codes))
         driver.start()
         try:
             started.wait(timeout=30)
@@ -589,7 +627,7 @@ def test_a_session_offload_with_an_invalid_limit_aborts_the_runs_beside_it() -> 
             driver.join(timeout=30)
 
     assert not driver.is_alive()
-    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
+    assert codes == [ExitCode.ABORTED_ON_ERROR]
 
 
 @pytest.mark.parametrize(
@@ -605,20 +643,15 @@ def test_an_evaluation_of_the_wrong_shape_aborts_the_runs_beside_it(
 ) -> None:
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
-    outcome: list[OptimizationResult] = []
+    codes: list[ExitCode] = []
 
     with session() as opened:
         surviving = opened.thread_pool(workers=1)
         failing = opened.thread_pool(workers=1)
-
-        def _survivor() -> None:
-            outcome.append(
-                surviving.optimize(
-                    _CONFIG, _INITIAL, _waits_then_holds(started, release)
-                )
-            )
-
-        driver = threading.Thread(target=_survivor)
+        run = partial(
+            surviving.optimize, _CONFIG, _INITIAL, _waits_then_holds(started, release)
+        )
+        driver = threading.Thread(target=_records_abort, args=(run, codes))
         driver.start()
         try:
             started.wait(timeout=30)
@@ -629,7 +662,7 @@ def test_an_evaluation_of_the_wrong_shape_aborts_the_runs_beside_it(
             driver.join(timeout=30)
 
     assert not driver.is_alive()
-    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
+    assert codes == [ExitCode.ABORTED_ON_ERROR]
 
 
 @pytest.mark.timeout(60)

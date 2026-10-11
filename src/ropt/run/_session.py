@@ -120,11 +120,9 @@ class Session:
     def abort(self) -> None:
         """Abort the runs that belong to this session.
 
-        Each run ends with `ExitCode.USER_ABORT`, keeping whatever its completed
-        batches produced; one aborted during its first batch has no result. An
-        [`offload`][ropt.WorkerPool.offload] in flight raises
-        [`AbortedError`][ropt.exceptions.AbortedError] instead, since it has no
-        result object to report a reason on.
+        Each optimization, evaluation and offload under way raises
+        [`AbortedError`][ropt.exceptions.AbortedError] with
+        `ExitCode.USER_ABORT`.
 
         This reaches every run under way. Calling it is thread-safe, and safe on
         a session with no runs. See
@@ -190,6 +188,7 @@ class Session:
             An [`OptimizationResult`][ropt.OptimizationResult].
 
         Raises:
+            AbortedError:  If the optimization was aborted.
             WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
         return _optimize(
@@ -217,7 +216,7 @@ class Session:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> EvaluationResult[FunctionResults | None]:
+    ) -> EvaluationResult[FunctionResults]:
         """Evaluate a single variable vector in-process, without optimizing.
 
         See [Running Optimizations](../running/running.md) for a walkthrough.
@@ -233,9 +232,10 @@ class Session:
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` is the [`FunctionResults`][ropt.results.FunctionResults]
-            for the vector, or `None` if the evaluation was aborted.
+            for the vector.
 
         Raises:
+            AbortedError:  If the evaluation was aborted.
             ValueError:    If `variables` is not a single vector.
             WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
@@ -278,10 +278,10 @@ class Session:
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` holds one
-            [`FunctionResults`][ropt.results.FunctionResults] per vector, and is
-            empty if the batch was aborted.
+            [`FunctionResults`][ropt.results.FunctionResults] per vector.
 
         Raises:
+            AbortedError:  If the evaluation was aborted.
             ValueError:    If `variables` is not a 2-D matrix.
             WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]

@@ -119,9 +119,10 @@ The optimizations started from the callables of one `offload` are
 aborts the others and raises that exception at once; when `offload` was called
 from your script, every other task on the session is aborted as well.
 [Failures and Aborts](failures.md) gives the rules for every case. An aborted
-optimization ends at its next evaluation boundary with `ABORTED_ON_ERROR`, but
-`offload` does not wait for it, and its result is lost. Optimizations still
-queued behind `limit` are not started after the abort.
+optimization raises `AbortedError` with `ABORTED_ON_ERROR` — at once on a pool,
+or at its next evaluation boundary without one — but `offload` does not wait for
+it, and its result is lost. Optimizations still queued behind `limit` are not
+started after the abort.
 
 A callable that catches the exception of its optimization does not fail, so the
 other optimizations are not aborted. Catch the exceptions you expect, and return

@@ -16,7 +16,6 @@ from ropt._utils import split_constraints
 from ropt.backend import OptimizationProblem
 from ropt.enums import ExitCode
 from ropt.exceptions import (
-    ExecutorStopped,
     OptimizerStop,
     TooFewRealizations,
     WorkflowError,
@@ -149,8 +148,6 @@ class EnsembleOptimizer:
                 )
         except TooFewRealizations:
             exit_code = ExitCode.TOO_FEW_REALIZATIONS
-        except ExecutorStopped:
-            exit_code = ExitCode.EXECUTOR_SHUT_DOWN
         except OptimizerStop as exc:
             exit_code = exc.exit_code
         return exit_code

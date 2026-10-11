@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import logging
 
+from ropt.components.concurrency import aborting
 from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
@@ -95,6 +96,7 @@ __all__ = [
     "UnsupportedError",
     "WorkerPool",
     "WorkflowError",
+    "aborting",
     "evaluate",
     "evaluate_batch",
     "optimize",

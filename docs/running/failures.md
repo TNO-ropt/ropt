@@ -93,9 +93,9 @@ results of its other functions are lost; see
 [Failure in one optimization](many_runs.md#failure-in-one-run) for a way to keep
 them.
 
-An optimization or evaluation that ends with an exit code has not failed in this
-sense. One that ends with `TOO_FEW_REALIZATIONS`, for instance, returns its
-result like any other, and no task is aborted.
+An optimization that stops with an exit code has not failed in this sense. One
+that stops with `TOO_FEW_REALIZATIONS`, for instance, returns its result like any
+other, and no task is aborted.
 
 ## What a failure aborts
 
@@ -132,13 +132,13 @@ This also holds when the nested task belongs to another session, as one started
 with the module-level `optimize` does. A nested task that starts after its
 parent was aborted is aborted at once.
 
-An aborted optimization ends without waiting for the evaluations that are
-running, keeping the best result it had reached, and an aborted evaluation
-returns no results; see [Exit Codes](../results/exit_codes.md). A function given
-to `offload` cannot stop part way. If it has not started, it is not run, and if
-it is running, `offload` does not wait for it: either way `offload` raises
-[`AbortedError`][ropt.exceptions.AbortedError] with the exit code of the abort.
-What happens to work that is already running depends on the pool:
+An aborted task raises [`AbortedError`][ropt.exceptions.AbortedError], whose
+`exit_code` is the exit code of the abort; see
+[Exit Codes](../results/exit_codes.md). It raises without waiting for the work it
+has running, and returns no result. A function given to `offload` cannot be
+stopped from outside. If it has not started, it is not run, and if it is
+running, `offload` does not wait for it. What happens to work that is already
+running depends on the pool:
 
 | Pool | Work already running when its task is aborted |
 | --- | --- |
@@ -152,7 +152,30 @@ task, so the call in progress has to return first. Where the task does not wait,
 an exception raised by work that is still running is logged as a warning, unless
 it is an `AbortedError`.
 
-`offload` also raises `AbortedError` when its pool can no longer run the work.
-In an evaluation function, returning `NaN` for that counts the realization as
-failed, so catch only the exceptions that your own code raises, as the example
-above does.
+`offload`, an optimization and an evaluation also raise `AbortedError` when
+their pool can no longer run the work. In an evaluation function, returning
+`NaN` for that counts the realization as failed, so catch only the exceptions
+that your own code raises, as the example above does.
+
+## Stopping early when aborted { #stopping-early-when-aborted }
+
+Work that is left running after its task was aborted runs to its end, unless it
+stops by itself. Call [`aborting`][ropt.aborting] in long-running code — an
+evaluation function, an event handler, a report callback, or a function given to
+`offload` — to find out whether the task that runs it is being aborted:
+
+```python
+from ropt import aborting
+
+def work(steps):
+    for step in steps:
+        if aborting():
+            return None
+        step()
+```
+
+A task nested in an aborted task is aborted as well, so code that starts an
+optimization, an evaluation or an `offload` needs no check of its own: the
+nested task raises `AbortedError` at once. `aborting` returns `False` in code
+that no task runs, which includes the worker processes of a process, local or
+HPC pool.

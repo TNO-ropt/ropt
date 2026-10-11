@@ -63,7 +63,10 @@ def optimize(  # ruff: ignore[too-many-arguments]
 
     Returns:
         An [`OptimizationResult`][ropt.OptimizationResult].
-    """
+
+    Raises:
+        AbortedError: If the optimization was aborted.
+    """  # ruff: ignore[docstring-extraneous-exception]
     with session() as opened:
         return opened.optimize(
             config,
@@ -87,7 +90,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     metadata: dict[str, Any] | None = None,
-) -> EvaluationResult[FunctionResults | None]:
+) -> EvaluationResult[FunctionResults]:
     """Evaluate a single variable vector in-process, without optimizing.
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
@@ -105,7 +108,8 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         the [`FunctionResults`][ropt.results.FunctionResults] for the vector.
 
     Raises:
-        ValueError: If `variables` is not a single vector.
+        AbortedError: If the evaluation was aborted.
+        ValueError:   If `variables` is not a single vector.
     """  # ruff: ignore[docstring-extraneous-exception]
     with session() as opened:
         return opened.evaluate(
@@ -145,7 +149,8 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         holds one [`FunctionResults`][ropt.results.FunctionResults] per vector.
 
     Raises:
-        ValueError: If `variables` is not a 2-D matrix.
+        AbortedError: If the evaluation was aborted.
+        ValueError:   If `variables` is not a 2-D matrix.
     """  # ruff: ignore[docstring-extraneous-exception]
     with session() as opened:
         return opened.evaluate_batch(

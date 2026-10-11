@@ -17,6 +17,7 @@ from ropt.components.concurrency import AbortSignal, parent_signal
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
+from ropt.exceptions import AbortedError, ExecutorStopped
 
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
@@ -110,6 +111,10 @@ def _optimize(  # ruff: ignore[too-many-arguments]
                 variables=np.asarray(x0, dtype=np.float64),
                 metadata=metadata,
             )
+    except ExecutorStopped:
+        # Not a failure of this run, so it is reported the way an abort is
+        # rather than escaping.
+        raise AbortedError(ExitCode.EXECUTOR_SHUT_DOWN) from None
     except Exception:
         # `signal.aborting` means this run was aborted rather than failing.
         if not signal.aborting:

@@ -12,7 +12,6 @@ from ropt._scaling import scale
 from ropt.core import EnsembleEvaluator
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
-from ropt.exceptions import OptimizerStop
 from ropt.results import FunctionResults
 
 from .base import ComputeStep
@@ -86,13 +85,7 @@ class EvaluationStep(ComputeStep[None]):
         context.lock()
 
         _logger.info("Starting evaluation")
-        try:
-            results = self._evaluate(context, variables, metadata)
-        except OptimizerStop:
-            # The batch was aborted on this step's signal. There is nothing to
-            # report, and the caller reads the signal for why.
-            _logger.info("Evaluation aborted")
-            return
+        results = self._evaluate(context, variables, metadata)
         _logger.info("Evaluation finished")
         self._emit_event(
             EnOptEvent(

@@ -216,7 +216,7 @@ def test_failing_nested_offload_aborts_what_is_nested_in_it() -> None:
         result = outer.evaluate(_CONFIG, _INITIAL, objective)
         assert done.wait(timeout=30)
 
-    assert result.exit_code == ExitCode.FINISHED
+    assert result.results is not None
     assert outcomes == [ExitCode.ABORTED_ON_ERROR]
 
 
@@ -284,7 +284,7 @@ def test_failing_run_of_a_nested_offload_aborts_only_the_runs_of_that_offload() 
         result = outer.evaluate(_CONFIG, _INITIAL, objective)
         assert recorded.wait(timeout=30)
 
-    assert result.exit_code == ExitCode.FINISHED
+    assert result.results is not None
     assert caught == [ValueError]
     assert exit_codes == [ExitCode.ABORTED_ON_ERROR]
 
@@ -324,7 +324,7 @@ def test_nested_session_offload_is_aborted_with_its_parent() -> None:
         result = outer.evaluate(_CONFIG, _INITIAL, objective)
         assert done.wait(timeout=30)
 
-    assert result.exit_code == ExitCode.FINISHED
+    assert result.results is not None
     assert exit_codes == [ExitCode.ABORTED_ON_ERROR]
 
 
@@ -363,6 +363,9 @@ def test_offload_from_a_thread_of_the_objective_is_nested_only_in_its_context(
             thread.join(timeout=30)
             return _sphere(variables, context)
 
-        result = outer.optimize(_CONFIG, _INITIAL, objective)
+        try:
+            ended_with = outer.optimize(_CONFIG, _INITIAL, objective).exit_code
+        except AbortedError as exc:
+            ended_with = exc.exit_code
 
-    assert result.exit_code == exit_code
+    assert ended_with == exit_code

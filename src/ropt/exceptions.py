@@ -63,10 +63,10 @@ class UnsupportedError(RoptError):
 class AbortedError(RoptError):
     """Work was aborted before it could finish.
 
-    Raised by [`WorkerPool.offload`][ropt.WorkerPool.offload], which
-    returns whatever its callables return and so has nowhere to report a reason.
-    An optimization or an evaluation carries its reason on the result object it
-    returns instead, and does not raise this.
+    Raised by an optimization, an evaluation or an offload that was aborted:
+    by [`Session.abort`][ropt.Session.abort], by its session closing, by a
+    failure elsewhere, or because its pool could no longer run the work. See
+    [Failures and Aborts](../running/failures.md).
 
     Attributes:
         exit_code: Why the work was aborted.

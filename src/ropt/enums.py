@@ -113,12 +113,12 @@ class EnOptEventType(IntEnum):
 class ExitCode(IntEnum):
     """Enumerates the reasons a run ends.
 
-    A run is an optimization or a single evaluation. It either **stops** or is
-    **aborted**. It stops when a condition on the run is met — the optimizer
-    converged, a budget ran out, a handler decided the results were good enough
-    — so it ends at a point that satisfied a stated criterion. It is aborted
-    when something ends it regardless of the state of the run, and the
-    result is then whatever it had reached, not a considered endpoint.
+    A run either **stops** or is **aborted**. It stops when a condition on the
+    run is met — the optimizer converged, a budget ran out, a handler decided
+    the results were good enough — so it ends at a point that satisfied a stated
+    criterion, and its result carries the code. It is aborted when something
+    ends it regardless of the state of the run, and it then raises
+    [`AbortedError`][ropt.exceptions.AbortedError], which carries the code.
 
     Each member carries a short description in
     [`message`][ropt.enums.ExitCode.message], for reporting.
@@ -147,7 +147,7 @@ class ExitCode(IntEnum):
     """Returned when the run terminated normally."""
 
     EXECUTOR_SHUT_DOWN = 6
-    """Returned when the executor could no longer run the evaluation.
+    """Carried by `AbortedError` when the executor could no longer run the work.
 
     Not a failure: in practice the interpreter was shutting down and the worker
     pool was gone, so the run is released rather than left waiting. An executor
@@ -156,17 +156,21 @@ class ExitCode(IntEnum):
     """
 
     ABORTED = 7
-    """Returned when the run was aborted from outside, without regard to where
-    it had got to.
+    """Carried by `AbortedError` when the run was aborted from outside, without
+    regard to where it had got to.
 
-    This is what closing a session reports for a run still under way.
+    This is what closing a session, or a `KeyboardInterrupt` passing through a
+    task, gives a run still under way.
     """
 
     ABORTED_ON_ERROR = 8
-    """Returned when another task raised, and this one was aborted with it."""
+    """Carried by `AbortedError` when another task raised, and this one was
+    aborted with it.
+    """
 
     USER_ABORT = 9
-    """Returned when [`Session.abort`][ropt.Session.abort] aborted the run.
+    """Carried by `AbortedError` when [`Session.abort`][ropt.Session.abort]
+    aborted the run.
 
     Set apart from [`ABORTED`][ropt.enums.ExitCode.ABORTED] so that an abort
     that was asked for can be told from one the library performed itself.

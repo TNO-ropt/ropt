@@ -114,6 +114,7 @@ class WorkerPool:
             An [`OptimizationResult`][ropt.OptimizationResult].
 
         Raises:
+            AbortedError:  If the optimization was aborted.
             WorkflowError: If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
         return _optimize(
@@ -142,7 +143,7 @@ class WorkerPool:
         report: ReportCallback | None = None,
         bundle_size: int | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> EvaluationResult[FunctionResults | None]:
+    ) -> EvaluationResult[FunctionResults]:
         """Evaluate a single variable vector on this pool, without optimizing.
 
         See [Running Optimizations](../running/running.md) for a walkthrough.
@@ -160,9 +161,10 @@ class WorkerPool:
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` is the [`FunctionResults`][ropt.results.FunctionResults]
-            for the vector, or `None` if the evaluation was aborted.
+            for the vector.
 
         Raises:
+            AbortedError:  If the evaluation was aborted.
             ValueError:    If `variables` is not a single vector.
             WorkflowError: If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
@@ -208,10 +210,10 @@ class WorkerPool:
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
             `results` holds one
-            [`FunctionResults`][ropt.results.FunctionResults] per vector, and is
-            empty if the batch was aborted.
+            [`FunctionResults`][ropt.results.FunctionResults] per vector.
 
         Raises:
+            AbortedError:  If the evaluation was aborted.
             ValueError:    If `variables` is not a 2-D matrix.
             WorkflowError: If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]

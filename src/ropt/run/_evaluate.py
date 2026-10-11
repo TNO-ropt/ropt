@@ -17,7 +17,7 @@ from ropt.components.concurrency import AbortSignal, parent_signal
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
-from ropt.exceptions import ExecutorStopped
+from ropt.exceptions import AbortedError, ExecutorStopped
 
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
@@ -70,7 +70,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     bundle_size: int | None,
     metadata: dict[str, Any] | None,
-) -> EvaluationResult[FunctionResults | None]:
+) -> EvaluationResult[FunctionResults]:
     try:
         array = _as_vector(variables)
     except Exception:
@@ -90,10 +90,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         bundle_size=bundle_size,
         metadata=metadata,
     )
-    return EvaluationResult(
-        exit_code=outcome.exit_code,
-        results=outcome.results[0] if outcome.results else None,
-    )
+    return EvaluationResult(results=outcome.results[0])
 
 
 def _evaluate_batch(  # ruff: ignore[too-many-arguments]
@@ -191,9 +188,9 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
                 metadata=metadata,
             )
     except ExecutorStopped:
-        # Reported on the result, as an optimization does, rather than raised
-        # into a program that is already shutting down.
-        return EvaluationResult(exit_code=ExitCode.EXECUTOR_SHUT_DOWN, results=())
+        # Not a failure of this evaluation, so it is reported the way an abort
+        # is rather than escaping.
+        raise AbortedError(ExitCode.EXECUTOR_SHUT_DOWN) from None
     except Exception:
         # `signal.aborting` means this run was aborted rather than failing.
         if not signal.aborting:
@@ -208,9 +205,4 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]
-    results = tuple(history["results"] or ())
-    # An abort that arrived too late to cost the batch anything did not abort
-    # it: the step reports its results either way.
-    if signal.aborting and not results:
-        return EvaluationResult(exit_code=signal.exit_code, results=())
-    return EvaluationResult(exit_code=ExitCode.FINISHED, results=results)
+    return EvaluationResult(results=tuple(history["results"] or ()))

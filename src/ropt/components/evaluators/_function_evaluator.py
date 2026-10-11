@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, override
 import numpy as np
 
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import OptimizerStop
+from ropt.exceptions import AbortedError
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
@@ -70,7 +70,7 @@ class FunctionEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            OptimizerStop: If the abort signal aborted the batch.
+            AbortedError: If the abort signal aborted the batch.
         """
         batch_id = self._batch_id_callback()
         no = evaluator_context.context.objectives.weights.size
@@ -88,7 +88,7 @@ class FunctionEvaluator(Evaluator):
             # The rows run on this thread, so this is the only place the batch
             # can be aborted part way.
             if self._abort_signal is not None and self._abort_signal.aborting:
-                raise OptimizerStop(self._abort_signal.exit_code)
+                raise AbortedError(self._abort_signal.exit_code)
             _scatter_result(
                 row_idx,
                 self._function(variables[row_idx, :], function_context),

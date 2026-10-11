@@ -34,7 +34,7 @@ from ropt.components.executors import (
     ThreadExecutor,
 )
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.exceptions import ExecutionError, WorkflowError
+from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 from ropt.results import FunctionResults
 from ropt.run._function import adapt_function
 
@@ -388,7 +388,6 @@ def test_adapt_function_splits_objectives_and_constraints() -> None:
 
 def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     outcome = evaluate(config, initial_values, test_functions[0])
-    assert outcome.exit_code is ExitCode.FINISHED
     result = outcome.results
     assert isinstance(result, FunctionResults)
     assert result.target_objective is not None
@@ -742,35 +741,26 @@ class _ShutdownPool:
     def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
 
 
-def test_evaluate_on_a_shut_down_pool_reports_the_exit_code(
+@pytest.mark.parametrize("call", ["optimize", "evaluate", "evaluate_batch"])
+def test_a_run_on_a_shut_down_pool_raises_with_the_exit_code(
     monkeypatch: pytest.MonkeyPatch,
     pools: Callable[..., WorkerPool],
     config: Any,
     test_functions: Any,
+    call: str,
 ) -> None:
     monkeypatch.setattr(
         "ropt.components.executors._thread_executor.ThreadPoolExecutor",
         _ShutdownPool,
     )
-    outcome = pools(workers=1).evaluate(config, initial_values, test_functions[0])
-    assert outcome.exit_code is ExitCode.EXECUTOR_SHUT_DOWN
-    assert outcome.results is None
-
-
-def test_evaluate_batch_on_a_shut_down_pool_reports_the_exit_code(
-    monkeypatch: pytest.MonkeyPatch,
-    pools: Callable[..., WorkerPool],
-    config: Any,
-    test_functions: Any,
-) -> None:
-    monkeypatch.setattr(
-        "ropt.components.executors._thread_executor.ThreadPoolExecutor",
-        _ShutdownPool,
+    variables = (
+        np.array([initial_values, np.zeros(initial_values.size)])
+        if call == "evaluate_batch"
+        else initial_values
     )
-    matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    outcome = pools(workers=1).evaluate_batch(config, matrix, test_functions[0])
-    assert outcome.exit_code is ExitCode.EXECUTOR_SHUT_DOWN
-    assert outcome.results == ()
+    with pytest.raises(AbortedError) as raised:
+        getattr(pools(workers=1), call)(config, variables, test_functions[0])
+    assert raised.value.exit_code is ExitCode.EXECUTOR_SHUT_DOWN
 
 
 _INNER_CONFIG: dict[str, Any] = {

@@ -12,7 +12,7 @@ from ropt._scaling import scale
 from ropt.core import EnsembleEvaluator, EnsembleOptimizer
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
-from ropt.exceptions import OptimizerStop
+from ropt.exceptions import AbortedError, OptimizerStop
 
 from .base import ComputeStep
 
@@ -162,4 +162,4 @@ class OptimizationStep(ComputeStep[ExitCode]):
             raise OptimizerStop(ExitCode.STOPPED)
         if self._aborting:
             assert self._abort_signal is not None
-            raise OptimizerStop(self._abort_signal.exit_code)
+            raise AbortedError(self._abort_signal.exit_code)

@@ -13,9 +13,10 @@ code.
 
 from __future__ import annotations
 
-from ._abort_signal import AbortSignal, parent_signal
+from ._abort_signal import AbortSignal, aborting, parent_signal
 
 __all__ = [
     "AbortSignal",
+    "aborting",
     "parent_signal",
 ]

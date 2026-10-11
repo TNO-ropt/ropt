@@ -27,7 +27,7 @@ from ropt.components.event_handlers import (
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import OptimizerStop, WorkflowError
+from ropt.exceptions import AbortedError, OptimizerStop, WorkflowError
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -815,11 +815,12 @@ def test_abort_signal_aborts_every_step_that_observes_it(
         OptimizationStep(evaluator=evaluator(), abort_signal=signal) for _ in range(2)
     ]
     signal.abort()
-    exit_codes = [
-        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
-        for step in steps
-    ]
-    assert exit_codes == [ExitCode.ABORTED, ExitCode.ABORTED]
+    for step in steps:
+        with pytest.raises(AbortedError) as raised:
+            step.run(
+                variables=initial_values, context=EnOptContext.model_validate(config)
+            )
+        assert raised.value.exit_code is ExitCode.ABORTED
 
 
 def test_abort_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -> None:
@@ -829,27 +830,23 @@ def test_abort_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
     signal.abort()
-    second = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
-    )
-    third = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
-    )
+    for _ in range(2):
+        with pytest.raises(AbortedError):
+            step.run(
+                variables=initial_values, context=EnOptContext.model_validate(config)
+            )
     assert first != ExitCode.ABORTED
-    assert second == ExitCode.ABORTED
-    assert third == ExitCode.ABORTED
 
 
-def test_abort_signal_carries_the_exit_code_its_steps_end_with(
+def test_abort_signal_carries_the_exit_code_its_steps_raise_with(
     config: Any, evaluator: Any
 ) -> None:
     signal = AbortSignal()
     step = OptimizationStep(evaluator=evaluator(), abort_signal=signal)
     signal.abort(ExitCode.ABORTED_ON_ERROR)
-    exit_code = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
-    )
-    assert exit_code == ExitCode.ABORTED_ON_ERROR
+    with pytest.raises(AbortedError) as raised:
+        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    assert raised.value.exit_code is ExitCode.ABORTED_ON_ERROR
 
 
 def test_abort_signal_keeps_the_exit_code_of_the_first_abort() -> None:

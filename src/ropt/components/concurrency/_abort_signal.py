@@ -184,3 +184,19 @@ def parent_signal() -> AbortSignal | None:
         The parent signal, or `None` for code that no run or offload is running.
     """
     return _parent.get()
+
+
+def aborting() -> bool:
+    """Return whether the task that runs the calling code is being aborted.
+
+    Code that a task runs — an evaluation function, an event handler, a report
+    callback, or a function given to `offload` — can call this to stop early
+    once its task is aborted. It returns `False` in code that no task runs,
+    which includes the worker processes of a process, local or HPC pool. See
+    [Failures and Aborts](../running/failures.md#stopping-early-when-aborted).
+
+    Returns:
+        Whether the task that runs the calling code is being aborted.
+    """
+    signal = _parent.get()
+    return signal is not None and signal.aborting

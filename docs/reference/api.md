@@ -36,6 +36,7 @@ and [`RoptError`][ropt.exceptions.RoptError] with
 ::: ropt.session
 ::: ropt.Session
 ::: ropt.WorkerPool
+::: ropt.aborting
 
 ## Handlers
 

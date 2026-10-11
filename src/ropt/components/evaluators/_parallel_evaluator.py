@@ -9,7 +9,7 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt.components.executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import ExecutionError, OptimizerStop, WorkflowError
+from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
@@ -86,7 +86,7 @@ class ParallelEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            OptimizerStop: If the abort signal aborted the batch.
+            AbortedError: If the abort signal aborted the batch.
         """
         batch_id = self._batch_id_callback()
 
@@ -118,7 +118,7 @@ class ParallelEvaluator(Evaluator):
         if self._abort_signal is not None and any(
             isinstance(value, WorkNotRun) for value in values
         ):
-            raise OptimizerStop(self._abort_signal.exit_code)
+            raise AbortedError(self._abort_signal.exit_code)
         for (row_idx, _), value in zip(active, values, strict=True):
             _handle_result(row_idx, value, results, metadata, no)
 
