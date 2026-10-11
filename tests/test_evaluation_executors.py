@@ -29,6 +29,7 @@ from uuid import UUID, uuid4
 import numpy as np
 import pytest
 
+from ropt import session
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.components.compute_steps import OptimizationStep
 from ropt.components.concurrency import AbortSignal, parent_signal
@@ -62,7 +63,7 @@ from ropt.components.executors._process_executor import (
     _terminate_workers,
 )
 from ropt.context import EnOptContext
-from ropt.exceptions import ExecutionError, WorkflowError
+from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Sequence
@@ -670,6 +671,58 @@ def test_hpc_batch_leaving_cancels_the_jobs_it_started(
     assert cancelled.wait(timeout=5.0)
     assert adapter.deleted == [1]
     assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+@pytest.mark.timeout(30)
+def test_closing_a_session_cancels_the_hpc_jobs_of_a_task_still_running(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The task's thread is held in its second scheduler query when the session
+    # closes, so until it is released only the session can cancel the job.
+    held = threading.Event()
+    release = threading.Event()
+
+    class _HeldSecondQuery(MockedHPCAdapter):
+        queries = 0
+
+        @override
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
+            # Registered but never run, so it is still live when the session goes.
+            self._job_id += 1
+            self._jobs[self._job_id] = job_name
+            return self._job_id
+
+        @override
+        def live_job_ids(self) -> set[int]:
+            type(self).queries += 1
+            if type(self).queries == 2:
+                held.set()
+                assert release.wait(timeout=20)
+            return super().live_job_ids()
+
+    adapter = _HeldSecondQuery(tmp_path)
+    _mock_scheduler(monkeypatch, adapter)
+    outcome: list[AbortedError] = []
+
+    def _offload_one(offload: Callable[[Callable[[], int]], int]) -> None:
+        try:
+            offload(partial(_function, 0))
+        except AbortedError as exc:
+            outcome.append(exc)
+
+    with session() as opened:
+        pool = opened.hpc_pool(workdir=tmp_path, workers=1, interval=0, template="")
+        task = threading.Thread(target=_offload_one, args=(pool.offload,))
+        task.start()
+        assert held.wait(timeout=20)
+    try:
+        assert adapter.deleted == [1]
+    finally:
+        release.set()
+        task.join(timeout=20)
+    assert not task.is_alive()
+    assert len(outcome) == 1
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
