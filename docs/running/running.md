@@ -331,8 +331,8 @@ which evaluates a single vector and then a matrix of them.
 Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in `result.exit_code` —
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value, for
-instance, or `ABORTED_ON_ERROR` when another run on the same session raised and
-brought this one down with it (see
+instance, or `ABORTED_ON_ERROR` when another task raised and this one was
+aborted with it (see
 [Failures and Aborts](failures.md)).
 [Exit Codes](../results/exit_codes.md) lists them all, and explains why a
 reason and a result are independent: `result.results` is `None` when no feasible

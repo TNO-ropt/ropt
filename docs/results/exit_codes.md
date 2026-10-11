@@ -39,7 +39,7 @@ comes back is then whatever it had reached rather than a chosen endpoint.
 | `STOPPED`               | A `report` callback returned `True`, ending the run at the next evaluation boundary.                 |
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
 | `ABORTED`               | The run was aborted from outside, as closing a session does to a run still under way. |
-| `ABORTED_ON_ERROR`      | Another run on the same session raised, and this one was aborted with it.                            |
+| `ABORTED_ON_ERROR`      | Another [task](../running/failures.md) raised, and this one was aborted with it.                    |
 | `USER_ABORT`            | [`Session.abort`](../running/running.md#stopping-from-outside) aborted the run.                      |
 | `EXECUTOR_SHUT_DOWN`    | The pool the run was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
 | `UNKNOWN`               | The zero value of the enumeration. No run reports it.                                                |

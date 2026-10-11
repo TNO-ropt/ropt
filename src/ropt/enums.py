@@ -163,7 +163,7 @@ class ExitCode(IntEnum):
     """
 
     ABORTED_ON_ERROR = 8
-    """Returned when another run this one shares a session with raised."""
+    """Returned when another task raised, and this one was aborted with it."""
 
     USER_ABORT = 9
     """Returned when [`Session.abort`][ropt.Session.abort] aborted the run.
@@ -196,7 +196,7 @@ _MESSAGES: Final[dict[ExitCode, str]] = {
     ExitCode.FINISHED: "Run completed normally",
     ExitCode.EXECUTOR_SHUT_DOWN: "Executor could no longer run the evaluations",
     ExitCode.ABORTED: "Run aborted",
-    ExitCode.ABORTED_ON_ERROR: "Aborted because another run on the session failed",
+    ExitCode.ABORTED_ON_ERROR: "Aborted because another task failed",
     ExitCode.USER_ABORT: "Run aborted on request",
 }
 
