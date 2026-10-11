@@ -2,7 +2,7 @@
 
 Several optimizations can run together rather than one after another. Wrap each
 `optimize` call in a zero-argument callable and pass the callables to
-[`Session.offload`][ropt.Session.offload], which runs each one on a thread of its
+[`Session.run`][ropt.Session.run], which starts each one on a thread of its
 own and returns the results in the order the callables were given:
 
 ```python
@@ -12,7 +12,7 @@ from ropt import session
 
 with session() as s:
     pool = s.thread_pool(workers=4)
-    results = s.offload(
+    results = s.run(
         [partial(pool.optimize, config, x0, objective) for x0 in start_points]
     )
 ```
@@ -27,7 +27,7 @@ own configuration, initial values, objective, `metadata` and `report` callback.
 
     ```python
     labels = ["low", "mid", "high"]
-    results = s.offload(
+    results = s.run(
         [
             partial(pool.optimize, config, x0, objective, metadata={"label": label})
             for x0, label in zip(start_points, labels)
@@ -43,9 +43,9 @@ own configuration, initial values, objective, `metadata` and `report` callback.
 
 There are two independent levels of concurrency here:
 
-- **The optimizations** run concurrently, each on a thread that `offload` starts
-  for it. The `limit` argument of `offload` caps how many run at the same time;
-  without it, all of them start at once.
+- **The optimizations** run concurrently, each on a thread that `run` starts
+  for it. The `limit` argument of `run` caps how many of them are under way at
+  the same time; without it, all of them start at once.
 - **The function evaluations** inside those optimizations happen on the pool
   that each `optimize` call is made on, and the pool determines how they are
   parallelized. With `thread_pool(workers=1)` the optimizations still progress
@@ -89,9 +89,9 @@ concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concur
     So keep a shared handler cheap. A handler that must do slow work — writing
     a file, talking to a database — holds up every optimization feeding it.
 
-!!! warning "Without a pool, the threads of `offload` do the evaluating"
+!!! warning "Without a pool, the threads of `run` do the evaluating"
     An optimization started with [`Session.optimize`][ropt.Session.optimize]
-    evaluates in your own program, on the thread that `offload` started for it.
+    evaluates in your own program, on the thread that `run` started for it.
     When several of them run at once, your evaluation function is called by
     several threads at once and must tolerate that. Start them on a pool when it
     must not be.
@@ -114,13 +114,13 @@ concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concur
 
 ## Failure in one optimization { #failure-in-one-run }
 
-The optimizations started from the callables of one `offload` are
-[nested](failures.md#nested-tasks) in it. When one of them raises, `offload`
-aborts the others and raises that exception at once; when `offload` was called
+The optimizations started from the callables of one `run` call are
+[nested](failures.md#nested-tasks) in it. When one of them raises, `run`
+aborts the others and raises that exception at once; when `run` was called
 from your script, every other task on the session is aborted as well.
 [Failures and Aborts](failures.md) gives the rules for every case. An aborted
 optimization raises `AbortedError` with `ABORTED_ON_ERROR` — at once on a pool,
-or at its next evaluation boundary without one — but `offload` does not wait for
+or at its next evaluation boundary without one — but `run` does not wait for
 it, and its result is lost. Optimizations still queued behind `limit` are not
 started after the abort.
 
@@ -135,16 +135,16 @@ def optimize_or_none(x0):
     except SimulationError:
         return None
 
-results = s.offload([partial(optimize_or_none, x0) for x0 in start_points])
+results = s.run([partial(optimize_or_none, x0) for x0 in start_points])
 ```
 
 `SimulationError` stands for an exception that your own objective raises.
 
 [`Session.abort`](running.md#stopping-from-outside) reaches every optimization on
-the session, and `offload` then raises
+the session, and `run` then raises
 [`AbortedError`][ropt.exceptions.AbortedError] with `USER_ABORT`. When a failure
 elsewhere aborted it, the exit code is `ABORTED_ON_ERROR`, so the exit code
 distinguishes an abort that was asked for from one that a failure caused. A
-`KeyboardInterrupt` aborts the optimizations of the `offload` it passes through,
+`KeyboardInterrupt` aborts the optimizations of the `run` call it passes through,
 and is raised at once. See [Exit Codes](../results/exit_codes.md) for what each
 code means.

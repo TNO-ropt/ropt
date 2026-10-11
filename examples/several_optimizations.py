@@ -1,6 +1,6 @@
-"""Run several optimizations concurrently with `Session.offload`.
+"""Run several optimizations concurrently with `Session.run`.
 
-`offload` runs each optimization on a thread of its own, at most `limit` at a
+`run` starts each optimization on a thread of its own, at most `limit` at a
 time, and every optimization evaluates on the same pool. Each one is tagged with
 a `metadata` dictionary (`label`) that is attached to its results, so the
 optimizations can be told apart afterwards.
@@ -51,7 +51,7 @@ def main() -> None:
     # --8<-- [start:run]
     with session() as s:
         optimize = partial(s.thread_pool(workers=3).optimize, CONFIG)
-        results = s.offload(
+        results = s.run(
             [
                 partial(optimize, start, rosenbrock, metadata={"label": label})
                 for label, start in enumerate(STARTS)

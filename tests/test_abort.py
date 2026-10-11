@@ -163,11 +163,11 @@ def test_aborting_turns_true_in_an_evaluation_function_once_its_run_is_aborted()
 
 
 @pytest.mark.timeout(60)
-def test_aborting_turns_true_in_an_offloaded_function_once_its_offload_is_aborted() -> (
+def test_aborting_turns_true_in_a_function_given_to_run_once_the_call_is_aborted() -> (
     None
 ):
-    # The offload does not wait for the function, so the function signals when
-    # it has looked.
+    # The `run` call does not wait for the function, so the function signals
+    # when it has looked.
     seen: list[tuple[bool, bool]] = []
     looked = threading.Event()
 
@@ -181,7 +181,7 @@ def test_aborting_turns_true_in_an_offloaded_function_once_its_offload_is_aborte
             return 0
 
         with pytest.raises(AbortedError):
-            opened.offload(_work)
+            opened.run(_work)
         assert looked.wait(timeout=30)
 
     assert seen == [(False, True)]
@@ -486,7 +486,7 @@ def test_session_abort_starts_none_of_the_runs_queued_behind_the_limit() -> None
     with session() as opened:
         pool = opened.thread_pool(workers=1)
         with pytest.raises(AbortedError) as raised:
-            opened.offload(
+            opened.run(
                 [
                     partial(pool.optimize, _CONFIG, _INITIAL, _counts(index, opened))
                     for index in range(5)
@@ -604,7 +604,7 @@ def test_an_evaluation_that_cannot_be_built_aborts_the_runs_beside_it() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_a_session_offload_with_an_invalid_limit_aborts_the_runs_beside_it() -> None:
+def test_a_session_run_with_an_invalid_limit_aborts_the_tasks_beside_it() -> None:
     # The failure is in the arguments of the call, before any task is created,
     # so this thread is the barrier's second party rather than the failing call.
     started = threading.Barrier(2, timeout=30)
@@ -621,7 +621,7 @@ def test_a_session_offload_with_an_invalid_limit_aborts_the_runs_beside_it() -> 
         try:
             started.wait(timeout=30)
             with pytest.raises(ValueError, match="at least one"):
-                opened.offload(partial(int, 1), limit=0)
+                opened.run(partial(int, 1), limit=0)
         finally:
             release.set()
             driver.join(timeout=30)
@@ -666,21 +666,21 @@ def test_an_evaluation_of_the_wrong_shape_aborts_the_runs_beside_it(
 
 
 @pytest.mark.timeout(60)
-def test_a_failing_run_aborts_an_offload_beside_it() -> None:
-    # The second call is still queued behind the single worker when the other
-    # run fails, so the abort keeps it from running.
+def test_a_failing_optimization_aborts_a_pool_run_beside_it() -> None:
+    # The second call is still queued behind the single worker when the
+    # optimization fails, so the abort keeps it from running.
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
     raised: list[AbortedError] = []
 
     with session() as opened:
-        offloading = opened.thread_pool(workers=1)
+        running = opened.thread_pool(workers=1)
         failing = opened.thread_pool(workers=1)
         work: list[Callable[[], int]] = [partial(_hold_at, started, release), _one]
 
         def _survivor() -> None:
             try:
-                offloading.offload(work)
+                running.run(work)
             except AbortedError as exc:
                 raised.append(exc)
 

@@ -42,7 +42,7 @@ class AbortSignal:
     than left waiting for work that will not run.
 
     A signal can abort with a parent signal, and can be the parent signal of the
-    runs and offloads started while it is marked as one: see `aborts_with` and
+    tasks started while it is marked as one: see `aborts_with` and
     `as_parent`.
 
     Setting the signal is thread-safe, and it cannot be reset.
@@ -154,7 +154,7 @@ class AbortSignal:
 
     @contextlib.contextmanager
     def as_parent(self) -> Generator[None]:
-        """Make this the parent signal of runs and offloads started in the block.
+        """Make this the parent signal of tasks started in the block.
 
         Inside the block, [`parent_signal`][ropt.components.concurrency.parent_signal]
         returns this signal.
@@ -175,13 +175,13 @@ _parent: ContextVar[AbortSignal | None] = ContextVar("parent_signal", default=No
 
 
 def parent_signal() -> AbortSignal | None:
-    """Return the parent signal of a run or offload started from the calling code.
+    """Return the parent signal of a task started from the calling code.
 
-    That is the signal of the run or offload whose code is running: its
-    evaluation function, an event handler, or an offloaded function.
+    That is the signal of the task whose code is running: its evaluation
+    function, an event handler, or a function given to `run`.
 
     Returns:
-        The parent signal, or `None` for code that no run or offload is running.
+        The parent signal, or `None` for code that no task is running.
     """
     return _parent.get()
 
@@ -190,9 +190,10 @@ def aborting() -> bool:
     """Return whether the task that runs the calling code is being aborted.
 
     Code that a task runs — an evaluation function, an event handler, a report
-    callback, or a function given to `offload` — can call this to stop early
-    once its task is aborted. It returns `False` in code that no task runs,
-    which includes the worker processes of a process, local or HPC pool. See
+    callback, or a function given to [`run`][ropt.Session.run] — can call this
+    to stop early once its task is aborted. It returns `False` in code that no
+    task runs, which includes the worker processes of a process, local or HPC
+    pool. See
     [Failures and Aborts](../running/failures.md#stopping-early-when-aborted).
 
     Returns:

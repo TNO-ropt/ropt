@@ -73,7 +73,7 @@ nothing: either every vector was evaluated and the evaluation returns them, or
 it was aborted and raises `AbortedError`. An abort that arrives once the batch
 has finished leaves it unaffected.
 
-An **offload** returns whatever its callables return, and raises
+A **`run` call** returns whatever its callables return, and raises
 `AbortedError` when it is aborted before all of them have finished.
 
 ## An exit code is not a result

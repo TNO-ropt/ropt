@@ -237,7 +237,7 @@ class ExecutorBase(Executor):
     cannot reach the executor, so it stays `False` there. Such a subclass also
     runs the work item inside the
     [`as_parent`][ropt.components.concurrency.AbortSignal.as_parent] block of
-    the `abort_signal` that `run` was given, so that a run or offload started
+    the `abort_signal` that `run` was given, so that a task started
     from the work item takes the one that sent it as its parent.
     """
 

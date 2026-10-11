@@ -47,7 +47,7 @@ Handlers that store results expose them through `handler["results"]` (and, for
 
 The same handler may also be given to optimizations that execute
 **concurrently** — those started together with
-[`Session.offload`](../running/many_runs.md), or ones you start on threads of
+[`Session.run`](../running/many_runs.md), or ones you start on threads of
 your own. A handler's
 [`handle_event`][ropt.EventHandler.handle_event]
 takes a lock around each call, so a second optimization waits for the first to
@@ -61,7 +61,7 @@ from ropt import HistoryHandler, session
 history = HistoryHandler()
 with session() as s:
     pool = s.thread_pool(workers=4)
-    s.offload(
+    s.run(
         [
             partial(pool.optimize, config, x0, objective, handlers=[history])
             for x0 in start_points
@@ -91,8 +91,8 @@ feeds two handlers from the same set of concurrent optimizations:
     [`optimize`][ropt.optimize] emits on the thread that called it — the
     one already inside the handler — so this raises a
     [`WorkflowError`][ropt.exceptions.WorkflowError]. A nested optimization
-    started with [`Session.offload`][ropt.Session.offload] emits on a thread
-    that `offload` started for it, which waits for a lock the first thread will
+    started with [`Session.run`][ropt.Session.run] emits on a thread
+    that `run` started for it, which waits for a lock the first thread will
     not release until the optimization ends, and both stop. The same holds for
     two handlers that each start an optimization reaching the other. Give the
     inner optimization handlers of its own.
@@ -362,7 +362,7 @@ handlers and your main program never see it.
 
 !!! note "Pools stay in the main process"
     A pool is tied to the process that opened its session, so it is not usable
-    in a worker. An objective that closes over one — to offload work, or to
+    in a worker. An objective that closes over one — to run work on it, or to
     start an inner optimization on it — is stopped in the worker, which reports the
     object by name. Do that work in the objective itself, or return what you
     need and act on it in the main process.

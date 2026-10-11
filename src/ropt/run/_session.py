@@ -27,9 +27,9 @@ from ropt.enums import ExitCode
 from ropt.exceptions import WorkflowError
 
 from ._evaluate import _evaluate, _evaluate_batch
-from ._offload import _offload
 from ._optimize import _optimize
 from ._pool import WorkerPool
+from ._work import _run_work
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -120,7 +120,7 @@ class Session:
     def abort(self) -> None:
         """Abort the tasks that belong to this session.
 
-        Each optimization, evaluation and offload under way raises
+        Each optimization, evaluation and `run` call under way raises
         [`AbortedError`][ropt.exceptions.AbortedError] with
         `ExitCode.USER_ABORT`.
 
@@ -298,14 +298,14 @@ class Session:
         )
 
     @overload
-    def offload[T](self, work: Callable[[], T], *, limit: int | None = None) -> T: ...
+    def run[T](self, work: Callable[[], T], *, limit: int | None = None) -> T: ...
 
     @overload
-    def offload[T](
+    def run[T](
         self, work: Sequence[Callable[[], T]], *, limit: int | None = None
     ) -> tuple[T, ...]: ...
 
-    def offload[T](
+    def run[T](
         self,
         work: Callable[[], T] | Sequence[Callable[[], T]],
         *,
@@ -318,7 +318,7 @@ class Session:
         order of `work`. Bind arguments with `functools.partial`. Each call runs
         on a daemon thread started for it, with a copy of the caller's context
         variables. See
-        [Offloading your own work](../running/parallel.md#offloading-your-own-work)
+        [Running your own work](../running/parallel.md#offloading-your-own-work)
         for a walkthrough.
 
         Args:
@@ -337,11 +337,11 @@ class Session:
         try:
             executor = DaemonThreadExecutor(limit=limit)
         except ValueError:
-            # Arguments that do not fit fail the offload before it starts.
+            # Arguments that do not fit fail the call before it starts.
             if parent_signal() is None:
                 self._fail()
             raise
-        return _offload(self, executor, work)
+        return _run_work(self, executor, work)
 
     def thread_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker threads.

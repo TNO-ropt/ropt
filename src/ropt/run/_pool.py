@@ -17,8 +17,8 @@ from ropt.components.executors._job_executor import JobExecutorBase
 from ropt.exceptions import WorkflowError
 
 from ._evaluate import _evaluate, _evaluate_batch
-from ._offload import _offload
 from ._optimize import _optimize
+from ._work import _run_work
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -230,12 +230,12 @@ class WorkerPool:
         )
 
     @overload
-    def offload[T](self, work: Callable[[], T]) -> T: ...
+    def run[T](self, work: Callable[[], T]) -> T: ...
 
     @overload
-    def offload[T](self, work: Sequence[Callable[[], T]]) -> tuple[T, ...]: ...
+    def run[T](self, work: Sequence[Callable[[], T]]) -> tuple[T, ...]: ...
 
-    def offload[T](
+    def run[T](
         self, work: Callable[[], T] | Sequence[Callable[[], T]]
     ) -> T | tuple[T, ...]:
         """Run one or more arbitrary callables on this pool's workers.
@@ -258,4 +258,4 @@ class WorkerPool:
             ExecutionError: If the machinery could not run a call.
             WorkflowError:  If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
-        return _offload(self._session, self._live_executor, work)
+        return _run_work(self._session, self._live_executor, work)

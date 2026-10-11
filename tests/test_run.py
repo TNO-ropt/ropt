@@ -226,7 +226,7 @@ def test_optimize_local_handler_reused_by_concurrent_runs(
             test_functions[0],
             handlers=[history],
         )
-        results = opened.offload([run, run])
+        results = opened.run([run, run])
     assert len(results) == 2
     assert len(history["results"]) > len(single["results"])
 
@@ -350,7 +350,7 @@ def test_report_callback_stops_only_own_run(config: Any, test_functions: Any) ->
             initial_values,
             test_functions[0],
         )
-        results = opened.offload(
+        results = opened.run(
             [partial(run, report=_stop), partial(run, report=_continue)]
         )
     assert results[0].exit_code == ExitCode.STOPPED
@@ -631,7 +631,7 @@ def test_batch_ids_are_unique_across_concurrent_runs(
     lock = threading.Lock()
     with session() as opened:
         run = opened.thread_pool(workers=2).optimize if with_pool else opened.optimize
-        opened.offload(
+        opened.run(
             [
                 partial(run, config, initial_values, _collect_batch_ids(sink, lock))
                 for sink in sinks
@@ -699,7 +699,7 @@ def test_metadata_per_run_reaches_each_evaluation_function(config: Any) -> None:
     lock = threading.Lock()
     with session() as opened:
         run = partial(opened.thread_pool(workers=2).optimize, config, initial_values)
-        opened.offload(
+        opened.run(
             [
                 partial(run, _record_metadata(first, lock), metadata={"run": 0}),
                 partial(run, _record_metadata(second, lock), metadata={"run": 1}),
@@ -1059,16 +1059,16 @@ def test_fatal_worker_error_reaches_the_caller(
     # A worker cannot act on a BaseException, so it travels to the caller
     # unchanged rather than being folded into a group along the way.
     with pytest.raises(_FatalWork, match="worker died"):
-        pools(workers=1).offload(_fatal_work)
+        pools(workers=1).run(_fatal_work)
 
 
 def _double(value: float) -> float:
     return 2.0 * value
 
 
-def _offload_in_own_pool(variables: NDArray[np.float64], _context: Any) -> float:
+def _run_in_own_pool(variables: NDArray[np.float64], _context: Any) -> float:
     with session() as inner:
-        doubled = inner.thread_pool(workers=2).offload(
+        doubled = inner.thread_pool(workers=2).run(
             [partial(_double, 3.0), partial(_double, 4.0)],
         )
     assert doubled == (6.0, 8.0)
@@ -1084,10 +1084,10 @@ def _own_handlers_in_evaluation(variables: NDArray[np.float64], _context: Any) -
     return float(variables @ variables)
 
 
-def test_offload_in_evaluation_uses_its_own_pool(
+def test_pool_run_in_evaluation_uses_its_own_pool(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
-    result = pools(workers=2).optimize(config, initial_values, _offload_in_own_pool)
+    result = pools(workers=2).optimize(config, initial_values, _run_in_own_pool)
     assert result.results is not None
 
 
@@ -1182,7 +1182,7 @@ def test_concurrent_runs_on_one_pool_converge(config: Any, test_functions: Any) 
     starts = [initial_values, np.zeros(initial_values.size)]
     with session() as opened:
         run = partial(opened.thread_pool(workers=2).optimize, config)
-        results = opened.offload(
+        results = opened.run(
             [partial(run, start, test_functions[0]) for start in starts]
         )
     for result in results:
@@ -1193,10 +1193,10 @@ def test_concurrent_runs_on_one_pool_converge(config: Any, test_functions: Any) 
 def test_concurrent_runs_without_a_pool_converge(
     config: Any, test_functions: Any
 ) -> None:
-    # Each run evaluates on the thread that `offload` started for it.
+    # Each optimization evaluates on the thread that `run` started for it.
     starts = [initial_values, np.zeros(initial_values.size)]
     with session() as opened:
-        results = opened.offload(
+        results = opened.run(
             [
                 partial(opened.optimize, config, start, test_functions[0])
                 for start in starts
@@ -1243,7 +1243,7 @@ def test_concurrent_runs_leave_the_pool_usable_after_a_failure(
     with session() as opened:
         pool = opened.thread_pool(workers=4)
         with pytest.raises(ValueError, match="boom"):
-            opened.offload(
+            opened.run(
                 [
                     partial(pool.optimize, config, initial_values, function)
                     for function in functions
@@ -1279,7 +1279,7 @@ def test_shared_handler_aggregates_across_concurrent_runs(
             test_functions[0],
             handlers=[shared],
         )
-        opened.offload([run, run, run])
+        opened.run([run, run, run])
 
     assert len(shared["results"]) > len(single["results"])
 

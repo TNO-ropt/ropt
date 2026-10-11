@@ -5,10 +5,9 @@ step that was given it. For the helpers meant for scripts and applications, see
 [`ropt.utils`][ropt.utils].
 
 [`AbortSignal.as_parent`][ropt.components.concurrency.AbortSignal.as_parent]
-marks the code that a run or offload is running, and
+marks the code that a task is running, and
 [`parent_signal`][ropt.components.concurrency.parent_signal] returns the signal
-it was marked with: the parent signal of a run or offload started from that
-code.
+it was marked with: the parent signal of a task started from that code.
 """
 
 from __future__ import annotations

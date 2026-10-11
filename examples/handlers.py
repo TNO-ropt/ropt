@@ -1,7 +1,7 @@
 """Aggregate results from concurrent optimizations with one shared handler.
 
 The same handler may be given to optimizations that run concurrently -- here
-the optimizations that `Session.offload` starts together. Its `handle_event`
+the optimizations that `Session.run` starts together. Its `handle_event`
 serializes its own calls, so a second optimization waits for the first instead
 of interleaving with it. An optimization may feed several handlers at once, for
 different purposes.
@@ -59,7 +59,7 @@ def main() -> None:
             CONFIG,
             handlers=[history, per_run],
         )
-        s.offload([partial(optimize, start, rosenbrock) for start in STARTS])
+        s.run([partial(optimize, start, rosenbrock) for start in STARTS])
     # --8<-- [end:shared]
     print(
         f"collected results across {len(STARTS)} concurrent optimizations: "

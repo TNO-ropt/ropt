@@ -1,8 +1,8 @@
-"""Tests for runs and offloads started from inside another run or offload."""
+"""Tests for tasks started from inside another task."""
 
-# A run or offload started from code that another one executes is nested in it.
+# A task started from code that another one executes is nested in it.
 # Its failure is raised to that code, which may handle it; only when the
-# exception escapes does the outer one fail and abort the other runs of the
+# exception escapes does the outer one fail and abort the other tasks of the
 # session.
 
 from __future__ import annotations
@@ -53,8 +53,8 @@ def _boom(*_args: object) -> float:
     raise ValueError(msg)
 
 
-def _offload(_opened: Session, inner: WorkerPool) -> None:
-    inner.offload(_boom)
+def _pool_run(_opened: Session, inner: WorkerPool) -> None:
+    inner.run(_boom)
 
 
 def _optimize(opened: Session, _inner: WorkerPool) -> None:
@@ -85,14 +85,14 @@ def _evaluate_batch_wrong_shape(opened: Session, _inner: WorkerPool) -> None:
     opened.evaluate_batch(_CONFIG, _INITIAL, _sphere)
 
 
-def _session_offload(opened: Session, _inner: WorkerPool) -> None:
-    opened.offload([partial(opened.optimize, _CONFIG, _INITIAL, _boom)] * 2)
+def _session_run(opened: Session, _inner: WorkerPool) -> None:
+    opened.run([partial(opened.optimize, _CONFIG, _INITIAL, _boom)] * 2)
 
 
 @pytest.mark.parametrize(
     "fails",
     [
-        pytest.param(_offload, id="offload"),
+        pytest.param(_pool_run, id="pool_run"),
         pytest.param(_optimize, id="optimize"),
         pytest.param(_optimize_invalid_config, id="optimize_invalid_config"),
         pytest.param(_evaluate, id="evaluate"),
@@ -100,7 +100,7 @@ def _session_offload(opened: Session, _inner: WorkerPool) -> None:
         pytest.param(_evaluate_wrong_shape, id="evaluate_wrong_shape"),
         pytest.param(_evaluate_batch, id="evaluate_batch"),
         pytest.param(_evaluate_batch_wrong_shape, id="evaluate_batch_wrong_shape"),
-        pytest.param(_session_offload, id="session_offload"),
+        pytest.param(_session_run, id="session_run"),
     ],
 )
 @pytest.mark.timeout(60)
@@ -130,59 +130,57 @@ def test_caught_nested_failure_does_not_abort_the_run(
     assert result.exit_code == ExitCode.FINISHED
 
 
-def _offload_from_an_in_process_objective(
-    opened: Session, offloads: Callable[[], None]
+def _run_from_an_in_process_objective(
+    opened: Session, work: Callable[[], None]
 ) -> ExitCode:
     def objective(
         variables: NDArray[np.float64], context: EvaluationFunctionContext
     ) -> float:
-        offloads()
+        work()
         return _sphere(variables, context)
 
     return opened.optimize(_CONFIG, _INITIAL, objective).exit_code
 
 
-def _offload_from_a_report_callback(
-    opened: Session, offloads: Callable[[], None]
-) -> ExitCode:
+def _run_from_a_report_callback(opened: Session, work: Callable[[], None]) -> ExitCode:
     def report(_: FunctionResults) -> None:
-        offloads()
+        work()
 
     pool = opened.thread_pool(workers=1)
     return pool.optimize(_CONFIG, _INITIAL, _sphere, report=report).exit_code
 
 
 @pytest.mark.parametrize(
-    "run",
+    "optimize",
     [
-        pytest.param(_offload_from_an_in_process_objective, id="in_process_objective"),
-        pytest.param(_offload_from_a_report_callback, id="report_callback"),
+        pytest.param(_run_from_an_in_process_objective, id="in_process_objective"),
+        pytest.param(_run_from_a_report_callback, id="report_callback"),
     ],
 )
 @pytest.mark.timeout(60)
-def test_caught_failure_of_an_offload_on_the_run_thread_does_not_abort_the_run(
-    run: Callable[[Session, Callable[[], None]], ExitCode],
+def test_caught_failure_of_a_pool_run_on_the_optimization_thread_does_not_abort_it(
+    optimize: Callable[[Session, Callable[[], None]], ExitCode],
 ) -> None:
     caught: list[type[Exception]] = []
 
     with session() as opened:
         inner = opened.thread_pool(workers=1)
 
-        def offloads() -> None:
+        def work() -> None:
             try:
-                inner.offload(_boom)
+                inner.run(_boom)
             except ValueError as exc:
                 caught.append(type(exc))
 
-        exit_code = run(opened, offloads)
+        exit_code = optimize(opened, work)
 
     assert caught
     assert exit_code == ExitCode.FINISHED
 
 
 @pytest.mark.timeout(60)
-def test_failing_nested_offload_aborts_what_is_nested_in_it() -> None:
-    # The middle offload has failed before the innermost one starts, so the
+def test_failing_nested_pool_run_aborts_what_is_nested_in_it() -> None:
+    # The middle `run` call has failed before the innermost one starts, so the
     # innermost one is aborted at once instead of running.
     failed = threading.Event()
     done = threading.Event()
@@ -193,23 +191,23 @@ def test_failing_nested_offload_aborts_what_is_nested_in_it() -> None:
         middle = opened.thread_pool(workers=2)
         inner = opened.thread_pool(workers=1)
 
-        def _offloads_after_the_failure() -> None:
+        def _runs_after_the_failure() -> None:
             try:
                 assert failed.wait(timeout=30)
                 try:
-                    outcomes.append(inner.offload(partial(int, 1)))
+                    outcomes.append(inner.run(partial(int, 1)))
                 except AbortedError as exc:
                     outcomes.append(exc.exit_code)
             finally:
                 done.set()
 
-        work: list[Callable[[], object]] = [_offloads_after_the_failure, _boom]
+        work: list[Callable[[], object]] = [_runs_after_the_failure, _boom]
 
         def objective(
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
             with contextlib.suppress(ValueError):
-                middle.offload(work)
+                middle.run(work)
             failed.set()
             return _sphere(variables, context)
 
@@ -240,7 +238,7 @@ def _records_its_abort(
         variables: NDArray[np.float64], context: EvaluationFunctionContext
     ) -> float:
         # Evaluated in-process, so the parent signal here is the signal of this
-        # run.
+        # optimization.
         signal = parent_signal()
         assert signal is not None
         if not recorded.is_set():
@@ -257,10 +255,10 @@ def _records_its_abort(
 
 
 @pytest.mark.timeout(60)
-def test_failing_run_of_a_nested_offload_aborts_only_the_runs_of_that_offload() -> None:
-    # Both runs are inside their first evaluation when one fails. The offload
-    # does not wait for the run it aborts, so that run records the exit code it
-    # was aborted with.
+def test_failing_optimization_in_a_nested_session_run_aborts_only_that_call() -> None:
+    # Both optimizations are inside their first evaluation when one fails. The
+    # `run` call does not wait for the optimization it aborts, so that one
+    # records the exit code it was aborted with.
     started = threading.Barrier(2, timeout=30)
     exit_codes: list[ExitCode] = []
     recorded = threading.Event()
@@ -272,11 +270,11 @@ def test_failing_run_of_a_nested_offload_aborts_only_the_runs_of_that_offload() 
         def objective(
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
-            run = partial(opened.optimize, _CONFIG, _INITIAL)
+            optimize = partial(opened.optimize, _CONFIG, _INITIAL)
             fails = _fails_once_both_evaluate(started)
             waits = _records_its_abort(started, exit_codes, recorded)
             try:
-                opened.offload([partial(run, fails), partial(run, waits)])
+                opened.run([partial(optimize, fails), partial(optimize, waits)])
             except ValueError as exc:
                 caught.append(type(exc))
             return _sphere(variables, context)
@@ -290,8 +288,8 @@ def test_failing_run_of_a_nested_offload_aborts_only_the_runs_of_that_offload() 
 
 
 @pytest.mark.timeout(60)
-def test_nested_session_offload_is_aborted_with_its_parent() -> None:
-    # The offload it is nested in has failed before the call starts, so it is
+def test_nested_session_run_is_aborted_with_its_parent() -> None:
+    # The `run` call it is nested in has failed before the call starts, so it is
     # aborted at once instead of running.
     failed = threading.Event()
     done = threading.Event()
@@ -304,8 +302,8 @@ def test_nested_session_offload_is_aborted_with_its_parent() -> None:
         def _optimizes_after_the_failure() -> None:
             try:
                 assert failed.wait(timeout=30)
-                run = partial(opened.optimize, _CONFIG, _INITIAL, _sphere)
-                opened.offload([run, run])
+                optimization = partial(opened.optimize, _CONFIG, _INITIAL, _sphere)
+                opened.run([optimization, optimization])
             except AbortedError as exc:
                 exit_codes.append(exc.exit_code)
             finally:
@@ -317,7 +315,7 @@ def test_nested_session_offload_is_aborted_with_its_parent() -> None:
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
             with contextlib.suppress(ValueError):
-                middle.offload(work)
+                middle.run(work)
             failed.set()
             return _sphere(variables, context)
 
@@ -344,21 +342,21 @@ def _start_in_a_copied_context(target: Callable[[], None]) -> threading.Thread:
     ],
 )
 @pytest.mark.timeout(60)
-def test_offload_from_a_thread_of_the_objective_is_nested_only_in_its_context(
+def test_pool_run_from_a_thread_of_the_objective_is_nested_only_in_its_context(
     start: Callable[[Callable[[], None]], threading.Thread], exit_code: ExitCode
 ) -> None:
     with session() as opened:
         outer = opened.thread_pool(workers=2)
         inner = opened.thread_pool(workers=2)
 
-        def offloads() -> None:
+        def work() -> None:
             with contextlib.suppress(ValueError):
-                inner.offload(_boom)
+                inner.run(_boom)
 
         def objective(
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
-            thread = start(offloads)
+            thread = start(work)
             thread.start()
             thread.join(timeout=30)
             return _sphere(variables, context)

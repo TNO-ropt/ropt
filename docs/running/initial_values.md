@@ -138,7 +138,7 @@ share one `f0` and `g0`, which is the case when the same point is optimized unde
 several configurations:
 
 ```python
-s.offload(
+s.run(
     [
         partial(s.optimize, config, x0, function, f0=f0, g0=g0)
         for config in (config_a, config_b)

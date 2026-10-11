@@ -1,12 +1,12 @@
 # Failures and Aborts
 
 `optimize`, `evaluate` and `evaluate_batch` each start one **task**, and
-`offload`, on a [session][ropt.Session.offload] or a
-[pool][ropt.WorkerPool.offload], starts one per function. Tasks can be under way
+`run`, on a [session][ropt.Session.run] or a
+[pool][ropt.WorkerPool.run], starts one per function. Tasks can be under way
 at the same time: side by side on one session, or started from inside one
-another, as when an evaluation function calls `offload`. When a task raises an
+another, as when an evaluation function calls `run`. When a task raises an
 exception, every task started from inside it is aborted, and so are the other
-tasks started by the same `offload`. The exception is then raised in the code
+tasks started by the same `run` call. The exception is then raised in the code
 that started the task. If the task was started from your script rather than from
 inside another task, every other task on the session is aborted as well.
 
@@ -18,7 +18,7 @@ inside another task, every other task on the session is aborted as well.
     happens when a worker breaks down in
     [When an evaluation fails](parallel.md#when-an-evaluation-fails).
 
-Here an evaluation function offloads a simulation to a process pool:
+Here an evaluation function runs a simulation on a process pool:
 
 ```python
 from functools import partial
@@ -30,7 +30,7 @@ with session() as s:
 
     def objective(variables, context):
         try:
-            return simulators.offload(partial(simulate, variables))
+            return simulators.run(partial(simulate, variables))
         except SimulationError:
             return float("nan")
 
@@ -38,9 +38,9 @@ with session() as s:
 ```
 
 `simulate` and `SimulationError` stand for your own function and an exception
-that it raises. `offload` is called from the evaluation function, so the task it
+that it raises. `run` is called from the evaluation function, so the task it
 starts is [nested](#nested-tasks) in the optimization. When `simulate` raises
-`SimulationError`, `offload` raises it in `objective`, which returns `NaN`. No
+`SimulationError`, `run` raises it in `objective`, which returns `NaN`. No
 other task is aborted: the optimization counts that realization as failed, as it
 does any `NaN`, and the other evaluations are not affected. How many failed
 realizations a batch may contain is set by
@@ -49,20 +49,20 @@ realizations a batch may contain is set by
 Without the `try`, the exception leaves `objective`, and the optimization fails
 with it. The optimization was started from your script, so `optimize` aborts
 every other task on the session, including the simulations that the other
-evaluations had offloaded, and then raises the `SimulationError` in your script.
+evaluations had started, and then raises the `SimulationError` in your script.
 
 ## Nested tasks { #nested-tasks }
 
 A task started from inside another task is **nested** in it, and the outer task
 is its **parent**. A task is started from inside another when `optimize`,
-`evaluate`, `evaluate_batch` or `offload` is called, in the same process, from an
-evaluation function, an event handler, a report callback, or a function that
-`offload` runs. This holds for the module-level functions as well as for the
+`evaluate`, `evaluate_batch` or `run` is called, in the same process, from an
+evaluation function, an event handler, a report callback, or a function given to
+`run`. This holds for the module-level functions as well as for the
 methods of a session or a pool.
 
 An evaluation function runs in your process when its optimization or evaluation
-has no pool or a thread pool, and so does a function offloaded to a thread pool
-or with `Session.offload`.
+has no pool or a thread pool, and so does a function given to `run` on a thread
+pool or on a session.
 On a process, local or HPC pool they run in another process, and the tasks they
 start there are not nested. Neither is a task started from your script.
 
@@ -81,14 +81,14 @@ start there are not nested. Neither is a task started from your script.
 
 ## Where the exception is raised
 
-`optimize`, `evaluate`, `evaluate_batch` and `offload` raise the exception of a
+`optimize`, `evaluate`, `evaluate_batch` and `run` raise the exception of a
 failing task in the code that called them. For a nested task, that is the
-evaluation function, event handler, report callback or offloaded function from
-which it was started. That code can catch the exception. If it does not, the
+evaluation function, event handler, report callback or function given to `run`
+from which it was started. That code can catch the exception. If it does not, the
 task that the code belongs to fails in turn, and the same rules apply to that
 task.
 
-`offload` raises the first exception that arrives, as soon as it arrives, and the
+`run` raises the first exception that arrives, as soon as it arrives, and the
 results of its other functions are lost; see
 [Failure in one optimization](many_runs.md#failure-in-one-run) for a way to keep
 them.
@@ -102,7 +102,7 @@ other, and no task is aborted.
 When a task raises an exception, these tasks are aborted:
 
 - every task nested in it, at any depth;
-- the other tasks started by the same `offload`;
+- the other tasks started by the same `run` call;
 - every other task on its session, unless the failing task is nested.
 
 The same holds when an optimization or evaluation cannot be built because its
@@ -114,7 +114,7 @@ exception raised by a task that is being aborted is still raised, but aborts
 nothing further.
 
 A `KeyboardInterrupt` or `SystemExit` is not a failure. When one passes through
-a task, the tasks nested in it and the other tasks of the same `offload` are
+a task, the tasks nested in it and the other tasks of the same `run` call are
 aborted with `ABORTED`, and the exception is raised. Other tasks on the session
 are not aborted until the exception leaves the session's `with` block.
 
@@ -135,15 +135,15 @@ parent was aborted is aborted at once.
 An aborted task raises [`AbortedError`][ropt.exceptions.AbortedError], whose
 `exit_code` is the exit code of the abort; see
 [Exit Codes](../results/exit_codes.md). It raises without waiting for the work it
-has running, and returns no result. A function given to `offload` cannot be
-stopped from outside. If it has not started, it is not run, and if it is
-running, `offload` does not wait for it. What happens to work that is already
+has running, and returns no result. A function given to `run` cannot be
+stopped from outside. If it has not started, it never starts, and if it is
+running, `run` does not wait for it. What happens to work that is already
 running depends on the pool:
 
 | Pool | Work already running when its task is aborted |
 | --- | --- |
 | none | runs to its end, and the task ends after it |
-| `thread_pool`, `process_pool`, or the threads of `Session.offload` | runs to its end, but the task does not wait for it |
+| `thread_pool`, `process_pool`, or the threads of `Session.run` | runs to its end, but the task does not wait for it |
 | `local_pool` | is killed, together with everything it launched |
 | `hpc_pool` | its cluster job is cancelled |
 
@@ -152,7 +152,7 @@ task, so the call in progress has to return first. Where the task does not wait,
 an exception raised by work that is still running is logged as a warning, unless
 it is an `AbortedError`.
 
-`offload`, an optimization and an evaluation also raise `AbortedError` when
+`run`, an optimization and an evaluation also raise `AbortedError` when
 their pool can no longer run the work. In an evaluation function, returning
 `NaN` for that counts the realization as failed, so catch only the exceptions
 that your own code raises, as the example above does.
@@ -162,7 +162,7 @@ that your own code raises, as the example above does.
 Work that is left running after its task was aborted runs to its end, unless it
 stops by itself. Call [`aborting`][ropt.aborting] in long-running code — an
 evaluation function, an event handler, a report callback, or a function given to
-`offload` — to find out whether the task that runs it is being aborted:
+`run` — to find out whether the task that runs it is being aborted:
 
 ```python
 from ropt import aborting
@@ -175,7 +175,7 @@ def work(steps):
 ```
 
 A task nested in an aborted task is aborted as well, so code that starts an
-optimization, an evaluation or an `offload` needs no check of its own: the
+optimization, an evaluation or a `run` call needs no check of its own: the
 nested task raises `AbortedError` at once. `aborting` returns `False` in code
 that no task runs, which includes the worker processes of a process, local or
 HPC pool.

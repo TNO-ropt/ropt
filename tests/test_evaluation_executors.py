@@ -705,15 +705,15 @@ def test_closing_a_session_cancels_the_hpc_jobs_of_a_task_still_running(
     _mock_scheduler(monkeypatch, adapter)
     outcome: list[AbortedError] = []
 
-    def _offload_one(offload: Callable[[Callable[[], int]], int]) -> None:
+    def _run_one(run: Callable[[Callable[[], int]], int]) -> None:
         try:
-            offload(partial(_function, 0))
+            run(partial(_function, 0))
         except AbortedError as exc:
             outcome.append(exc)
 
     with session() as opened:
         pool = opened.hpc_pool(workdir=tmp_path, workers=1, interval=0, template="")
-        task = threading.Thread(target=_offload_one, args=(pool.offload,))
+        task = threading.Thread(target=_run_one, args=(pool.run,))
         task.start()
         assert held.wait(timeout=20)
     try:
@@ -2439,7 +2439,7 @@ def test_job_executor_cancels_on_a_thread_the_interpreter_waits_for(
 ) -> None:
     # Cancelling runs on a thread of its own, so that a second interrupt breaks
     # the join rather than the cancelling. A new thread inherits the daemon flag
-    # of the thread that creates it, and `Session.offload` drives its work from
+    # of the thread that creates it, and `Session.run` drives its work from
     # daemon threads, which the interpreter would not wait for.
     executor = _ControlledJobExecutor(tmp_path)
     executor.release_pass.set()

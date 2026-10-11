@@ -194,7 +194,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     except Exception:
         # `signal.aborting` means this run was aborted rather than failing.
         if not signal.aborting:
-            # Aborts the runs and offloads started from this run's code.
+            # Aborts the tasks started from this evaluation's code.
             signal.abort(ExitCode.ABORTED_ON_ERROR)
             if failure_aborts_session:
                 session._fail()  # ruff: ignore[private-member-access]

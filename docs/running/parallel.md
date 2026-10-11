@@ -1,7 +1,7 @@
 # Evaluating in Parallel
 
-Evaluations within one optimization can run in parallel, and work of your own
-can be offloaded the same way. Both go through a **pool**.
+Evaluations within one optimization can run in parallel, and so can work of your
+own. Both go through a **pool**.
 
 ## Running in parallel
 
@@ -93,7 +93,7 @@ evaluations the optimizer requests at once. For a gradient-based optimization
 over an ensemble that is one per realization, plus their perturbations on the
 batches where a gradient is estimated. The second factor is `1` unless you run
 [several optimizations at once](many_runs.md), where it is the `limit` argument
-of `offload` (or the number of optimizations, if you set no limit).
+of `run` (or the number of optimizations, if you set no limit).
 
 A worker is not free, so this is an upper bound rather than a target. Ask for
 what the work needs; the useful number is usually much smaller than the
@@ -128,7 +128,7 @@ machine's core count.
     share a pool and differ in cost can each state their own:
 
     ```python
-    s.offload(
+    s.run(
         [
             partial(pool.optimize, config, x0, cheap, bundle_size=25),
             partial(pool.optimize, config, x0, costly, bundle_size=1),
@@ -543,11 +543,11 @@ it could be read: a shared filesystem need not show its contents yet, and a
 submission script that does not redirect the job's output — with
 `#SBATCH --output={{output}}` or its equivalent — never writes them at all.
 
-## Offloading your own work
+## Running your own work { #offloading-your-own-work }
 
 You can hand **your own** functions to a pool with
-[`WorkerPool.offload`][ropt.WorkerPool.offload], or run them on threads of their
-own with [`Session.offload`][ropt.Session.offload]. It is useful when code
+[`WorkerPool.run`][ropt.WorkerPool.run], or run them on threads of their
+own with [`Session.run`][ropt.Session.run]. It is useful when code
 you control — a custom handler, a custom component, or a helper you call between
 optimizations — has an expensive, self-contained piece of work you want to run
 on a pool instead of inline.
@@ -560,10 +560,10 @@ from functools import partial
 from ropt import session
 
 with session() as s:
-    result = s.process_pool(workers=4).offload(partial(expensive, data))
+    result = s.process_pool(workers=4).run(partial(expensive, data))
 ```
 
-`offload` takes **zero-argument** callables — bind arguments with
+`run` takes **zero-argument** callables — bind arguments with
 `functools.partial` (or a closure). Pass a **sequence** of callables to run them
 concurrently and get a tuple of results in order; they may be entirely different
 functions:
@@ -571,48 +571,48 @@ functions:
 ```python
 with session() as s:
     pool = s.process_pool(workers=4)
-    first, second = pool.offload([partial(expensive, x), partial(other, y)])
+    first, second = pool.run([partial(expensive, x), partial(other, y)])
 ```
 
 As with the evaluation function on a process, local, or HPC pool, the
 callables and their arguments are **copied to the workers**, since they run in
 separate processes.
 
-Called on the session instead of on a pool, `offload` runs the callables **in
+Called on the session instead of on a pool, `run` starts the callables **in
 your process, on threads of their own**: one thread per callable, started by that
 call, with at most `limit` of them running at once:
 
 ```python
 with session() as s:
-    first, second = s.offload([partial(expensive, x), partial(other, y)], limit=2)
+    first, second = s.run([partial(expensive, x), partial(other, y)], limit=2)
 ```
 
 Without `limit`, all callables start at once. They are not copied, so they need
 not be picklable, and each one sees a copy of the context variables of the code
-that called `offload`. The threads are daemon threads: a callable still running
+that called `run`. The threads are daemon threads: a callable still running
 when your program exits is stopped without completing, and does not keep the
 program from exiting.
 
-`offload` starts one task per callable, on the session it is called on or on its
+`run` starts one task per callable, on the session it is called on or on its
 pool's session;
 [Failures and Aborts](failures.md) describes tasks and how a failure or an abort
-reaches them. When a callable raises, `offload` aborts the other callables and
+reaches them. When a callable raises, `run` aborts the other callables and
 raises the exception at once. When an abort arrives before all of its callables
-have finished, `offload` raises [`AbortedError`][ropt.exceptions.AbortedError] at
+have finished, `run` raises [`AbortedError`][ropt.exceptions.AbortedError] at
 once, as an aborted optimization does. Its `exit_code` distinguishes an abort
 that was asked for from one that a failure caused, and is `EXECUTOR_SHUT_DOWN`
-when the pool could no longer run the work. `offload` does not wait for a
+when the pool could no longer run the work. `run` does not wait for a
 callable that is still running: on a thread of its own or on a thread or process
 pool it runs to its end, unless it checks [`aborting`][ropt.aborting], and an
 exception it raises is logged as a warning; on a local or HPC pool it is
 cancelled.
 
-!!! warning "Offloaded work coordinates with nothing"
-    An offloaded callable runs wherever its pool puts it, and on a process,
+!!! warning "Work given to `run` coordinates with nothing"
+    A callable given to `run` goes wherever its pool puts it, and on a process,
     local, or HPC pool that is somewhere else. It may create handlers and
     pools of its own, but they are *its* handlers and *its* pools.
 
-    - **Results cannot be tracked across offloaded callables.** A handler
+    - **Results cannot be tracked across the callables.** A handler
       created inside one sees only that callable's results and cannot be brought back:
       handlers cannot be moved between processes, so the return value is all
       that comes back. Callables that stay in your process, on the session or on
@@ -625,28 +625,28 @@ cancelled.
       their effort: one with twenty pieces of work still runs ten at a time
       while another group sits idle. The machine carries forty workers, and
       never forty working on the same thing. Where evaluations stay in your
-      process this is avoidable by sharing one pool; offloaded onto a
-      process, local, or HPC pool it is not.
+      process this is avoidable by sharing one pool; on a process, local, or
+      HPC pool it is not.
 
-    So `offload` to a process, local, or HPC pool fits a piece of work that is
+    So `run` on a process, local, or HPC pool fits a piece of work that is
     genuinely self-contained and returns its answer as a return value. When
     several pieces must be coordinated — counted, collected, or held to one
     budget — keep them in your own process instead.
 
-!!! warning "Offloading from a handler holds up the optimizations feeding it"
-    A handler runs on the thread driving the optimization, so it can offload to
-    a pool. While it waits, it holds its own lock, so every other optimization
+!!! warning "Calling `run` from a handler holds up the optimizations feeding it"
+    A handler runs on the thread driving the optimization, so it can call `run`
+    on a pool. While it waits, it holds its own lock, so every other optimization
     waiting on that handler waits too.
 
-    An offloaded callable that reaches back into the same handler — by starting
-    an optimization that carries it in `handlers=` — fails differently per pool.
-    On a thread pool it blocks: the handler waits for the offloaded call, and the
+    A callable given to `run` that reaches back into the same handler — by
+    starting an optimization that carries it in `handlers=` — fails differently
+    per pool. On a thread pool it blocks: the handler waits for the call, and the
     call waits for the lock the handler holds. On a process pool it
     raises an [`ExecutionError`][ropt.exceptions.ExecutionError], since a
     handler holds a lock and cannot be serialized. See
     [Sharing a handler across concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
-    Work offloaded from the evaluation function runs without that lock held,
+    An evaluation function that calls `run` does so without that lock held,
     so it does not make the other optimizations wait.
 
 ## Configuring an HPC pool

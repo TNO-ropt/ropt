@@ -1,4 +1,4 @@
-"""Tests for the offload method on sessions and worker pools."""
+"""Tests for the run method on sessions and worker pools."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
-from ropt.run._offload import _run
+from ropt.run._work import _run
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -70,16 +70,16 @@ def _kill_worker() -> int:
     os._exit(1)
 
 
-def test_offload_empty_sequence_returns_empty(
+def test_pool_run_empty_sequence_returns_empty(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert pools(workers=1).offload([]) == ()
+    assert pools(workers=1).run([]) == ()
 
 
-def test_offload_single_call_with_a_thread_pool(
+def test_pool_run_single_call_with_a_thread_pool(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert pools(workers=2).offload(partial(add, 3, 4)) == 7
+    assert pools(workers=2).run(partial(add, 3, 4)) == 7
 
 
 class _ShutdownPool:
@@ -95,7 +95,7 @@ class _ShutdownPool:
     def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
 
 
-def test_offload_on_a_shut_down_pool_raises_aborted_with_the_exit_code(
+def test_pool_run_on_a_shut_down_pool_raises_aborted_with_the_exit_code(
     monkeypatch: pytest.MonkeyPatch, pools: Callable[..., WorkerPool]
 ) -> None:
     monkeypatch.setattr(
@@ -103,14 +103,14 @@ def test_offload_on_a_shut_down_pool_raises_aborted_with_the_exit_code(
         _ShutdownPool,
     )
     with pytest.raises(AbortedError) as raised:
-        pools(workers=1).offload(partial(_square, 3))
+        pools(workers=1).run(partial(_square, 3))
     assert raised.value.exit_code is ExitCode.EXECUTOR_SHUT_DOWN
 
 
-def test_offload_sequence_with_a_thread_pool(
+def test_pool_run_sequence_with_a_thread_pool(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert pools(workers=3).offload([partial(_square, i) for i in range(1, 6)]) == (
+    assert pools(workers=3).run([partial(_square, i) for i in range(1, 6)]) == (
         1,
         4,
         9,
@@ -119,20 +119,20 @@ def test_offload_sequence_with_a_thread_pool(
     )
 
 
-def test_offload_sequence_of_different_functions(
+def test_pool_run_sequence_of_different_functions(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert pools(workers=2).offload([partial(_square, 3), partial(_double, 5)]) == (
+    assert pools(workers=2).run([partial(_square, 3), partial(_double, 5)]) == (
         9,
         10,
     )
 
 
 @pytest.mark.slow
-def test_offload_sequence_with_a_process_pool(
+def test_pool_run_sequence_with_a_process_pool(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert pools(ProcessExecutor, workers=2).offload(
+    assert pools(ProcessExecutor, workers=2).run(
         [partial(_square, i) for i in (1, 2, 3)]
     ) == (
         1,
@@ -143,14 +143,14 @@ def test_offload_sequence_with_a_process_pool(
 
 @pytest.mark.slow
 @pytest.mark.timeout(60)
-def test_dying_worker_reported_to_offload_caller(
+def test_dying_worker_reported_to_pool_run_caller(
     pools: Callable[..., WorkerPool],
 ) -> None:
     with pytest.raises(ExecutionError, match="could not be run"):
-        pools(ProcessExecutor, workers=1).offload(_kill_worker)
+        pools(ProcessExecutor, workers=1).run(_kill_worker)
 
 
-def test_offload_preserves_order_across_workers(
+def test_pool_run_preserves_order_across_workers(
     pools: Callable[..., WorkerPool],
 ) -> None:
     # Each job waits for its successor, so the jobs finish in exactly the
@@ -167,35 +167,35 @@ def test_offload_preserves_order_across_workers(
         return (index + 1) * (index + 1)
 
     jobs = [partial(square, index) for index in range(count)]
-    assert pools(workers=count).offload(jobs) == (1, 4, 9, 16, 25)
+    assert pools(workers=count).run(jobs) == (1, 4, 9, 16, 25)
 
 
-def test_offload_from_an_event_loop(pools: Callable[..., WorkerPool]) -> None:
+def test_pool_run_from_an_event_loop(pools: Callable[..., WorkerPool]) -> None:
     # Nothing in the pools touches asyncio, so a call from inside a
     # coroutine -- a notebook cell, say -- is an ordinary blocking call.
-    async def _offload_in_a_cell(pool: WorkerPool) -> int:  # ruff: ignore[unused-async]
-        return pool.offload(partial(_square, 4))
+    async def _run_in_a_cell(pool: WorkerPool) -> int:  # ruff: ignore[unused-async]
+        return pool.run(partial(_square, 4))
 
-    assert asyncio.run(_offload_in_a_cell(pools(workers=1))) == 16
+    assert asyncio.run(_run_in_a_cell(pools(workers=1))) == 16
 
 
 @pytest.mark.timeout(30)
 @pytest.mark.parametrize("work", [_exit_process, _interrupt])
-def test_offload_base_exception_reaches_caller(
+def test_pool_run_base_exception_reaches_caller(
     pools: Callable[..., WorkerPool], work: Callable[[], int]
 ) -> None:
     # A worker thread cannot exit the interpreter on its own, so the exception
     # is delivered to the caller, which is where it means something.
     with pytest.raises((SystemExit, KeyboardInterrupt)):
-        pools(workers=2).offload(work)
+        pools(workers=2).run(work)
 
 
 @pytest.mark.timeout(30)
 @pytest.mark.parametrize("error", [KeyboardInterrupt, SystemExit])
-def test_an_offload_ended_by_a_base_exception_aborts_the_work_it_started(
+def test_a_pool_run_ended_by_a_base_exception_aborts_the_work_it_started(
     pools: Callable[..., WorkerPool], error: type[BaseException]
 ) -> None:
-    # Work started from the offloaded function takes this signal as its parent,
+    # Work started from the function takes this signal as its parent,
     # so whether it aborts is what reaches that work.
     seen: list[AbortSignal] = []
 
@@ -206,13 +206,13 @@ def test_an_offload_ended_by_a_base_exception_aborts_the_work_it_started(
         raise error
 
     with pytest.raises(error):
-        pools(workers=1).offload(_record_then_raise)
+        pools(workers=1).run(_record_then_raise)
     assert seen[0].aborting
     assert seen[0].exit_code is ExitCode.ABORTED
 
 
-class _OffloadingHandler(EventHandler):
-    """Record what offloading from inside a handler returns."""
+class _RunningHandler(EventHandler):
+    """Record what calling `run` from inside a handler returns."""
 
     def __init__(self, pool: WorkerPool) -> None:
         super().__init__()
@@ -227,15 +227,15 @@ class _OffloadingHandler(EventHandler):
     @override
     def _handle_event(self, event: EnOptEvent) -> None:
         if self.outcome is None:
-            self.outcome = self.pool.offload(partial(_square, 4))
+            self.outcome = self.pool.run(partial(_square, 4))
 
 
 @pytest.mark.timeout(60)
-def test_handler_can_offload(pools: Callable[..., WorkerPool]) -> None:
-    # A handler runs on the thread driving the run, not on a worker, so the
-    # pool it is given works there as usual.
+def test_handler_can_call_pool_run(pools: Callable[..., WorkerPool]) -> None:
+    # A handler runs on the thread driving the optimization, not on a worker,
+    # so the pool it is given works there as usual.
     pool = pools(workers=2)
-    handler = _OffloadingHandler(pool)
+    handler = _RunningHandler(pool)
     config = {
         "variables": {"variable_count": 2, "perturbation_magnitudes": 1e-6},
         "optimizer": {"max_functions": 2},
@@ -250,9 +250,9 @@ def test_handler_can_offload(pools: Callable[..., WorkerPool]) -> None:
 
 
 @pytest.mark.timeout(60)
-def test_an_offload_aborted_while_its_function_runs_raises() -> None:
+def test_a_pool_run_aborted_while_its_function_runs_raises() -> None:
     # The function is already on a worker when the abort arrives. A worker
-    # cannot be interrupted, and `offload` does not wait for it.
+    # cannot be interrupted, and `run` does not wait for it.
     with session() as opened:
         pool = opened.thread_pool(workers=1)
 
@@ -261,17 +261,17 @@ def test_an_offload_aborted_while_its_function_runs_raises() -> None:
             return 7
 
         with pytest.raises(AbortedError) as raised:
-            pool.offload(_abort_then_return)
+            pool.run(_abort_then_return)
     assert raised.value.exit_code is ExitCode.USER_ABORT
 
 
 @pytest.mark.parametrize("exit_code", [ExitCode.ABORTED, ExitCode.ABORTED_ON_ERROR])
-def test_an_aborted_offload_reports_why_it_was_aborted(
+def test_an_aborted_pool_run_reports_why_it_was_aborted(
     exit_code: ExitCode,
 ) -> None:
     # A signal that is already aborting keeps every call from starting, which is
     # what an abort arriving mid-batch leaves behind. Driving `_run`
-    # directly is what makes the ordering certain: through `offload` the worker
+    # directly is what makes the ordering certain: through `run` the worker
     # may drain the queue before the collecting thread is scheduled to drop it.
     signal = AbortSignal()
     signal.abort(exit_code)
@@ -280,13 +280,13 @@ def test_an_aborted_offload_reports_why_it_was_aborted(
     assert exc_info.value.exit_code == exit_code
 
 
-def test_session_offload_runs_a_single_callable() -> None:
+def test_session_run_runs_a_single_callable() -> None:
     with session() as opened:
-        assert opened.offload(partial(add, 3, 4)) == 7
+        assert opened.run(partial(add, 3, 4)) == 7
 
 
 @pytest.mark.timeout(60)
-def test_session_offload_runs_a_sequence_at_once_in_the_order_given() -> None:
+def test_session_run_runs_a_sequence_at_once_in_the_order_given() -> None:
     # Each job waits for its successor, so the jobs finish in the reverse of the
     # order they were given in, and only run at all if they all run at once.
     count = 5
@@ -300,11 +300,11 @@ def test_session_offload_runs_a_sequence_at_once_in_the_order_given() -> None:
 
     with session() as opened:
         jobs = [partial(square, index) for index in range(count)]
-        assert opened.offload(jobs) == (1, 4, 9, 16, 25)
+        assert opened.run(jobs) == (1, 4, 9, 16, 25)
 
 
 @pytest.mark.timeout(60)
-def test_session_offload_runs_no_more_than_limit_callables_at_once() -> None:
+def test_session_run_runs_no_more_than_limit_callables_at_once() -> None:
     # The jobs meet in pairs, so two must run at once, and a third running
     # beside them would raise the peak.
     lock = threading.Lock()
@@ -322,38 +322,38 @@ def test_session_offload_runs_no_more_than_limit_callables_at_once() -> None:
             running -= 1
 
     with session() as opened:
-        opened.offload([_meet] * 4, limit=2)
+        opened.run([_meet] * 4, limit=2)
     assert peak == 2
 
 
-def test_session_offload_rejects_a_limit_below_one() -> None:
+def test_session_run_rejects_a_limit_below_one() -> None:
     with session() as opened, pytest.raises(ValueError, match="at least one"):
-        opened.offload(partial(_square, 2), limit=0)
+        opened.run(partial(_square, 2), limit=0)
 
 
-def test_session_offload_runs_callables_on_daemon_threads() -> None:
+def test_session_run_runs_callables_on_daemon_threads() -> None:
     with session() as opened:
-        assert opened.offload(lambda: threading.current_thread().daemon)
+        assert opened.run(lambda: threading.current_thread().daemon)
 
 
-def test_session_offload_gives_callables_the_context_of_the_caller() -> None:
+def test_session_run_gives_callables_the_context_of_the_caller() -> None:
     marker: contextvars.ContextVar[str] = contextvars.ContextVar("marker")
 
-    def _offload_from_a_context() -> str:
+    def _run_from_a_context() -> str:
         marker.set("caller")
         with session() as opened:
-            return opened.offload(marker.get)
+            return opened.run(marker.get)
 
-    assert contextvars.copy_context().run(_offload_from_a_context) == "caller"
+    assert contextvars.copy_context().run(_run_from_a_context) == "caller"
 
 
-def test_session_offload_runs_callables_as_nested_tasks() -> None:
+def test_session_run_runs_callables_as_nested_tasks() -> None:
     with session() as opened:
-        assert opened.offload(lambda: parent_signal() is not None)
+        assert opened.run(lambda: parent_signal() is not None)
 
 
 @pytest.mark.timeout(60)
-def test_session_offload_raises_the_first_exception_without_waiting() -> None:
+def test_session_run_raises_the_first_exception_without_waiting() -> None:
     release = threading.Event()
 
     def _block() -> int:
@@ -367,13 +367,13 @@ def test_session_offload_raises_the_first_exception_without_waiting() -> None:
     with session() as opened:
         try:
             with pytest.raises(ValueError, match="first"):
-                opened.offload([_block, _fail])
+                opened.run([_block, _fail])
         finally:
             release.set()
 
 
 @pytest.mark.timeout(60)
-def test_session_offload_aborted_while_a_callable_runs_raises_without_waiting() -> None:
+def test_session_run_aborted_while_a_callable_runs_raises_without_waiting() -> None:
     release = threading.Event()
     with session() as opened:
 
@@ -384,13 +384,13 @@ def test_session_offload_aborted_while_a_callable_runs_raises_without_waiting() 
 
         try:
             with pytest.raises(AbortedError) as raised:
-                opened.offload(_abort_then_block)
+                opened.run(_abort_then_block)
         finally:
             release.set()
     assert raised.value.exit_code is ExitCode.USER_ABORT
 
 
-def test_session_offload_starts_no_queued_callable_after_an_abort() -> None:
+def test_session_run_starts_no_queued_callable_after_an_abort() -> None:
     ran: list[int] = []
 
     def _record() -> int:
@@ -404,12 +404,12 @@ def test_session_offload_starts_no_queued_callable_after_an_abort() -> None:
             return 0
 
         with pytest.raises(AbortedError):
-            opened.offload([_abort, _record], limit=1)
+            opened.run([_abort, _record], limit=1)
     assert not ran
 
 
 @pytest.mark.parametrize("error", [KeyboardInterrupt, SystemExit])
-def test_session_offload_ended_by_a_base_exception_aborts_the_work_it_started(
+def test_session_run_ended_by_a_base_exception_aborts_the_work_it_started(
     error: type[BaseException],
 ) -> None:
     seen: list[AbortSignal] = []
@@ -422,13 +422,13 @@ def test_session_offload_ended_by_a_base_exception_aborts_the_work_it_started(
 
     with session() as opened:
         with pytest.raises(error):
-            opened.offload(_record_then_raise)
+            opened.run(_record_then_raise)
         assert seen[0].aborting
         assert seen[0].exit_code is ExitCode.ABORTED
 
 
-def test_session_offload_on_a_closed_session_raises() -> None:
+def test_session_run_on_a_closed_session_raises() -> None:
     with session() as opened:
         pass
     with pytest.raises(WorkflowError):
-        opened.offload(partial(_square, 2))
+        opened.run(partial(_square, 2))

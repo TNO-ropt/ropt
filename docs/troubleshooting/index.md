@@ -82,9 +82,9 @@ the worker finishes. Return what you need instead; see
 [Handlers and separate processes](../results/handlers.md#handlers-and-separate-processes).
 
 **Several optimizations may call your objective at the same time.**
-Optimizations started together with [`Session.offload`][ropt.Session.offload]
+Optimizations started together with [`Session.run`][ropt.Session.run]
 run concurrently. Given a pool, their evaluations go there; given none, each
-optimization evaluates on the thread that `offload` started for it, so your
+optimization evaluates on the thread that `run` started for it, so your
 evaluation function is called from several threads at once and has to tolerate
 that. See [Several Optimizations at Once](../running/many_runs.md).
 
@@ -156,7 +156,7 @@ waits for the lock. Keep a shared handler cheap.
 **A handler must not start an optimization that reaches it again.** The handler
 holds its own lock while it runs. A nested [`optimize`][ropt.optimize] emits on
 that same thread and raises; a nested optimization started with
-[`Session.offload`][ropt.Session.offload] emits on the thread that `offload`
+[`Session.run`][ropt.Session.run] emits on the thread that `run`
 started for it, and blocks. See [Result
 Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 

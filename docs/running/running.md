@@ -230,8 +230,8 @@ return. On a local or HPC pool they are cancelled.
 
 `abort()` reaches the tasks that are under way at the moment it is called, and
 nothing more. A task started afterwards is unaffected, so a
-loop that abandons one attempt and starts another keeps working. An
-[`offload`][ropt.Session.offload] counts as one task here: a callable it has
+loop that abandons one attempt and starts another keeps working. A
+[`run`][ropt.Session.run] call counts as one task here: a callable it has
 queued behind its `limit` is not started. Leaving the session's `with` block
 aborts its tasks as well, and then releases its pools, which is what refuses a
 task started after that. Releasing a local or HPC pool cancels the jobs it still
@@ -367,9 +367,9 @@ What *is* raised falls into three groups:
   checked as the optimization starts — and
   [`ExecutionError`][ropt.exceptions.ExecutionError] when the worker pool
   that runs your evaluations, or a callable handed to
-  [`WorkerPool.offload`][ropt.WorkerPool.offload], cannot start or breaks
+  [`WorkerPool.run`][ropt.WorkerPool.run], cannot start or breaks
   down, and [`AbortedError`][ropt.exceptions.AbortedError] when the
-  optimization, or an offload, was aborted before it finished.
+  optimization, or a `run` call, was aborted before it finished.
 
 - **Exceptions from your own evaluation function** are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process
@@ -389,7 +389,7 @@ function stay whatever you raised. The control-flow signals that `ropt` raises
 and catches itself are excluded as well, and stay in
 [`ropt.exceptions`][ropt.exceptions].
 
-`optimize`, `evaluate`, `evaluate_batch` and `offload` start
+`optimize`, `evaluate`, `evaluate_batch` and `run` start
 **tasks**, which can be under way at the same time. When a task raises an
 exception, every task started from inside it is aborted, and the exception is
 raised in the code that started the task. If that code is your script, every

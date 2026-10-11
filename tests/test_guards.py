@@ -57,8 +57,8 @@ def _evaluate_batch(pool: WorkerPool) -> None:
     pool.evaluate_batch(_CONFIG, _MATRIX, _sphere)
 
 
-def _offload(pool: WorkerPool) -> None:
-    pool.offload(partial(pow, 2, 3))
+def _pool_run(pool: WorkerPool) -> None:
+    pool.run(partial(pow, 2, 3))
 
 
 _TAKES_A_POOL = pytest.mark.parametrize(
@@ -67,7 +67,7 @@ _TAKES_A_POOL = pytest.mark.parametrize(
         pytest.param(_optimize, id="optimize"),
         pytest.param(_evaluate, id="evaluate"),
         pytest.param(_evaluate_batch, id="evaluate_batch"),
-        pytest.param(_offload, id="offload"),
+        pytest.param(_pool_run, id="run"),
     ],
 )
 
@@ -101,8 +101,8 @@ def _session_evaluate_batch(opened: Session) -> None:
     opened.evaluate_batch(_CONFIG, _MATRIX, _sphere)
 
 
-def _session_offload(opened: Session) -> None:
-    opened.offload(partial(pow, 2, 3))
+def _session_run(opened: Session) -> None:
+    opened.run(partial(pow, 2, 3))
 
 
 _RUNS_ON_A_SESSION = pytest.mark.parametrize(
@@ -111,7 +111,7 @@ _RUNS_ON_A_SESSION = pytest.mark.parametrize(
         pytest.param(_session_optimize, id="optimize"),
         pytest.param(_session_evaluate, id="evaluate"),
         pytest.param(_session_evaluate_batch, id="evaluate_batch"),
-        pytest.param(_session_offload, id="offload"),
+        pytest.param(_session_run, id="run"),
     ],
 )
 
@@ -154,8 +154,8 @@ def test_run_starting_while_a_session_closes_refused() -> None:
     assert outcomes == ["refused"]
 
 
-def _offload_again(pool: WorkerPool) -> int:
-    return pool.offload(partial(pow, 2, 3))
+def _run_again(pool: WorkerPool) -> int:
+    return pool.run(partial(pow, 2, 3))
 
 
 def _optimize_again(
@@ -170,10 +170,10 @@ def _optimize_again(
 
 
 @pytest.mark.timeout(30)
-def test_offload_to_the_pool_it_runs_on_refused(opened: Session) -> None:
+def test_pool_run_on_the_pool_it_runs_on_refused(opened: Session) -> None:
     pool = opened.thread_pool(workers=1)
     with pytest.raises(WorkflowError, match="already running on it"):
-        pool.offload(partial(_offload_again, pool))
+        pool.run(partial(_run_again, pool))
 
 
 @pytest.mark.timeout(30)
