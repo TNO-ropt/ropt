@@ -158,6 +158,10 @@ def _run_again(pool: WorkerPool) -> int:
     return pool.run(partial(pow, 2, 3))
 
 
+def _run_again_on_a_session_thread(opened: Session, pool: WorkerPool) -> int:
+    return opened.run(partial(_run_again, pool))
+
+
 def _optimize_again(
     pool: WorkerPool, variables: NDArray[np.float64], _: EvaluationFunctionContext
 ) -> float:
@@ -165,7 +169,7 @@ def _optimize_again(
     return float(np.sum(variables**2))
 
 
-# Both of these would hang rather than fail if the refusal were dropped, so the
+# These would hang rather than fail if the refusal were dropped, so the
 # ceiling turns that regression back into a test failure.
 
 
@@ -174,6 +178,15 @@ def test_pool_run_on_the_pool_it_runs_on_refused(opened: Session) -> None:
     pool = opened.thread_pool(workers=1)
     with pytest.raises(WorkflowError, match="already running on it"):
         pool.run(partial(_run_again, pool))
+
+
+@pytest.mark.timeout(30)
+def test_pool_run_on_the_pool_it_runs_on_refused_from_a_session_thread(
+    opened: Session,
+) -> None:
+    pool = opened.thread_pool(workers=1)
+    with pytest.raises(WorkflowError, match="already running on it"):
+        pool.run(partial(_run_again_on_a_session_thread, opened, pool))
 
 
 @pytest.mark.timeout(30)

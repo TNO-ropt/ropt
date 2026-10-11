@@ -446,10 +446,12 @@ evaluations to finish, so one handed the pool it is already running on would
 wait for the workers it is itself occupying — a deadlock as soon as they are all
 busy, which is the normal case, since an optimization fills its pool with one
 work item per realization. Rather than hang, the pool refuses work submitted by
-the evaluation itself with a [`WorkflowError`][ropt.exceptions.WorkflowError]. A
-thread the evaluation starts is not recognized as a worker, so work submitted
-from it is not refused and can still deadlock on the pool. Give the inner
-optimization its own pool, or none at all, which evaluates inline.
+the evaluation itself with a [`WorkflowError`][ropt.exceptions.WorkflowError].
+The same holds for work submitted from a thread that the evaluation starts with
+[`Session.run`][ropt.Session.run], or through `contextvars.copy_context().run`.
+A thread started in any other way is not recognized as a worker, so work
+submitted from it is not refused and can still deadlock on the pool. Give the
+inner optimization its own pool, or none at all, which evaluates inline.
 
 The evaluation must stay **in your process**, so on a thread pool or with no
 pool. On a process, local, or HPC pool the evaluation function is copied

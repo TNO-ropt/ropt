@@ -13,16 +13,16 @@ or process when the batch is aborted: it cannot be stopped, so it runs to its
 end after `run` has returned. An executor acquires its workers, and releases
 them when it is collected, so there is nothing for a caller to close.
 
-Reading the caller's own location to refuse a call that could only hang leaves
-the meaning of an operation fixed by its arguments: a thread already running one
-of the executor's work items turns a deadlock into an error, and does nothing
-else.
+Reading the caller's context to refuse a call that could only hang leaves the
+meaning of an operation fixed by its arguments: code running one of the
+executor's work items, or a thread started from it with a copy of its context,
+turns a deadlock into an error, and does nothing else.
 """
 
 from __future__ import annotations
 
-import threading
 from abc import ABC, abstractmethod
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, override
 
@@ -196,9 +196,10 @@ class Executor(ABC):
         after `run` has returned, and an exception they raise is logged as a
         warning. See [Stopping a run](../running/parallel.md#stopping-a-run).
 
-        May be called from any thread, except one of the executor's own workers:
-        that caller would wait for workers it is itself occupying, so it is
-        refused rather than left to deadlock.
+        May be called from any thread, except from work running on one of the
+        executor's own workers, or from a thread started by that work with a
+        copy of its context: that caller would wait for workers it is itself
+        occupying, so it is refused rather than left to deadlock.
 
         Whatever this batch started is released before this returns, however it
         returns.
@@ -213,15 +214,13 @@ class Executor(ABC):
             One result per call, in the order of `calls`.
 
         Raises:
-            WorkflowError:   If the caller is one of the executor's workers.
+            WorkflowError:   If the call comes from one of the executor's workers.
             ExecutorStopped: If the executor could no longer run the work.
         """
 
 
-class _ThreadState(threading.local):
-    # A `threading.local` attribute exists per thread that assigns it; every
-    # other thread reads the class attribute below.
-    running_work_item: bool = False
+# A context variable, so that threads started with a copy of the context inherit it.
+_running_on: ContextVar[Executor | None] = ContextVar("running_on", default=None)
 
 
 class ExecutorBase(Executor):
@@ -231,14 +230,14 @@ class ExecutorBase(Executor):
     a batch into bundles. Subclasses implement `_run_bundles`, which must
     release whatever the batch started before it returns.
 
-    A subclass whose workers are threads in this process sets
-    `_thread_state.running_work_item` for as long as a work item runs on one,
-    and `run` refuses a caller that has it set. Workers in another interpreter
-    cannot reach the executor, so it stays `False` there. Such a subclass also
-    runs the work item inside the
+    A subclass whose workers are threads in this process sets `_running_on` to
+    the executor for as long as a work item runs on one, and `run` refuses a
+    caller whose context has it set, including a thread started with a copy of
+    that context. Workers in another interpreter cannot reach the executor, so
+    it is never set there. Such a subclass also runs the work item inside the
     [`as_parent`][ropt.components.concurrency.AbortSignal.as_parent] block of
-    the `abort_signal` that `run` was given, so that a task started
-    from the work item takes the one that sent it as its parent.
+    the `abort_signal` that `run` was given, so that a task started from the
+    work item takes the one that sent it as its parent.
     """
 
     def __init__(self, *, bundle_size: int = 1) -> None:
@@ -253,7 +252,6 @@ class ExecutorBase(Executor):
         super().__init__()
         _check_bundle_size(bundle_size)
         self._default_bundle_size = bundle_size
-        self._thread_state = _ThreadState()
 
     @override
     def run(
@@ -276,9 +274,9 @@ class ExecutorBase(Executor):
             One result per call, in the order of `calls`.
 
         Raises:
-            WorkflowError: If the caller is one of the executor's workers.
+            WorkflowError: If the call comes from one of the executor's workers.
         """
-        if self._thread_state.running_work_item:
+        if _running_on.get() is self:
             raise WorkflowError(_ON_WORKER)
         items = list(calls)
         if not items:

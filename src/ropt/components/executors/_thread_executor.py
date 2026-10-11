@@ -18,6 +18,7 @@ from .base import (
     _calls,
     _log_left_running,
     _run_bundle,
+    _running_on,
     _stopped,
 )
 
@@ -121,10 +122,10 @@ class ThreadExecutor(ExecutorBase):
         # whether a bundle starts is decided here rather than there.
         if abort_signal is not None and abort_signal.aborting:
             return WorkNotRun(_NOT_RUN)
-        # Runs on the pool thread, so it marks that thread, not the submitter.
-        self._thread_state.running_work_item = True
+        # Runs on the pool thread, so it marks that thread's context, not the caller's.
+        token = _running_on.set(self)
         try:
             with nullcontext() if abort_signal is None else abort_signal.as_parent():
                 return _run_bundle(calls)
         finally:
-            self._thread_state.running_work_item = False
+            _running_on.reset(token)
