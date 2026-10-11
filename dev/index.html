@@ -932,7 +932,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2513,11 +2513,11 @@ statistic, such as the mean, over the ensemble.</p>
   processes, as separate processes on the local machine, or as jobs on an HPC
   cluster. One set of workers serves every optimization started on it, and work
   of your own can be sent to it as well.</li>
-<li>Stopping a run on a criterion of your own, or aborting it from another
-  thread; both return the best result reached so far.</li>
-<li>Restarting an optimization from the point an earlier run reached, passing in
-  the function and gradient values already computed there so that they are not
-  evaluated again.</li>
+<li>Stopping an optimization on a criterion of your own, which returns the best
+  result reached so far, or aborting it from another thread.</li>
+<li>Restarting an optimization from the point an earlier optimization reached,
+  passing in the function and gradient values already computed there so that
+  they are not evaluated again.</li>
 <li>An interface for running various continuous and discrete optimization methods.
   By default, optimizers from the
   <a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
@@ -2534,7 +2534,7 @@ statistic, such as the mean, over the ensemble.</p>
   <a href="https://docs.pydantic.dev/"><code>pydantic</code></a>.</li>
 <li>Support for tracking and processing optimization results generated during the
   optimization process, with a callback invoked for each evaluation, or with
-  handler objects that can be shared between runs.</li>
+  handler objects that can be shared between optimizations.</li>
 <li>Optional support for exporting results as
   <a href="https://pandas.pydata.org/"><code>pandas</code></a> or <a href="https://pola.rs/"><code>polars</code></a> data
   frames.</li>
@@ -2555,9 +2555,9 @@ optimization. It is covered in the
 <a href="optimizer_setup/key_concepts/">Optimizer Setup</a> section.</p>
 <p><em>How</em> to run a configured optimization is covered in
 <a href="running/running/">Running Optimizations</a>, which describes the functions the
-<code>ropt</code> package exports. They start a run with a single function call and cover
-<a href="running/parallel/">parallel evaluation</a>,
-<a href="running/many_runs/">many runs at once</a>,
+<code>ropt</code> package exports. They start an optimization with a single function call
+and cover <a href="running/parallel/">parallel evaluation</a>,
+<a href="running/many_runs/">several optimizations at once</a>,
 <a href="running/nested/">nested optimization</a>, and custom result handling.</p>
 <h2 id="related-packages">Related packages</h2>
 <h3 id="plugins">Plugins</h3>

@@ -898,7 +898,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2438,11 +2438,11 @@ result an optimization produces.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">))</span>   <span class="c1"># every evaluation from this run</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">))</span>   <span class="c1"># every evaluation from this optimization</span>
 </span></code></pre></div>
 <p>Compare this with the <code>report</code> callback from
 <a href="../ensemble/#4-follow-the-progress-optional">Follow the progress</a>:
-<code>report</code> is called once per evaluation, for one run. A handler is more
+<code>report</code> is called once per evaluation, for one optimization. A handler is more
 general — it keeps or reacts to results, and, unlike <code>report</code>, the same
 handler can be reused across several <strong>sequential</strong> calls to <code>optimize</code>,
 accumulating results from all of them.</p>
@@ -2455,7 +2455,7 @@ accumulating results from all of them.</p>
 <li><strong><a class="autorefs autorefs-internal" title="            ropt.DataFrameHandler" href="../../reference/api/#ropt.DataFrameHandler"><code>DataFrameHandler</code></a></strong> — collects results into a <code>pandas</code> or <code>polars</code> table.</li>
 </ul>
 <p>See <a href="../../results/handlers/">Result handlers</a> for the full
-list, and for what a handler shared between concurrent runs guarantees.</p>
+list, and for what a handler shared between concurrent optimizations guarantees.</p>
 
 
 

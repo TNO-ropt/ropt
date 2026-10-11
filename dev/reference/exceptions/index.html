@@ -835,7 +835,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2418,34 +2418,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.RunsFailedError" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        RunsFailedError
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RunsFailedError">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.RunsFailedError.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.exceptions.OptimizerStop" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2627,34 +2599,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.RunsFailedError" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        RunsFailedError
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RunsFailedError">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.RunsFailedError.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.exceptions.OptimizerStop" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2749,9 +2693,8 @@
 <a class="autorefs autorefs-internal" title="            RoptError" href="#ropt.exceptions.RoptError"><code>RoptError</code></a> and report a failure a caller may
 catch: <a class="autorefs autorefs-internal" title="            WorkflowError" href="#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>,
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>,
-<a class="autorefs autorefs-internal" title="            UnsupportedError" href="#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a>,
-<a class="autorefs autorefs-internal" title="            AbortedError" href="#ropt.exceptions.AbortedError"><code>AbortedError</code></a> and
-<a class="autorefs autorefs-internal" title="            RunsFailedError" href="#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            UnsupportedError" href="#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a> and
+<a class="autorefs autorefs-internal" title="            AbortedError" href="#ropt.exceptions.AbortedError"><code>AbortedError</code></a>.</p>
 <p>The other three derive from <code>Exception</code> directly and are control-flow signals
 rather than errors. <a class="autorefs autorefs-internal" title="            OptimizerStop" href="#ropt.exceptions.OptimizerStop"><code>OptimizerStop</code></a> and
 <a class="autorefs autorefs-internal" title="            ExecutorStopped" href="#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> are raised and caught
@@ -2770,10 +2713,6 @@ no realization a positive weight.</p>
 
 
 <div class="doc doc-children">
-
-
-
-
 
 
 
@@ -2959,10 +2898,10 @@ or the selected plugin does not support the requested method.</p>
 
 
         <p>Work was aborted before it could finish.</p>
-<p>Raised by <a class="autorefs autorefs-internal" title="            offload" href="../api/#ropt.WorkerPool.offload"><code>WorkerPool.offload</code></a>, which
-returns whatever its callables return and so has nowhere to report a reason.
-An optimization or an evaluation carries its reason on the result object it
-returns instead, and does not raise this.</p>
+<p>Raised by an optimization, an evaluation or a <code>run</code> call that was aborted:
+by <a class="autorefs autorefs-internal" title="            abort" href="../api/#ropt.Session.abort"><code>Session.abort</code></a>, by its session closing, by a
+failure elsewhere, or because its pool could no longer run the work. See
+<a href="../../running/failures/">Failures and Aborts</a>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3043,154 +2982,6 @@ returns instead, and does not raise this.</p>
             <td>
               <div class="doc-md-description">
                 <p>Why the work was aborted.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.exceptions.RunsFailedError" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RunsFailedError</span>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            RoptError (ropt.exceptions.RoptError)" href="#ropt.exceptions.RoptError">RoptError</a></code></p>
-
-
-
-        <p>One of several concurrent runs raised.</p>
-<p>Several runs produce several outcomes, so there is neither a single
-exception to re-raise nor a single set of results to return. This carries
-both, so the work the other runs did is not thrown away with the one that
-failed. The first exception is chained, so a traceback still shows what
-went wrong.</p>
-<p>The runs that did not raise were aborted when one did, and ended with
-<code>ExitCode.ABORTED_ON_ERROR</code>. Each kept whatever its completed batches had
-produced; one aborted during its first batch has no result.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.exceptions.RunsFailedError.outcomes">outcomes</span></code></td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Per run, in the order the runs were given, its
-      <a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
-
-
-  
-      dataclass
-  " href="../api/#ropt.OptimizationResult"><code>OptimizationResult</code></a> or the
-      exception it raised.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.exceptions.RunsFailedError.__init__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
-
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">outcomes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">OptimizationResult</span> <span class="o">|</span> <span class="ne">Exception</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Initialize the error.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>outcomes</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
-
-
-  
-      dataclass
-  " href="../api/#ropt.OptimizationResult">OptimizationResult</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#Exception">Exception</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Per run, its result or the exception it raised.</p>
               </div>
             </td>
             <td>
@@ -3380,7 +3171,7 @@ produced; one aborted during its first batch has no result.</p>
 
         <p>Raised when the evaluation executor can no longer run the work.</p>
 <p>A generic signal, carrying no exit code. In practice this happens at
-interpreter shutdown, when the worker pool is gone and a run that outlived
+interpreter shutdown, when the worker pool is gone and a task that outlived
 its program is released rather than left waiting.</p>
 
 

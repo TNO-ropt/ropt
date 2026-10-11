@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -1181,7 +1181,7 @@
   <a href="#what-each-kind-of-run-reports" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What each kind of run reports
+        What each kind of task reports
       
     </span>
   </a>
@@ -1193,17 +1193,6 @@
     <span class="md-ellipsis">
       
         An exit code is not a result
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#work-that-has-no-result-object" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Work that has no result object
       
     </span>
   </a>
@@ -2408,7 +2397,7 @@
   <a href="#what-each-kind-of-run-reports" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What each kind of run reports
+        What each kind of task reports
       
     </span>
   </a>
@@ -2420,17 +2409,6 @@
     <span class="md-ellipsis">
       
         An exit code is not a result
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#work-that-has-no-result-object" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Work that has no result object
       
     </span>
   </a>
@@ -2458,9 +2436,9 @@
 
 
 <h1 id="exit-codes">Exit Codes</h1>
-<p>Every run reports why it ended. The reason is an
-<a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, carried on the object the run returns
-rather than raised:</p>
+<p>Every optimization reports why it ended. The reason is an
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, carried on the result the optimization
+returns:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
@@ -2473,7 +2451,7 @@ rather than raised:</p>
   
       property
   " href="../../reference/enums/#ropt.enums.ExitCode.message"><code>message</code></a>, which is what to print or log when
-reporting a run. Use <code>name</code> where the identifier itself is wanted, and compare
+reporting it. Use <code>name</code> where the identifier itself is wanted, and compare
 against the member to branch on it. Note that <code>str()</code> and an f-string give the
 integer value, as they do for any <code>IntEnum</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">code</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span>
@@ -2481,12 +2459,21 @@ integer value, as they do for any <code>IntEnum</code>:</p>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">code</span><span class="o">.</span><span class="n">name</span>     <span class="c1"># 'MAX_FUNCTIONS_REACHED'</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nb">str</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>     <span class="c1"># '2'</span>
 </span></code></pre></div>
-<p>A run either <strong>stops</strong> or is <strong>aborted</strong>, and the exit code indicates which. It
-stops when a condition on the run is met — the optimizer converged, a budget ran
-out, a <a href="../../running/running/#stopping-early-from-the-callback"><code>report</code> callback</a>
-returned <code>True</code> — so it ends at a point that satisfied a stated criterion. It is
-aborted when something ends it regardless of the state of the run, and what
-comes back is then whatever it had reached rather than a chosen endpoint.</p>
+<p>An optimization either <strong>stops</strong> or is <strong>aborted</strong>. It stops when a condition on
+the optimization is met — the optimizer converged, a budget ran out, a
+<a href="../../running/running/#stopping-early-from-the-callback"><code>report</code> callback</a>
+returned <code>True</code> — so it ends at a point that satisfied a stated criterion, and
+returns its result with the code. It is aborted when something ends it
+regardless of its state, and it then raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose <code>exit_code</code> attribute
+holds the code:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbortedError</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">except</span> <span class="n">AbortedError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</span></code></pre></div>
 <table>
 <thead>
 <tr>
@@ -2497,7 +2484,7 @@ comes back is then whatever it had reached rather than a chosen endpoint.</p>
 <tbody>
 <tr>
 <td><code>FINISHED</code></td>
-<td>The run terminated normally. For an optimization this means the backend ended it, by converging or on a limit of its own such as <code>max_iterations</code>.</td>
+<td>The optimizer ended the optimization, by converging or on a limit of its own such as <code>max_iterations</code>.</td>
 </tr>
 <tr>
 <td><code>MAX_FUNCTIONS_REACHED</code></td>
@@ -2509,7 +2496,7 @@ comes back is then whatever it had reached rather than a chosen endpoint.</p>
 </tr>
 <tr>
 <td><code>STOPPED</code></td>
-<td>A <code>report</code> callback returned <code>True</code>, ending the run at the next evaluation boundary.</td>
+<td>A <code>report</code> callback returned <code>True</code>, ending the optimization at the next evaluation boundary.</td>
 </tr>
 <tr>
 <td><code>TOO_FEW_REALIZATIONS</code></td>
@@ -2517,55 +2504,52 @@ comes back is then whatever it had reached rather than a chosen endpoint.</p>
 </tr>
 <tr>
 <td><code>ABORTED</code></td>
-<td>The run was aborted from outside, as closing a session does to a run still under way.</td>
+<td>The task was aborted from outside, as closing a session, or a <code>KeyboardInterrupt</code>, does to a task still under way.</td>
 </tr>
 <tr>
 <td><code>ABORTED_ON_ERROR</code></td>
-<td>Another run on the same session raised, and this one was aborted with it.</td>
+<td>Another <a href="../../running/failures/">task</a> raised, and this one was aborted with it.</td>
 </tr>
 <tr>
 <td><code>USER_ABORT</code></td>
-<td><a href="../../running/running/#stopping-from-outside"><code>Session.abort</code></a> aborted the run.</td>
+<td><a href="../../running/running/#stopping-from-outside"><code>Session.abort</code></a> aborted the task.</td>
 </tr>
 <tr>
 <td><code>EXECUTOR_SHUT_DOWN</code></td>
-<td>The pool the run was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it.</td>
+<td>The pool the task was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it.</td>
 </tr>
 <tr>
 <td><code>UNKNOWN</code></td>
-<td>The zero value of the enumeration. No run reports it.</td>
+<td>The zero value of the enumeration. No task reports it.</td>
 </tr>
 </tbody>
 </table>
-<p>The first five are stops and the next four aborts; <code>UNKNOWN</code> is neither.
-<code>TOO_FEW_REALIZATIONS</code> ends a run at an evaluation boundary like the other
-stops, but unlike them it follows from a failure: one failed realization is
-enough to trigger it unless
+<p>The first five are stops, returned on the result, and the next four are aborts,
+raised with <code>AbortedError</code>; <code>UNKNOWN</code> is neither. <code>TOO_FEW_REALIZATIONS</code> ends an
+optimization at an evaluation boundary like the other stops, but unlike them it
+follows from a failure: one failed realization is enough to trigger it unless
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 is lowered.</p>
-<h2 id="what-each-kind-of-run-reports">What each kind of run reports</h2>
-<p>An <strong>optimization</strong> can end with any of the codes above.</p>
-<p>An <strong>evaluation</strong> is a single batch with no optimizer loop around it, so it
-reports only <code>FINISHED</code>, <code>USER_ABORT</code>, <code>ABORTED</code> or <code>ABORTED_ON_ERROR</code>. It is
-also all or nothing: either every vector was evaluated, or the batch was
-aborted and <code>results</code> is empty. An abort that arrives once the batch has
-finished leaves it unaffected, and the evaluation reports <code>FINISHED</code>.</p>
+<h2 id="what-each-kind-of-run-reports">What each kind of task reports</h2>
+<p>An <strong>optimization</strong> returns any of the stop codes above, and raises with any of
+the abort codes.</p>
+<p>An <strong>evaluation</strong> is a single batch with no optimizer loop around it, so it has
+no criterion to stop on and its result carries no exit code. It is all or
+nothing: either every vector was evaluated and the evaluation returns them, or
+it was aborted and raises <code>AbortedError</code>. An abort that arrives once the batch
+has finished leaves it unaffected.</p>
+<p>A <strong><code>run</code> call</strong> returns whatever its callables return, and raises
+<code>AbortedError</code> when it is aborted before all of them have finished.</p>
 <h2 id="an-exit-code-is-not-a-result">An exit code is not a result</h2>
 <p>The two are independent. <code>results</code> is <code>None</code> when no feasible result was ever
-recorded, whatever the code the run ended with, and a run that ends early still
-returns the best result it had reached before that. A run can therefore report
-<code>FINISHED</code> and still have nothing on <code>results</code>, because only a result satisfying
-every constraint to within <code>constraint_tolerance</code> can be returned as the best
-one — <code>1e-10</code> unless you pass another, and it applies to the bounds and the
-linear constraints as well as the nonlinear ones. See
+recorded, whatever the code the optimization ended with, and an optimization
+that stops early still returns the best result it had reached before that. An
+optimization can therefore report <code>FINISHED</code> and still have nothing on
+<code>results</code>, because only a result satisfying every constraint to within
+<code>constraint_tolerance</code> can be returned as the best one — <code>1e-10</code> unless you pass
+another, and it applies to the bounds and the linear constraints as well as the
+nonlinear ones. See
 <a href="../../running/running/#when-something-goes-wrong">When something goes wrong</a>.</p>
-<h2 id="work-that-has-no-result-object">Work that has no result object</h2>
-<p><a class="autorefs autorefs-internal" title="            offload" href="../../reference/api/#ropt.WorkerPool.offload"><code>WorkerPool.offload</code></a> returns whatever its
-callables return, so there is no result object to carry an exit code. An
-<code>offload</code> with a callable that an abort kept from running raises
-<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead, whose
-<code>exit_code</code> attribute says why: an abort that was asked for, one another run
-caused, or <code>EXECUTOR_SHUT_DOWN</code> when the pool could no longer run the work.</p>
 
 
 

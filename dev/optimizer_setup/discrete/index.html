@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2554,7 +2554,7 @@ by following a gradient, and the cost profile differs accordingly:</p>
 <ul>
 <li><code>perturbation_magnitudes</code> is unused. No perturbations are evaluated, because
   no gradient is estimated.</li>
-<li>Limit the run with <a href="../configuration_sections/#optimizer"><code>max_functions</code></a> or
+<li>Limit the optimization with <a href="../configuration_sections/#optimizer"><code>max_functions</code></a> or
   <code>max_iterations</code> rather than a convergence tolerance.</li>
 <li>The result is reproducible only if the method's own generator is seeded —
   hence <code>"options": {"rng": 4}</code> in both scripts.</li>

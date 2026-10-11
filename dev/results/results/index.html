@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -3585,7 +3585,7 @@ which runs the same problem unscaled, with <code>auto_scale</code> on the object
 with a variable scale, printing both domains each time. It shows that
 <code>auto_scale</code> divides the reported objective by a large factor while leaving the
 solution where it was, so only <code>functions.objectives</code> and <code>variables</code> can be
-compared between runs.</p>
+compared between optimizations.</p>
 <h2 id="metadata">Metadata</h2>
 <p>Results carry two independent kinds of metadata, neither interpreted by <code>ropt</code>:</p>
 <ul>
@@ -3595,12 +3595,11 @@ compared between runs.</p>
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object, identical for every result of a run.
-  It is set once when the run starts: pass a <code>metadata</code> dict to the
-  <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> /
-  <a class="autorefs autorefs-internal" title="            ropt.optimize_many" href="../../reference/api/#ropt.optimize_many"><code>optimize_many</code></a> /
-  <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> functions. Use it to tag or identify a
-  run, for example <code>{"run_id": 7}</code>.</li>
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object, identical for every result of one
+  optimization or evaluation. It is set once, at the start: pass a <code>metadata</code>
+  dict to the <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> / <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>
+  functions. Use it to tag or identify an optimization, for example
+  <code>{"run_id": 7}</code>.</li>
 <li><strong>Per-realization metadata</strong> — the <code>metadata</code> dict on the <code>evaluations</code> field,
   with one array entry per realization. It is produced by the objective when it
   returns an
@@ -3612,7 +3611,8 @@ compared between runs.</p>
   " href="../../reference/api/#ropt.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
   with a <code>metadata</code> field.</li>
 </ul>
-<p>Result metadata is passed to the run and read back from <code>metadata</code>:</p>
+<p>Result metadata is passed to <code>optimize</code> or <code>evaluate</code> and read back from
+<code>metadata</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"run_id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span>            <span class="c1"># {'run_id': 7}</span>
 </span></code></pre></div>
@@ -3662,8 +3662,8 @@ result exports a list of fields, each named by a dotted path from the result:</p
 <p>The runnable script for this section is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/export.py">examples/export.py</a>,
 which exports one result stacked, the same result unstacked, and then every
-result of the run in one frame. It uses polars by default and pandas with
-<code>--pandas</code>, so only one of the two needs to be installed.</p>
+result of the optimization in one frame. It uses polars by default and pandas
+with <code>--pandas</code>, so only one of the two needs to be installed.</p>
 <p>A path may name a field of the result itself (<code>"variables"</code>,
 <code>"target_objective"</code>), a field of one of its sub-objects
 (<code>"functions.objectives"</code>, <code>"scaled.variables"</code>), or an entry of a dict-valued
@@ -3800,10 +3800,10 @@ unstacked while <code>realization</code> stays a row label:</p>
 </span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>2        r0                                         0.09                               -0.02
 </span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>         r1                                         0.22                                0.05
 </span></code></pre></div>
-<p>The run-level <strong>result metadata</strong> sits directly on the result, so it has no
-axes and gives one value per result, which is convenient for pulling in a run
-tag. It may be nested to any depth, and is reachable from <code>to_pandas</code> and
-<code>results_to_pandas</code> alike:</p>
+<p>The <strong>result metadata</strong>, set once per optimization, sits directly on the result,
+so it has no axes and gives one value per result, which is convenient for pulling
+in a tag that identifies the optimization. It may be nested to any depth, and is
+reachable from <code>to_pandas</code> and <code>results_to_pandas</code> alike:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_pandas</span><span class="p">(</span>
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="n">all_results</span><span class="p">,</span>
 </span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"metadata.run_id"</span><span class="p">,</span> <span class="s2">"target_objective"</span><span class="p">],</span>

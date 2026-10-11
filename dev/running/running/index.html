@@ -896,7 +896,7 @@
   <a href="#stopping-from-outside" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Aborting a run from outside
+        Aborting from outside
       
     </span>
   </a>
@@ -1003,7 +1003,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2547,7 +2547,7 @@
   <a href="#stopping-from-outside" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Aborting a run from outside
+        Aborting from outside
       
     </span>
   </a>
@@ -2686,8 +2686,8 @@ additional options.</p>
   batches, and each batch in a program gets its own number.</li>
 <li><code>context.row_idx</code> — the position of the evaluation within its batch,
   counted from 0.</li>
-<li><code>context.metadata</code> — the <code>metadata</code> dict the run was started with, if
-  any (see <a href="#attaching-metadata">Attaching metadata</a>).</li>
+<li><code>context.metadata</code> — the <code>metadata</code> dict the optimization was started
+  with, if any (see <a href="#attaching-metadata">Attaching metadata</a>).</li>
 </ul>
 </li>
 </ul>
@@ -2710,7 +2710,7 @@ There are three ways to return them:</p>
 <code>NaN</code> as a failed realization and keeps going, as long as enough realizations
 succeed. How many is enough is set by
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>,
-which defaults to <em>all</em> of them — so a single <code>NaN</code> ends the run with
+which defaults to <em>all</em> of them — so a single <code>NaN</code> ends the optimization with
 <code>TOO_FEW_REALIZATIONS</code> unless you lower it.</p>
 <h2 id="the-result">The result</h2>
 <p><code>optimize</code> returns an <a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
@@ -2722,7 +2722,7 @@ which defaults to <em>all</em> of them — so a single <code>NaN</code> ends the
 which carries two things:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span>  <span class="c1"># why the run stopped (an ExitCode)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span>  <span class="c1"># why the optimization stopped (an ExitCode)</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">result</span><span class="o">.</span><span class="n">results</span>      <span class="c1"># the best evaluation, or None if none was valid</span>
 </span></code></pre></div>
 <p><code>results</code> is a <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
@@ -2740,7 +2740,8 @@ values are read from it at the paths described in
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">objectives</span>  <span class="c1"># the separate objective values</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span> <span class="c1"># the nonlinear constraint values</span>
 </span></code></pre></div>
-<p><code>results</code> is <code>None</code> when the run produced no valid result: too few realizations
+<p><code>results</code> is <code>None</code> when the optimization produced no valid result: too few
+realizations
 succeeded, or no result ever satisfied the constraints — see
 <a href="#when-something-goes-wrong">When something goes wrong</a>. One check therefore
 covers every field.</p>
@@ -2761,7 +2762,7 @@ object a handler is given:</p>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>result.variables</code> is the point that was evaluated. During an optimization the
-optimizer chose it, so this is how you follow the path a run takes.</p>
+optimizer chose it, so this is how you follow the path an optimization takes.</p>
 <h3 id="reporting-gradients-as-well">Reporting gradients as well</h3>
 <p>Set <code>report_gradients=True</code> and the callback is also called with each
 <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
@@ -2815,11 +2816,12 @@ continue.</p>
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
 </span></code></pre></div>
-<p>With <a href="../many_runs/"><code>optimize_many</code></a> this stops only the run
-whose callback returned <code>True</code>; the other runs continue.</p>
+<p>With <a href="../many_runs/">several optimizations at once</a>, this stops only the
+optimization whose callback returned <code>True</code>; the others continue.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py">examples/stopping.py</a>,
-which stops a run after a fixed number of results and then reads the best point
+which stops an optimization after a fixed number of results and then reads the
+best point
 it had reached.</p>
 <div class="admonition note">
 <p class="admonition-title">Nothing to stop on an evaluation</p>
@@ -2828,55 +2830,60 @@ it had reached.</p>
 there the return value is <strong>ignored</strong>. An evaluation is a single batch with
 no optimizer loop to interrupt, so the callback reports and nothing more.</p>
 </div>
-<h3 id="stopping-from-outside">Aborting a run from outside</h3>
-<p>The <code>report</code> callback runs inside the run it stops, which is no use to a signal
-handler or a user interface. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> is
-the one that is called from another thread: it aborts every run that belongs
-to the session, and each ends with <code>USER_ABORT</code>, keeping the best result it had
-reached.</p>
+<h3 id="stopping-from-outside">Aborting from outside</h3>
+<p>The <code>report</code> callback runs inside the optimization it stops, which is no use to
+a signal handler or a user interface. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> is
+the one that is called from another thread: it aborts every task that belongs
+to the session, and each raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>
+with <code>USER_ABORT</code>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">abort</span><span class="p">())</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">USER_ABORT</span><span class="p">:</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"aborted early, best so far:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="k">except</span> <span class="n">AbortedError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">"aborted:"</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The two are not the same kind of ending, which is why they have different exit
-codes. A <code>report</code> callback stops the run <em>on a criterion</em>, at a point it chose.
-An abort applies no criterion: the result is whatever the run had reached.</p>
-<p>An aborted run ends at its next evaluation boundary. With no pool, or on a thread
-or process pool, the evaluations already in flight are still carried out, and
-their workers are free only once they return. On a local or HPC pool they are
-cancelled.</p>
-<p><code>abort()</code> reaches the runs that are under way at the moment it is called, and
-nothing more. A run started afterwards is unaffected, so a
-loop that abandons one attempt and starts another keeps working. An
-<a class="autorefs autorefs-internal" title="            optimize_many" href="../../reference/api/#ropt.Session.optimize_many"><code>optimize_many</code></a> counts as one run here: a
-run it has queued behind its <code>limit</code> is aborted as well, and reports <code>USER_ABORT</code>
-without evaluating anything. Leaving the session's <code>with</code> block aborts its runs
-as well, and then releases its pools, which is what refuses a run started after
-that. A run aborted that way reports <code>ABORTED</code> rather than <code>USER_ABORT</code>, since
-it was the block ending rather than a request to abort.</p>
-<p>A run started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> belongs
+codes. A <code>report</code> callback stops the optimization <em>on a criterion</em>, at a point it
+chose, and the optimization returns the best result it had reached. An abort
+applies no criterion, and the optimization returns no result. To keep what an
+aborted optimization had reached, collect its results as they arrive, with a
+<code>report</code> callback or a <a href="../../results/handlers/">handler</a>.</p>
+<p>An aborted task does not wait for the evaluations that are running. With no
+pool, the evaluation function runs in the calling thread, so the call in progress
+returns first. On a thread or process pool, the evaluations already running
+continue after the task has ended, and their workers are free only once they
+return. On a local or HPC pool they are cancelled.</p>
+<p><code>abort()</code> reaches the tasks that are under way at the moment it is called, and
+nothing more. A task started afterwards is unaffected, so a
+loop that abandons one attempt and starts another keeps working. A
+<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>run</code></a> call counts as one task here: a callable it has
+queued behind its <code>limit</code> is not started. Leaving the session's <code>with</code> block
+aborts its tasks as well, and then releases its pools, which is what refuses a
+task started after that. Releasing a local or HPC pool cancels the jobs it still
+has, so none are left running when the block has ended. A task aborted that way
+raises with <code>ABORTED</code> rather than <code>USER_ABORT</code>, since it was the block ending
+rather than a request to abort.</p>
+<p>An optimization started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> belongs
 to no session you hold and cannot be aborted this way. It evaluates on the
 calling thread, which is the thread that would have to call <code>abort()</code>. Start it
 on a session or one of its pools to make it abortable.</p>
 <h2 id="attaching-metadata">Attaching metadata</h2>
-<p>You can attach arbitrary <strong>metadata</strong> to a run, from two sources:</p>
+<p>You can attach arbitrary <strong>metadata</strong> to an optimization or evaluation, from two
+sources:</p>
 <ul>
-<li><strong>Constant, per run</strong> — pass a <code>metadata</code> dict to <code>optimize</code>, <code>optimize_many</code>,
-  <code>evaluate</code>, or <code>evaluate_batch</code>. <code>ropt</code> copies it onto every result the run
-  produces, which is one way to tag a run:</li>
+<li><strong>Constant, per task</strong> — pass a <code>metadata</code> dict to <code>optimize</code>, <code>evaluate</code>, or
+  <code>evaluate_batch</code>. <code>ropt</code> copies it onto every result the task produces, which
+  is one way to tag an optimization:</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"run_id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"run_id"</span><span class="p">])</span>   <span class="c1"># 7</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>   <span class="c1"># 7</span>
 </span></code></pre></div>
 <p>The same dict also reaches the evaluation function itself, as
-  <code>context.metadata</code> — useful when the evaluation needs to know which run it is
-  part of. With <code>optimize_many</code>, this is how runs are told apart:
-  give one dict (shared by all runs) or a list with one dict per run; see
-  <a href="../many_runs/">Give each run an ID</a>.</p>
+  <code>context.metadata</code> — useful when the evaluation needs to know which
+  optimization it is part of. With several optimizations at once, this is how
+  they are told apart; see <a href="../many_runs/">Give each optimization an ID</a>.</p>
 <ul>
 <li><strong>Per evaluation</strong> — return an
   <a class="autorefs autorefs-internal" title="            ropt.EvaluationFunctionResult
@@ -2921,23 +2928,16 @@ optimizer. Use <a class="autorefs autorefs-internal" title="            ropt.eva
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_batch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">single</span><span class="o">.</span><span class="n">results</span>  <span class="c1"># one FunctionResults, or None if the evaluation was aborted</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">batch</span><span class="o">.</span><span class="n">results</span>   <span class="c1"># one per row of the matrix, empty if the batch was aborted</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">single</span><span class="o">.</span><span class="n">results</span>  <span class="c1"># one FunctionResults</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">batch</span><span class="o">.</span><span class="n">results</span>   <span class="c1"># one per row of the matrix</span>
 </span></code></pre></div>
 <p>Both return an <a class="autorefs autorefs-internal" title="            ropt.EvaluationResult
 
 
   
       dataclass
-  " href="../../reference/api/#ropt.EvaluationResult"><code>EvaluationResult</code></a>, shaped like
-the <a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
-
-
-  
-      dataclass
-  " href="../../reference/api/#ropt.OptimizationResult"><code>OptimizationResult</code></a> that <code>optimize</code>
-returns: <code>exit_code</code> indicates why the evaluation ended and <code>results</code> holds what it
-produced. What is on <code>results</code> is a
+  " href="../../reference/api/#ropt.EvaluationResult"><code>EvaluationResult</code></a>, whose <code>results</code>
+holds what the evaluation produced. What is on <code>results</code> is a
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -2948,11 +2948,10 @@ receives, so everything is read the same way wherever it came from. Here
 <code>result.variables</code> is just the point you supplied; it is only informative in a
 <code>report</code> callback, where the optimizer chose the point.</p>
 <p>An evaluation is a single batch, so it produces either every result or none.
-That is why <code>exit_code</code> can only be <code>FINISHED</code>; <code>USER_ABORT</code> or
-<code>ABORTED_ON_ERROR</code> when <a href="#stopping-from-outside"><code>Session.abort</code></a> or a failing
-run on the same session aborted it; or <code>EXECUTOR_SHUT_DOWN</code> when the pool it was
-evaluating on could no longer run the work. An abort that arrives after the
-batch has finished leaves it unaffected, and the evaluation reports <code>FINISHED</code>.</p>
+When <a href="#stopping-from-outside"><code>Session.abort</code></a> or a failing task on the same
+session aborts it, or when the pool it was evaluating on could no longer run the
+work, it raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. An abort that
+arrives after the batch has finished leaves it unaffected.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/evaluate.py">examples/evaluate.py</a>,
 which evaluates a single vector and then a matrix of them.</p>
@@ -2960,13 +2959,14 @@ which evaluates a single vector and then a matrix of them.</p>
 <p>Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in <code>result.exit_code</code> —
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value, for
-instance, or <code>ABORTED_ON_ERROR</code> when another run on the same session raised and
-brought this one down with it (see
+instance. An optimization that is aborted, for instance because another task
+raised, raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead (see
 <a href="../failures/">Failures and Aborts</a>).
 <a href="../../results/exit_codes/">Exit Codes</a> lists them all, and explains why a
 reason and a result are independent: <code>result.results</code> is <code>None</code> when no feasible
-result was ever recorded, whatever the reason the run ended, and a run that fails
-part-way still returns the best result it had reached before that. The
+result was ever recorded, whatever the reason the optimization ended, and an
+optimization that stops part-way still returns the best result it had reached
+before that. The
 evaluations it did make reach the <a href="../../results/handlers/">handlers</a> attached to
 it either way.</p>
 <p>What <em>is</em> raised falls into three groups:</p>
@@ -2975,7 +2975,7 @@ it either way.</p>
 <p><strong>Mistakes in the configuration</strong> surface as a <code>pydantic.ValidationError</code>
   from the <code>config</code> dictionary: an unknown field, a value of the wrong type, a
   method name no installed plugin provides, or a set of options the chosen
-  method does not accept. These are raised when the run starts, before
+  method does not accept. These are raised when the optimization starts, before
   anything is evaluated.</p>
 </li>
 <li>
@@ -2985,27 +2985,22 @@ it either way.</p>
   <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> when a pool or handler
   is used in a way it cannot be (a pool asked to run work from one of its
   own workers, a pool whose session has closed, a handler already claimed by
-  another run),
+  another optimization),
   <a class="autorefs autorefs-internal" title="            UnsupportedError" href="../../reference/exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a> when an optional
   dependency is missing, or when the chosen method cannot handle the problem
   as configured — a constraint it does not support, for instance, which is
-  checked as the run starts — and
+  checked as the optimization starts — and
   <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> when the worker pool
   that runs your evaluations, or a callable handed to
-  <a class="autorefs autorefs-internal" title="            offload" href="../../reference/api/#ropt.WorkerPool.offload"><code>WorkerPool.offload</code></a>, cannot start or breaks
-  down, and <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> when an abort
-  kept an offloaded callable from running.</p>
+  <a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.WorkerPool.run"><code>WorkerPool.run</code></a>, cannot start or breaks
+  down, and <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> when the
+  optimization, or a <code>run</code> call, was aborted before it finished.</p>
 </li>
 <li>
 <p><strong>Exceptions from your own evaluation function</strong> are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process
   — and are re-raised from the <code>optimize</code> call. Return <code>float("nan")</code> instead
-  if a failed realization should be tolerated rather than fatal. With
-  <a class="autorefs autorefs-internal" title="            ropt.optimize_many" href="../../reference/api/#ropt.optimize_many"><code>optimize_many</code></a> there is no single exception to
-  re-raise, so <code>optimize_many</code> raises
-  <a class="autorefs autorefs-internal" title="            RunsFailedError" href="../../reference/exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a> carrying what every run
-  raised or reached; see
-  <a href="../many_runs/#failure-in-one-run">Failure in one run</a>.</p>
+  if a failed realization should be tolerated rather than fatal.</p>
 </li>
 </ul>
 <p>The <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> types above are imported from
@@ -3017,7 +3012,7 @@ configuration errors belong to pydantic, and errors from your evaluation
 function stay whatever you raised. The control-flow signals that <code>ropt</code> raises
 and catches itself are excluded as well, and stay in
 <a class="autorefs autorefs-internal" title="            ropt.exceptions" href="../../reference/exceptions/#ropt.exceptions"><code>ropt.exceptions</code></a>.</p>
-<p><code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code>, <code>optimize_many</code> and <code>offload</code> start
+<p><code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> and <code>run</code> start
 <strong>tasks</strong>, which can be under way at the same time. When a task raises an
 exception, every task started from inside it is aborted, and the exception is
 raised in the code that started the task. If that code is your script, every

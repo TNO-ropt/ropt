@@ -840,7 +840,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -974,7 +974,7 @@
   <a href="#when-an-inner-run-fails" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When an inner run fails
+        When an inner optimization fails
       
     </span>
   </a>
@@ -1004,10 +1004,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#collecting-results-from-runs-that-overlap" class="md-nav__link">
+  <a href="#collecting-results-from-optimizations-that-overlap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Collecting results from runs that overlap
+        Collecting results from optimizations that overlap
       
     </span>
   </a>
@@ -2463,7 +2463,7 @@
   <a href="#when-an-inner-run-fails" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When an inner run fails
+        When an inner optimization fails
       
     </span>
   </a>
@@ -2493,10 +2493,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#collecting-results-from-runs-that-overlap" class="md-nav__link">
+  <a href="#collecting-results-from-optimizations-that-overlap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Collecting results from runs that overlap
+        Collecting results from optimizations that overlap
       
     </span>
   </a>
@@ -2527,14 +2527,15 @@
 <p>Some problems split naturally into two layers: a few variables that are awkward
 for one method — integers, say, or switches — and the rest, which a gradient
 method handles well. <strong>Nested optimization</strong> solves them in two loops. An outer
-run varies the awkward variables, and every outer evaluation runs a complete
-inner optimization over the remaining ones, returning the best value it reached.</p>
+optimization varies the awkward variables, and every outer evaluation runs a
+complete inner optimization over the remaining ones, returning the best value it
+reached.</p>
 <div class="admonition tip">
 <p class="admonition-title">This page also covers four things that are not nesting</p>
 <p>Nesting itself is a niche, but this page puts four things that are not
 into one program small enough to read end to end: choosing a pool per
 layer, and why one of them has to stay on threads; collecting results from
-runs that overlap in time, in one handler; reusing an evaluation
+optimizations that overlap in time, in one handler; reusing an evaluation
 the optimizer has already made; and moving the expensive layer to a cluster
 by changing a single line.</p>
 </div>
@@ -2565,8 +2566,8 @@ get the results out.</p>
     end
     in1 ==&gt;|"batch"| w1
     in2 ==&gt;|"batch"| w2</code></pre>
-<p>Solid arrows start a run, thick arrows carry evaluations out to a worker
-process, and dotted arrows carry results back to the handler. Both pools
+<p>Solid arrows start an optimization, thick arrows carry evaluations out to a
+worker process, and dotted arrows carry results back to the handler. Both pools
 are drawn: the outer one is inside your process, the inner one is not. The
 sections below work through each part.</p>
 <p>The runnable script for this page is
@@ -2608,8 +2609,9 @@ change. The <code>mask</code> field does this, and the two masks are complements
 </span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>A masked-out variable keeps the value it was given and is not passed to the
-optimizer, so the inner run treats the outer variables as constants and the
-outer run never touches the inner ones. The two layers can otherwise be
+optimizer, so the inner optimization treats the outer variables as constants and
+the outer optimization never touches the inner ones. The two layers can otherwise
+be
 configured completely differently — here the outer is integer-valued and
 gradient-free, while the inner is continuous and uses an ensemble of five
 realizations. See <a href="../../optimizer_setup/configuration_sections/#variables"><code>variables</code></a>
@@ -2630,7 +2632,7 @@ objective it found:</p>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">function</span><span class="p">,</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">],</span>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="c1"># A whole inner batch goes to one worker: the parallelism comes from the</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="c1"># outer runs.</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="c1"># outer evaluations.</span>
 </span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="n">bundle_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="c1"># Within a batch only (batch_id, row_idx) is unique: several rows share</span>
 </span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="c1"># a realization, so realization alone would not identify the caller.</span>
@@ -2650,25 +2652,26 @@ being tried. The <code>metadata</code> tags every inner result with the outer ev
 that caused it, which is what makes the collected results traceable. The <code>memo</code>
 lookup above it is covered in
 <a href="#reusing-an-outer-evaluation">Reusing an outer evaluation</a>.</p>
-<p>An inner run that ends with <code>TOO_FEW_REALIZATIONS</code> has no result, and the outer
-evaluation reports <code>NaN</code> for it. That is the same value an ordinary evaluation
-function returns for a realization that failed, so the outer run applies its own
+<p>An inner optimization that ends with <code>TOO_FEW_REALIZATIONS</code> has no result, and
+the outer evaluation reports <code>NaN</code> for it. That is the same value an ordinary
+evaluation function returns for a realization that failed, so the outer
+optimization applies its own
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 to it.</p>
-<h2 id="when-an-inner-run-fails">When an inner run fails</h2>
-<p>The inner run is started from the outer evaluation function, so it is
-<a href="../failures/#nested-tasks">nested</a> in the outer run. An exception it
+<h2 id="when-an-inner-run-fails">When an inner optimization fails</h2>
+<p>The inner optimization is started from the outer evaluation function, so it is
+<a href="../failures/#nested-tasks">nested</a> in the outer optimization. An exception it
 raises is raised in the outer evaluation function and aborts nothing outside the
-inner run. The evaluation function can catch it and return <code>NaN</code> for that
-realization:</p>
+inner optimization. The evaluation function can catch it and return <code>NaN</code> for
+that realization:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">try</span><span class="p">:</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">inner_config</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">inner_function</span><span class="p">)</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>An exception that the outer evaluation function does not catch ends the outer
-run, as any exception from an evaluation function does. When the outer run is
-aborted, the inner runs are aborted with it. See
+optimization, as any exception from an evaluation function does. When the outer
+optimization is aborted, the inner optimizations are aborted with it. See
 <a href="../failures/">Failures and Aborts</a> for the rules that apply to every task.</p>
 <h2 id="two-pools-not-one">Two pools, not one</h2>
 <p>Each layer evaluates on its own pool, and that is a requirement rather than
@@ -2706,14 +2709,15 @@ the shared handler can travel with it: the job has to open its own session and
 collect its own results, and return them as data for you to combine. Use that
 when the outer evaluations are genuinely independent; use the shape above when
 you want one pool and one table across all of them.</p>
-<p>The inner run passes <code>bundle_size=0</code>, which sends a whole inner batch to one
-worker at once. Within one inner run that gives up parallelism
+<p>The inner optimization passes <code>bundle_size=0</code>, which sends a whole inner batch to
+one worker at once. Within one inner optimization that gives up parallelism
 completely — its five realizations are evaluated one after another — but the
 parallelism here comes from the layer above: two outer evaluations run at once,
 each feeding the inner pool one bundle, so both workers are busy and each
 batch costs one transfer instead of five. See
 <a href="../parallel/#how-many-workers">How a batch is split across workers</a>.</p>
-<p>Handing the inner run the pool it is already running on would deadlock, and
+<p>Handing the inner optimization the pool it is already running on would deadlock,
+and
 <code>ropt</code> refuses it rather than hanging — see
 <a href="../parallel/#pools-inside-an-evaluation">Pools inside an evaluation</a> for
 why.</p>
@@ -2737,15 +2741,15 @@ it finishes, without raising. See
 missing and both compute it. The stored value is the same either way, so the
 cost is one repeated evaluation. A lock would close that window and serialize
 the outer layer with it.</p>
-<p>A repeat starts no inner run, so the table described next holds rows for the
-outer evaluations that were computed, not for every outer evaluation.</p>
-<h2 id="collecting-results-from-runs-that-overlap">Collecting results from runs that overlap</h2>
-<p>The inner runs are concurrent, and <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">one
+<p>A repeat starts no inner optimization, so the table described next holds rows
+for the outer evaluations that were computed, not for every outer evaluation.</p>
+<h2 id="collecting-results-from-optimizations-that-overlap">Collecting results from optimizations that overlap</h2>
+<p>The inner optimizations are concurrent, and <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">one
 handler</a> collects them
-all: it takes a lock around every event it handles, so the runs wait for each
-other rather than interleaving. Give every inner run the same
+all: it takes a lock around every event it handles, so the optimizations wait for
+each other rather than interleaving. Give every inner optimization the same
 <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a> and every inner evaluation
-from every inner run lands in one table, keyed by the outer evaluation it
+from every inner optimization lands in one table, keyed by the outer evaluation it
 belongs to.</p>
 <p>Reading the answer takes one more step than usual:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">best</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">"Objective"</span><span class="p">)</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

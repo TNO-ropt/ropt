@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -3165,7 +3165,7 @@ optimization from an initial variable vector. It is selected through the
 <code>backend</code> section of the configuration, either as an instance or as a
 <a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> naming a method. The configuration
 itself never reaches the backend: <code>ropt</code> reduces it to an
-<code>OptimizationProblem</code> when the run starts.</p>
+<code>OptimizationProblem</code> when the optimization starts.</p>
 <p><code>ropt</code> ships <a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a> and
 <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="#ropt.backend.external.ExternalBackend"><code>ExternalBackend</code></a>, which runs an
 optimizer in a separate process; further backends come from plugin packages. See
@@ -3229,9 +3229,10 @@ against zero and never handles a bound. See
 whose algorithm expects the opposite convention negates the values and
 their gradients.</p>
 <p><strong>Process-global state</strong></p>
-<p>While a run is in progress a backend must not change the working directory,
-the environment, <code>sys.stdout</code> or <code>sys.stderr</code>, or file descriptors 1 and 2,
-since it shares them with every other run in the process. See
+<p>While an optimization is in progress a backend must not change the working
+directory, the environment, <code>sys.stdout</code> or <code>sys.stderr</code>, or file
+descriptors 1 and 2, since it shares them with every other optimization in
+the process. See
 <a href="../../advanced/writing_plugins/#what-a-backend-may-not-change">What a backend may not change</a>.</p>
 
 
@@ -4303,7 +4304,7 @@ are non-negative when the constraint is satisfied, so a backend compares
 them against zero and never needs a bound. A constraint with a finite lower
 and a finite upper bound contributes two values, an equality one, and a
 constraint with no finite bound none. Which of them are equalities is fixed
-for the run and available from
+for the optimization and available from
 <a class="autorefs autorefs-internal" title="            nonlinear_equalities
 
 
@@ -4547,7 +4548,8 @@ accepts every kind of problem:</p>
 <p>A method without a gradient asks only for function values, so no
 perturbations are evaluated for it. Configuring a method with a constraint
 it does not support raises
-<a class="autorefs autorefs-internal" title="            UnsupportedError" href="../exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a> when the run starts.
+<a class="autorefs autorefs-internal" title="            UnsupportedError" href="../exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a> when the optimization
+starts.
 <code>differential_evolution</code> requires bound constraints on all variables, and
 is the only method that handles integer variables; the others silently
 treat them as continuous.</p>

@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -3956,13 +3956,14 @@ when each event type fires and what data it carries.</p>
 
 
 
-        <p>Enumerates the reasons a run ends.</p>
-<p>A run is an optimization or a single evaluation. It either <strong>stops</strong> or is
-<strong>aborted</strong>. It stops when a condition on the run is met — the optimizer
-converged, a budget ran out, a handler decided the results were good enough
-— so it ends at a point that satisfied a stated criterion. It is aborted
-when something ends it regardless of the state of the run, and the
-result is then whatever it had reached, not a considered endpoint.</p>
+        <p>Enumerates the reasons a task ends.</p>
+<p>An optimization either <strong>stops</strong> or is <strong>aborted</strong>. It stops when a
+condition on the optimization is met — the optimizer converged, a budget
+ran out, a handler decided the results were good enough — so it ends at a
+point that satisfied a stated criterion, and its result carries the code. A
+task of any kind is aborted when something ends it regardless of its state,
+and it then raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, which
+carries the code.</p>
 <p>Each member carries a short description in
 <a class="autorefs autorefs-internal" title="            message
 
@@ -4128,7 +4129,7 @@ result is then whatever it had reached, not a considered endpoint.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when an event handler asked the run to stop.</p>
+        <p>Returned when an event handler asked the optimization to stop.</p>
 <p>A graceful end at an evaluation boundary, on a criterion the caller
 supplied. A <code>report</code> callback is such a handler.</p>
 
@@ -4160,7 +4161,7 @@ supplied. A <code>report</code> callback is such a handler.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when the run terminated normally.</p>
+        <p>Returned when the optimizer ended the optimization.</p>
 
     </div>
 
@@ -4190,9 +4191,9 @@ supplied. A <code>report</code> callback is such a handler.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when the executor could no longer run the evaluation.</p>
+        <p>Carried by <code>AbortedError</code> when the executor could no longer run the work.</p>
 <p>Not a failure: in practice the interpreter was shutting down and the worker
-pool was gone, so the run is released rather than left waiting. An executor
+pool was gone, so the task is released rather than left waiting. An executor
 that breaks raises <a class="autorefs autorefs-internal" title="            ExecutionError" href="../exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>
 instead.</p>
 
@@ -4224,9 +4225,10 @@ instead.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when the run was aborted from outside, without regard to where
-it had got to.</p>
-<p>This is what closing a session reports for a run still under way.</p>
+        <p>Carried by <code>AbortedError</code> when the task was aborted from outside, without
+regard to where it had got to.</p>
+<p>This is what closing a session, or a <code>KeyboardInterrupt</code> passing through a
+task, gives a task still under way.</p>
 
     </div>
 
@@ -4256,7 +4258,8 @@ it had got to.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when another run this one shares a session with raised.</p>
+        <p>Carried by <code>AbortedError</code> when another task raised, and this one was
+aborted with it.</p>
 
     </div>
 
@@ -4286,7 +4289,8 @@ it had got to.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when <a class="autorefs autorefs-internal" title="            abort" href="../api/#ropt.Session.abort"><code>Session.abort</code></a> aborted the run.</p>
+        <p>Carried by <code>AbortedError</code> when <a class="autorefs autorefs-internal" title="            abort" href="../api/#ropt.Session.abort"><code>Session.abort</code></a>
+aborted the task.</p>
 <p>Set apart from <a class="autorefs autorefs-internal" title="            ABORTED
 
 
@@ -4325,7 +4329,7 @@ that was asked for can be told from one the library performed itself.</p>
 
         <p>A short description of this exit code, for reporting.</p>
 <p>Note that <code>str()</code> and f-strings give the integer value, as they do for
-any <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum"><code>IntEnum</code></a>; use this or <code>name</code> to report a run.</p>
+any <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum"><code>IntEnum</code></a>; use this or <code>name</code> to report the code.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>

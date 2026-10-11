@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2696,12 +2696,12 @@ their place.</p>
 members may be written in their place.</p>
 <h2 id="reproducibility">Reproducibility</h2>
 <p>The perturbations are drawn from a generator seeded by <code>variables.seed</code>, which
-defaults to <code>1</code>. Repeating a run therefore reproduces it exactly, and changing
-the seed draws a different set of perturbations.</p>
-<p>A plain integer is enough for a single run. The field also accepts a tuple, and
-giving a unique identifier as its first element is what keeps runs distinct when
-they are nested or evaluated in parallel: each run draws its own perturbations
-while remaining reproducible on its own.</p>
+defaults to <code>1</code>. Repeating an optimization therefore reproduces it exactly, and
+changing the seed draws a different set of perturbations.</p>
+<p>A plain integer is enough for a single optimization. The field also accepts a
+tuple, and giving a unique identifier as its first element is what keeps
+optimizations distinct when they are nested or run concurrently: each one draws
+its own perturbations while remaining reproducible on its own.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"seed"</span><span class="p">:</span> <span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">)}</span>
 </span></code></pre></div>
 <h2 id="choosing-number_of_perturbations">Choosing <code>number_of_perturbations</code></h2>
@@ -2720,9 +2720,9 @@ crashes), the gradient can still be computed when at least
 to also tolerate failed realizations.</p>
 <p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/failures.py">examples/failures.py</a>
 runs one problem twice: once with the default, where a single failing
-realization ends the run with <code>TOO_FEW_REALIZATIONS</code> and no result, and once
-with <code>realization_min_success</code> lowered, where the run finishes on the
-realizations that did work.</p>
+realization ends the optimization with <code>TOO_FEW_REALIZATIONS</code> and no result, and
+once with <code>realization_min_success</code> lowered, where the optimization finishes on
+the realizations that did work.</p>
 <h2 id="evaluation-policy">Evaluation policy</h2>
 <p><a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig.evaluation_policy</code></a> picks one of:</p>
 <ul>
@@ -2751,7 +2751,8 @@ average, are covered in <a href="../function_estimators/">Function Estimators</a
 <ul>
 <li>What <code>evaluation_policy</code> means when evaluations are submitted concurrently:
   <a href="../../running/parallel/">Evaluating in Parallel</a>.</li>
-<li>When a run ends with <code>TOO_FEW_REALIZATIONS</code>, or two runs disagree:
+<li>When an optimization ends with <code>TOO_FEW_REALIZATIONS</code>, or two optimizations
+  disagree:
   <a href="../../troubleshooting/">Troubleshooting</a>.</li>
 </ul>
 

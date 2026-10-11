@@ -850,7 +850,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2351,7 +2351,7 @@
 happen one after another, on the same thread that called
 <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>. If each evaluation is slow, you can run several at
 the same time by evaluating on a <strong>pool</strong>.</p>
-<p>Open a <a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a>, build a pool on it, and start the run
+<p>Open a <a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a>, build a pool on it, and start the optimization
 on that pool:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -2366,11 +2366,11 @@ when it is passed <code>--multiprocessing</code>.</p>
 <p>A thread pool is one of four kinds. The others run each evaluation in a separate
 process, as a local job, or as a job on an HPC cluster.
 <a href="../../running/parallel/">Evaluating in Parallel</a> covers all four: which one
-suits a given evaluation function, how many workers to ask for, what stopping a
-run does to each, and the one property of your objective that rules some of them
-out.</p>
+suits a given evaluation function, how many workers to ask for, what stopping an
+optimization does to each, and the one property of your objective that rules
+some of them out.</p>
 <p>To run several optimizations at the same time, rather than parallelizing within
-one, see <a href="../../running/many_runs/">Many Runs at Once</a>.</p>
+one, see <a href="../../running/many_runs/">Several Optimizations at Once</a>.</p>
 
 
 

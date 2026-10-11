@@ -964,7 +964,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2640,7 +2640,7 @@ every evaluation, with the
   " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> describing what was just
 computed.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">FunctionResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""Print the objective of each evaluation as the run proceeds.</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""Print the objective of each evaluation as the optimization proceeds.</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="sd">    Args:</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="sd">        result: The result of a single function evaluation.</span>
@@ -2648,9 +2648,9 @@ computed.</p>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The callback belongs to one run and sees one evaluation at a time. To keep the
-results rather than just look at them — or to collect them across several runs
-— use a handler instead; see
+<p>The callback belongs to one optimization and sees one evaluation at a time. To
+keep the results rather than just look at them — or to collect them across
+several optimizations — use a handler instead; see
 <a href="../handlers/">Collecting Results with Handlers</a>.</p>
 <h2 id="5-run-it">5. Run it</h2>
 <p>The call to <code>optimize</code> is the same as for a deterministic problem, with
@@ -2673,9 +2673,9 @@ robust objective, which is what it optimizes.</p>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <ul>
-<li><code>result.exit_code</code> indicates why the run stopped (a member of the
+<li><code>result.exit_code</code> indicates why the optimization stopped (a member of the
   <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> enumeration).</li>
-<li><code>result.results</code> is the best evaluation of the run, a
+<li><code>result.results</code> is the best evaluation of the optimization, a
   <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -2683,7 +2683,8 @@ robust objective, which is what it optimizes.</p>
       dataclass
   " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> carrying every value that
   evaluation produced — the same object a handler receives. It is <code>None</code> if the
-  run produced no valid result, so one check covers every value read from it.</li>
+  optimization produced no valid result, so one check covers every value read
+  from it.</li>
 <li><code>result.results.variables</code> is the best set of variables found, and
   <code>result.results.target_objective</code> the robust objective value there.</li>
 </ul>

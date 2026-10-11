@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2969,7 +2969,7 @@
         <p>Configuration classes for ensemble-based optimization.</p>
 <p>Pydantic models that together define a complete optimization setup. Each
 corresponds to a top-level section of the configuration dictionary that
-describes a single run. See
+describes a single optimization. See
 <a href="../../optimizer_setup/configuration_sections/">Configuration Sections</a> for the
 fields, their defaults and worked examples.</p>
 
@@ -3232,7 +3232,7 @@ derives scales from the bounds when that is what is wanted.</p>
 <p>See <a href="../../optimizer_setup/configuration_sections/#objectives">Configuration Sections</a> for
 detailed descriptions and usage examples.</p>
 <p>The reported <code>target_objective</code> is divided by the estimated <code>auto_scale</code>
-factors, so runs that differ in that setting compare only through
+factors, so optimizations that differ in that setting compare only through
 <code>functions.objectives</code> or their variables.</p>
 
 
@@ -3621,7 +3621,7 @@ descriptions and usage examples.</p>
 <p>See <a href="../../optimizer_setup/configuration_sections/#realizations">Configuration Sections</a> for
 detailed descriptions and usage examples.</p>
 <p><code>realization_min_success</code> defaults to the number of realizations, so a
-single failure ends the run.</p>
+single failure ends the optimization.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3702,17 +3702,18 @@ single failure ends the run.</p>
 
 
         <p>Configuration class for the optimization algorithm.</p>
-<p><code>OptimizerConfig</code> defines run-level settings for an optimization. It is the
-<code>optimizer</code> section of the configuration.</p>
+<p><code>OptimizerConfig</code> defines the settings that control how an optimization is
+managed. It is the <code>optimizer</code> section of the configuration.</p>
 <p>See <a href="../../optimizer_setup/configuration_sections/#optimizer">Configuration Sections</a> for
 detailed descriptions and usage examples.</p>
 
 
 <details class="warning" open>
   <summary>Warning</summary>
-  <p>Capturing output rewires process-global state, so one run at a time can
-do it. A second run that sets <code>stdout</code> or <code>stderr</code> while another holds
-the capture raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
+  <p>Capturing output rewires process-global state, so one optimization at a
+time can do it. A second optimization that sets <code>stdout</code> or <code>stderr</code>
+while another holds the capture raises
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
 </details>
 
 <p><span class="doc-section-title">Attributes:</span></p>

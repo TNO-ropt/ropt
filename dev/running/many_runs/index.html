@@ -23,7 +23,7 @@
     
     
       
-        <title>Many Runs at Once - ropt Documentation</title>
+        <title>Several Optimizations at Once - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#many-runs-at-once" class="md-skip">
+        <a href="#several-optimizations-at-once" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Many Runs at Once
+              Several Optimizations at Once
             
           </span>
         </div>
@@ -849,7 +849,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -867,7 +867,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -904,10 +904,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#watching-runs-that-overlap" class="md-nav__link">
+  <a href="#watching-optimizations-that-overlap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Watching runs that overlap
+        Watching optimizations that overlap
       
     </span>
   </a>
@@ -918,7 +918,7 @@
   <a href="#failure-in-one-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Failure in one run
+        Failure in one optimization
       
     </span>
   </a>
@@ -2416,10 +2416,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#watching-runs-that-overlap" class="md-nav__link">
+  <a href="#watching-optimizations-that-overlap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Watching runs that overlap
+        Watching optimizations that overlap
       
     </span>
   </a>
@@ -2430,7 +2430,7 @@
   <a href="#failure-in-one-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Failure in one run
+        Failure in one optimization
       
     </span>
   </a>
@@ -2457,159 +2457,146 @@
   
 
 
-<h1 id="many-runs-at-once">Many Runs at Once</h1>
-<p>Several optimizations can run together rather than one after another, each on
-its own driver thread, sharing one pool for their evaluations. Use
-<a class="autorefs autorefs-internal" title="            ropt.optimize_many" href="../../reference/api/#ropt.optimize_many"><code>optimize_many</code></a>. Any of <code>config</code>, <code>x0</code>, or
-<code>objective</code> may be a single value (used for every run) or a list (one per run):</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
+<h1 id="several-optimizations-at-once">Several Optimizations at Once</h1>
+<p>Several optimizations can run together rather than one after another. Wrap each
+<code>optimize</code> call in a zero-argument callable and pass the callables to
+<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>Session.run</code></a>, which starts each one on a thread of its
+own and returns the results in the order the callables were given:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="c1"># One run per start point.</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">optimize_many</span><span class="p">(</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="p">[</span><span class="n">partial</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span> <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">]</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="p">)</span>
 </span></code></pre></div>
+<p>Each callable is an ordinary <code>optimize</code> call, so every optimization can have its
+own configuration, initial values, objective, <code>metadata</code> and <code>report</code> callback.</p>
 <div class="admonition tip">
-<p class="admonition-title">Give each run an ID</p>
-<p>Pass a per-run <code>metadata</code> list to tag every run with a user-defined
-identifier that is attached to its results (and shows up in a
+<p class="admonition-title">Give each optimization an ID</p>
+<p>Pass <code>metadata</code> to tag each optimization with an identifier that is
+attached to its results (and shows up in a
 <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a>'s tables):</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"low"</span><span class="p">,</span> <span class="s2">"mid"</span><span class="p">,</span> <span class="s2">"high"</span><span class="p">]</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">[{</span><span class="s2">"run_id"</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"run_id"</span><span class="p">])</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="p">[</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="n">partial</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="n">label</span><span class="p">})</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="k">for</span> <span class="n">x0</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">start_points</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="p">]</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"label"</span><span class="p">])</span>
 </span></code></pre></div>
 <p>See <a href="../running/#attaching-metadata">Attaching metadata</a> for details.</p>
 </div>
 <h2 id="two-levels-of-concurrency">Two levels of concurrency</h2>
 <p>There are two independent levels of concurrency here:</p>
 <ul>
-<li><strong>The optimizations</strong> always run concurrently, each on its own driver thread.
-  This is built into <code>optimize_many</code> and does not depend on the pool;
-  the <code>limit</code> argument caps how many run at the same time.</li>
-<li><strong>The function evaluations</strong> inside those runs all happen on the one pool
-  that <code>optimize_many</code> was started on, and the pool determines how they are
-  parallelized. With
-  <code>thread_pool(workers=1)</code> the runs still progress together, but their
-  evaluations are executed one at a time. A larger pool —
+<li><strong>The optimizations</strong> run concurrently, each on a thread that <code>run</code> starts
+  for it. The <code>limit</code> argument of <code>run</code> caps how many of them are under way at
+  the same time; without it, all of them start at once.</li>
+<li><strong>The function evaluations</strong> inside those optimizations happen on the pool
+  that each <code>optimize</code> call is made on, and the pool determines how they are
+  parallelized. With <code>thread_pool(workers=1)</code> the optimizations still progress
+  together, but their evaluations are executed one at a time. A larger pool —
   <code>thread_pool(workers=n)</code>, or a process, local or HPC pool — runs several
   evaluations at once.</li>
 </ul>
-<p>One pool is one budget: <code>workers=10</code> means ten evaluations at a time across
-the whole batch of runs, not ten per run. Batch IDs stay distinct whatever you
-pass, since every run in the program draws them from one counter.</p>
-<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/optimize_many.py">examples/optimize_many.py</a>
-runs one optimization per start vector, capping how many go at once and tagging
-each with its own metadata:</p>
+<p>One pool is one budget: <code>workers=10</code> means ten evaluations at a time across all
+the optimizations that use the pool, not ten per optimization. Batch IDs stay
+distinct whatever you pass, since every optimization in the program draws them
+from one counter.</p>
+<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/several_optimizations.py">examples/several_optimizations.py</a>
+runs one optimization per start vector, at most two at a time, and tags each with
+its own metadata:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">optimize_many</span><span class="p">(</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="n">CONFIG</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="n">STARTS</span><span class="p">,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">rosenbrock</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">metadata</span><span class="o">=</span><span class="n">run_metadata</span><span class="p">,</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="p">)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">optimize</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">optimize</span><span class="p">,</span> <span class="n">CONFIG</span><span class="p">)</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="p">[</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>            <span class="n">partial</span><span class="p">(</span><span class="n">optimize</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="n">label</span><span class="p">})</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>            <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">STARTS</span><span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="p">],</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="p">)</span>
 </span></code></pre></div>
-<h2 id="watching-runs-that-overlap">Watching runs that overlap</h2>
-<p>The two callback arguments differ. <code>report=</code> is <strong>per run</strong>: one
-callback receives the results of every run, or pass a list with one callback per
-run. <code>handlers=</code> is <strong>shared</strong>: one list of handlers that all runs feed
-together — see <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent
-runs</a>.</p>
+<h2 id="watching-optimizations-that-overlap">Watching optimizations that overlap</h2>
+<p><code>report=</code> belongs to one <code>optimize</code> call: give each optimization its own
+callback, or the same one to all of them. <code>handlers=</code> takes handlers that
+several optimizations may feed together — see <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across
+concurrent optimizations</a>.</p>
 <div class="admonition warning">
-<p class="admonition-title">One <code>report=</code> callback is called by every run at once</p>
-<p>A single callback is wired into each run separately, and each run calls it
-on its own thread. Nothing serializes those calls, so a callback that
-appends to a list, updates a counter, or writes a file needs a lock of its
-own. Give each run its own callback when they must stay apart, or pass a
+<p class="admonition-title">A shared <code>report=</code> callback is called by every optimization at once</p>
+<p>Each optimization calls its callback on its own thread. Nothing serializes
+those calls, so a callback that appends to a list, updates a counter, or
+writes a file needs a lock of its own. Give each optimization its own
+callback when they must stay apart, or pass a
 <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">handler</a> in
 <code>handlers=</code>, which takes a lock around every event it handles.</p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">A shared handler makes the runs wait for each other</p>
-<p>That lock is not free. A run that emits a result waits until the handler
-has finished with it, and a second run waits for the first. A slow handler
-therefore throttles the whole batch, once per result produced.</p>
+<p class="admonition-title">A shared handler makes the optimizations wait for each other</p>
+<p>That lock is not free. An optimization that emits a result waits until the
+handler has finished with it, and a second optimization waits for the first.
+A slow handler therefore throttles all of them, once per result produced.</p>
 <p>So keep a shared handler cheap. A handler that must do slow work — writing
-a file, talking to a database — holds up every run feeding it.</p>
+a file, talking to a database — holds up every optimization feeding it.</p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">Without a pool the driver threads do the evaluating</p>
-<p><code>optimize_many</code> needs no pool. Without one, the runs still execute
-concurrently, but each evaluates inside your own program, on its own driver
-thread — so your evaluation function is called by several threads at once
-and must tolerate that. Start <code>optimize_many</code> on a pool when it must not
-be.</p>
+<p class="admonition-title">Without a pool, the threads of <code>run</code> do the evaluating</p>
+<p>An optimization started with <a class="autorefs autorefs-internal" title="            optimize" href="../../reference/api/#ropt.Session.optimize"><code>Session.optimize</code></a>
+evaluates in your own program, on the thread that <code>run</code> started for it.
+When several of them run at once, your evaluation function is called by
+several threads at once and must tolerate that. Start them on a pool when it
+must not be.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Not every backend can take part</p>
 <p>An optimizer that needs a working directory of its own, writes to a file
 whose name is fixed, or keeps state inside its library between calls cannot
-run while anything else is running in the same process — another run of its
-own kind included. Each backend documents whether this applies to it.
-Select it as
+run while anything else is running in the same process — another
+optimization of its own kind included. Each backend documents whether this
+applies to it. Select it as
 <a href="../../optimizer_setup/optimizer/#external-backend"><code>external/...</code></a> and
 it gets a process of its own, where none of that is shared.</p>
-<p>Optimizer output capture is likewise for one run at a time. If more than
-one of these runs sets
+<p>Optimizer output capture is likewise for one optimization at a time. If more
+than one of them sets
 <a href="../../optimizer_setup/configuration_sections/#optimizer"><code>stdout</code> or <code>stderr</code></a>, the
 second to start raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
 Leave both unset here, and set <a href="../../optimizer_setup/configuration_sections/#backend"><code>verbose=False</code></a>
-unless you want the runs' reports interleaved on the terminal.</p>
+unless you want the optimizers' reports interleaved on the terminal.</p>
 </div>
-<h2 id="failure-in-one-run">Failure in one run</h2>
-<p>A run that raises aborts the other runs of the same <code>optimize_many</code>. When
-<code>optimize_many</code> was called from your script, it also aborts every other task on
-the session, such as another optimization or an <code>offload</code> in progress;
-<a href="../failures/">Failures and Aborts</a> defines tasks and gives the rules for every
-case. Each aborted run ends at its next evaluation boundary with
-<code>ABORTED_ON_ERROR</code>, keeping the best result it had reached. A run still queued
-behind <code>limit</code> is aborted before its first evaluation, and reports
-<code>ABORTED_ON_ERROR</code> with no result at all. Nothing is built for such a run, so an
-invalid configuration in one is never reported.</p>
-<p><code>optimize_many</code> then raises
-<a class="autorefs autorefs-internal" title="            RunsFailedError" href="../../reference/exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a>. With several runs there is
-no single exception to re-raise and no single set of results to return, so the
-error carries both. <code>outcomes</code> has one entry per run, in the order the runs were
-given, holding either that run's
-<a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
-
-
-  
-      dataclass
-  " href="../../reference/api/#ropt.OptimizationResult"><code>OptimizationResult</code></a> or the exception it
-raised:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunsFailedError</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">try</span><span class="p">:</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">except</span> <span class="n">RunsFailedError</span> <span class="k">as</span> <span class="n">failure</span><span class="p">:</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">failure</span><span class="o">.</span><span class="n">outcomes</span><span class="p">):</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> raised: </span><span class="si">{</span><span class="n">outcome</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> ended with </span><span class="si">{</span><span class="n">outcome</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<h2 id="failure-in-one-run">Failure in one optimization</h2>
+<p>The optimizations started from the callables of one <code>run</code> call are
+<a href="../failures/#nested-tasks">nested</a> in it. When one of them raises, <code>run</code>
+aborts the others and raises that exception at once; when <code>run</code> was called
+from your script, every other task on the session is aborted as well.
+<a href="../failures/">Failures and Aborts</a> gives the rules for every case. An aborted
+optimization raises <code>AbortedError</code> with <code>ABORTED_ON_ERROR</code> — at once on a pool,
+or at its next evaluation boundary without one — but <code>run</code> does not wait for
+it, and its result is lost. Optimizations still queued behind <code>limit</code> are not
+started after the abort.</p>
+<p>A callable that catches the exception of its optimization does not fail, so the
+other optimizations are not aborted. Catch the exceptions you expect, and return
+something that marks the failure:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">optimize_or_none</span><span class="p">(</span><span class="n">x0</span><span class="p">):</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>        <span class="k">return</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="k">except</span> <span class="n">SimulationError</span><span class="p">:</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">optimize_or_none</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">])</span>
 </span></code></pre></div>
-<p>Without this the work the other runs did would be thrown away along with the run
-that failed, which matters more now that they are aborted deliberately. The
-first exception is chained, so a traceback still shows what went wrong. A
-<code>KeyboardInterrupt</code> or <code>SystemExit</code> propagates unchanged instead of being
-collected into <code>RunsFailedError</code>, since it means the program is ending rather
-than a run reporting a problem. The
-interrupt also aborts the runs that are still going and waits for them, so they
-end at their next evaluation boundary rather than continuing in the background;
-a second interrupt stops waiting for them.</p>
-<p>Arguments that do not agree are rejected before any run is created, and count
-as a failure: <code>optimize_many</code> broadcasts its arguments first, so lists whose
-lengths disagree raise <code>ValueError</code>. <code>RunsFailedError</code> is not raised in that
-case, since no run exists to carry an outcome.</p>
-<p><a href="../running/#stopping-from-outside"><code>Session.abort</code></a> also reaches every run on
-the session, and those runs end with <code>USER_ABORT</code> instead, so the exit code
-distinguishes an abort that was asked for from one that a failing run caused.
-See <a href="../../results/exit_codes/">Exit Codes</a> for what each one means.</p>
+<p><code>SimulationError</code> stands for an exception that your own objective raises.</p>
+<p><a href="../running/#stopping-from-outside"><code>Session.abort</code></a> reaches every optimization on
+the session, and <code>run</code> then raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with <code>USER_ABORT</code>. When a failure
+elsewhere aborted it, the exit code is <code>ABORTED_ON_ERROR</code>, so the exit code
+distinguishes an abort that was asked for from one that a failure caused. A
+<code>KeyboardInterrupt</code> aborts the optimizations of the <code>run</code> call it passes through,
+and is raised at once. See <a href="../../results/exit_codes/">Exit Codes</a> for what each
+code means.</p>
 
 
 

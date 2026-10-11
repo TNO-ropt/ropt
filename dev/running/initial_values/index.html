@@ -840,7 +840,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -1041,7 +1041,7 @@
   <a href="#what-may-differ-between-the-two-runs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What may differ between the two runs
+        What may differ between the two optimizations
       
     </span>
   </a>
@@ -1071,10 +1071,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#several-runs-at-once" class="md-nav__link">
+  <a href="#several-optimizations-at-once" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Several runs at once
+        Several optimizations at once
       
     </span>
   </a>
@@ -2485,7 +2485,7 @@
   <a href="#what-may-differ-between-the-two-runs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What may differ between the two runs
+        What may differ between the two optimizations
       
     </span>
   </a>
@@ -2515,10 +2515,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#several-runs-at-once" class="md-nav__link">
+  <a href="#several-optimizations-at-once" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Several runs at once
+        Several optimizations at once
       
     </span>
   </a>
@@ -2547,33 +2547,33 @@
 
 <h1 id="reusing-results-at-the-starting-point">Reusing Results at the Starting Point</h1>
 <p>An optimization begins by evaluating its start point. If those evaluations have
-already been performed — by an earlier run, or by one that was interrupted after
-them — pass them to <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> as <code>f0</code> and <code>g0</code> and they
-are not performed again.</p>
+already been performed — by an earlier optimization, or by one that was
+interrupted after them — pass them to <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> as <code>f0</code> and
+<code>g0</code> and they are not performed again.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><a href="../restart/">Restarting from the Best Point</a> passes these results back under
 an unchanged configuration, where they cover every evaluation at the start
-point. This page is about a configuration that changes between the two runs,
-where part of the start point must still be evaluated.</p>
+point. This page is about a configuration that changes between the two
+optimizations, where part of the start point must still be evaluated.</p>
 </div>
 <p>The full script for this example is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/initial_values.py">examples/initial_values.py</a>.
 It optimizes an ensemble of two realizations, then restarts from the best point
 with five.</p>
 <h2 id="where-the-results-come-from">Where the results come from</h2>
-<p><a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> returns the best evaluation of a run on
+<p><a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> returns the best evaluation of an optimization on
 <code>results</code>, and the gradient computed at that same point on <code>gradient</code>. Those are
-the two objects a run restarting from that point needs:</p>
+the two objects an optimization restarting from that point needs:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">first</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">(</span><span class="n">SCREENING_REALIZATIONS</span><span class="p">),</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The configuration sets
 <a href="../../optimizer_setup/gradients/#evaluation-policy"><code>evaluation_policy</code></a> to
 <code>"speculative"</code>, which computes a gradient at every function evaluation, so a
-gradient is available at the point the first run returns.</p>
+gradient is available at the point the first optimization returns.</p>
 <h2 id="restarting-with-a-larger-ensemble">Restarting with a larger ensemble</h2>
-<p>The second run starts at the best point of the first, with five realizations
-instead of two, and is given the results recorded there:</p>
+<p>The second optimization starts at the best point of the first, with five
+realizations instead of two, and is given the results recorded there:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">optimize</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">config</span><span class="p">(</span><span class="n">FULL_REALIZATIONS</span><span class="p">),</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">first</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span>
@@ -2586,13 +2586,14 @@ instead of two, and is given the results recorded there:</p>
 <p>The five-realization ensemble needs 25 evaluations at that point: one per
 realization, and one per realization for each of the four perturbations. Ten of
 them — the two recorded realizations, unperturbed and at each perturbation —
-come from <code>f0</code> and <code>g0</code>, and the second run evaluates the remaining fifteen. The
-first two per-realization objectives are the values the first run returned:</p>
+come from <code>f0</code> and <code>g0</code>, and the second optimization evaluates the remaining
+fifteen. The first two per-realization objectives are the values the first
+optimization returned:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>per-realization objectives at the restart point: [64.0004475  56.66862051 63.84798703 58.60943629 58.6053663 ]
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>reused from the first run: [64.0004475  56.66862051]
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>reused from the first optimization: [64.0004475  56.66862051]
 </span></code></pre></div>
 <p>The aggregated objective is recomputed over all five, so it is not the value the
-first run reported:</p>
+first optimization reported:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>objective there, 2 realizations: [60.334534]
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>objective there, 5 realizations: [60.34637152]
 </span></code></pre></div>
@@ -2630,9 +2631,9 @@ evaluations are.</p>
 before any scaling, together with the record of which realizations were
 evaluated. Everything else on the two objects is ignored, including the
 aggregated functions and gradients, the realization weights, the metadata and
-the batch id. All of those are recomputed by the second run under its own
-configuration.</p>
-<h2 id="what-may-differ-between-the-two-runs">What may differ between the two runs</h2>
+the batch id. All of those are recomputed by the second optimization under its
+own configuration.</p>
+<h2 id="what-may-differ-between-the-two-runs">What may differ between the two optimizations</h2>
 <p>The number of realizations and the number of perturbations may both grow or
 shrink. Realization weights, realization filters, objective weights, scales,
 offsets, <code>maximize</code> flags, function estimators, <code>merge_realizations</code> and the
@@ -2642,32 +2643,38 @@ objectives, the number of nonlinear constraints, whether constraints are present
 at all, and the number of variables. A mismatch raises <code>ValueError</code> before
 anything is evaluated.</p>
 <p>The start point is checked as well. The <code>variables</code> on <code>f0</code> and on <code>g0</code> must
-match <code>x0</code>, which is also what makes the two results belong together. A run
-starting anywhere else raises <code>ValueError</code>. A restart meets this by
+match <code>x0</code>, which is also what makes the two results belong together. An
+optimization starting anywhere else raises <code>ValueError</code>. A restart meets this by
 construction, since <code>x0</code> is the <code>variables</code> of the result passed as <code>f0</code>.</p>
 <h2 id="realizations-and-perturbations-that-were-not-recorded">Realizations and perturbations that were not recorded</h2>
-<p><code>evaluated_realizations</code> says which realizations the recorded run computed. One
-that it skipped — because its weight was zero, or because it did not exist yet —
-is evaluated by the new run, and the rest are taken from the record. The same
-holds per perturbation: a run configured with more perturbations than were
-recorded evaluates the additional ones and reuses the rest.</p>
-<p>Perturbed points that were recorded are used as they were; the new run draws
-points only for the perturbations it adds.</p>
+<p><code>evaluated_realizations</code> says which realizations the recorded optimization
+computed. One that it skipped — because its weight was zero, or because it did not
+exist yet — is evaluated by the new optimization, and the rest are taken from the
+record. The same holds per perturbation: an optimization configured with more
+perturbations than were recorded evaluates the additional ones and reuses the
+rest.</p>
+<p>Perturbed points that were recorded are used as they were; the new optimization
+draws points only for the perturbations it adds.</p>
 <h2 id="things-to-know">Things to know</h2>
-<p><strong>Realizations correspond by position.</strong> Realization 3 of the recorded run is
-realization 3 of the new one. If the realizations were reordered between the
-runs, the values are attached to the wrong ones, and nothing detects this.</p>
+<p><strong>Realizations correspond by position.</strong> Realization 3 of the recorded
+optimization is realization 3 of the new one. If the realizations were reordered
+between the optimizations, the values are attached to the wrong ones, and nothing
+detects this.</p>
 <p><strong>A failed realization counts as evaluated.</strong> A realization that returned <code>NaN</code>
 is part of the record and is not evaluated again. Supply a record without it if
 it should be retried.</p>
 <p><strong>Only the start point is covered.</strong> <code>f0</code> and <code>g0</code> are used once, by the first
 evaluation of each kind; every later point is evaluated normally.</p>
-<h2 id="several-runs-at-once">Several runs at once</h2>
-<p><a class="autorefs autorefs-internal" title="            ropt.optimize_many" href="../../reference/api/#ropt.optimize_many"><code>optimize_many</code></a> takes either one result shared by
-every run, or a sequence with one per run, as it does for <code>config</code> and
-<code>metadata</code>. Sharing one result requires the runs to share <code>x0</code>, which is the
-case when the same point is optimized under several configurations:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">optimize_many</span><span class="p">([</span><span class="n">config_a</span><span class="p">,</span> <span class="n">config_b</span><span class="p">],</span> <span class="n">x0</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">,</span> <span class="n">g0</span><span class="o">=</span><span class="n">g0</span><span class="p">)</span>
+<h2 id="several-optimizations-at-once">Several optimizations at once</h2>
+<p>When <a href="../many_runs/">several optimizations</a> start from the same <code>x0</code>, they can
+share one <code>f0</code> and <code>g0</code>, which is the case when the same point is optimized under
+several configurations:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">s</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="p">[</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>        <span class="n">partial</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">optimize</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">,</span> <span class="n">g0</span><span class="o">=</span><span class="n">g0</span><span class="p">)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="p">(</span><span class="n">config_a</span><span class="p">,</span> <span class="n">config_b</span><span class="p">)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="p">]</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">)</span>
 </span></code></pre></div>
 
 

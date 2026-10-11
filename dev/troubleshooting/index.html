@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2502,9 +2502,9 @@
 
 
 <h1 id="troubleshooting">Troubleshooting</h1>
-<p>A <code>ropt</code> run keeps going through a failed realization or an infeasible result,
-so it can end without a result to return and without raising an error. Check
-<a href="../results/exit_codes/"><code>exit_code</code></a> before using what comes back. This
+<p>A <code>ropt</code> optimization keeps going through a failed realization or an infeasible
+result, so it can end without a result to return and without raising an error.
+Check <a href="../results/exit_codes/"><code>exit_code</code></a> before using what comes back. This
 page collects the behaviours that most often cause confusion.</p>
 <p>Skim it once to know what is here, then come back with a symptom and read the
 table of the section it belongs to.</p>
@@ -2513,18 +2513,19 @@ table of the section it belongs to.</p>
 <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../reference/api/#ropt.optimize"><code>optimize</code></a> returns the best result that satisfies every
 constraint to within <code>constraint_tolerance</code>, which defaults to <code>1e-10</code> and
 applies to bounds and linear constraints as well as nonlinear ones. If no
-evaluation satisfies them, the run ends normally with <code>result.results</code>
+evaluation satisfies them, the optimization ends normally with <code>result.results</code>
 set to <code>None</code>. The evaluations themselves are not lost: every result, feasible
-or not, still reaches the <a href="../results/handlers/">handlers</a> attached to the run.</p>
-<p><strong>The return value is a summary, not the record of the run.</strong> It holds a single
-result, the best feasible evaluation. The whole history is available instead:
+or not, still reaches the <a href="../results/handlers/">handlers</a> attached to the
+optimization.</p>
+<p><strong>The return value is a summary, not the record of the optimization.</strong> It holds a
+single result, the best feasible evaluation. The whole history is available instead:
 attach a <a class="autorefs autorefs-internal" title="            ropt.HistoryHandler" href="../reference/api/#ropt.HistoryHandler"><code>HistoryHandler</code></a> or a
 <a class="autorefs autorefs-internal" title="            ropt.DataFrameHandler" href="../reference/api/#ropt.DataFrameHandler"><code>DataFrameHandler</code></a> to collect every result as it
 arrives. That history is also what remains when there is no best result to
 return.</p>
 <p><strong><code>NaN</code> means "this realization failed", and one failure is already too many.</strong>
 <a href="../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
-defaults to <em>all</em> realizations, so a single <code>NaN</code> ends the run with
+defaults to <em>all</em> realizations, so a single <code>NaN</code> ends the optimization with
 <code>TOO_FEW_REALIZATIONS</code>. If some realizations are allowed to fail, set it lower:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">},</span>
@@ -2535,20 +2536,20 @@ defaults to <em>all</em> realizations, so a single <code>NaN</code> ends the run
 runs the same problem twice, once with the default and once allowing the
 failure, and prints the exit code and result of each.</p>
 <p><strong>Not everything that goes wrong raises.</strong> Check <code>exit_code</code> before using a
-result. The exit code gives why the run ended; the result is the best
+result. The exit code gives why the optimization ended; the result is the best
 feasible evaluation recorded before it did, and is <code>None</code> only when there was
-none. A run that fails part-way therefore still returns what it had reached.
-See <a href="../running/running/#when-something-goes-wrong">When something goes wrong</a>.</p>
+none. An optimization that stops part-way therefore still returns what it had
+reached. See <a href="../running/running/#when-something-goes-wrong">When something goes wrong</a>.</p>
 <p><strong><code>FINISHED</code> does not mean a limit was reached.</strong> It is the exit code
-for every run the backend ended by itself — because it converged, or because it
-reached <code>max_iterations</code> or <code>convergence_tolerance</code>. Those two live in the
-<code>backend</code> section and are enforced by the algorithm rather than counted by
-<code>ropt</code>, so a run can stop far short of <code>max_functions</code>, and the exit code does
-not distinguish which of the three applied. Only <code>MAX_FUNCTIONS_REACHED</code> and
+for every optimization the backend ended by itself — because it converged, or
+because it reached <code>max_iterations</code> or <code>convergence_tolerance</code>. Those two live in
+the <code>backend</code> section and are enforced by the algorithm rather than counted by
+<code>ropt</code>, so an optimization can stop far short of <code>max_functions</code>, and the exit
+code does not distinguish which of the three applied. Only <code>MAX_FUNCTIONS_REACHED</code> and
 <code>MAX_BATCHES_REACHED</code> correspond to a limit <code>ropt</code> enforced itself.</p>
 <p><strong>A broken worker pool is an error, not a failed realization.</strong> When the pool
 itself fails — a worker process is killed, a cluster job never writes its result
-— the run stops with an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> giving
+— the optimization stops with an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> giving
 the reason the first lost evaluation gave. It is not absorbed as a <code>NaN</code>,
 because a result computed over the workers that survived is indistinguishable
 from one computed over the whole ensemble.</p>
@@ -2569,11 +2570,11 @@ from one computed over the whole ensemble.</p>
 <td><a href="../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a> defaults to all of them. Lower it.</td>
 </tr>
 <tr>
-<td>The run stopped long before <code>max_functions</code>, with <code>FINISHED</code></td>
-<td>The backend ended it: <code>max_iterations</code>, <code>convergence_tolerance</code>, or its own convergence test. Those are set in the <code>backend</code> section; see <a href="../optimizer_setup/optimizer/#limiting-the-length-of-a-run">Limiting the length of a run</a>.</td>
+<td>The optimization stopped long before <code>max_functions</code>, with <code>FINISHED</code></td>
+<td>The backend ended it: <code>max_iterations</code>, <code>convergence_tolerance</code>, or its own convergence test. Those are set in the <code>backend</code> section; see <a href="../optimizer_setup/optimizer/#limiting-the-length-of-a-run">Limiting the length of an optimization</a>.</td>
 </tr>
 <tr>
-<td><code>ExecutionError</code> part-way through a run</td>
+<td><code>ExecutionError</code> part-way through an optimization</td>
 <td>The worker pool failed, not your objective. The message names the reason the first lost evaluation gave.</td>
 </tr>
 <tr>
@@ -2590,16 +2591,16 @@ your evaluation function is sent to a worker together with the data it uses. Any
 it writes there — a global, a cache, a list it appends to — is thrown away when
 the worker finishes. Return what you need instead; see
 <a href="../results/handlers/#handlers-and-separate-processes">Handlers and separate processes</a>.</p>
-<p><strong>Several runs may call your objective at the same time.</strong>
-<a class="autorefs autorefs-internal" title="            ropt.optimize_many" href="../reference/api/#ropt.optimize_many"><code>optimize_many</code></a> always runs its optimizations
-concurrently. Given a pool, their evaluations go there; given none, each run
-evaluates on its own driver thread, so your evaluation function is called from
-several threads at once and has to tolerate that. See
-<a href="../running/many_runs/">Many Runs at Once</a>.</p>
+<p><strong>Several optimizations may call your objective at the same time.</strong>
+Optimizations started together with <a class="autorefs autorefs-internal" title="            run" href="../reference/api/#ropt.Session.run"><code>Session.run</code></a>
+run concurrently. Given a pool, their evaluations go there; given none, each
+optimization evaluates on the thread that <code>run</code> started for it, so your
+evaluation function is called from several threads at once and has to tolerate
+that. See <a href="../running/many_runs/">Several Optimizations at Once</a>.</p>
 <p><strong>Metadata is copied with <code>copy.deepcopy</code>.</strong> Every result gets its own copy of
 the <code>metadata</code> you passed, so keep it to plain data — numbers, strings, lists,
 arrays. A lock, an open file, or a database connection cannot be copied and
-raises a <code>TypeError</code> in the middle of the run.</p>
+raises a <code>TypeError</code> in the middle of the optimization.</p>
 <p><strong>An exception from your objective is not turned into a failed realization.</strong> It
 is re-raised from the <code>optimize</code> call, whichever pool the evaluation ran on, so
 a bug surfaces as the exception you wrote rather than as a missing value. Return
@@ -2619,31 +2620,31 @@ tolerated; see
 <td>The objective ran in a worker process, on a copy. Return the value as <a href="../running/running/#attaching-metadata">metadata</a> instead.</td>
 </tr>
 <tr>
-<td>An objective that works alone misbehaves under <code>optimize_many</code></td>
+<td>An objective that works alone misbehaves when several optimizations run at once</td>
 <td>It is being called from several threads at once. Remove the shared mutable state, or guard it with a lock of its own.</td>
 </tr>
 <tr>
-<td><code>TypeError: cannot pickle ...</code> part-way through a run</td>
+<td><code>TypeError: cannot pickle ...</code> part-way through an optimization</td>
 <td>Something in <code>metadata</code> cannot be deep-copied.</td>
 </tr>
 <tr>
-<td><code>ExecutionError</code> part-way through a run on a pool</td>
+<td><code>ExecutionError</code> part-way through an optimization on a pool</td>
 <td>A worker or job broke, rather than your objective; see <a href="../running/parallel/#when-an-evaluation-fails">When an evaluation fails</a>.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="pools-stopping-and-processes">Pools, stopping and processes</h2>
-<p><strong>A run evaluates on the pool it was started on, and no other.</strong> Nothing is
-picked up from the surrounding code. A run started with the module-level
-<a class="autorefs autorefs-internal" title="            ropt.optimize" href="../reference/api/#ropt.optimize"><code>optimize</code></a> evaluates inside your own program, on the
-thread that called it — even if a pool exists next to it.</p>
+<p><strong>An optimization evaluates on the pool it was started on, and no other.</strong>
+Nothing is picked up from the surrounding code. An optimization started with the
+module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../reference/api/#ropt.optimize"><code>optimize</code></a> evaluates inside your own program, on
+the thread that called it — even if a pool exists next to it.</p>
 <p><strong>Threads cannot be interrupted.</strong> Evaluations on a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
 outside. If an evaluation may run long and has to be interruptible, put it on a
 local pool or an HPC pool; see
-<a href="../running/parallel/#stopping-a-run">Stopping a run</a>.</p>
+<a href="../running/parallel/#stopping-a-run">Stopping an optimization</a>.</p>
 <p><strong>A process pool re-imports your script.</strong> Its workers are started with
-<code>spawn</code>, so each of them imports the file the run was started from, and
+<code>spawn</code>, so each of them imports the file your program was started from, and
 everything at module level runs again in every worker. That is why the entry
 point has to sit behind <code>if __name__ == "__main__":</code>. Without the guard the
 workers try to start workers of their own, and building the pool raises.</p>
@@ -2672,7 +2673,7 @@ the loop or function that uses it rather than around the whole program; see
 </tr>
 <tr>
 <td>A process pool keeps hundreds of megabytes resident</td>
-<td>Each worker is a separate interpreter. Close the session that built the pool when the runs that use it are done.</td>
+<td>Each worker is a separate interpreter. Close the session that built the pool when the optimizations that use it are done.</td>
 </tr>
 <tr>
 <td><code>WorkflowError</code> about a pool released when its session closed</td>
@@ -2683,7 +2684,7 @@ the loop or function that uses it rather than around the whole program; see
 <td><code>numpy</code> and similar libraries already use every core. Set <code>OMP_NUM_THREADS=1</code> and let the pool provide the parallelism; see <a href="../running/parallel/#which-pool">Which pool should I use?</a>.</td>
 </tr>
 <tr>
-<td>Simulators keep running after the run stopped</td>
+<td>Simulators keep running after the optimization stopped</td>
 <td>A process pool kills only its own workers. Use a <a href="../running/parallel/#local-pool">local pool</a>, which signals the whole process group.</td>
 </tr>
 <tr>
@@ -2693,24 +2694,26 @@ the loop or function that uses it rather than around the whole program; see
 </tbody>
 </table>
 <h2 id="running-many-at-once">Running many at once</h2>
-<p><strong><code>optimize_many</code> really does run everything at once.</strong> A handler given to all
-the runs takes a lock around every event it handles, so it collects them safely, but a
-single <code>report=</code> callback does not: it is called by several threads at the same
-time. Keep such a callback free of shared state, or give each run its own.</p>
-<p><strong>A slow shared handler holds up every run.</strong> The run that emitted a result
-waits until the handler has finished with it, and the next run waits for the
-lock. Keep a shared handler cheap.</p>
-<p><strong>A handler must not start a run that reaches it again.</strong> The handler holds its
-own lock while it runs. A nested <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../reference/api/#ropt.optimize"><code>optimize</code></a> emits on
-that same thread and raises; a nested
-<a class="autorefs autorefs-internal" title="            ropt.optimize_many" href="../reference/api/#ropt.optimize_many"><code>optimize_many</code></a> emits on its own driver threads
-and blocks. See <a href="../results/handlers/#sharing-a-handler-across-concurrent-runs">Result
+<p><strong>Optimizations started together really do run at once.</strong> A handler given to all
+of them takes a lock around every event it handles, so it collects them safely,
+but a single <code>report=</code> callback does not: it is called by several threads at the
+same time. Keep such a callback free of shared state, or give each optimization
+its own.</p>
+<p><strong>A slow shared handler holds up every optimization.</strong> The optimization that
+emitted a result waits until the handler has finished with it, and the next one
+waits for the lock. Keep a shared handler cheap.</p>
+<p><strong>A handler must not start an optimization that reaches it again.</strong> The handler
+holds its own lock while it runs. A nested <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../reference/api/#ropt.optimize"><code>optimize</code></a> emits on
+that same thread and raises; a nested optimization started with
+<a class="autorefs autorefs-internal" title="            run" href="../reference/api/#ropt.Session.run"><code>Session.run</code></a> emits on the thread that <code>run</code>
+started for it, and blocks. See <a href="../results/handlers/#sharing-a-handler-across-concurrent-runs">Result
 Handlers</a>.</p>
 <p><strong>Not every optimizer can run beside another.</strong> A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its
 library cannot run concurrently in one process; select it as
 <a href="../optimizer_setup/optimizer/#external-backend"><code>external/...</code></a> to give it a
-process of its own. Optimizer output capture is likewise for one run at a time.</p>
+process of its own. Optimizer output capture is likewise for one optimization at
+a time.</p>
 <table>
 <thead>
 <tr>
@@ -2721,31 +2724,33 @@ process of its own. Optimizer output capture is likewise for one run at a time.<
 <tbody>
 <tr>
 <td>Results from a shared <code>report=</code> callback are jumbled or lost</td>
-<td>The callback is called from every run's thread at once. Collect the results in a <a href="../results/handlers/#sharing-a-handler-across-concurrent-runs">handler</a> instead, or use one callback per run.</td>
+<td>The callback is called from the thread of every optimization at once. Collect the results in a <a href="../results/handlers/#sharing-a-handler-across-concurrent-runs">handler</a> instead, or use one callback per optimization.</td>
 </tr>
 <tr>
-<td>A run started from a handler raises <code>WorkflowError</code> about the call stack, or hangs</td>
+<td>An optimization started from a handler raises <code>WorkflowError</code> about the call stack, or hangs</td>
 <td>Its handler list reaches a handler that is already running; see <a href="../results/handlers/#sharing-a-handler-across-concurrent-runs">Result Handlers</a>.</td>
 </tr>
 <tr>
-<td>Many runs are slower than expected while the workers sit idle</td>
+<td>Several optimizations are slower than expected while the workers sit idle</td>
 <td>A shared handler is serializing them. Make it cheaper.</td>
 </tr>
 <tr>
-<td>A second concurrent run raises <code>WorkflowError</code> about output capture</td>
-<td>Only one run at a time may set <code>stdout</code> or <code>stderr</code>; see <a href="../running/many_runs/">Many Runs at Once</a>.</td>
+<td>A second concurrent optimization raises <code>WorkflowError</code> about output capture</td>
+<td>Only one optimization at a time may set <code>stdout</code> or <code>stderr</code>; see <a href="../running/many_runs/">Several Optimizations at Once</a>.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="configuration">Configuration</h2>
-<p><strong>Runs are reproducible by default.</strong> The
+<p><strong>Optimizations are reproducible by default.</strong> The
 <a href="../optimizer_setup/configuration_sections/#variable-perturbations">seed</a> is fixed at
-<code>1</code> unless you set it, so repeating a run reproduces its perturbations exactly.
+<code>1</code> unless you set it, so repeating an optimization reproduces its perturbations
+exactly.
 Change the seed when you deliberately want an independent repetition of the same
 problem.</p>
 <p><strong>Label tuples are checked at export, not at the start.</strong> A tuple in
 <a href="../optimizer_setup/configuration_sections/#names"><code>names</code></a> that is not as long as the
-axis it labels lets the run finish normally; the mismatch surfaces later, as an
+axis it labels lets the optimization finish normally; the mismatch surfaces later,
+as an
 error from pandas or polars when a result is turned into a table.</p>
 <table>
 <thead>
@@ -2760,7 +2765,7 @@ error from pandas or polars when a result is turned into a table.</p>
 <td>The first batch averaged to zero, or to a value that is not finite, so no scale could be derived. Set the scales yourself, or start somewhere else.</td>
 </tr>
 <tr>
-<td>Two runs that should agree give different gradients</td>
+<td>Two optimizations that should agree give different gradients</td>
 <td>Quasi-random samplers (<code>sobol</code>, <code>halton</code>, <code>lhs</code>) are seeded in the order the <a href="../optimizer_setup/configuration_sections/#samplers">samplers</a> are defined, so reordering that section changes the perturbations.</td>
 </tr>
 </tbody>

@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2917,8 +2917,9 @@ specifies how to handle such violations (the values of
 <a class="autorefs autorefs-internal" title="            BoundaryType" href="../../reference/enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>). The default, <code>"mirror"</code>, mirrors
 perturbations back into the valid range. As with <code>types</code>, the enumeration
 members may be written in place of the strings.</p>
-<p>The <code>seed</code> value (default: <code>1</code>) ensures consistent results across repeated runs.
-To obtain unique results for each optimization run, modify the seed. A common
+<p>The <code>seed</code> value (default: <code>1</code>) ensures consistent results across repeated
+optimizations. To obtain unique results for each optimization, modify the seed.
+A common
 approach is to use a tuple with a unique ID as the first
 element, ensuring reproducibility across nested and parallel evaluations.</p>
 <div class="admonition tip">
@@ -2977,8 +2978,8 @@ does it for you:</p>
 <p>Scales must be positive: a scale is a change of units, and nothing else. The
 default is a scale of 1 and an offset of 0, which is the identity. There is no
 <code>auto_scale</code> for variables, because there is nothing to estimate one from: the
-bounds are the only information available before the run starts, and using them
-is a choice, not a default.</p>
+bounds are the only information available before the optimization starts, and
+using them is a choice, not a default.</p>
 <p>Everything that describes the variables moves with them. The bounds are mapped,
 and so are the <a href="#variable-perturbations">perturbation magnitudes</a> of type
 <code>ABSOLUTE</code>; a magnitude is a distance rather than a position, so only the scale
@@ -3055,12 +3056,13 @@ for all objectives, which preserves their relative magnitudes and therefore both
 the meaning of <code>weights</code> and, unlike a per-objective scale, the location of the
 optimum. Realizations that fail do not contribute.</p>
 <p>The estimate is computed once, from the first batch, and then fixed for the rest
-of the run. It <em>multiplies</em> <code>scales</code> rather than replacing it, so a configured
-scale still applies on top of an estimated one. An <code>offsets</code> entry is subtracted
-before the estimate is taken, so the estimate measures what is left after it.</p>
+of the optimization. It <em>multiplies</em> <code>scales</code> rather than replacing it, so a
+configured scale still applies on top of an estimated one. An <code>offsets</code> entry is
+subtracted before the estimate is taken, so the estimate measures what is left
+after it.</p>
 <p>Because the estimate divides the objective the optimizer reports, switching
 <code>auto_scale</code> on lowers <code>target_objective</code> without changing the solution. Two
-runs that differ in this setting can only be compared through
+optimizations that differ in this setting can only be compared through
 <code>functions.objectives</code> or their variables; see
 <a href="../../results/results/#scaling-of-results">Scaling of results</a>.</p>
 <h3 id="objective-offsets">Offsetting objectives</h3>
@@ -3077,8 +3079,8 @@ little. An NPV around <span class="arithmatex">\(10^9\)</span> that varies by <s
 tolerance of many methods. Subtracting a baseline of <span class="arithmatex">\(10^9\)</span> first and then
 dividing by <span class="arithmatex">\(10^5\)</span> leaves the variation at order one.</p>
 <p>Because it changes the value the optimizer tests against its tolerances, an
-offset can change where a run stops, even though it cannot change where the
-optimum is.</p>
+offset can change where an optimization stops, even though it cannot change
+where the optimum is.</p>
 <p>An aggregate that measures dispersion rather than central tendency has its
 offset subtracted too. A standard deviation is unchanged by shifting the values
 it summarizes, so the offset applies to the aggregate itself; the map is undone
@@ -3235,7 +3237,7 @@ realization.</p>
 </div>
 <h2 id="optimizer"><code>optimizer</code></h2>
 <p>Validated into <a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../../reference/config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a>.</p>
-<p>Run-level settings that control how the optimization is managed. All
+<p>Settings that control how the optimization is managed. All
 fields are optional and default to <code>None</code> (no limit) or <code>None</code> (no
 redirection):</p>
 <ul>
@@ -3273,18 +3275,18 @@ is any: that is <a href="#backend"><code>verbose</code></a>. The evaluation call
 either way — anything your objective function or your result handlers print goes
 to the terminal as usual.</p>
 <div class="admonition warning">
-<p class="admonition-title">Capture is for one run at a time</p>
+<p class="admonition-title">Capture is for one optimization at a time</p>
 <p>Capturing rewires process-global state, so only one optimization at a time
-can do it. A second run that tries while another holds it — a concurrent run
-of <a href="../../running/many_runs/"><code>optimize_many</code></a>, or
+can do it. A second optimization that tries while another holds it — one of
+<a href="../../running/many_runs/">several optimizations at once</a>, or
 an optimization started from inside an evaluation callback — raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Leave <code>stdout</code> and
-<code>stderr</code> unset on runs that overlap.</p>
+<code>stderr</code> unset on optimizations that overlap.</p>
 <p>Whether an optimizer reports at all is decided by <a href="#backend"><code>verbose</code></a>,
 independently of capture. To silence one, set <code>verbose=False</code>; to discard
 output you cannot switch off, capture to <code>os.devnull</code> — but this
-discards anything <em>else</em> the process writes during the run, which a
-throwaway file would not.</p>
+discards anything <em>else</em> the process writes during the optimization, which
+a throwaway file would not.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">What else lands in the file</p>
@@ -3311,8 +3313,8 @@ settings that are forwarded to the backend:</p>
   backends support this setting. It is compared against the quantities the
   optimizer works with, which are scaled; see <a href="#objective-scales">Scaling
   objectives</a>. Setting <code>auto_scale</code> there brings the weighted
-  objective sum to a magnitude of one at the start of the run, which is what
-  makes a fixed tolerance mean the same thing across problems.</li>
+  objective sum to a magnitude of one at the start of the optimization, which is
+  what makes a fixed tolerance mean the same thing across problems.</li>
 <li><strong><code>parallel</code></strong> (default: <code>False</code>): If <code>True</code>, allows the optimizer to use
   parallelized function evaluations. Typically applies to gradient-free methods;
   not all backends support this setting.</li>
@@ -3342,7 +3344,7 @@ terminal. A backend option that names the same setting, such as SciPy's
 of them accepts, and which <code>options</code> they take, is documented by the backend
 itself. For the built-in SciPy backend, see
 <a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="../../reference/backend/#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a>. A method configured with a
-constraint it cannot handle is only rejected when the run starts, with
+constraint it cannot handle is only rejected when the optimization starts, with
 <a class="autorefs autorefs-internal" title="            UnsupportedError" href="../../reference/exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a>, after the rest of the
 configuration has already been written.</p>
 <p>A backend can also be run in a process of its own, by prefixing the method with

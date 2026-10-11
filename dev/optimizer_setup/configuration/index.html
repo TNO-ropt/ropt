@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2668,13 +2668,14 @@
 
 
 <h1 id="configuration">Configuration</h1>
-<p>Every <code>ropt</code> optimization run is described by a configuration dictionary. This
+<p>Every <code>ropt</code> optimization is described by a configuration dictionary. This
 page covers what that dictionary becomes, the rules that apply to all of it, and
 how the pieces fit together. For the field-by-field description of each section,
 see <a href="../configuration_sections/">Configuration Sections</a>.</p>
 <h2 id="the-configuration-object">The configuration object</h2>
-<p>The dictionary is validated when the run starts, and each top-level key becomes
-an instance of that section's configuration class: <code>variables</code> becomes a
+<p>The dictionary is validated when the optimization or evaluation starts, and each
+top-level key becomes an instance of that section's configuration class:
+<code>variables</code> becomes a
 <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>, <code>objectives</code> an
 <a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig" href="../../reference/config/#ropt.config.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig</code></a>, and so on.
 Only <code>variables</code> is required; every other section has defaults.</p>
@@ -2682,8 +2683,8 @@ Only <code>variables</code> is required; every other section has defaults.</p>
 <code>function_estimators</code> do not hold settings but <strong>components</strong> — objects built by
 the plugin system, which the sections that use them refer to by key.</p>
 <p>Most of the rules below follow from this one step. Because the dictionary is
-converted once, validation and coercion happen before the run rather than during
-it; because the result is a set of objects rather than the dict you wrote, those
+converted once, validation and coercion happen before the optimization rather
+than during it; because the result is a set of objects rather than the dict you wrote, those
 objects are frozen; and because components are shared rather than copied, they
 are addressed by key.</p>
 <h2 id="top-level-layout">Top-level layout</h2>
@@ -2849,10 +2850,10 @@ named backend in a separate process; see <a href="../optimizer/#external-backend
 process</a>.</p>
 <h3 id="immutability">Immutability</h3>
 <p>The objects the dictionary is validated into are frozen, so a setting cannot be
-changed once a run has started. Validation also does work that a later change
-would not repeat: bounds, perturbation magnitudes and linear constraints are
-scaled at that point. To change a setting, modify the dictionary and start a new
-run.</p>
+changed once an optimization has started. Validation also does work that a later
+change would not repeat: bounds, perturbation magnitudes and linear constraints
+are scaled at that point. To change a setting, modify the dictionary and start a
+new optimization.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Do not serialize and round-trip the validated configuration objects (for
@@ -2864,8 +2865,8 @@ instead.</p>
 </div>
 <h2 id="naming-things-for-output">Naming things for output</h2>
 <p>One section describes nothing about the problem itself. <code>names</code> attaches labels
-to the parts of a run — the variables, the objectives, the realizations, and the
-rest — so that results come back readable:</p>
+to the parts of an optimization — the variables, the objectives, the
+realizations, and the rest — so that results come back readable:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">),</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">"objective"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"val"</span><span class="p">,</span> <span class="s2">"cost"</span><span class="p">),</span>
@@ -2879,8 +2880,8 @@ name of a metadata entry holding array values, which labels the axis that
 metadata spans.</p>
 <p>Labels are not purely decorative. Some components use them to identify the items
 they are given instead of relying on position, which lets results be matched
-between runs whose ordering differs. That applies to the realization names; the
-others affect only how a printed table reads.</p>
+between optimizations whose ordering differs. That applies to the realization
+names; the others affect only how a printed table reads.</p>
 <p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/export.py">examples/export.py</a>
 names variables, objectives and realizations before exporting to a frame, and
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py">examples/metadata.py</a>

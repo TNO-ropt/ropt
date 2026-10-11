@@ -837,7 +837,7 @@
   <span class="md-ellipsis">
     
   
-    Many Runs at Once
+    Several Optimizations at Once
   
 
     
@@ -2547,11 +2547,11 @@ which brings the weighted total near one while preserving the objectives'
 relative magnitudes — so it does not rebalance them, and does not move the
 optimum.</p>
 <div class="admonition warning">
-<p class="admonition-title">A rescaled run reports a different objective</p>
+<p class="admonition-title">A rescaled optimization reports a different objective</p>
 <p><code>auto_scale</code> divides the objective the optimizer reports, so switching it on
-lowers <code>target_objective</code> without improving the solution. Two runs that
-differ in this setting can only be compared through <code>functions.objectives</code>
-or their variables. The runnable demonstration is
+lowers <code>target_objective</code> without improving the solution. Two optimizations
+that differ in this setting can only be compared through
+<code>functions.objectives</code> or their variables. The runnable demonstration is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py">examples/scaling.py</a>.</p>
 </div>
 <p>An <code>offsets</code> entry is subtracted before the division. It cannot move the optimum
@@ -2563,8 +2563,8 @@ objectives</a> and
 full field descriptions.</p>
 <h2 id="see-also">See also</h2>
 <ul>
-<li>What a run reports in each domain, and which fields are comparable between
-  runs: <a href="../../results/results/#scaling-of-results">Working with Results</a>.</li>
+<li>What an optimization reports in each domain, and which fields are comparable
+  between optimizations: <a href="../../results/results/#scaling-of-results">Working with Results</a>.</li>
 </ul>
 
 
