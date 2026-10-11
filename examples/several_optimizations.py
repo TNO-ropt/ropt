@@ -1,13 +1,12 @@
-"""Run several optimizations concurrently with `optimize_many`.
+"""Run several optimizations concurrently with `Session.offload`.
 
-`optimize_many` runs a batch of optimizations on driver threads that all
-evaluate on the pool it is called on. Any of `config`/`x0`/`objective` may be a
-single value (broadcast to every run) or a per-run sequence; here a matrix of
-start vectors sets the number of runs while the config and objective are re-used
-by all runs. Each run is tagged with a `metadata` dictionary (`run_id`) that
-is attached to its results, so the runs can be told apart afterwards.
+`offload` runs each optimization on a thread of its own, at most `limit` at a
+time, and every optimization evaluates on the same pool. Each one is tagged with
+a `metadata` dictionary (`label`) that is attached to its results, so the
+optimizations can be told apart afterwards.
 """
 
+from functools import partial
 from typing import Any
 
 import numpy as np
@@ -48,23 +47,23 @@ def rosenbrock(
 
 
 def main() -> None:
-    """Run one optimization per start vector, concurrently, tagging each run."""
-    run_metadata = [{"run_id": idx} for idx in range(len(STARTS))]
+    """Run one optimization per start vector, concurrently, tagging each one."""
     # --8<-- [start:run]
     with session() as s:
-        results = s.thread_pool(workers=3).optimize_many(
-            CONFIG,
-            STARTS,
-            rosenbrock,
-            metadata=run_metadata,
+        optimize = partial(s.thread_pool(workers=3).optimize, CONFIG)
+        results = s.offload(
+            [
+                partial(optimize, start, rosenbrock, metadata={"label": label})
+                for label, start in enumerate(STARTS)
+            ],
             limit=2,
         )
     # --8<-- [end:run]
     for result in results:
         assert result.results is not None
-        run_id = result.results.metadata["run_id"]
+        label = result.results.metadata["label"]
         objective = result.results.target_objective
-        print(f"run {run_id} -> objective {objective}")
+        print(f"start {label} -> objective {objective}")
         assert objective is not None
         assert objective < 1.0
 

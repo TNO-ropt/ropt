@@ -1,32 +1,40 @@
-# Many Runs at Once
+# Several Optimizations at Once
 
-Several optimizations can run together rather than one after another, each on
-its own driver thread, sharing one pool for their evaluations. Use
-[`optimize_many`][ropt.optimize_many]. Any of `config`, `x0`, or
-`objective` may be a single value (used for every run) or a list (one per run):
+Several optimizations can run together rather than one after another. Wrap each
+`optimize` call in a zero-argument callable and pass the callables to
+[`Session.offload`][ropt.Session.offload], which runs each one on a thread of its
+own and returns the results in the order the callables were given:
 
 ```python
+from functools import partial
+
 from ropt import session
 
 with session() as s:
-    # One run per start point.
-    results = s.thread_pool(workers=4).optimize_many(
-        config, start_points, objective
+    pool = s.thread_pool(workers=4)
+    results = s.offload(
+        [partial(pool.optimize, config, x0, objective) for x0 in start_points]
     )
 ```
 
-!!! tip "Give each run an ID"
-    Pass a per-run `metadata` list to tag every run with a user-defined
-    identifier that is attached to its results (and shows up in a
+Each callable is an ordinary `optimize` call, so every optimization can have its
+own configuration, initial values, objective, `metadata` and `report` callback.
+
+!!! tip "Give each optimization an ID"
+    Pass `metadata` to tag each optimization with an identifier that is
+    attached to its results (and shows up in a
     [`DataFrameHandler`](../results/handlers.md#dataframehandler)'s tables):
 
     ```python
     labels = ["low", "mid", "high"]
-    results = optimize_many(
-        config, start_points, objective, metadata=[{"run_id": x} for x in labels]
+    results = s.offload(
+        [
+            partial(pool.optimize, config, x0, objective, metadata={"label": label})
+            for x0, label in zip(start_points, labels)
+        ]
     )
     for result in results:
-        print(result.results.metadata["run_id"])
+        print(result.results.metadata["label"])
     ```
 
     See [Attaching metadata](running.md#attaching-metadata) for details.
@@ -35,125 +43,107 @@ with session() as s:
 
 There are two independent levels of concurrency here:
 
-- **The optimizations** always run concurrently, each on its own driver thread.
-  This is built into `optimize_many` and does not depend on the pool;
-  the `limit` argument caps how many run at the same time.
-- **The function evaluations** inside those runs all happen on the one pool
-  that `optimize_many` was started on, and the pool determines how they are
-  parallelized. With
-  `thread_pool(workers=1)` the runs still progress together, but their
-  evaluations are executed one at a time. A larger pool —
+- **The optimizations** run concurrently, each on a thread that `offload` starts
+  for it. The `limit` argument of `offload` caps how many run at the same time;
+  without it, all of them start at once.
+- **The function evaluations** inside those optimizations happen on the pool
+  that each `optimize` call is made on, and the pool determines how they are
+  parallelized. With `thread_pool(workers=1)` the optimizations still progress
+  together, but their evaluations are executed one at a time. A larger pool —
   `thread_pool(workers=n)`, or a process, local or HPC pool — runs several
   evaluations at once.
 
-One pool is one budget: `workers=10` means ten evaluations at a time across
-the whole batch of runs, not ten per run. Batch IDs stay distinct whatever you
-pass, since every run in the program draws them from one counter.
+One pool is one budget: `workers=10` means ten evaluations at a time across all
+the optimizations that use the pool, not ten per optimization. Batch IDs stay
+distinct whatever you pass, since every optimization in the program draws them
+from one counter.
 
-[examples/optimize_many.py](https://github.com/TNO-ropt/ropt/blob/main/examples/optimize_many.py)
-runs one optimization per start vector, capping how many go at once and tagging
-each with its own metadata:
+[examples/several_optimizations.py](https://github.com/TNO-ropt/ropt/blob/main/examples/several_optimizations.py)
+runs one optimization per start vector, at most two at a time, and tags each with
+its own metadata:
 
 ```python
---8<-- "examples/optimize_many.py:run"
+--8<-- "examples/several_optimizations.py:run"
 ```
 
-## Watching runs that overlap
+## Watching optimizations that overlap
 
-The two callback arguments differ. `report=` is **per run**: one
-callback receives the results of every run, or pass a list with one callback per
-run. `handlers=` is **shared**: one list of handlers that all runs feed
-together — see [Sharing a handler across concurrent
-runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
+`report=` belongs to one `optimize` call: give each optimization its own
+callback, or the same one to all of them. `handlers=` takes handlers that
+several optimizations may feed together — see [Sharing a handler across
+concurrent runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
-!!! warning "One `report=` callback is called by every run at once"
-    A single callback is wired into each run separately, and each run calls it
-    on its own thread. Nothing serializes those calls, so a callback that
-    appends to a list, updates a counter, or writes a file needs a lock of its
-    own. Give each run its own callback when they must stay apart, or pass a
+!!! warning "A shared `report=` callback is called by every optimization at once"
+    Each optimization calls its callback on its own thread. Nothing serializes
+    those calls, so a callback that appends to a list, updates a counter, or
+    writes a file needs a lock of its own. Give each optimization its own
+    callback when they must stay apart, or pass a
     [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) in
     `handlers=`, which takes a lock around every event it handles.
 
-!!! warning "A shared handler makes the runs wait for each other"
-    That lock is not free. A run that emits a result waits until the handler
-    has finished with it, and a second run waits for the first. A slow handler
-    therefore throttles the whole batch, once per result produced.
+!!! warning "A shared handler makes the optimizations wait for each other"
+    That lock is not free. An optimization that emits a result waits until the
+    handler has finished with it, and a second optimization waits for the first.
+    A slow handler therefore throttles all of them, once per result produced.
 
     So keep a shared handler cheap. A handler that must do slow work — writing
-    a file, talking to a database — holds up every run feeding it.
+    a file, talking to a database — holds up every optimization feeding it.
 
-!!! warning "Without a pool the driver threads do the evaluating"
-    `optimize_many` needs no pool. Without one, the runs still execute
-    concurrently, but each evaluates inside your own program, on its own driver
-    thread — so your evaluation function is called by several threads at once
-    and must tolerate that. Start `optimize_many` on a pool when it must not
-    be.
+!!! warning "Without a pool, the threads of `offload` do the evaluating"
+    An optimization started with [`Session.optimize`][ropt.Session.optimize]
+    evaluates in your own program, on the thread that `offload` started for it.
+    When several of them run at once, your evaluation function is called by
+    several threads at once and must tolerate that. Start them on a pool when it
+    must not be.
 
 !!! warning "Not every backend can take part"
     An optimizer that needs a working directory of its own, writes to a file
     whose name is fixed, or keeps state inside its library between calls cannot
-    run while anything else is running in the same process — another run of its
-    own kind included. Each backend documents whether this applies to it.
-    Select it as
+    run while anything else is running in the same process — another
+    optimization of its own kind included. Each backend documents whether this
+    applies to it. Select it as
     [`external/...`](../optimizer_setup/optimizer.md#external-backend) and
     it gets a process of its own, where none of that is shared.
 
-    Optimizer output capture is likewise for one run at a time. If more than
-    one of these runs sets
+    Optimizer output capture is likewise for one optimization at a time. If more
+    than one of them sets
     [`stdout` or `stderr`](../optimizer_setup/configuration_sections.md#optimizer), the
     second to start raises [`WorkflowError`][ropt.exceptions.WorkflowError].
     Leave both unset here, and set [`verbose=False`](../optimizer_setup/configuration_sections.md#backend)
-    unless you want the runs' reports interleaved on the terminal.
+    unless you want the optimizers' reports interleaved on the terminal.
 
-## Failure in one run
+## Failure in one optimization { #failure-in-one-run }
 
-A run that raises aborts the other runs of the same `optimize_many`. When
-`optimize_many` was called from your script, it also aborts every other task on
-the session, such as another optimization or an `offload` in progress;
-[Failures and Aborts](failures.md) defines tasks and gives the rules for every
-case. Each aborted run ends at its next evaluation boundary with
-`ABORTED_ON_ERROR`, keeping the best result it had reached. A run still queued
-behind `limit` is aborted before its first evaluation, and reports
-`ABORTED_ON_ERROR` with no result at all. Nothing is built for such a run, so an
-invalid configuration in one is never reported.
+The optimizations started from the callables of one `offload` are
+[nested](failures.md#nested-tasks) in it. When one of them raises, `offload`
+aborts the others and raises that exception at once; when `offload` was called
+from your script, every other task on the session is aborted as well.
+[Failures and Aborts](failures.md) gives the rules for every case. An aborted
+optimization ends at its next evaluation boundary with `ABORTED_ON_ERROR`, but
+`offload` does not wait for it, and its result is lost. Optimizations still
+queued behind `limit` are not started after the abort.
 
-`optimize_many` then raises
-[`RunsFailedError`][ropt.exceptions.RunsFailedError]. With several runs there is
-no single exception to re-raise and no single set of results to return, so the
-error carries both. `outcomes` has one entry per run, in the order the runs were
-given, holding either that run's
-[`OptimizationResult`][ropt.OptimizationResult] or the exception it
-raised:
+A callable that catches the exception of its optimization does not fail, so the
+other optimizations are not aborted. Catch the exceptions you expect, and return
+something that marks the failure:
 
 ```python
-from ropt import RunsFailedError
+def optimize_or_none(x0):
+    try:
+        return pool.optimize(config, x0, objective)
+    except SimulationError:
+        return None
 
-try:
-    results = pool.optimize_many(config, start_points, objective)
-except RunsFailedError as failure:
-    for index, outcome in enumerate(failure.outcomes):
-        if isinstance(outcome, Exception):
-            print(f"run {index} raised: {outcome}")
-        else:
-            print(f"run {index} ended with {outcome.exit_code.message}")
+results = s.offload([partial(optimize_or_none, x0) for x0 in start_points])
 ```
 
-Without this the work the other runs did would be thrown away along with the run
-that failed, which matters more now that they are aborted deliberately. The
-first exception is chained, so a traceback still shows what went wrong. A
-`KeyboardInterrupt` or `SystemExit` propagates unchanged instead of being
-collected into `RunsFailedError`, since it means the program is ending rather
-than a run reporting a problem. The
-interrupt also aborts the runs that are still going and waits for them, so they
-end at their next evaluation boundary rather than continuing in the background;
-a second interrupt stops waiting for them.
+`SimulationError` stands for an exception that your own objective raises.
 
-Arguments that do not agree are rejected before any run is created, and count
-as a failure: `optimize_many` broadcasts its arguments first, so lists whose
-lengths disagree raise `ValueError`. `RunsFailedError` is not raised in that
-case, since no run exists to carry an outcome.
-
-[`Session.abort`](running.md#stopping-from-outside) also reaches every run on
-the session, and those runs end with `USER_ABORT` instead, so the exit code
-distinguishes an abort that was asked for from one that a failing run caused.
-See [Exit Codes](../results/exit_codes.md) for what each one means.
+[`Session.abort`](running.md#stopping-from-outside) reaches every optimization on
+the session, and `offload` then raises
+[`AbortedError`][ropt.exceptions.AbortedError] with `USER_ABORT`. When a failure
+elsewhere aborted it, the exit code is `ABORTED_ON_ERROR`, so the exit code
+distinguishes an abort that was asked for from one that a failure caused. A
+`KeyboardInterrupt` aborts the optimizations of the `offload` it passes through,
+and is raised at once. See [Exit Codes](../results/exit_codes.md) for what each
+code means.

@@ -27,6 +27,6 @@ read that page with the script open beside it.
 | [`restart.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/restart.py) | Restarting from the best point, collecting every result | [Restarting from the Best Point](../running/restart.md) |
 | [`initial_values.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/initial_values.py) | Restarting with a larger ensemble, reusing what is known there | [Reusing Results at the Starting Point](../running/initial_values.md) |
 | [`parallel.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py) | Evaluating on a thread or process pool | [Evaluating in Parallel](../running/parallel.md) |
-| [`optimize_many.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/optimize_many.py) | Running several optimizations concurrently | [Many Runs at Once](../running/many_runs.md) |
+| [`several_optimizations.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/several_optimizations.py) | Running several optimizations concurrently | [Several Optimizations at Once](../running/many_runs.md) |
 | [`nested_optimization.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/nested_optimization.py) | An inner optimization per outer evaluation, on its own pool | [Nested Optimization](../running/nested.md) |
 | [`hpc.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/hpc.py) | Submitting evaluations to a cluster queue | [Evaluating in Parallel](../running/parallel.md#running-on-an-hpc-cluster) |

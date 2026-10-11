@@ -80,12 +80,12 @@ it writes there — a global, a cache, a list it appends to — is thrown away w
 the worker finishes. Return what you need instead; see
 [Handlers and separate processes](../results/handlers.md#handlers-and-separate-processes).
 
-**Several runs may call your objective at the same time.**
-[`optimize_many`][ropt.optimize_many] always runs its optimizations
-concurrently. Given a pool, their evaluations go there; given none, each run
-evaluates on its own driver thread, so your evaluation function is called from
-several threads at once and has to tolerate that. See
-[Many Runs at Once](../running/many_runs.md).
+**Several optimizations may call your objective at the same time.**
+Optimizations started together with [`Session.offload`][ropt.Session.offload]
+run concurrently. Given a pool, their evaluations go there; given none, each
+optimization evaluates on the thread that `offload` started for it, so your
+evaluation function is called from several threads at once and has to tolerate
+that. See [Several Optimizations at Once](../running/many_runs.md).
 
 **Metadata is copied with `copy.deepcopy`.** Every result gets its own copy of
 the `metadata` you passed, so keep it to plain data — numbers, strings, lists,
@@ -102,7 +102,7 @@ tolerated; see
 | What you see | Most likely cause |
 | --- | --- |
 | A global or a cache your objective writes to is never updated | The objective ran in a worker process, on a copy. Return the value as [metadata](../running/running.md#attaching-metadata) instead. |
-| An objective that works alone misbehaves under `optimize_many` | It is being called from several threads at once. Remove the shared mutable state, or guard it with a lock of its own. |
+| An objective that works alone misbehaves when several optimizations run at once | It is being called from several threads at once. Remove the shared mutable state, or guard it with a lock of its own. |
 | `TypeError: cannot pickle ...` part-way through a run | Something in `metadata` cannot be deep-copied. |
 | `ExecutionError` part-way through a run on a pool | A worker or job broke, rather than your objective; see [When an evaluation fails](../running/parallel.md#when-an-evaluation-fails). |
 
@@ -142,10 +142,11 @@ the loop or function that uses it rather than around the whole program; see
 
 ## Running many at once
 
-**`optimize_many` really does run everything at once.** A handler given to all
-the runs takes a lock around every event it handles, so it collects them safely, but a
-single `report=` callback does not: it is called by several threads at the same
-time. Keep such a callback free of shared state, or give each run its own.
+**Optimizations started together really do run at once.** A handler given to all
+of them takes a lock around every event it handles, so it collects them safely,
+but a single `report=` callback does not: it is called by several threads at the
+same time. Keep such a callback free of shared state, or give each optimization
+its own.
 
 **A slow shared handler holds up every run.** The run that emitted a result
 waits until the handler has finished with it, and the next run waits for the
@@ -153,9 +154,9 @@ lock. Keep a shared handler cheap.
 
 **A handler must not start a run that reaches it again.** The handler holds its
 own lock while it runs. A nested [`optimize`][ropt.optimize] emits on
-that same thread and raises; a nested
-[`optimize_many`][ropt.optimize_many] emits on its own driver threads
-and blocks. See [Result
+that same thread and raises; a nested optimization started with
+[`Session.offload`][ropt.Session.offload] emits on the thread that `offload`
+started for it, and blocks. See [Result
 Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 **Not every optimizer can run beside another.** A backend that needs its own
@@ -169,7 +170,7 @@ process of its own. Optimizer output capture is likewise for one run at a time.
 | Results from a shared `report=` callback are jumbled or lost | The callback is called from every run's thread at once. Collect the results in a [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) instead, or use one callback per run. |
 | A run started from a handler raises `WorkflowError` about the call stack, or hangs | Its handler list reaches a handler that is already running; see [Result Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs). |
 | Many runs are slower than expected while the workers sit idle | A shared handler is serializing them. Make it cheaper. |
-| A second concurrent run raises `WorkflowError` about output capture | Only one run at a time may set `stdout` or `stderr`; see [Many Runs at Once](../running/many_runs.md). |
+| A second concurrent run raises `WorkflowError` about output capture | Only one run at a time may set `stdout` or `stderr`; see [Several Optimizations at Once](../running/many_runs.md). |
 
 ## Configuration
 

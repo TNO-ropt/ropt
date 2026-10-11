@@ -48,7 +48,6 @@ from ropt.exceptions import (
     AbortedError,
     ExecutionError,
     RoptError,
-    RunsFailedError,
     UnsupportedError,
     WorkflowError,
 )
@@ -69,7 +68,6 @@ from ropt.run import (
     evaluate,
     evaluate_batch,
     optimize,
-    optimize_many,
     session,
 )
 
@@ -93,7 +91,6 @@ __all__ = [
     "Results",
     "ResultsHandler",
     "RoptError",
-    "RunsFailedError",
     "Session",
     "UnsupportedError",
     "WorkerPool",
@@ -101,7 +98,6 @@ __all__ = [
     "evaluate",
     "evaluate_batch",
     "optimize",
-    "optimize_many",
     "results_to_pandas",
     "results_to_polars",
     "session",

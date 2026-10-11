@@ -14,14 +14,12 @@ The remaining names imported from `ropt` are documented on their own pages:
 and [`RoptError`][ropt.exceptions.RoptError] with
 [`WorkflowError`][ropt.exceptions.WorkflowError],
 [`ExecutionError`][ropt.exceptions.ExecutionError],
-[`UnsupportedError`][ropt.exceptions.UnsupportedError],
-[`AbortedError`][ropt.exceptions.AbortedError] and
-[`RunsFailedError`][ropt.exceptions.RunsFailedError].
+[`UnsupportedError`][ropt.exceptions.UnsupportedError] and
+[`AbortedError`][ropt.exceptions.AbortedError].
 
 ## Running optimizations
 
 ::: ropt.optimize
-::: ropt.optimize_many
 
 ## Evaluating without optimizing
 

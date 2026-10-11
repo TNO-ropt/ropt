@@ -439,7 +439,6 @@ Results carry two independent kinds of metadata, neither interpreted by `ropt`:
   [`Results`][ropt.results.Results] object, identical for every result of a run.
   It is set once when the run starts: pass a `metadata` dict to the
   [`optimize`][ropt.optimize] /
-  [`optimize_many`][ropt.optimize_many] /
   [`evaluate`][ropt.evaluate] functions. Use it to tag or identify a
   run, for example `{"run_id": 7}`.
 - **Per-realization metadata** — the `metadata` dict on the `evaluations` field,

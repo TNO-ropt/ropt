@@ -24,7 +24,6 @@ from ropt import (
     evaluate,
     evaluate_batch,
     optimize,
-    optimize_many,
     session,
 )
 from ropt.components.event_handlers import EventHandler
@@ -35,7 +34,7 @@ from ropt.components.executors import (
     ThreadExecutor,
 )
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.exceptions import ExecutionError, RunsFailedError, WorkflowError
+from ropt.exceptions import ExecutionError, WorkflowError
 from ropt.results import FunctionResults
 from ropt.run._function import adapt_function
 
@@ -219,12 +218,15 @@ def test_optimize_local_handler_reused_by_concurrent_runs(
     optimize(config, initial_values, test_functions[0], handlers=[single])
 
     history = HistoryHandler()
-    results = optimize_many(
-        [config, config],
-        initial_values,
-        test_functions[0],
-        handlers=[history],
-    )
+    with session() as opened:
+        run = partial(
+            opened.optimize,
+            config,
+            initial_values,
+            test_functions[0],
+            handlers=[history],
+        )
+        results = opened.offload([run, run])
     assert len(results) == 2
     assert len(history["results"]) > len(single["results"])
 
@@ -334,22 +336,23 @@ def test_report_callback_stops_optimization(config: Any, test_functions: Any) ->
     assert reported == 1
 
 
-def test_report_callback_stops_only_own_run(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
+def test_report_callback_stops_only_own_run(config: Any, test_functions: Any) -> None:
     def _stop(_: FunctionResults) -> bool:
         return True
 
     def _continue(_: FunctionResults) -> None:
         return None
 
-    x0 = np.array([initial_values, initial_values])
-    results = pools(workers=2).optimize_many(
-        config,
-        x0,
-        test_functions[0],
-        report=[_stop, _continue],
-    )
+    with session() as opened:
+        run = partial(
+            opened.thread_pool(workers=2).optimize,
+            config,
+            initial_values,
+            test_functions[0],
+        )
+        results = opened.offload(
+            [partial(run, report=_stop), partial(run, report=_continue)]
+        )
     assert results[0].exit_code == ExitCode.STOPPED
     assert results[1].exit_code != ExitCode.STOPPED
 
@@ -623,16 +626,18 @@ def test_batch_ids_are_unique_across_sequential_runs(
 
 @pytest.mark.parametrize("with_pool", [True, False])
 def test_batch_ids_are_unique_across_concurrent_runs(
-    pools: Callable[..., WorkerPool], config: Any, *, with_pool: bool
+    config: Any, *, with_pool: bool
 ) -> None:
     sinks: list[list[int]] = [[], [], []]
     lock = threading.Lock()
-    run = pools(workers=2).optimize_many if with_pool else optimize_many
-    run(
-        config,
-        initial_values,
-        [_collect_batch_ids(sink, lock) for sink in sinks],
-    )
+    with session() as opened:
+        run = opened.thread_pool(workers=2).optimize if with_pool else opened.optimize
+        opened.offload(
+            [
+                partial(run, config, initial_values, _collect_batch_ids(sink, lock))
+                for sink in sinks
+            ]
+        )
     assert all(sinks)
     assert sum(len(set(sink)) for sink in sinks) == len(set().union(*sinks))
 
@@ -689,18 +694,20 @@ def test_metadata_reaches_the_evaluation_function_of_evaluate(config: Any) -> No
     assert all(item == {"run": 7} for item in seen)
 
 
-def test_metadata_per_run_reaches_each_evaluation_function(
-    pools: Callable[..., WorkerPool], config: Any
-) -> None:
+def test_metadata_per_run_reaches_each_evaluation_function(config: Any) -> None:
     first: list[Any] = []
     second: list[Any] = []
     lock = threading.Lock()
-    pools(workers=2).optimize_many(
-        config,
-        initial_values,
-        [_record_metadata(first, lock), _record_metadata(second, lock)],
-        metadata=[{"run": 0}, {"run": 1}],
-    )
+    with session() as opened:
+        run = partial(opened.thread_pool(workers=2).optimize, config, initial_values)
+        opened.offload(
+            [
+                partial(run, _record_metadata(first, lock), metadata={"run": 0}),
+                partial(run, _record_metadata(second, lock), metadata={"run": 1}),
+            ]
+        )
+    assert first
+    assert second
     assert all(item == {"run": 0} for item in first)
     assert all(item == {"run": 1} for item in second)
 
@@ -925,18 +932,6 @@ def test_thread_pool_runs_unbundled_calls_at_once(
     )
     assert results.results is not None
     assert results.results.functions is not None
-
-
-def test_bundle_size_sequence_length_must_match_runs(
-    pools: Callable[..., WorkerPool],
-) -> None:
-    with pytest.raises(ValueError, match="bundle_size sequence length"):
-        pools().optimize_many(
-            _BUNDLE_CONFIG,
-            np.zeros(2),
-            [_bundle_pid, _bundle_pid],
-            bundle_size=[1, 2, 3],
-        )
 
 
 _NESTED_INNER: dict[str, Any] = {
@@ -1193,271 +1188,38 @@ def test_evaluate_without_cloudpickle(
     assert result.results.target_objective == pytest.approx(0.01)
 
 
-def test_optimize_many_broadcasts_config_and_objective(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    starts = np.array([initial_values, np.zeros(initial_values.size)])
-    results = pools(workers=2).optimize_many(config, starts, test_functions[0])
-    assert len(results) == 2
-    assert all(isinstance(result, OptimizationResult) for result in results)
+def test_concurrent_runs_on_one_pool_converge(config: Any, test_functions: Any) -> None:
+    starts = [initial_values, np.zeros(initial_values.size)]
+    with session() as opened:
+        run = partial(opened.thread_pool(workers=2).optimize, config)
+        results = opened.offload(
+            [partial(run, start, test_functions[0]) for start in starts]
+        )
     for result in results:
         assert result.results is not None
         assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
-def test_optimize_many_per_run_objectives(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    results = pools(workers=2).optimize_many(
-        config,
-        initial_values,
-        [test_functions[0], test_functions[1]],
-    )
-    assert len(results) == 2
-    assert results[0].results is not None
-    assert results[1].results is not None
-    assert np.allclose(results[0].results.variables, [0.5, 0.5, 0.5], atol=0.02)
-    assert np.allclose(results[1].results.variables, [-1.5, -1.5, 0.5], atol=0.02)
-
-
-def test_optimize_many_report_callback_shared_across_runs(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    reported: list[FunctionResults] = []
-    starts = np.array([initial_values, np.zeros(initial_values.size)])
-    pools(workers=2).optimize_many(
-        config,
-        starts,
-        test_functions[0],
-        report=reported.append,
-    )
-    assert reported
-    assert all(isinstance(item, FunctionResults) for item in reported)
-
-
-def test_optimize_many_accepts_a_report_per_run(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    first: list[FunctionResults] = []
-    second: list[FunctionResults] = []
-    starts = np.array([initial_values, np.zeros(initial_values.size)])
-    pools(workers=2).optimize_many(
-        config,
-        starts,
-        test_functions[0],
-        report=[first.append, second.append],
-    )
-    assert first
-    assert second
-    assert all(isinstance(item, FunctionResults) for item in (*first, *second))
-
-
-def test_optimize_many_rejects_mismatched_report_sequence(
+def test_concurrent_runs_without_a_pool_converge(
     config: Any, test_functions: Any
 ) -> None:
-    starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with pytest.raises(ValueError, match="number of runs"):
-        optimize_many(config, starts, test_functions[0], report=[lambda _r: None])
-
-
-def test_optimize_many_broadcasts_a_single_metadata_dict(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    starts = np.array([initial_values, np.zeros(initial_values.size)])
-    results = pools(workers=2).optimize_many(
-        config,
-        starts,
-        test_functions[0],
-        metadata={"group": "g"},
-    )
-    for result in results:
-        assert result.results is not None
-        assert result.results.metadata["group"] == "g"
-
-
-def test_optimize_many_accepts_metadata_per_run(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    starts = np.array([initial_values, np.zeros(initial_values.size)])
-    results = pools(workers=2).optimize_many(
-        config,
-        starts,
-        test_functions[0],
-        metadata=[{"run_id": 0}, {"run_id": 1}],
-    )
-    assert len(results) == 2
-    for idx, result in enumerate(results):
-        assert result.results is not None
-        assert result.results.metadata["run_id"] == idx
-
-
-def test_optimize_many_rejects_mismatched_metadata_sequence(
-    config: Any, test_functions: Any
-) -> None:
-    starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with pytest.raises(ValueError, match="number of runs"):
-        optimize_many(config, starts, test_functions[0], metadata=[{"run_id": 0}])
-
-
-def test_optimize_many_respects_limit(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    starts = np.tile(initial_values, (4, 1))
-    results = pools(workers=2).optimize_many(
-        config,
-        starts,
-        test_functions[0],
-        limit=2,
-    )
-    assert len(results) == 4
-
-
-def test_optimize_many_mismatched_lengths_raises(
-    config: Any, test_functions: Any
-) -> None:
-    starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with pytest.raises(ValueError, match="same length"):
-        optimize_many(
-            config, starts, [test_functions[0], test_functions[1], test_functions[0]]
+    # Each run evaluates on the thread that `offload` started for it.
+    starts = [initial_values, np.zeros(initial_values.size)]
+    with session() as opened:
+        results = opened.offload(
+            [
+                partial(opened.optimize, config, start, test_functions[0])
+                for start in starts
+            ]
         )
-
-
-def test_optimize_many_rejects_more_than_two_dimensional_starts(
-    config: Any, test_functions: Any
-) -> None:
-    starts = np.tile(initial_values, (2, 2, 1))
-    with pytest.raises(ValueError, match="vector or a 2-D matrix"):
-        optimize_many(config, starts, test_functions[0])
-
-
-def test_optimize_many_without_runs_returns_nothing(test_functions: Any) -> None:
-    assert optimize_many([], initial_values, test_functions[0]) == ()
-
-
-def test_optimize_many_without_a_pool(config: Any, test_functions: Any) -> None:
-    # Without a pool, optimize_many evaluates on its own driver threads.
-    starts = np.array([initial_values, np.zeros(initial_values.size)])
-    results = optimize_many(config, starts, test_functions[0])
-    assert len(results) == 2
     for result in results:
         assert result.results is not None
         assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
-def test_optimize_many_carries_the_outcome_of_every_run_when_one_fails(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    # The runs that did not fail were aborted when the other one did, so what
-    # they reached is only reachable through the carrier.
-    def boom(_v: Any, _c: Any) -> float:
-        msg = "boom"
-        raise ValueError(msg)
-
-    starts = np.tile(initial_values, (3, 1))
-    with pytest.raises(RunsFailedError) as raised:
-        pools(workers=2).optimize_many(
-            config,
-            starts,
-            [test_functions[0], boom, test_functions[0]],
-        )
-
-    outcomes = raised.value.outcomes
-    assert len(outcomes) == 3
-    assert isinstance(outcomes[1], ValueError)
-    assert str(outcomes[1]) == "boom"
-    assert isinstance(raised.value.__cause__, ValueError)
-    for index in (0, 2):
-        outcome = outcomes[index]
-        assert isinstance(outcome, OptimizationResult)
-        assert outcome.exit_code in {ExitCode.ABORTED_ON_ERROR, ExitCode.FINISHED}
-
-
 @pytest.mark.timeout(60)
-def test_optimize_many_aborts_queued_runs_when_one_fails(
-    pools: Callable[..., WorkerPool], config: Any
-) -> None:
-    calls = 0
-    lock = threading.Lock()
-
-    def boom(_v: Any, _c: Any) -> float:
-        nonlocal calls
-        with lock:
-            calls += 1
-        msg = "boom"
-        raise ValueError(msg)
-
-    # One at a time, so the first run fails before any other is admitted.
-    starts = np.tile(initial_values, (5, 1))
-    pool = pools(workers=2)
-    with pytest.raises(RunsFailedError) as raised:
-        pool.optimize_many(config, starts, boom, limit=1)
-
-    outcomes = raised.value.outcomes
-    assert isinstance(outcomes[0], ValueError)
-    for outcome in outcomes[1:]:
-        assert isinstance(outcome, OptimizationResult)
-        assert outcome.exit_code == ExitCode.ABORTED_ON_ERROR
-        assert outcome.results is None
-    with lock:
-        assert calls == 1
-
-
-@pytest.mark.timeout(60)
-def test_optimize_many_aborts_a_queued_run_before_validating_its_config(
-    pools: Callable[..., WorkerPool], config: Any
-) -> None:
-    def boom(_v: Any, _c: Any) -> float:
-        msg = "boom"
-        raise ValueError(msg)
-
-    broken = {**config, "objectives": {"weights": [0.75, -0.25]}}
-
-    # One at a time, so the first run fails before the other two are admitted.
-    starts = np.tile(initial_values, (3, 1))
-    pool = pools(workers=2)
-    with pytest.raises(RunsFailedError) as raised:
-        pool.optimize_many([config, broken, broken], starts, boom, limit=1)
-
-    outcomes = raised.value.outcomes
-    assert isinstance(outcomes[0], ValueError)
-    for outcome in outcomes[1:]:
-        assert isinstance(outcome, OptimizationResult)
-        assert outcome.exit_code == ExitCode.ABORTED_ON_ERROR
-
-
-@pytest.mark.timeout(60)
-def test_optimize_many_aborts_queued_runs_when_one_cannot_be_built(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    calls = 0
-    lock = threading.Lock()
-
-    def counted(variables: Any, context: Any) -> float:
-        nonlocal calls
-        with lock:
-            calls += 1
-        return float(test_functions[0](variables, context))
-
-    broken = {**config, "objectives": {"weights": [0.75, -0.25]}}
-
-    # One at a time, so the first run fails before the other two are admitted.
-    starts = np.tile(initial_values, (3, 1))
-    pool = pools(workers=2)
-    with pytest.raises(RunsFailedError) as raised:
-        pool.optimize_many([broken, config, config], starts, counted, limit=1)
-
-    outcomes = raised.value.outcomes
-    assert isinstance(outcomes[0], Exception)
-    for outcome in outcomes[1:]:
-        assert isinstance(outcome, OptimizationResult)
-        assert outcome.exit_code == ExitCode.ABORTED_ON_ERROR
-    with lock:
-        assert calls == 0
-
-
-@pytest.mark.timeout(60)
-def test_optimize_many_leaves_the_pool_usable_after_a_failure(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
+def test_concurrent_runs_leave_the_pool_usable_after_a_failure(
+    config: Any, test_functions: Any
 ) -> None:
     # Every run reaches its first evaluation before any of them returns, so the
     # three siblings are provably in flight when the fourth fails. A barrier
@@ -1482,22 +1244,24 @@ def test_optimize_many_leaves_the_pool_usable_after_a_failure(
 
         return objective
 
-    starts = np.tile(initial_values, (4, 1))
-    pool = pools(workers=4)
-    with pytest.raises(RunsFailedError):
-        pool.optimize_many(
-            config,
-            starts,
-            [
-                first_evaluation_waits(),
-                first_evaluation_waits(),
-                boom,
-                first_evaluation_waits(),
-            ],
-        )
-    # The siblings keep their workers until they finish, so the pool must stay
-    # usable and must not deadlock against them.
-    result = pool.optimize(config, initial_values, test_functions[0])
+    functions = [
+        first_evaluation_waits(),
+        first_evaluation_waits(),
+        boom,
+        first_evaluation_waits(),
+    ]
+    with session() as opened:
+        pool = opened.thread_pool(workers=4)
+        with pytest.raises(ValueError, match="boom"):
+            opened.offload(
+                [
+                    partial(pool.optimize, config, initial_values, function)
+                    for function in functions
+                ]
+            )
+        # The siblings keep their workers until their evaluations return, so
+        # the pool must stay usable and must not deadlock against them.
+        result = pool.optimize(config, initial_values, test_functions[0])
     assert result.exit_code == ExitCode.FINISHED
 
 
@@ -1510,38 +1274,24 @@ def test_shared_handler_without_a_pool_aggregates_runs(
     assert history["results"]
 
 
-def test_shared_handler_aggregates_across_optimize_many(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
+def test_shared_handler_aggregates_across_concurrent_runs(
+    config: Any, test_functions: Any
 ) -> None:
     single = HistoryHandler()
     optimize(config, initial_values, test_functions[0], handlers=[single])
 
     shared = HistoryHandler()
-    starts = np.tile(initial_values, (3, 1))
-    pools(workers=2).optimize_many(
-        config,
-        starts,
-        test_functions[0],
-        handlers=[shared],
-    )
+    with session() as opened:
+        run = partial(
+            opened.thread_pool(workers=2).optimize,
+            config,
+            initial_values,
+            test_functions[0],
+            handlers=[shared],
+        )
+        opened.offload([run, run, run])
 
     assert len(shared["results"]) > len(single["results"])
-
-
-def test_optimize_many_accepts_bare_handler(config: Any, test_functions: Any) -> None:
-    single = HistoryHandler()
-    optimize(config, initial_values, test_functions[0], handlers=[single])
-
-    handler = HistoryHandler()
-    results = optimize_many(
-        [config, config, config],
-        initial_values,
-        test_functions[0],
-        handlers=[handler],
-    )
-    assert len(results) == 3
-    # Every run feeds the same handler, which serializes the calls itself.
-    assert len(handler["results"]) > len(single["results"])
 
 
 if _TEST_HPC:

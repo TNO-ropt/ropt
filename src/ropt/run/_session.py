@@ -27,7 +27,7 @@ from ropt.exceptions import WorkflowError
 
 from ._evaluate import _evaluate, _evaluate_batch
 from ._offload import _offload
-from ._optimize import _optimize, _optimize_many
+from ._optimize import _optimize
 from ._pool import WorkerPool
 
 if TYPE_CHECKING:
@@ -199,72 +199,6 @@ class Session:
             function,
             handlers=handlers,
             report=report,
-            constraint_tolerance=constraint_tolerance,
-            bundle_size=None,
-            metadata=metadata,
-            optimize_many_signal=None,
-            f0=f0,
-            g0=g0,
-            report_gradients=report_gradients,
-        )
-
-    def optimize_many(  # ruff: ignore[too-many-arguments]
-        self,
-        config: dict[str, Any] | Sequence[dict[str, Any]],
-        x0: ArrayLike,
-        function: EvaluationFunction | Sequence[EvaluationFunction],
-        *,
-        handlers: Sequence[EventHandler] | None = None,
-        report: ReportCallback | Sequence[ReportCallback] | None = None,
-        limit: int | None = None,
-        constraint_tolerance: float = 1e-10,
-        metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
-        f0: FunctionResults | Sequence[FunctionResults | None] | None = None,
-        g0: GradientResults | Sequence[GradientResults | None] | None = None,
-        report_gradients: bool = False,
-    ) -> tuple[OptimizationResult, ...]:
-        """Run several optimizations concurrently in-process, on this session.
-
-        The runs overlap on driver threads, but each evaluates on its own
-        thread, so `function` is called by several threads at once and must
-        tolerate that. Start them on one of this session's pools to give the
-        evaluations workers instead. See
-        [Evaluating in Parallel](../running/parallel.md) for a
-        walkthrough.
-
-        Args:
-            config:               The configuration, or one per run.
-            x0:                   The initial vector, or one per row.
-            function:             The evaluation function, or one per run.
-            handlers:             Optional handlers, fed by every run.
-            report:               Optional callback, shared or one per run.
-            limit:                The maximum number of runs at once.
-            constraint_tolerance: The tolerance within which a constraint holds.
-            metadata:             Optional dictionary attached to every result.
-            f0:                   Optional function results at `x0`, shared or
-                                  one per run.
-            g0:                   Optional gradient results at `x0`, shared or
-                                  one per run.
-            report_gradients:     Whether `report` also receives gradient results.
-
-        Returns:
-            One [`OptimizationResult`][ropt.OptimizationResult] per run.
-
-        Raises:
-            RunsFailedError: If any of the runs raised.
-            ValueError:      If `x0` has the wrong shape, or the sequences
-                             given per run disagree in length.
-            WorkflowError:   If this session has closed.
-        """  # ruff: ignore[docstring-extraneous-exception]
-        return _optimize_many(
-            self,
-            None,
-            config,
-            x0,
-            function,
-            handlers=handlers,
-            report=report,
-            limit=limit,
             constraint_tolerance=constraint_tolerance,
             bundle_size=None,
             metadata=metadata,

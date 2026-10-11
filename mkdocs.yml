@@ -116,7 +116,7 @@ nav:
   - "Running":
       - "Running Optimizations": running/running.md
       - "Evaluating in Parallel": running/parallel.md
-      - "Many Runs at Once": running/many_runs.md
+      - "Several Optimizations at Once": running/many_runs.md
       - "Failures and Aborts": running/failures.md
       - "Nested Optimization": running/nested.md
       - "Restarting from the Best Point": running/restart.md

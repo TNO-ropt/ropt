@@ -181,8 +181,8 @@ result = optimize(config, x0, objective, report=report)
 assert result.exit_code is ExitCode.STOPPED
 ```
 
-With [`optimize_many`](many_runs.md) this stops only the run
-whose callback returned `True`; the other runs continue.
+With [several optimizations at once](many_runs.md), this stops only the
+optimization whose callback returned `True`; the others continue.
 
 The runnable script is
 [examples/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py),
@@ -226,14 +226,13 @@ return. On a local or HPC pool they are cancelled.
 `abort()` reaches the runs that are under way at the moment it is called, and
 nothing more. A run started afterwards is unaffected, so a
 loop that abandons one attempt and starts another keeps working. An
-[`optimize_many`][ropt.Session.optimize_many] counts as one run here: a
-run it has queued behind its `limit` is aborted as well, and reports `USER_ABORT`
-without evaluating anything. Leaving the session's `with` block aborts its runs
-as well, and then releases its pools, which is what refuses a run started after
-that. Releasing a local or HPC pool cancels the jobs it still has, so none are
-left running when the block has ended. A run aborted that way reports `ABORTED`
-rather than `USER_ABORT`, since it was the block ending rather than a request to
-abort.
+[`offload`][ropt.Session.offload] counts as one task here: a callable it has
+queued behind its `limit` is not started. Leaving the session's `with` block
+aborts its runs as well, and then releases its pools, which is what refuses a
+run started after that. Releasing a local or HPC pool cancels the jobs it still
+has, so none are left running when the block has ended. A run aborted that way
+reports `ABORTED` rather than `USER_ABORT`, since it was the block ending rather
+than a request to abort.
 
 A run started with the module-level [`optimize`][ropt.optimize] belongs
 to no session you hold and cannot be aborted this way. It evaluates on the
@@ -244,9 +243,9 @@ on a session or one of its pools to make it abortable.
 
 You can attach arbitrary **metadata** to a run, from two sources:
 
-- **Constant, per run** — pass a `metadata` dict to `optimize`, `optimize_many`,
-  `evaluate`, or `evaluate_batch`. `ropt` copies it onto every result the run
-  produces, which is one way to tag a run:
+- **Constant, per run** — pass a `metadata` dict to `optimize`, `evaluate`, or
+  `evaluate_batch`. `ropt` copies it onto every result the run produces, which
+  is one way to tag a run:
 
   ```python
   result = optimize(config, x0, objective, metadata={"run_id": 7})
@@ -255,9 +254,8 @@ You can attach arbitrary **metadata** to a run, from two sources:
 
   The same dict also reaches the evaluation function itself, as
   `context.metadata` — useful when the evaluation needs to know which run it is
-  part of. With `optimize_many`, this is how runs are told apart:
-  give one dict (shared by all runs) or a list with one dict per run; see
-  [Give each run an ID](many_runs.md).
+  part of. With several optimizations at once, this is how they are told apart;
+  see [Give each optimization an ID](many_runs.md).
 
 - **Per evaluation** — return an
   [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
@@ -367,17 +365,12 @@ What *is* raised falls into three groups:
   that runs your evaluations, or a callable handed to
   [`WorkerPool.offload`][ropt.WorkerPool.offload], cannot start or breaks
   down, and [`AbortedError`][ropt.exceptions.AbortedError] when an abort
-  kept an offloaded callable from running.
+  arrived before every offloaded callable had finished.
 
 - **Exceptions from your own evaluation function** are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process
   — and are re-raised from the `optimize` call. Return `float("nan")` instead
-  if a failed realization should be tolerated rather than fatal. With
-  [`optimize_many`][ropt.optimize_many] there is no single exception to
-  re-raise, so `optimize_many` raises
-  [`RunsFailedError`][ropt.exceptions.RunsFailedError] carrying what every run
-  raised or reached; see
-  [Failure in one run](many_runs.md#failure-in-one-run).
+  if a failed realization should be tolerated rather than fatal.
 
 The [`RoptError`][ropt.exceptions.RoptError] types above are imported from
 `ropt` itself, and catching the base class catches all of them at once:
@@ -392,7 +385,7 @@ function stay whatever you raised. The control-flow signals that `ropt` raises
 and catches itself are excluded as well, and stay in
 [`ropt.exceptions`][ropt.exceptions].
 
-`optimize`, `evaluate`, `evaluate_batch`, `optimize_many` and `offload` start
+`optimize`, `evaluate`, `evaluate_batch` and `offload` start
 **tasks**, which can be under way at the same time. When a task raises an
 exception, every task started from inside it is aborted, and the exception is
 raised in the code that started the task. If that code is your script, every

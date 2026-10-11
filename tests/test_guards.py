@@ -49,10 +49,6 @@ def _optimize(pool: WorkerPool) -> None:
     pool.optimize(_CONFIG, _INITIAL, _sphere)
 
 
-def _optimize_many(pool: WorkerPool) -> None:
-    pool.optimize_many(_CONFIG, _MATRIX, _sphere)
-
-
 def _evaluate(pool: WorkerPool) -> None:
     pool.evaluate(_CONFIG, _INITIAL, _sphere)
 
@@ -69,7 +65,6 @@ _TAKES_A_POOL = pytest.mark.parametrize(
     "entry_point",
     [
         pytest.param(_optimize, id="optimize"),
-        pytest.param(_optimize_many, id="optimize_many"),
         pytest.param(_evaluate, id="evaluate"),
         pytest.param(_evaluate_batch, id="evaluate_batch"),
         pytest.param(_offload, id="offload"),
@@ -98,10 +93,6 @@ def _session_optimize(opened: Session) -> None:
     opened.optimize(_CONFIG, _INITIAL, _sphere)
 
 
-def _session_optimize_many(opened: Session) -> None:
-    opened.optimize_many(_CONFIG, _MATRIX, _sphere)
-
-
 def _session_evaluate(opened: Session) -> None:
     opened.evaluate(_CONFIG, _INITIAL, _sphere)
 
@@ -110,13 +101,17 @@ def _session_evaluate_batch(opened: Session) -> None:
     opened.evaluate_batch(_CONFIG, _MATRIX, _sphere)
 
 
+def _session_offload(opened: Session) -> None:
+    opened.offload(partial(pow, 2, 3))
+
+
 _RUNS_ON_A_SESSION = pytest.mark.parametrize(
     "entry_point",
     [
         pytest.param(_session_optimize, id="optimize"),
-        pytest.param(_session_optimize_many, id="optimize_many"),
         pytest.param(_session_evaluate, id="evaluate"),
         pytest.param(_session_evaluate_batch, id="evaluate_batch"),
+        pytest.param(_session_offload, id="offload"),
     ],
 )
 

@@ -43,22 +43,26 @@ Handlers that store results expose them through `handler["results"]` (and, for
 ## Sharing a handler across concurrent runs
 
 The same handler may also be given to runs that execute **concurrently** — the
-runs of an [`optimize_many`](../running/many_runs.md), or runs
-you start on threads of your own. A handler's
+optimizations started together with
+[`Session.offload`](../running/many_runs.md), or runs you start on threads of
+your own. A handler's
 [`handle_event`][ropt.EventHandler.handle_event]
 takes a lock around each call, so a second run waits for the first to finish
 rather than interleaving with it:
 
 ```python
+from functools import partial
+
 from ropt import HistoryHandler, session
 
 history = HistoryHandler()
 with session() as s:
-    s.thread_pool(workers=4).optimize_many(
-        config,
-        start_points,
-        objective,
-        handlers=[history],
+    pool = s.thread_pool(workers=4)
+    s.offload(
+        [
+            partial(pool.optimize, config, x0, objective, handlers=[history])
+            for x0 in start_points
+        ]
     )
 
 print(history.results)
@@ -83,11 +87,12 @@ feeds two handlers from the same set of concurrent runs:
     call that is feeding the handler. A nested
     [`optimize`][ropt.optimize] emits on the thread that called it — the
     one already inside the handler — so this raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. A nested
-    [`optimize_many`][ropt.optimize_many] emits on driver threads of its
-    own, which wait for a lock the first thread will not release until the run
-    ends, and both stop. The same holds for two handlers that each start a run
-    reaching the other. Give the inner run handlers of its own.
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. A nested optimization
+    started with [`Session.offload`][ropt.Session.offload] emits on a thread
+    that `offload` started for it, which waits for a lock the first thread will
+    not release until the run ends, and both stop. The same holds for two
+    handlers that each start a run reaching the other. Give the inner run
+    handlers of its own.
 
 Two handlers that write to the same external state are each serialized on their
 own, but not as a pair: a run can be inside one while another run is inside the

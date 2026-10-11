@@ -307,24 +307,26 @@ def test_a_nested_run_that_fails_does_not_abort_the_run_that_started_it() -> Non
 def test_session_abort_aborts_every_run_in_progress() -> None:
     runs = 3
     started = threading.Barrier(runs + 1)
+    lock = threading.Lock()
+    results: list[OptimizationResult] = []
 
     with session() as opened:
         pool = opened.thread_pool(workers=runs)
 
-        def abort_once_all_have_started() -> None:
+        def _run() -> None:
+            result = pool.optimize(_CONFIG, _INITIAL, _waits_once(started))
+            with lock:
+                results.append(result)
+
+        drivers = [threading.Thread(target=_run) for _ in range(runs)]
+        for driver in drivers:
+            driver.start()
+        try:
             started.wait(timeout=30)
             opened.abort()
-
-        abort_thread = threading.Thread(target=abort_once_all_have_started)
-        abort_thread.start()
-        try:
-            results = pool.optimize_many(
-                _CONFIG,
-                np.tile(_INITIAL, (runs, 1)),
-                [_waits_once(started) for _ in range(runs)],
-            )
         finally:
-            abort_thread.join(timeout=30)
+            for driver in drivers:
+                driver.join(timeout=30)
 
     assert [result.exit_code for result in results] == [ExitCode.USER_ABORT] * runs
 
@@ -412,7 +414,7 @@ def test_a_failing_run_aborts_the_others_on_its_session() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_session_abort_aborts_the_runs_queued_behind_the_limit() -> None:
+def test_session_abort_starts_none_of_the_runs_queued_behind_the_limit() -> None:
     # One at a time, so the four behind the first are still queued when the
     # abort arrives. Each run counts its own evaluations, which is what shows
     # that none of the four reached one.
@@ -433,14 +435,16 @@ def test_session_abort_aborts_the_runs_queued_behind_the_limit() -> None:
 
     with session() as opened:
         pool = opened.thread_pool(workers=1)
-        outcomes = pool.optimize_many(
-            _CONFIG,
-            np.tile(_INITIAL, (5, 1)),
-            [_counts(index, opened) for index in range(5)],
-            limit=1,
-        )
+        with pytest.raises(AbortedError) as raised:
+            opened.offload(
+                [
+                    partial(pool.optimize, _CONFIG, _INITIAL, _counts(index, opened))
+                    for index in range(5)
+                ],
+                limit=1,
+            )
 
-    assert [outcome.exit_code for outcome in outcomes] == [ExitCode.USER_ABORT] * 5
+    assert raised.value.exit_code is ExitCode.USER_ABORT
     with lock:
         assert calls[0] >= 1
         assert calls[1:] == [0, 0, 0, 0]
@@ -548,40 +552,6 @@ def test_an_evaluation_that_cannot_be_built_aborts_the_runs_beside_it() -> None:
             started.wait(timeout=30)
             with pytest.raises(ValidationError, match="Weights must not be negative"):
                 failing.evaluate(broken, _INITIAL, _sphere)
-        finally:
-            release.set()
-            driver.join(timeout=30)
-
-    assert not driver.is_alive()
-    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
-
-
-@pytest.mark.timeout(60)
-def test_an_optimize_many_whose_arguments_disagree_aborts_the_runs_beside_it() -> None:
-    # The failure is in the setup of the call, before any run is created, so
-    # this thread is the barrier's second party rather than the failing call.
-    started = threading.Barrier(2, timeout=30)
-    release = threading.Event()
-    starts = np.array([_INITIAL, np.zeros(_INITIAL.size)])
-    outcome: list[OptimizationResult] = []
-
-    with session() as opened:
-        surviving = opened.thread_pool(workers=1)
-        failing = opened.thread_pool(workers=1)
-
-        def _survivor() -> None:
-            outcome.append(
-                surviving.optimize(
-                    _CONFIG, _INITIAL, _waits_then_holds(started, release)
-                )
-            )
-
-        driver = threading.Thread(target=_survivor)
-        driver.start()
-        try:
-            started.wait(timeout=30)
-            with pytest.raises(ValueError, match="same length"):
-                failing.optimize_many(_CONFIG, starts, [_sphere, _sphere, _sphere])
         finally:
             release.set()
             driver.join(timeout=30)

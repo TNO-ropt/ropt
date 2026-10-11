@@ -29,4 +29,4 @@ run does to each, and the one property of your objective that rules some of them
 out.
 
 To run several optimizations at the same time, rather than parallelizing within
-one, see [Many Runs at Once](../running/many_runs.md).
+one, see [Several Optimizations at Once](../running/many_runs.md).

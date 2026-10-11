@@ -1,11 +1,13 @@
 """Aggregate results from concurrent runs with one shared handler.
 
-The same handler may be given to optimizations that run concurrently -- the
-runs of `optimize_many`. Its `handle_event` serializes its own calls, so a
-second run waits for the first instead of interleaving with it. A run may feed
-several handlers at once, for different purposes.
+The same handler may be given to optimizations that run concurrently -- here
+the optimizations that `Session.offload` starts together. Its `handle_event`
+serializes its own calls, so a second run waits for the first instead of
+interleaving with it. A run may feed several handlers at once, for different
+purposes.
 """
 
+from functools import partial
 from typing import Any
 
 import numpy as np
@@ -52,12 +54,12 @@ def main() -> None:
     per_run = HistoryHandler()
     # --8<-- [start:shared]
     with session() as s:
-        s.thread_pool(workers=len(STARTS)).optimize_many(
+        optimize = partial(
+            s.thread_pool(workers=len(STARTS)).optimize,
             CONFIG,
-            STARTS,
-            rosenbrock,
             handlers=[history, per_run],
         )
+        s.offload([partial(optimize, start, rosenbrock) for start in STARTS])
     # --8<-- [end:shared]
     print(
         f"collected results across {len(STARTS)} concurrent runs: "

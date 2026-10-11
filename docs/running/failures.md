@@ -1,15 +1,14 @@
 # Failures and Aborts
 
-`optimize`, `evaluate` and `evaluate_batch` each start one **task**;
-[`optimize_many`][ropt.Session.optimize_many] starts one per optimization, and
+`optimize`, `evaluate` and `evaluate_batch` each start one **task**, and
 `offload`, on a [session][ropt.Session.offload] or a
-[pool][ropt.WorkerPool.offload], one per function. Tasks can be under way at
-the same time: side by side on one session, or started from inside one another,
-as when an evaluation function calls `offload`. When a task raises an exception,
-every task started from inside it is aborted, and so are the other tasks started
-by the same `optimize_many` or `offload`. The exception is then raised in the
-code that started the task. If the task was started from your script rather than
-from inside another task, every other task on the session is aborted as well.
+[pool][ropt.WorkerPool.offload], starts one per function. Tasks can be under way
+at the same time: side by side on one session, or started from inside one
+another, as when an evaluation function calls `offload`. When a task raises an
+exception, every task started from inside it is aborted, and so are the other
+tasks started by the same `offload`. The exception is then raised in the code
+that started the task. If the task was started from your script rather than from
+inside another task, every other task on the session is aborted as well.
 
 !!! note
 
@@ -56,10 +55,10 @@ evaluations had offloaded, and then raises the `SimulationError` in your script.
 
 A task started from inside another task is **nested** in it, and the outer task
 is its **parent**. A task is started from inside another when `optimize`,
-`optimize_many`, `evaluate`, `evaluate_batch` or `offload` is called, in the same
-process, from an evaluation function, an event handler, a report callback, or a
-function that `offload` runs. This holds for the module-level functions as well
-as for the methods of a session or a pool.
+`evaluate`, `evaluate_batch` or `offload` is called, in the same process, from an
+evaluation function, an event handler, a report callback, or a function that
+`offload` runs. This holds for the module-level functions as well as for the
+methods of a session or a pool.
 
 An evaluation function runs in your process when its optimization or evaluation
 has no pool or a thread pool, and so does a function offloaded to a thread pool
@@ -89,11 +88,10 @@ which it was started. That code can catch the exception. If it does not, the
 task that the code belongs to fails in turn, and the same rules apply to that
 task.
 
-`optimize_many` raises [`RunsFailedError`][ropt.exceptions.RunsFailedError]
-instead, which carries the outcome of every optimization, including the
-exception; see [Failure in one run](many_runs.md#failure-in-one-run). `offload`
-raises the first exception that arrives, as soon as it arrives, and the results
-of its other functions are lost.
+`offload` raises the first exception that arrives, as soon as it arrives, and the
+results of its other functions are lost; see
+[Failure in one optimization](many_runs.md#failure-in-one-run) for a way to keep
+them.
 
 An optimization or evaluation that ends with an exit code has not failed in this
 sense. One that ends with `TOO_FEW_REALIZATIONS`, for instance, returns its
@@ -104,7 +102,7 @@ result like any other, and no task is aborted.
 When a task raises an exception, these tasks are aborted:
 
 - every task nested in it, at any depth;
-- the other tasks started by the same `optimize_many` or `offload`;
+- the other tasks started by the same `offload`;
 - every other task on its session, unless the failing task is nested.
 
 The same holds when an optimization or evaluation cannot be built because its

@@ -2439,8 +2439,8 @@ def test_job_executor_cancels_on_a_thread_the_interpreter_waits_for(
 ) -> None:
     # Cancelling runs on a thread of its own, so that a second interrupt breaks
     # the join rather than the cancelling. A new thread inherits the daemon flag
-    # of the thread that creates it, and `run_concurrent` drives every run from
-    # a daemon thread, which the interpreter would not wait for.
+    # of the thread that creates it, and `Session.offload` drives its work from
+    # daemon threads, which the interpreter would not wait for.
     executor = _ControlledJobExecutor(tmp_path)
     executor.release_pass.set()
     cancelled = threading.Event()

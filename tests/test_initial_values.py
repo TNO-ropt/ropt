@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt import HistoryHandler, optimize, optimize_many
+from ropt import HistoryHandler, optimize
 from ropt.context import EnOptContext
 from ropt.core import EnsembleEvaluator
 from ropt.results import FunctionResults, GradientResults
@@ -262,25 +262,3 @@ def test_initial_function_results_reject_several_variable_vectors(
     variables = np.repeat(_INITIAL[np.newaxis, :], 2, axis=0)
     with pytest.raises(ValueError, match="need a single variable vector"):
         ensemble.calculate(variables, compute_functions=True, compute_gradients=False)
-
-
-def test_optimize_many_spreads_initial_values_over_the_runs(config: Any) -> None:
-    f0, g0 = _record(config)
-    first = _Recorder()
-    second = _Recorder()
-    optimize_many(
-        [config, config],
-        _INITIAL,
-        [first, second],
-        f0=[f0, None],
-        g0=[g0, None],
-    )
-    assert len(second.rows) - len(first.rows) == _REALIZATIONS * (1 + _PERTURBATIONS)
-
-
-def test_optimize_many_rejects_a_mismatched_initial_value_sequence(
-    config: Any,
-) -> None:
-    f0, _ = _record(config)
-    with pytest.raises(ValueError, match="f0 sequence length"):
-        optimize_many([config, config], _INITIAL, _objective, f0=[f0])

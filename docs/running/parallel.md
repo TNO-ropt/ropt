@@ -90,9 +90,9 @@ figure the extra workers have nothing to do and sit idle.
 Batch size follows from the problem, not from a setting: it is how many
 evaluations the optimizer requests at once. For a gradient-based run over an
 ensemble that is one per realization, plus their perturbations on the batches
-where a gradient is estimated. The second factor is `1` unless you use
-[`optimize_many`][ropt.optimize_many], where it is the `limit` argument
-(or the number of runs, if you set no limit).
+where a gradient is estimated. The second factor is `1` unless you run
+[several optimizations at once](many_runs.md), where it is the `limit` argument
+of `offload` (or the number of optimizations, if you set no limit).
 
 A worker is not free, so this is an upper bound rather than a target. Ask for
 what the work needs; the useful number is usually much smaller than the
@@ -104,7 +104,6 @@ machine's core count.
     transfer costs something, though, so when the evaluations are cheap the
     transfers can dominate. Pass `bundle_size=` to
     [`WorkerPool.optimize`][ropt.WorkerPool.optimize],
-    [`optimize_many`][ropt.WorkerPool.optimize_many],
     [`evaluate`][ropt.WorkerPool.evaluate] or
     [`evaluate_batch`][ropt.WorkerPool.evaluate_batch] to send several
     evaluations to a worker together, or `bundle_size=0` to send a whole batch
@@ -124,12 +123,16 @@ machine's core count.
     leave one worker holding all the slow ones.
 
     It belongs to the run rather than to the pool because it describes the
-    evaluation function, and one pool may serve several. Runs of
-    `optimize_many` that differ in cost can each state their own, either as one
-    size for every run or as a sequence with one per run:
+    evaluation function, and one pool may serve several. Optimizations that
+    share a pool and differ in cost can each state their own:
 
     ```python
-    pool.optimize_many(config, x0, [cheap, costly], bundle_size=[25, 1])
+    s.offload(
+        [
+            partial(pool.optimize, config, x0, cheap, bundle_size=25),
+            partial(pool.optimize, config, x0, costly, bundle_size=1),
+        ]
+    )
     ```
 
     Every pool honours it, including a thread pool: a bundle goes to one worker
@@ -609,9 +612,9 @@ as a warning; on a local or HPC pool it is cancelled.
     - **Results cannot be tracked across offloaded callables.** A handler
       created inside one sees only that callable's results and cannot be brought back:
       handlers cannot be moved between processes, so the return value is all
-      that comes back. Following several concurrent pieces of work in one place
-      is something [`optimize_many`](many_runs.md) can do and
-      `offload` cannot.
+      that comes back. Callables that stay in your process, on the session or on
+      a thread pool, can feed one handler that they share, as
+      [Several Optimizations at Once](many_runs.md) shows.
     - **Worker budgets multiply, with no way around it.** A pool cannot be
       carried into a worker process, so a callable that needs one builds its
       own. Four callables that each build a ten-worker pool put **forty**
@@ -622,10 +625,10 @@ as a warning; on a local or HPC pool it is cancelled.
       process this is avoidable by sharing one pool; offloaded onto a
       process, local, or HPC pool it is not.
 
-    So `offload` fits a piece of work that is genuinely self-contained and
-    returns its answer as a return value. When several pieces must be
-    coordinated — counted, collected, or held to one budget — drive them from
-    your own process instead.
+    So `offload` to a process, local, or HPC pool fits a piece of work that is
+    genuinely self-contained and returns its answer as a return value. When
+    several pieces must be coordinated — counted, collected, or held to one
+    budget — keep them in your own process instead.
 
 !!! warning "Offloading from a handler holds up the runs feeding it"
     A handler runs on the thread driving the run, so it can offload to a

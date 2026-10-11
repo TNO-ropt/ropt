@@ -128,13 +128,17 @@ it should be retried.
 **Only the start point is covered.** `f0` and `g0` are used once, by the first
 evaluation of each kind; every later point is evaluated normally.
 
-## Several runs at once
+## Several optimizations at once
 
-[`optimize_many`][ropt.optimize_many] takes either one result shared by
-every run, or a sequence with one per run, as it does for `config` and
-`metadata`. Sharing one result requires the runs to share `x0`, which is the
-case when the same point is optimized under several configurations:
+When [several optimizations](many_runs.md) start from the same `x0`, they can
+share one `f0` and `g0`, which is the case when the same point is optimized under
+several configurations:
 
 ```python
-optimize_many([config_a, config_b], x0, function, f0=f0, g0=g0)
+s.offload(
+    [
+        partial(s.optimize, config, x0, function, f0=f0, g0=g0)
+        for config in (config_a, config_b)
+    ]
+)
 ```

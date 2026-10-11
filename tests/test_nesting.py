@@ -19,7 +19,7 @@ import pytest
 from ropt import session
 from ropt.components.concurrency import parent_signal
 from ropt.enums import ExitCode
-from ropt.exceptions import AbortedError, RunsFailedError
+from ropt.exceptions import AbortedError
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -28,7 +28,6 @@ if TYPE_CHECKING:
 
     from ropt import (
         EvaluationFunctionContext,
-        OptimizationResult,
         Session,
         WorkerPool,
     )
@@ -86,12 +85,8 @@ def _evaluate_batch_wrong_shape(opened: Session, _inner: WorkerPool) -> None:
     opened.evaluate_batch(_CONFIG, _INITIAL, _sphere)
 
 
-def _optimize_many(opened: Session, _inner: WorkerPool) -> None:
-    opened.optimize_many(_CONFIG, np.tile(_INITIAL, (2, 1)), _boom)
-
-
-def _optimize_many_mismatched(opened: Session, _inner: WorkerPool) -> None:
-    opened.optimize_many(_CONFIG, np.tile(_INITIAL, (2, 1)), [_sphere] * 3)
+def _session_offload(opened: Session, _inner: WorkerPool) -> None:
+    opened.offload([partial(opened.optimize, _CONFIG, _INITIAL, _boom)] * 2)
 
 
 @pytest.mark.parametrize(
@@ -105,8 +100,7 @@ def _optimize_many_mismatched(opened: Session, _inner: WorkerPool) -> None:
         pytest.param(_evaluate_wrong_shape, id="evaluate_wrong_shape"),
         pytest.param(_evaluate_batch, id="evaluate_batch"),
         pytest.param(_evaluate_batch_wrong_shape, id="evaluate_batch_wrong_shape"),
-        pytest.param(_optimize_many, id="optimize_many"),
-        pytest.param(_optimize_many_mismatched, id="optimize_many_mismatched"),
+        pytest.param(_session_offload, id="session_offload"),
     ],
 )
 @pytest.mark.timeout(60)
@@ -125,7 +119,7 @@ def test_caught_nested_failure_does_not_abort_the_run(
         ) -> float:
             try:
                 fails(opened, inner)
-            except (ValueError, RunsFailedError) as exc:
+            except ValueError as exc:
                 with lock:
                     caught.append(type(exc))
             return _sphere(variables, context)
@@ -226,23 +220,51 @@ def test_failing_nested_offload_aborts_what_is_nested_in_it() -> None:
     assert outcomes == [ExitCode.ABORTED_ON_ERROR]
 
 
-def _waits_until_aborted(
-    variables: NDArray[np.float64], context: EvaluationFunctionContext
-) -> float:
-    # Evaluated in-process, so the parent signal here is the signal of this run.
-    signal = parent_signal()
-    assert signal is not None
-    aborted = threading.Event()
-    signal.add_callback(aborted.set)
-    assert aborted.wait(timeout=30)
-    return _sphere(variables, context)
+def _fails_once_both_evaluate(
+    started: threading.Barrier,
+) -> Callable[[NDArray[np.float64], EvaluationFunctionContext], float]:
+    def objective(
+        _variables: NDArray[np.float64], _context: EvaluationFunctionContext
+    ) -> float:
+        started.wait()
+        msg = "boom"
+        raise ValueError(msg)
+
+    return objective
+
+
+def _records_its_abort(
+    started: threading.Barrier, exit_codes: list[ExitCode], recorded: threading.Event
+) -> Callable[[NDArray[np.float64], EvaluationFunctionContext], float]:
+    def objective(
+        variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> float:
+        # Evaluated in-process, so the parent signal here is the signal of this
+        # run.
+        signal = parent_signal()
+        assert signal is not None
+        if not recorded.is_set():
+            started.wait()
+        aborted = threading.Event()
+        signal.add_callback(aborted.set)
+        assert aborted.wait(timeout=30)
+        if not recorded.is_set():
+            exit_codes.append(signal.exit_code)
+            recorded.set()
+        return _sphere(variables, context)
+
+    return objective
 
 
 @pytest.mark.timeout(60)
-def test_failing_run_of_a_nested_optimize_many_aborts_only_the_runs_of_that_call() -> (
-    None
-):
-    outcomes: list[tuple[OptimizationResult | Exception, ...]] = []
+def test_failing_run_of_a_nested_offload_aborts_only_the_runs_of_that_offload() -> None:
+    # Both runs are inside their first evaluation when one fails. The offload
+    # does not wait for the run it aborts, so that run records the exit code it
+    # was aborted with.
+    started = threading.Barrier(2, timeout=30)
+    exit_codes: list[ExitCode] = []
+    recorded = threading.Event()
+    caught: list[type[Exception]] = []
 
     with session() as opened:
         outer = opened.thread_pool(workers=1)
@@ -250,28 +272,27 @@ def test_failing_run_of_a_nested_optimize_many_aborts_only_the_runs_of_that_call
         def objective(
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
+            run = partial(opened.optimize, _CONFIG, _INITIAL)
+            fails = _fails_once_both_evaluate(started)
+            waits = _records_its_abort(started, exit_codes, recorded)
             try:
-                opened.optimize_many(
-                    _CONFIG, np.tile(_INITIAL, (2, 1)), [_boom, _waits_until_aborted]
-                )
-            except RunsFailedError as exc:
-                outcomes.append(exc.outcomes)
+                opened.offload([partial(run, fails), partial(run, waits)])
+            except ValueError as exc:
+                caught.append(type(exc))
             return _sphere(variables, context)
 
-        result = outer.optimize(_CONFIG, _INITIAL, objective)
+        result = outer.evaluate(_CONFIG, _INITIAL, objective)
+        assert recorded.wait(timeout=30)
 
     assert result.exit_code == ExitCode.FINISHED
-    assert outcomes
-    for failed, aborted in outcomes:
-        assert isinstance(failed, ValueError)
-        assert not isinstance(aborted, Exception)
-        assert aborted.exit_code == ExitCode.ABORTED_ON_ERROR
+    assert caught == [ValueError]
+    assert exit_codes == [ExitCode.ABORTED_ON_ERROR]
 
 
 @pytest.mark.timeout(60)
-def test_nested_optimize_many_is_aborted_with_its_parent() -> None:
-    # The offload it is nested in has failed before the call starts, so its runs
-    # are aborted at once instead of running.
+def test_nested_session_offload_is_aborted_with_its_parent() -> None:
+    # The offload it is nested in has failed before the call starts, so it is
+    # aborted at once instead of running.
     failed = threading.Event()
     done = threading.Event()
     exit_codes: list[ExitCode] = []
@@ -283,10 +304,10 @@ def test_nested_optimize_many_is_aborted_with_its_parent() -> None:
         def _optimizes_after_the_failure() -> None:
             try:
                 assert failed.wait(timeout=30)
-                results = opened.optimize_many(
-                    _CONFIG, np.tile(_INITIAL, (2, 1)), _sphere
-                )
-                exit_codes.extend(result.exit_code for result in results)
+                run = partial(opened.optimize, _CONFIG, _INITIAL, _sphere)
+                opened.offload([run, run])
+            except AbortedError as exc:
+                exit_codes.append(exc.exit_code)
             finally:
                 done.set()
 
@@ -304,7 +325,7 @@ def test_nested_optimize_many_is_aborted_with_its_parent() -> None:
         assert done.wait(timeout=30)
 
     assert result.exit_code == ExitCode.FINISHED
-    assert exit_codes == [ExitCode.ABORTED_ON_ERROR] * 2
+    assert exit_codes == [ExitCode.ABORTED_ON_ERROR]
 
 
 def _start_plain(target: Callable[[], None]) -> threading.Thread:
