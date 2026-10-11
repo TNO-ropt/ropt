@@ -3301,10 +3301,12 @@ evaluations to finish, so one handed the pool it is already running on would
 wait for the workers it is itself occupying — a deadlock as soon as they are all
 busy, which is the normal case, since an optimization fills its pool with one
 work item per realization. Rather than hang, the pool refuses work submitted by
-the evaluation itself with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A
-thread the evaluation starts is not recognized as a worker, so work submitted
-from it is not refused and can still deadlock on the pool. Give the inner
-optimization its own pool, or none at all, which evaluates inline.</p>
+the evaluation itself with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
+The same holds for work submitted from a thread that the evaluation starts with
+<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>Session.run</code></a>, or through <code>contextvars.copy_context().run</code>.
+A thread started in any other way is not recognized as a worker, so work
+submitted from it is not refused and can still deadlock on the pool. Give the
+inner optimization its own pool, or none at all, which evaluates inline.</p>
 <p>The evaluation must stay <strong>in your process</strong>, so on a thread pool or with no
 pool. On a process, local, or HPC pool the evaluation function is copied
 into a worker, and a pool cannot be copied with it: open a session and build
