@@ -217,10 +217,11 @@ The two are not the same kind of ending, which is why they have different exit
 codes. A `report` callback stops the run *on a criterion*, at a point it chose.
 An abort applies no criterion: the result is whatever the run had reached.
 
-An aborted run ends at its next evaluation boundary. With no pool, or on a thread
-or process pool, the evaluations already in flight are still carried out, and
-their workers are free only once they return. On a local or HPC pool they are
-cancelled.
+An aborted run does not wait for the evaluations that are running. With no pool,
+the evaluation function runs in the calling thread, so the call in progress
+returns first. On a thread or process pool, the evaluations already running
+continue after the run has ended, and their workers are free only once they
+return. On a local or HPC pool they are cancelled.
 
 `abort()` reaches the runs that are under way at the moment it is called, and
 nothing more. A run started afterwards is unaffected, so a

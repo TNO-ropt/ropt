@@ -21,6 +21,7 @@ from .base import (
     ExecutorFailure,
     WorkItem,
     _calls,
+    _log_left_running,
     _run_bundle,
     _stopped,
 )
@@ -43,16 +44,18 @@ class ProcessExecutor(ExecutorBase):
     point must use.
 
     Warning:
-        A worker process runs its work item to the end. A program a work item
-        started itself keeps running, without an error being raised. Use
+        A worker process runs its work item to the end, and an abort does not
+        wait for it: `run` returns at once, and an exception the work item
+        raises afterwards is logged. A program a work item started itself keeps
+        running, without an error being raised. Use
         [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] where
         an evaluation launches external programs.
 
     Note:
-        An abort also runs one bundle that was submitted but not yet started:
-        the pool marks a bundle as running when it moves it towards a worker,
-        so it can no longer be withdrawn. See
-        [Releasing a batch](../advanced/parallel.md#releasing-a-batch).
+        An abort also leaves one bundle running that was submitted but not yet
+        started: the pool marks a bundle as running when it moves it towards a
+        worker, so it can no longer be withdrawn. See
+        [Stopping a run](../running/parallel.md#stopping-a-run).
     """
 
     def __init__(
@@ -126,19 +129,14 @@ class ProcessExecutor(ExecutorBase):
         try:
             while pending or futures:
                 if abort_signal is not None and abort_signal.aborting:
-                    # Work not yet sent is dropped here; work already with a
-                    # worker is collected below, since it runs whether or not
-                    # anyone is still waiting for it.
-                    pending.clear()
+                    break
                 unsent = self._submit_pending(pending, futures, done, abort_signal)
                 _store_unsent(unsent, store)
                 if not futures:
                     continue
                 item = done.get()
                 if item is None:
-                    for future in list(futures):
-                        future.cancel()
-                    continue
+                    break
                 index = futures.pop(item)
                 self._payload_gate.release()
                 if not item.cancelled():
@@ -148,8 +146,15 @@ class ProcessExecutor(ExecutorBase):
                 abort_signal.remove_callback(wake)
                 abort_signal.remove_callback(self._payload_gate.wake)
             for future in futures:
-                future.cancel()
-                self._payload_gate.release()
+                if future.cancel():
+                    self._payload_gate.release()
+                else:
+                    future.add_done_callback(self._end_left_running)
+
+    def _end_left_running(self, future: Future[tuple[bool, bytes]]) -> None:
+        # A payload holds its slot until its work ends, waited for or not.
+        self._payload_gate.release()
+        _log_left_running(_bundle_result, future)
 
     def _submit_pending(
         self,

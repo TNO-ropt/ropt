@@ -64,7 +64,7 @@ from ropt.context import EnOptContext
 from ropt.exceptions import ExecutionError, WorkflowError
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Generator, Sequence
 
     from numpy.typing import NDArray
 
@@ -1410,10 +1410,10 @@ def test_a_returned_exception_is_a_result_rather_than_a_failure() -> None:
     assert isinstance(results[0], ValueError)
 
 
-def test_an_abort_wakes_a_blocked_executor() -> None:
+def test_an_abort_does_not_wait_for_work_already_running() -> None:
     # The first call holds the only worker, so the other two are still queued
-    # when the abort arrives and must be dropped rather than run. A thread
-    # cannot be interrupted, so the first one is waited out and kept.
+    # when the abort arrives and must not start. A thread cannot be interrupted,
+    # so `run` has to return while the first one is still blocked.
     signal = AbortSignal()
     started = threading.Event()
     release = threading.Event()
@@ -1439,53 +1439,98 @@ def test_an_abort_wakes_a_blocked_executor() -> None:
         driver.start()
         assert started.wait(timeout=4.0)
         signal.abort()
-        # Still blocked, so nothing below can be explained by the batch ending.
-        assert not release.is_set()
-        release.set()
         driver.join(timeout=4.0)
         assert not driver.is_alive()
+        assert not release.is_set()
     finally:
         release.set()
 
     assert not ran
-    assert not isinstance(results[0], WorkNotRun)
-    assert all(isinstance(value, WorkNotRun) for value in results[1:])
+    assert all(isinstance(value, WorkNotRun) for value in results)
 
 
-def test_an_abort_keeps_the_error_of_work_already_running() -> None:
-    # Discarding a running work item would lose what it raised, and a run that
-    # is aborted while its own evaluation fails would report only the abort.
+class _RecordWaiter(logging.Handler):
+    def __init__(self, text: str) -> None:
+        super().__init__()
+        self.text = text
+        self.seen = threading.Event()
+
+    @override
+    def emit(self, record: logging.LogRecord) -> None:
+        if self.text in record.getMessage():
+            self.seen.set()
+
+
+@contextlib.contextmanager
+def _waiting_for_log(text: str) -> Generator[threading.Event]:
+    # Work left running logs from a thread of its own, so the test waits for the
+    # record rather than for a fixed time.
+    waiter = _RecordWaiter(text)
+    logger = logging.getLogger("ropt")
+    logger.addHandler(waiter)
+    try:
+        yield waiter.seen
+    finally:
+        logger.removeHandler(waiter)
+
+
+def test_an_error_raised_by_work_left_running_is_logged() -> None:
     signal = AbortSignal()
     started = threading.Event()
-    aborted = threading.Event()
+    release = threading.Event()
 
-    def _fail_once_aborted() -> int:
+    def _fail_once_released() -> int:
         started.set()
-        assert aborted.wait(timeout=30)
-        msg = "boom"
+        assert release.wait(timeout=5.0)
+        msg = "left running"
         raise ValueError(msg)
 
-    executor = ThreadExecutor(workers=1)
-    items = [
-        WorkItem(function=_fail_once_aborted),
-        WorkItem(function=_function, args=(1,)),
-    ]
-    raised: list[BaseException] = []
+    def _abort_once_started() -> None:
+        assert started.wait(timeout=5.0)
+        signal.abort()
+
+    aborter = threading.Thread(target=_abort_once_started)
+    with _waiting_for_log("left running") as logged:
+        aborter.start()
+        results = ThreadExecutor(workers=1).run(
+            [WorkItem(function=_fail_once_released)], abort_signal=signal
+        )
+        aborter.join(timeout=5.0)
+        release.set()
+        assert logged.wait(timeout=5.0)
+    assert isinstance(results[0], WorkNotRun)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(60)
+def test_an_abort_does_not_wait_for_work_running_in_a_process(tmp_path: Path) -> None:
+    # The work item blocks in the worker until the test disconnects, so `run`
+    # can only return first if the abort does not wait for it. Disconnecting
+    # then makes the work item raise, which is logged.
+    listener = Listener(str(tmp_path / "worker"))
+    executor = ProcessExecutor(workers=1)
+    signal = AbortSignal()
+    results: list[Any] = []
+    connection = None
 
     def _drive() -> None:
-        try:
-            executor.run(items, abort_signal=signal)
-        except ValueError as exc:
-            raised.append(exc)
+        item = WorkItem(function=_block_until_disconnected, args=(listener.address,))
+        results.extend(executor.run([item], abort_signal=signal))
 
-    driver = threading.Thread(target=_drive)
-    driver.start()
-    assert started.wait(timeout=4.0)
-    signal.abort()
-    aborted.set()
-    driver.join(timeout=10.0)
-    assert not driver.is_alive()
-    assert [str(exc) for exc in raised] == ["boom"]
+    driver = threading.Thread(target=_drive, daemon=True)
+    with _waiting_for_log("EOFError") as logged:
+        try:
+            driver.start()
+            connection = listener.accept()
+            signal.abort()
+            driver.join(timeout=10.0)
+            assert not driver.is_alive()
+            assert isinstance(results[0], WorkNotRun)
+        finally:
+            if connection is not None:
+                connection.close()
+            listener.close()
+        assert logged.wait(timeout=30.0)
 
 
 @pytest.mark.slow

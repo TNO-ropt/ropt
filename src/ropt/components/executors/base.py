@@ -8,8 +8,10 @@ does the work of getting them, and an executor owns no thread of its own.
 
 Whatever a scope acquires, that scope releases. A batch acquires cluster jobs
 and worker processes, and `run`'s `finally` releases them, so nothing a batch
-started outlives it. An executor acquires its workers, and releases them when it
-is collected, so there is nothing for a caller to close.
+started outlives it. The exception is a call already running on a worker thread
+or process when the batch is aborted: it cannot be stopped, so it runs to its
+end after `run` has returned. An executor acquires its workers, and releases
+them when it is collected, so there is nothing for a caller to close.
 
 Reading the caller's own location to refuse a call that could only hang leaves
 the meaning of an operation fixed by its arguments: a thread already running one
@@ -24,14 +26,18 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, override
 
-from ropt.exceptions import ExecutorStopped, WorkflowError
+from ropt._logging import get_logger
+from ropt.exceptions import AbortedError, ExecutorStopped, WorkflowError
 
 from ._picklable import picklable_exception
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+    from concurrent.futures import Future
 
     from ropt.components.concurrency import AbortSignal
+
+_logger = get_logger(__name__)
 
 _ON_WORKER = (
     "This executor cannot be used from work that is already running on it: the "
@@ -42,7 +48,9 @@ _ON_WORKER = (
 
 _STOPPED = "The executor can no longer run this work."
 
-_NOT_RUN = "The work item was not run: the batch was aborted."
+_NOT_RUN = "The work item has no result: the batch was aborted."
+
+_LEFT_RUNNING = "A work item that was still running when its batch returned raised: %r"
 
 
 @dataclass(kw_only=True)
@@ -79,14 +87,15 @@ class ExecutorFailure:
 
 @dataclass(frozen=True)
 class WorkNotRun:
-    """A work item was never attempted.
+    """A work item has no result because its batch was aborted.
 
     Returned in the work item's position when the batch it belonged to was
-    aborted before the item ran, so nothing about the item or the executor
-    failed.
+    aborted before the item finished: it was never started, it was cancelled,
+    or it was still running when the batch returned. Nothing about the item or
+    the executor failed.
 
     Attributes:
-        message: Why it was not attempted.
+        message: Why it has no result.
     """
 
     message: str
@@ -127,6 +136,22 @@ def _run_bundle(
     return results
 
 
+def _log_left_running(
+    outcome: Callable[[Future[Any]], Any], future: Future[Any]
+) -> None:
+    # Work that its batch no longer waits for has no caller left to raise into.
+    # An abort it passed on is the batch's own abort, not an error of the work.
+    try:
+        bundle_result = outcome(future)
+    except Exception as exc:  # ruff: ignore[blind-except]
+        bundle_result = [_Raised(exc)]
+    if not isinstance(bundle_result, list):
+        return
+    for item in bundle_result:
+        if isinstance(item, _Raised) and not isinstance(item.error, AbortedError):
+            _logger.warning(_LEFT_RUNNING, item.error, exc_info=item.error)
+
+
 class Executor(ABC):
     """Abstract base class for executor components within an optimization workflow.
 
@@ -152,9 +177,10 @@ class Executor(ABC):
     ) -> list[Any]:
         """Run the calls and return their results, in the order they were given.
 
-        Blocks until every call has a result. A call the machinery could not run
-        gets an [`ExecutorFailure`][ropt.components.executors.ExecutorFailure]
-        in its position, and a call that was never attempted gets a
+        Blocks until every call has a result, or until `abort_signal` fires. A
+        call the machinery could not run gets an
+        [`ExecutorFailure`][ropt.components.executors.ExecutorFailure] in its
+        position, and a call left without a result by an abort gets a
         [`WorkNotRun`][ropt.components.executors.WorkNotRun].
 
         An exception raised by a call's own function is re-raised here, without
@@ -163,11 +189,12 @@ class Executor(ABC):
 
         An `abort_signal` that fires aborts the batch: queued calls are never
         started, started ones are cancelled where the mechanism allows it, and
-        each call that did not run gets a `WorkNotRun`. Calls already running on
-        a worker thread or process run to their end, and so does a call the
-        mechanism has handed to a worker but can no longer withdraw, which gets
-        its result rather than a `WorkNotRun`. See
-        [Releasing a batch](../advanced/parallel.md#releasing-a-batch).
+        `run` returns without waiting for the rest. Each call that did not
+        finish gets a `WorkNotRun`. A call already running on a worker thread
+        or process cannot be stopped, and neither can a call the mechanism has
+        handed to a worker but can no longer withdraw: both run to their end
+        after `run` has returned, and an exception they raise is logged as a
+        warning. See [Stopping a run](../running/parallel.md#stopping-a-run).
 
         May be called from any thread, except one of the executor's own workers:
         that caller would wait for workers it is itself occupying, so it is

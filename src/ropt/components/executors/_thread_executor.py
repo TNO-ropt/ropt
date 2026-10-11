@@ -16,6 +16,7 @@ from .base import (
     WorkItem,
     WorkNotRun,
     _calls,
+    _log_left_running,
     _run_bundle,
     _stopped,
 )
@@ -36,7 +37,9 @@ class ThreadExecutor(ExecutorBase):
 
     Warning:
         A thread cannot be interrupted. Work that has already started runs to
-        completion, and the interpreter waits for it before exiting.
+        completion, and the interpreter waits for it before exiting. An abort
+        does not wait for it: `run` returns at once, and an exception the work
+        raises afterwards is logged.
     """
 
     def __init__(self, *, workers: int = 1, bundle_size: int = 1) -> None:
@@ -84,13 +87,7 @@ class ThreadExecutor(ExecutorBase):
             while futures:
                 item = done.get()
                 if item is None:
-                    # Dropping a bundle that is still queued is what an abort
-                    # can do here. One already on a worker cannot be
-                    # interrupted, so it is waited for and its outcome kept:
-                    # discarding it would lose whatever it raised.
-                    for future in list(futures):
-                        future.cancel()
-                    continue
+                    break
                 index = futures.pop(item)
                 if not item.cancelled():
                     store(index, item.result())
@@ -98,7 +95,10 @@ class ThreadExecutor(ExecutorBase):
             if abort_signal is not None:
                 abort_signal.remove_callback(wake)
             for future in futures:
-                future.cancel()
+                # A bundle already on a worker cannot be interrupted, so it is
+                # left to finish.
+                if not future.cancel():
+                    future.add_done_callback(partial(_log_left_running, Future.result))
 
     def _submit(
         self, bundle: list[WorkItem], abort_signal: AbortSignal | None

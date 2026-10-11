@@ -71,8 +71,8 @@ def _run(
         abort_signal=signal,
     )
     not_run = any(isinstance(value, WorkNotRun) for value in values)
-    # Both conditions: an abort that arrived after every call had run kept
-    # none from running, and is not reported as one.
+    # Both conditions: an abort that arrived after every call had finished cost
+    # none of them its result, and is not reported as one.
     if not_run and signal.aborting:
         raise AbortedError(signal.exit_code)
     for value in values:

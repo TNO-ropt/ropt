@@ -228,9 +228,9 @@ def test_handler_can_offload(pools: Callable[..., WorkerPool]) -> None:
 
 
 @pytest.mark.timeout(60)
-def test_an_offload_that_completes_despite_an_abort_returns_its_results() -> None:
-    # The call is already on a worker when the abort arrives, and a worker
-    # cannot be interrupted, so nothing was lost and nothing is dropped.
+def test_an_offload_aborted_while_its_function_runs_raises() -> None:
+    # The function is already on a worker when the abort arrives. A worker
+    # cannot be interrupted, and `offload` does not wait for it.
     with session() as opened:
         pool = opened.thread_pool(workers=1)
 
@@ -238,7 +238,9 @@ def test_an_offload_that_completes_despite_an_abort_returns_its_results() -> Non
             opened.abort()
             return 7
 
-        assert pool.offload(_abort_then_return) == 7
+        with pytest.raises(AbortedError) as raised:
+            pool.offload(_abort_then_return)
+    assert raised.value.exit_code is ExitCode.USER_ABORT
 
 
 @pytest.mark.parametrize("exit_code", [ExitCode.ABORTED, ExitCode.ABORTED_ON_ERROR])

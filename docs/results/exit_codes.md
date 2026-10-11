@@ -76,7 +76,7 @@ linear constraints as well as the nonlinear ones. See
 
 [`WorkerPool.offload`][ropt.WorkerPool.offload] returns whatever its
 callables return, so there is no result object to carry an exit code. An
-`offload` with a callable that an abort kept from running raises
+`offload` aborted before all of its callables have finished raises
 [`AbortedError`][ropt.exceptions.AbortedError] instead, whose
 `exit_code` attribute says why: an abort that was asked for, one another run
 caused, or `EXECUTOR_SHUT_DOWN` when the pool could no longer run the work.

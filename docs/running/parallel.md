@@ -481,8 +481,8 @@ started may still be alive afterwards.
 
 **A process pool also finishes one evaluation it had not started.** It keeps one
 more evaluation submitted than it has workers, and a submitted evaluation can no
-longer be cancelled, so that one runs too before the run ends. It is one
-evaluation however many are left to do.
+longer be cancelled, so that one runs too, although the run does not wait for
+it. It is one evaluation however many are left to do.
 
 !!! tip "If Ctrl-C seems to do nothing at all"
     Some third-party packages change a process-wide setting when imported that
@@ -575,14 +575,14 @@ separate processes.
 [Failures and Aborts](failures.md) describes tasks and how a failure or an abort
 reaches them. When a callable raises, `offload` aborts the other callables and
 raises the exception at once. `offload` returns whatever its callables return
-and so has nowhere to report a reason: when an abort kept one of its callables
-from running, `offload` raises [`AbortedError`][ropt.exceptions.AbortedError],
-whose `exit_code` distinguishes an abort that was asked for from one that a
-failure caused, and reports `EXECUTOR_SHUT_DOWN` when the pool could no longer
-run the work. On a thread or process pool, a callable that is already running
-when the abort arrives runs to its end, so an abort that arrives after the last
-callable has started costs nothing, and `offload` returns the results. On a
-local or HPC pool, running callables are cancelled as well.
+and so has nowhere to report a reason: when an abort arrives before all of its
+callables have finished, `offload` raises
+[`AbortedError`][ropt.exceptions.AbortedError] at once. Its `exit_code`
+distinguishes an abort that was asked for from one that a failure caused, and is
+`EXECUTOR_SHUT_DOWN` when the pool could no longer run the work. `offload` does
+not wait for a callable that is still running: on a thread or process pool it
+runs to its end, and an exception it raises is logged as a warning; on a local
+or HPC pool it is cancelled.
 
 !!! warning "Offloaded work coordinates with nothing"
     An offloaded callable runs wherever its pool puts it, and on a process,

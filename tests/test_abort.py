@@ -215,9 +215,9 @@ def test_an_in_process_evaluation_batch_is_aborted_between_its_rows() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_an_evaluation_that_completes_despite_an_abort_reports_its_results() -> None:
-    # The single vector is already on a worker when the abort arrives, and a
-    # worker cannot be interrupted, so nothing was lost and nothing is dropped.
+def test_an_evaluation_aborted_while_its_vector_runs_has_no_results() -> None:
+    # The single vector is already on a worker when the abort arrives. A worker
+    # cannot be interrupted, and the evaluation does not wait for it.
     with session() as opened:
         pool = opened.thread_pool(workers=1)
 
@@ -229,8 +229,8 @@ def test_an_evaluation_that_completes_despite_an_abort_reports_its_results() -> 
 
         outcome = pool.evaluate(_CONFIG, _INITIAL, objective)
 
-    assert outcome.exit_code == ExitCode.FINISHED
-    assert outcome.results is not None
+    assert outcome.exit_code == ExitCode.USER_ABORT
+    assert outcome.results is None
 
 
 @pytest.mark.timeout(60)
@@ -404,6 +404,8 @@ def test_session_abort_aborts_the_runs_queued_behind_the_limit() -> None:
 def test_an_aborted_run_does_not_report_a_failure() -> None:
     # The evaluation raises because its run was aborted. Reporting that as a
     # failure would abort a run that started after the abort and is innocent.
+    # The aborted run has no pool, so it waits for its evaluation and raises
+    # what the evaluation raised.
     aborted_started = threading.Barrier(2, timeout=30)
     running = threading.Barrier(2, timeout=30)
     release = threading.Event()
@@ -411,12 +413,11 @@ def test_an_aborted_run_does_not_report_a_failure() -> None:
     raised: list[BaseException] = []
 
     with session() as opened:
-        aborted_pool = opened.thread_pool(workers=1)
         fresh_pool = opened.thread_pool(workers=1)
 
         def _aborted_run() -> None:
             try:
-                aborted_pool.optimize(
+                opened.optimize(
                     _CONFIG, _INITIAL, _waits_then_raises(aborted_started, release)
                 )
             except ValueError as exc:

@@ -126,19 +126,25 @@ This also holds when the nested task belongs to another session, as one started
 with the module-level `optimize` does. A nested task that starts after its
 parent was aborted is aborted at once.
 
-An aborted optimization ends at its next evaluation boundary, keeping the best
-result it had reached, and an aborted evaluation returns no results; see
-[Exit Codes](../results/exit_codes.md). A function given to `offload` cannot stop
-part way. If it has not started, it is not run, and `offload` raises
+An aborted optimization ends without waiting for the evaluations that are
+running, keeping the best result it had reached, and an aborted evaluation
+returns no results; see [Exit Codes](../results/exit_codes.md). A function given
+to `offload` cannot stop part way. If it has not started, it is not run, and if
+it is running, `offload` does not wait for it: either way `offload` raises
 [`AbortedError`][ropt.exceptions.AbortedError] with the exit code of the abort.
-If it is already running, what happens depends on the pool, and the same holds
-for an evaluation that is in flight:
+What happens to work that is already running depends on the pool:
 
 | Pool | Work already running when its task is aborted |
 | --- | --- |
-| none, `thread_pool` or `process_pool` | runs to its end |
+| none | runs to its end, and the task ends after it |
+| `thread_pool` or `process_pool` | runs to its end, but the task does not wait for it |
 | `local_pool` | is killed, together with everything it launched |
 | `hpc_pool` | its cluster job is cancelled |
+
+Without a pool, the evaluation function runs in the thread that started the
+task, so the call in progress has to return first. On a thread or process pool,
+an exception raised by work that the task no longer waits for is logged as a
+warning, unless it is an `AbortedError`.
 
 `offload` also raises `AbortedError` when its pool can no longer run the work.
 In an evaluation function, returning `NaN` for that counts the realization as
