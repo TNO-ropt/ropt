@@ -113,6 +113,11 @@ has closed, or on one of its pools, raises
 exception raised by a task that is being aborted is still raised, but aborts
 nothing further.
 
+A `KeyboardInterrupt` or `SystemExit` is not a failure. When one passes through
+a task, the tasks nested in it and the other tasks of the same `offload` are
+aborted with `ABORTED`, and the exception is raised. Other tasks on the session
+are not aborted until the exception leaves the session's `with` block.
+
 A failure does not abort the tasks of another session, unless they are nested in
 one that it aborts. A module-level function such as [`optimize`][ropt.optimize]
 opens a session of its own, which holds only the tasks started by that function.
@@ -121,7 +126,8 @@ opens a session of its own, which holds only the tasks started by that function.
 
 A nested task is aborted when its parent is, with the same exit code:
 `USER_ABORT` after [`Session.abort`](running.md#stopping-from-outside), `ABORTED`
-when the session's `with` block ends, and `ABORTED_ON_ERROR` after a failure.
+when the session's `with` block ends or a `KeyboardInterrupt` or `SystemExit`
+passes through the parent, and `ABORTED_ON_ERROR` after a failure.
 This also holds when the nested task belongs to another session, as one started
 with the module-level `optimize` does. A nested task that starts after its
 parent was aborted is aborted at once.

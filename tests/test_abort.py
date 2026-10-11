@@ -15,6 +15,7 @@ import pytest
 from pydantic import ValidationError
 
 from ropt import session
+from ropt.components.concurrency import parent_signal
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
 
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
         OptimizationResult,
         Session,
     )
+    from ropt.components.concurrency import AbortSignal
     from ropt.results import FunctionResults
 
 _INITIAL = np.array([0.0, 0.0, 0.1])
@@ -108,6 +110,50 @@ def _waits_then_raises(barrier: threading.Barrier, release: threading.Event) -> 
         return 0.0
 
     return objective
+
+
+def _records_its_signal_then_raises(
+    seen: list[AbortSignal], error: type[BaseException]
+) -> Any:
+    # Work started from the evaluation function takes this signal as its parent,
+    # so whether it aborts is what reaches that work.
+    def objective(
+        _variables: NDArray[np.float64], _context: EvaluationFunctionContext
+    ) -> float:
+        signal = parent_signal()
+        assert signal is not None
+        seen.append(signal)
+        raise error
+
+    return objective
+
+
+@pytest.mark.parametrize("error", [KeyboardInterrupt, SystemExit])
+def test_an_optimization_ended_by_a_base_exception_aborts_the_work_it_started(
+    error: type[BaseException],
+) -> None:
+    seen: list[AbortSignal] = []
+    with session() as opened:
+        with pytest.raises(error):
+            opened.optimize(
+                _CONFIG, _INITIAL, _records_its_signal_then_raises(seen, error)
+            )
+        assert seen[0].aborting
+        assert seen[0].exit_code is ExitCode.ABORTED
+
+
+@pytest.mark.parametrize("error", [KeyboardInterrupt, SystemExit])
+def test_an_evaluation_ended_by_a_base_exception_aborts_the_work_it_started(
+    error: type[BaseException],
+) -> None:
+    seen: list[AbortSignal] = []
+    with session() as opened:
+        with pytest.raises(error):
+            opened.evaluate(
+                _CONFIG, _INITIAL, _records_its_signal_then_raises(seen, error)
+            )
+        assert seen[0].aborting
+        assert seen[0].exit_code is ExitCode.ABORTED
 
 
 def _hold_at(barrier: threading.Barrier, release: threading.Event) -> int:

@@ -69,7 +69,7 @@ def _build_optimization(  # ruff: ignore[too-many-arguments]
     return context, step, result_handler
 
 
-def _optimize(  # ruff: ignore[too-many-arguments]
+def _optimize(  # ruff: ignore[too-many-arguments, complex-structure]
     session: Session,
     executor: Executor | None,
     config: dict[str, Any],
@@ -139,6 +139,10 @@ def _optimize(  # ruff: ignore[too-many-arguments]
                 optimize_many_signal.abort(ExitCode.ABORTED_ON_ERROR)
             if failure_aborts_session:
                 session._fail()  # ruff: ignore[private-member-access]
+        raise
+    except BaseException:
+        # Not a failure, but the work started from this run must not outlive it.
+        signal.abort(ExitCode.ABORTED)
         raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]

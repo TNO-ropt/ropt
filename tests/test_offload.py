@@ -14,7 +14,7 @@ import numpy as np
 import pytest
 
 from ropt import session
-from ropt.components.concurrency import AbortSignal
+from ropt.components.concurrency import AbortSignal, parent_signal
 from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
 from ropt.enums import EnOptEventType, ExitCode
@@ -187,6 +187,27 @@ def test_offload_base_exception_reaches_caller(
     # is delivered to the caller, which is where it means something.
     with pytest.raises((SystemExit, KeyboardInterrupt)):
         pools(workers=2).offload(work)
+
+
+@pytest.mark.timeout(30)
+@pytest.mark.parametrize("error", [KeyboardInterrupt, SystemExit])
+def test_an_offload_ended_by_a_base_exception_aborts_the_work_it_started(
+    pools: Callable[..., WorkerPool], error: type[BaseException]
+) -> None:
+    # Work started from the offloaded function takes this signal as its parent,
+    # so whether it aborts is what reaches that work.
+    seen: list[AbortSignal] = []
+
+    def _record_then_raise() -> int:
+        signal = parent_signal()
+        assert signal is not None
+        seen.append(signal)
+        raise error
+
+    with pytest.raises(error):
+        pools(workers=1).offload(_record_then_raise)
+    assert seen[0].aborting
+    assert seen[0].exit_code is ExitCode.ABORTED
 
 
 class _OffloadingHandler(EventHandler):

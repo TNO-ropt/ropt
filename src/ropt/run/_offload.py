@@ -56,6 +56,11 @@ def _offload[T](
             if failure_aborts_session:
                 session._fail()  # ruff: ignore[private-member-access]
         raise
+    except BaseException:
+        # Not a failure, but the work started from this offload must not
+        # outlive it.
+        signal.abort(ExitCode.ABORTED)
+        raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]
 
