@@ -15,6 +15,7 @@ from __future__ import annotations
 import threading
 from typing import TYPE_CHECKING, Any, Self, overload
 
+from ropt.components.concurrency import parent_signal
 from ropt.components.executors import (
     HPCExecutor,
     LocalJobExecutor,
@@ -333,7 +334,14 @@ class Session:
             ValueError:    If `limit` is less than one.
             WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
-        return _offload(self, DaemonThreadExecutor(limit=limit), work)
+        try:
+            executor = DaemonThreadExecutor(limit=limit)
+        except ValueError:
+            # Arguments that do not fit fail the offload before it starts.
+            if parent_signal() is None:
+                self._fail()
+            raise
+        return _offload(self, executor, work)
 
     def thread_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker threads.

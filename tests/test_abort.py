@@ -560,6 +560,38 @@ def test_an_evaluation_that_cannot_be_built_aborts_the_runs_beside_it() -> None:
     assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
 
 
+@pytest.mark.timeout(60)
+def test_a_session_offload_with_an_invalid_limit_aborts_the_runs_beside_it() -> None:
+    # The failure is in the arguments of the call, before any task is created,
+    # so this thread is the barrier's second party rather than the failing call.
+    started = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    outcome: list[OptimizationResult] = []
+
+    with session() as opened:
+        surviving = opened.thread_pool(workers=1)
+
+        def _survivor() -> None:
+            outcome.append(
+                surviving.optimize(
+                    _CONFIG, _INITIAL, _waits_then_holds(started, release)
+                )
+            )
+
+        driver = threading.Thread(target=_survivor)
+        driver.start()
+        try:
+            started.wait(timeout=30)
+            with pytest.raises(ValueError, match="at least one"):
+                opened.offload(partial(int, 1), limit=0)
+        finally:
+            release.set()
+            driver.join(timeout=30)
+
+    assert not driver.is_alive()
+    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
+
+
 @pytest.mark.parametrize(
     ("call", "variables", "message"),
     [
