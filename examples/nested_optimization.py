@@ -1,16 +1,18 @@
-"""Nested optimization: an inner run per outer evaluation, on its own pool.
+"""Nested optimization: an inner optimization per outer evaluation, on its own pool.
 
 Each evaluation of the outer optimization runs an inner optimization over the
 remaining variables. The two layers use **different** pools, which is what
 makes this safe: the outer evaluations run on a thread pool, so each stays in
 this process and can reach the inner pool, and the inner evaluations run on a
-process pool of their own. Handing the inner run the pool it is already running
-on would instead be refused, since it would wait for the workers it occupies.
+process pool of their own. Handing the inner optimization the pool it is already
+running on would instead be refused, since it would wait for the workers it
+occupies.
 
-The inner runs all feed one `DataFrameHandler`. They overlap, which the handler
-allows: `handle_event` serializes its own calls, so a second run waits for the
-first. Each inner run tags its results with the outer evaluation that started
-it, so every row in the frame can be traced back.
+The inner optimizations all feed one `DataFrameHandler`. They overlap, which the
+handler allows: `handle_event` serializes its own calls, so a second
+optimization waits for the first. Each inner optimization tags its results with
+the outer evaluation that started it, so every row in the frame can be traced
+back.
 
 The outer optimizer works on integer variables and revisits points it has
 already tried. The outer evaluation function keeps a memo of the objectives it
@@ -118,13 +120,13 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         variables: The outer variable vector to evaluate.
         context:   The evaluation context, identifying this outer evaluation.
         pool:      The pool the inner evaluations run on.
-        tables:    The handler every inner run feeds.
+        tables:    The handler every inner optimization feeds.
         function:  The objective the inner optimization minimizes.
         memo:      Objectives already computed, keyed by outer point.
 
     Returns:
         The best inner objective found at this outer point, or `NaN` if the
-        inner run ended with too few successful realizations.
+        inner optimization ended with too few successful realizations.
     """
     # --8<-- [start:inner]
     key = (context.realization, *variables.tolist())
@@ -137,7 +139,7 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         function,
         handlers=[tables],
         # A whole inner batch goes to one worker: the parallelism comes from the
-        # outer runs.
+        # outer evaluations.
         bundle_size=0,
         # Within a batch only (batch_id, row_idx) is unique: several rows share
         # a realization, so realization alone would not identify the caller.
@@ -211,7 +213,7 @@ def main() -> None:
     assert best["Objective"] < 1.0
 
     # Every inner result carries the outer evaluation that produced it, and the
-    # inner runs share one pool, so their batch IDs never collide.
+    # inner optimizations share one pool, so their batch IDs never collide.
     assert frame.height > 0
     assert frame["Inner-batch"].n_unique() == frame.height
     assert frame["Outer-batch"].null_count() == 0

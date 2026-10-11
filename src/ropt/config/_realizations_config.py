@@ -22,7 +22,7 @@ class RealizationsConfig(BaseModel):
     detailed descriptions and usage examples.
 
     `realization_min_success` defaults to the number of realizations, so a
-    single failure ends the run.
+    single failure ends the optimization.
 
     Attributes:
         weights:                 Weights for the realizations (default: 1.0).

@@ -429,25 +429,26 @@ which runs the same problem unscaled, with `auto_scale` on the objective, and
 with a variable scale, printing both domains each time. It shows that
 `auto_scale` divides the reported objective by a large factor while leaving the
 solution where it was, so only `functions.objectives` and `variables` can be
-compared between runs.
+compared between optimizations.
 
 ## Metadata
 
 Results carry two independent kinds of metadata, neither interpreted by `ropt`:
 
 - **Result metadata** — the `metadata` dict on every
-  [`Results`][ropt.results.Results] object, identical for every result of a run.
-  It is set once when the run starts: pass a `metadata` dict to the
-  [`optimize`][ropt.optimize] /
-  [`evaluate`][ropt.evaluate] functions. Use it to tag or identify a
-  run, for example `{"run_id": 7}`.
+  [`Results`][ropt.results.Results] object, identical for every result of one
+  optimization or evaluation. It is set once, at the start: pass a `metadata`
+  dict to the [`optimize`][ropt.optimize] / [`evaluate`][ropt.evaluate]
+  functions. Use it to tag or identify an optimization, for example
+  `{"run_id": 7}`.
 - **Per-realization metadata** — the `metadata` dict on the `evaluations` field,
   with one array entry per realization. It is produced by the objective when it
   returns an
   [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
   with a `metadata` field.
 
-Result metadata is passed to the run and read back from `metadata`:
+Result metadata is passed to `optimize` or `evaluate` and read back from
+`metadata`:
 
 ```python
 result = optimize(config, x0, objective, metadata={"run_id": 7})
@@ -516,8 +517,8 @@ df = result.to_pandas(["variables", "evaluations.objectives"])
 The runnable script for this section is
 [examples/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py),
 which exports one result stacked, the same result unstacked, and then every
-result of the run in one frame. It uses polars by default and pandas with
-`--pandas`, so only one of the two needs to be installed.
+result of the optimization in one frame. It uses polars by default and pandas
+with `--pandas`, so only one of the two needs to be installed.
 
 A path may name a field of the result itself (`"variables"`,
 `"target_objective"`), a field of one of its sub-objects
@@ -676,10 +677,10 @@ batch_id realization
          r1                                         0.22                                0.05
 ```
 
-The run-level **result metadata** sits directly on the result, so it has no
-axes and gives one value per result, which is convenient for pulling in a run
-tag. It may be nested to any depth, and is reachable from `to_pandas` and
-`results_to_pandas` alike:
+The **result metadata**, set once per optimization, sits directly on the result,
+so it has no axes and gives one value per result, which is convenient for pulling
+in a tag that identifies the optimization. It may be nested to any depth, and is
+reachable from `to_pandas` and `results_to_pandas` alike:
 
 ```python
 df = results_to_pandas(

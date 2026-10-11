@@ -78,7 +78,7 @@ def _export_pandas(results: Sequence[FunctionResults]) -> None:
     """Show the three shapes using pandas, which keeps the axes in an index.
 
     Args:
-        results: The results collected by the run.
+        results: The results collected by the optimization.
     """
     # Every axis of a selected field becomes a row label, under `batch_id`.
     # --8<-- [start:stacked]
@@ -117,7 +117,7 @@ def _export_polars(results: Sequence[FunctionResults]) -> None:
     """Show the same three shapes using polars, which has no index.
 
     Args:
-        results: The results collected by the run.
+        results: The results collected by the optimization.
     """
     stacked = results[0].to_polars(["evaluations.objectives"])
     print(f"stacked\n{stacked}\n")

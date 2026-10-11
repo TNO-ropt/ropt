@@ -33,7 +33,7 @@ class FunctionEstimator(ABC):
         """Create a new function estimator instance.
 
         Store the configuration; keep initialization lightweight.
-        Run-dependent setup belongs in `init`.
+        Setup that depends on the optimization belongs in `init`.
 
         Args:
             estimator_config: The estimator configuration.

@@ -2,13 +2,13 @@
 
 `ropt` reports its progress through Python's standard
 [`logging`](https://docs.python.org/3/library/logging.html) module. Switching it
-on takes one line and needs no code of your own. To *collect* what a run
-produces — to keep results, tabulate them, or stop a run early — use
+on takes one line and needs no code of your own. To *collect* what an
+optimization produces — to keep results, tabulate them, or stop it early — use
 [result handlers](../results/handlers.md) instead.
 
 ## Turning it on
 
-Put this before the run:
+Put this before the call to [`optimize`][ropt.optimize]:
 
 ```python
 import logging
@@ -38,13 +38,16 @@ application adds a destination for it.
 
 **The per-batch counts** appear one per batch of evaluations, and `4/4` means an
 ensemble of 4 evaluations came back with a value. While these keep arriving, the
-run is alive and calling your objective. A `3/4` after a run of `4/4` indicates a
-failed realization; how many failures a run tolerates is set by
+optimization is alive and calling your objective. A `3/4` after a series of
+`4/4` indicates a failed realization; how many failures an optimization
+tolerates is set by
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations).
 
-**A new best objective** is reported each time the run improves on what it had.
+**A new best objective** is reported each time the optimization improves on what
+it had.
 
-**The reason for stopping** is stated before the run ends, and the closing line
+**The reason for stopping** is stated before the optimization ends, and the
+closing line
 names the [`ExitCode`][ropt.enums.ExitCode] it finished with — the same one
 `result.exit_code` reports. See
 [When something goes wrong](running.md#when-something-goes-wrong) for what each
@@ -56,9 +59,9 @@ it. That is what a bug report needs; leave
 
 ## Warnings only
 
-`INFO` is one line per batch, which adds up on a long run. Setting the level to
-`WARNING` instead reports nothing while the run proceeds normally, and reports
-only events that did not stop it:
+`INFO` is one line per batch, which adds up on a long optimization. Setting the
+level to `WARNING` instead reports nothing while the optimization proceeds
+normally, and reports only events that did not stop it:
 
 ```python
 logging.basicConfig(level=logging.WARNING)
@@ -70,8 +73,8 @@ so you can see what a failed job left, and evaluations that must finish before
 your program is allowed to exit. None of these raise, and most are reported
 nowhere else.
 
-A failure that stops a run does not need logging to be seen: it either raises,
-or is named by the exit code the run ends with. See
+A failure that stops an optimization does not need logging to be seen: it either
+raises, or is named by the exit code the optimization ends with. See
 [Troubleshooting](../troubleshooting/index.md).
 
 ## Sending the output somewhere else
@@ -104,8 +107,8 @@ Setting [`stdout` or
 optimizer's own output to a file. That capture is scoped to a period of time
 rather than to a source, so other output produced during that period could end
 up in the file as well. Almost no log output does: `ropt` lifts the capture
-around every evaluation, and a console destination created before the run keeps
-writing to the stream it was given.
+around every evaluation, and a console destination created before the
+optimization starts keeps writing to the stream it was given.
 
 The exception is an optimizer that prints from compiled code. `ropt` then
 redirects the process's output streams as well, and at that level console
@@ -129,16 +132,17 @@ generally comes from the optimizer.
 
     | Logger | Emits |
     | --- | --- |
-    | `ropt.components.compute_steps` | the start and finish of a run, and the configuration it started from |
+    | `ropt.components.compute_steps` | the start and finish of an optimization or evaluation, and the configuration it started from |
     | `ropt.core` | per-batch realization counts, stopping conditions, optimizer callbacks, and reuse of cached results |
-    | `ropt.components.executors` | executor start-up, job submission and cancellation, retained working directories, and exceptions raised by work that an aborted run no longer waits for |
+    | `ropt.components.executors` | executor start-up, job submission and cancellation, retained working directories, and exceptions raised by work that an aborted task no longer waits for |
     | `ropt.components.evaluators` | work-item dispatch |
     | `ropt.components.event_handlers` | each new best objective, and any handler that raised |
     | `ropt.backend.scipy`, `ropt.backend.external` | the method in use, and the external subprocess lifecycle |
     | `ropt.plugins` | plugin registration |
 
     `DEBUG` traces the mechanism: one line per optimizer callback, per
-    dispatched batch and per cluster job, plus the configuration the run
-    started from. It is verbose — a gradient-based method requests functions
-    and gradients separately on most iterations, and each request is a line —
+    dispatched batch and per cluster job, plus the configuration the
+    optimization started from. It is verbose — a gradient-based method
+    requests functions and gradients separately on most iterations, and each
+    request is a line —
     but it is what to attach to a bug report.

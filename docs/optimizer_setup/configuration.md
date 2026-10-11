@@ -1,14 +1,15 @@
 # Configuration
 
-Every `ropt` optimization run is described by a configuration dictionary. This
+Every `ropt` optimization is described by a configuration dictionary. This
 page covers what that dictionary becomes, the rules that apply to all of it, and
 how the pieces fit together. For the field-by-field description of each section,
 see [Configuration Sections](configuration_sections.md).
 
 ## The configuration object
 
-The dictionary is validated when the run starts, and each top-level key becomes
-an instance of that section's configuration class: `variables` becomes a
+The dictionary is validated when the optimization or evaluation starts, and each
+top-level key becomes an instance of that section's configuration class:
+`variables` becomes a
 [`VariablesConfig`][ropt.config.VariablesConfig], `objectives` an
 [`ObjectiveFunctionsConfig`][ropt.config.ObjectiveFunctionsConfig], and so on.
 Only `variables` is required; every other section has defaults.
@@ -18,8 +19,8 @@ Three keys are different in kind. `samplers`, `realization_filters` and
 the plugin system, which the sections that use them refer to by key.
 
 Most of the rules below follow from this one step. Because the dictionary is
-converted once, validation and coercion happen before the run rather than during
-it; because the result is a set of objects rather than the dict you wrote, those
+converted once, validation and coercion happen before the optimization rather
+than during it; because the result is a set of objects rather than the dict you wrote, those
 objects are frozen; and because components are shared rather than copied, they
 are addressed by key.
 
@@ -203,10 +204,10 @@ process](optimizer.md#external-backend).
 ### Immutability
 
 The objects the dictionary is validated into are frozen, so a setting cannot be
-changed once a run has started. Validation also does work that a later change
-would not repeat: bounds, perturbation magnitudes and linear constraints are
-scaled at that point. To change a setting, modify the dictionary and start a new
-run.
+changed once an optimization has started. Validation also does work that a later
+change would not repeat: bounds, perturbation magnitudes and linear constraints
+are scaled at that point. To change a setting, modify the dictionary and start a
+new optimization.
 
 !!! warning
 
@@ -220,8 +221,8 @@ run.
 ## Naming things for output
 
 One section describes nothing about the problem itself. `names` attaches labels
-to the parts of a run — the variables, the objectives, the realizations, and the
-rest — so that results come back readable:
+to the parts of an optimization — the variables, the objectives, the
+realizations, and the rest — so that results come back readable:
 
 ```python
 "names": {
@@ -239,8 +240,8 @@ metadata spans.
 
 Labels are not purely decorative. Some components use them to identify the items
 they are given instead of relying on position, which lets results be matched
-between runs whose ordering differs. That applies to the realization names; the
-others affect only how a printed table reads.
+between optimizations whose ordering differs. That applies to the realization
+names; the others affect only how a printed table reads.
 
 [examples/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py)
 names variables, objectives and realizations before exporting to a frame, and

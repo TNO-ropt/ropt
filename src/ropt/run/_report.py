@@ -1,8 +1,8 @@
-"""Progress reporting for an optimization run.
+"""Progress reporting for an optimization or evaluation.
 
 A report callback is the small counterpart of a result handler: it is wired up
-as an ordinary handler, but as one belonging to a single run, which is why it is
-given per run even where `handlers=` only takes shared groups.
+as an ordinary handler, but as one belonging to a single call, which is why it
+is given per call even where `handlers=` only takes shared groups.
 """
 
 from __future__ import annotations
@@ -20,11 +20,11 @@ if TYPE_CHECKING:
 
 
 ReportCallback = Callable[[FunctionResults], bool | None]
-"""Called with each function evaluation; returning `True` stops the run.
+"""Called with each function evaluation; returning `True` stops the optimization.
 
 Results later in the same batch are not passed on.
 
-With `report_gradients` set on the run, the callback is also called with each
+With `report_gradients` set, the callback is also called with each
 [`GradientResults`][ropt.results.GradientResults], and must accept those as
 well. This alias describes the default, so a callback that takes gradients too
 widens its own annotation.

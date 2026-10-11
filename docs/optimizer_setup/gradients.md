@@ -76,13 +76,13 @@ members may be written in their place.
 ## Reproducibility
 
 The perturbations are drawn from a generator seeded by `variables.seed`, which
-defaults to `1`. Repeating a run therefore reproduces it exactly, and changing
-the seed draws a different set of perturbations.
+defaults to `1`. Repeating an optimization therefore reproduces it exactly, and
+changing the seed draws a different set of perturbations.
 
-A plain integer is enough for a single run. The field also accepts a tuple, and
-giving a unique identifier as its first element is what keeps runs distinct when
-they are nested or evaluated in parallel: each run draws its own perturbations
-while remaining reproducible on its own.
+A plain integer is enough for a single optimization. The field also accepts a
+tuple, and giving a unique identifier as its first element is what keeps
+optimizations distinct when they are nested or run concurrently: each one draws
+its own perturbations while remaining reproducible on its own.
 
 ```python
 "variables": {"variable_count": 5, "seed": (run_id, 1)}
@@ -108,9 +108,9 @@ to also tolerate failed realizations.
 
 [examples/failures.py](https://github.com/TNO-ropt/ropt/blob/main/examples/failures.py)
 runs one problem twice: once with the default, where a single failing
-realization ends the run with `TOO_FEW_REALIZATIONS` and no result, and once
-with `realization_min_success` lowered, where the run finishes on the
-realizations that did work.
+realization ends the optimization with `TOO_FEW_REALIZATIONS` and no result, and
+once with `realization_min_success` lowered, where the optimization finishes on
+the realizations that did work.
 
 ## Evaluation policy
 
@@ -145,5 +145,6 @@ average, are covered in [Function Estimators](function_estimators.md).
 
 - What `evaluation_policy` means when evaluations are submitted concurrently:
   [Evaluating in Parallel](../running/parallel.md).
-- When a run ends with `TOO_FEW_REALIZATIONS`, or two runs disagree:
+- When an optimization ends with `TOO_FEW_REALIZATIONS`, or two optimizations
+  disagree:
   [Troubleshooting](../troubleshooting/index.md).

@@ -65,19 +65,19 @@ scales, offsets = scales_and_offsets_from_bounds([0.0, 100.0], [1.0, 600.0])
 
 That maps both variables onto $[0, 1]$. Scales must be positive, since a scale
 is a change of units and nothing else. There is no `auto_scale` for variables:
-the bounds are the only information available before the run starts, and using
-them is a choice rather than a default.
+the bounds are the only information available before the optimization starts,
+and using them is a choice rather than a default.
 
 Everything describing the variables moves with them — the bounds, the absolute
 perturbation magnitudes, and the linear constraints — so scaling is not
 something that has to be applied consistently by hand. The details are under
 [Scaling the variables](configuration_sections.md#variable-scales).
 
-!!! warning "Scaling changes what a run reports"
+!!! warning "Scaling changes what an optimization reports"
 
     Results carry both domains: `variables` in the units configured here, and
     `scaled.variables` in the optimizer's. Only the first is comparable between
-    runs that scale differently. The runnable demonstration is
+    optimizations that scale differently. The runnable demonstration is
     [examples/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py),
     and [Working with Results](../results/results.md#scaling-of-results)
     describes which fields have two domains.

@@ -1,8 +1,8 @@
 """Restart with a larger ensemble, reusing the results at the restart point.
 
-A first run optimizes an ensemble of two realizations. A second run restarts
+A first optimization uses an ensemble of two realizations. A second one restarts
 from its best point with five, and is given the function and gradient results
-the first run produced there. The two realizations evaluated at that point are
+the first one produced there. The two realizations evaluated at that point are
 reused, and only the three added ones are evaluated.
 """
 
@@ -24,7 +24,8 @@ FULL_REALIZATIONS = 5
 UNCERTAINTY = 0.1
 INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 
-# Drawn once for the full ensemble, so a realization is the same in both runs.
+# Drawn once for the full ensemble, so a realization is the same in both
+# optimizations.
 rng = default_rng(seed=123)
 a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=FULL_REALIZATIONS)
 b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=FULL_REALIZATIONS)
@@ -97,7 +98,10 @@ def main() -> None:
         f"per-realization objectives at the restart point: "
         f"{restart.evaluations.objectives.ravel()}"
     )
-    print(f"reused from the first run: {first.results.evaluations.objectives.ravel()}")
+    print(
+        "reused from the first optimization: "
+        f"{first.results.evaluations.objectives.ravel()}"
+    )
     print(
         f"objective there, {SCREENING_REALIZATIONS} realizations: "
         f"{first.results.functions.objectives}"

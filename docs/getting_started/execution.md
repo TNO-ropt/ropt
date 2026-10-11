@@ -5,7 +5,7 @@ happen one after another, on the same thread that called
 [`optimize`][ropt.optimize]. If each evaluation is slow, you can run several at
 the same time by evaluating on a **pool**.
 
-Open a [`session`][ropt.session], build a pool on it, and start the run
+Open a [`session`][ropt.session], build a pool on it, and start the optimization
 on that pool:
 
 ```python
@@ -24,9 +24,9 @@ when it is passed `--multiprocessing`.
 A thread pool is one of four kinds. The others run each evaluation in a separate
 process, as a local job, or as a job on an HPC cluster.
 [Evaluating in Parallel](../running/parallel.md) covers all four: which one
-suits a given evaluation function, how many workers to ask for, what stopping a
-run does to each, and the one property of your objective that rules some of them
-out.
+suits a given evaluation function, how many workers to ask for, what stopping an
+optimization does to each, and the one property of your objective that rules
+some of them out.
 
 To run several optimizations at the same time, rather than parallelizing within
 one, see [Several Optimizations at Once](../running/many_runs.md).

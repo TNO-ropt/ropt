@@ -7,7 +7,7 @@ can be offloaded the same way. Both go through a **pool**.
 
 By default [`optimize`][ropt.optimize] runs on the calling thread, one
 evaluation at a time. To run the evaluations in parallel, open a
-[`session`][ropt.session], build a **pool** on it and start the run on
+[`session`][ropt.session], build a **pool** on it and start the optimization on
 that pool:
 
 ```python
@@ -22,8 +22,9 @@ The runnable script for this section is
 which takes `-m` to swap its thread pool for a process pool.
 
 The session owns the pools built on it and releases their workers when its
-block ends, so most code needs no further cleanup. Nothing is implicit: a run
-evaluates on the pool it was started on, and on no other. A run started with
+block ends, so most code needs no further cleanup. Nothing is implicit: an
+optimization evaluates on the pool it was started on, and on no other. An
+optimization started with
 the module-level [`optimize`][ropt.optimize] evaluates inside your own
 program and needs no session, wherever it is called from — including from a
 thread you started yourself.
@@ -52,9 +53,9 @@ function works and nothing is copied. The other three run the work **outside**
 it, so the objective and its data are copied there.
 
 Only the evaluations ever leave. The optimizer itself, the pool object and your
-handlers all stay in the process that opened the session and started the run,
-whichever pool you choose. Throughout this page, **your program** means that
-process.
+handlers all stay in the process that opened the session and started the
+optimization, whichever pool you choose. Throughout this page, **your program**
+means that process.
 
 ??? info "New to threads and processes?"
     A **process** is a running program with its own private memory. A **thread**
@@ -88,9 +89,9 @@ capped by what the machine or the queue will actually give you. Beyond that
 figure the extra workers have nothing to do and sit idle.
 
 Batch size follows from the problem, not from a setting: it is how many
-evaluations the optimizer requests at once. For a gradient-based run over an
-ensemble that is one per realization, plus their perturbations on the batches
-where a gradient is estimated. The second factor is `1` unless you run
+evaluations the optimizer requests at once. For a gradient-based optimization
+over an ensemble that is one per realization, plus their perturbations on the
+batches where a gradient is estimated. The second factor is `1` unless you run
 [several optimizations at once](many_runs.md), where it is the `limit` argument
 of `offload` (or the number of optimizations, if you set no limit).
 
@@ -108,13 +109,13 @@ machine's core count.
     [`evaluate_batch`][ropt.WorkerPool.evaluate_batch] to send several
     evaluations to a worker together, or `bundle_size=0` to send a whole batch
     at once. The evaluations in one bundle run after each other, so `0` gives up
-    parallelism inside the batch entirely: it is for a run whose parallelism
-    comes from the layer above it, as in
+    parallelism inside the batch entirely: it is for an optimization whose
+    parallelism comes from the layer above it, as in
     [Nested Optimization](nested.md#two-pools-not-one).
 
     `workers` and `bundle_size` are the two halves of matching work to capacity,
-    one on the pool and one on the run. `workers` sets how many bundles may
-    be in flight; `bundle_size` sets how much work one of them carries. With a
+    one on the pool and one on the optimization. `workers` sets how many bundles
+    may be in flight; `bundle_size` sets how much work one of them carries. With a
     batch of 100 cheap evaluations and 8 workers, the default sends 100 separate
     transfers to keep 8 workers busy; `bundle_size=13` sends 8. Raise it when
     the evaluations are cheap relative to a transfer, which on a process, local
@@ -122,8 +123,8 @@ machine's core count.
     the evaluations are expensive, or when they vary in cost and bundling would
     leave one worker holding all the slow ones.
 
-    It belongs to the run rather than to the pool because it describes the
-    evaluation function, and one pool may serve several. Optimizations that
+    It belongs to the optimization rather than to the pool because it describes
+    the evaluation function, and one pool may serve several. Optimizations that
     share a pool and differ in cost can each state their own:
 
     ```python
@@ -137,13 +138,13 @@ machine's core count.
 
     Every pool honours it, including a thread pool: a bundle goes to one worker
     as a whole, so `bundle_size=0` on a thread pool runs the whole batch on a
-    single thread. It is a pool argument only: a run started without one
-    evaluates inline, where a bundle has nothing to save.
+    single thread. It is a pool argument only: an optimization started without
+    one evaluates inline, where a bundle has nothing to save.
 
-    A pool also takes a `bundle_size` of its own, used by any run that does
-    not state one.
+    A pool also takes a `bundle_size` of its own, used by any optimization that
+    does not state one.
 
-You can keep several pools open at once and choose per run:
+You can keep several pools open at once and choose per optimization:
 
 ```python
 with session() as s:
@@ -154,8 +155,8 @@ with session() as s:
 ```
 
 !!! note "Pools inside an evaluation"
-    An evaluation function may start a run of its own, but build its pool
-    **once**, in the calling code, and pass it to every evaluation. Building one
+    An evaluation function may start an optimization of its own, but build its
+    pool **once**, in the calling code, and pass it to every evaluation. Building one
     per evaluation gives each a budget separate from every other: ten evaluations
     each building a ten-worker pool put a hundred workers on the machine,
     where one shared pool puts ten. Which pool it may be is a separate
@@ -201,7 +202,7 @@ past this pool — see [Which pool should I use?](#which-pool).
 ### Evaluating in worker processes { #process-pool }
 
 A [`process_pool`][ropt.Session.process_pool] runs the evaluations in a
-handful of separate processes, reused across the run. Each has its own
+handful of separate processes, reused across the optimization. Each has its own
 interpreter, so this is where heavy Python code actually runs faster:
 
 ```python
@@ -223,9 +224,10 @@ only come **back** through the return value; see
 [Handlers and separate processes](../results/handlers.md#handlers-and-separate-processes).
 
 !!! warning "This pool does not clean up programs your objective started"
-    When a run is stopped by Ctrl-C the worker processes are killed, but
-    anything they had launched themselves is not: a simulator or solver started
-    by your objective keeps running, unattached, after your program is gone.
+    When an optimization is stopped by Ctrl-C the worker processes are killed,
+    but anything they had launched themselves is not: a simulator or solver
+    started by your objective keeps running, unattached, after your program is
+    gone.
     Nothing reports this. If your objective launches external programs, use a
     [`local_pool`][ropt.Session.local_pool] instead, which was built for
     exactly this.
@@ -296,7 +298,7 @@ them apart. What differs is whether a process is a *worker* or a *job*:
 | --- | --- | --- |
 | Processes | a few, **reused** for many evaluations | one **fresh** process per evaluation |
 | Start-up cost | paid once, when the pool is built | paid again on every evaluation |
-| Programs your objective starts | keep running when the run stops | killed along with the evaluation |
+| Programs your objective starts | keep running when the optimization stops | killed along with the evaluation |
 | Output of a failed evaluation | lost | captured, and attached to the error |
 | Sending the objective | your script is re-imported, so a function defined in it can be found by name | a fresh command; needs an importable module or `ropt[cloudpickle]` |
 | Platform | anywhere | POSIX only |
@@ -325,7 +327,7 @@ belongs on a cluster.
 
     A process pool does not stand in for a cluster job: it reuses workers, keeps
     your objective in Python, and leaves the programs it starts running when the
-    run stops — none of which is how a cluster job behaves.
+    optimization stops — none of which is how a cluster job behaves.
 
 ### Running on an HPC cluster
 
@@ -377,7 +379,7 @@ reading your own code rather than by measuring:
       wrong.
 
 Once that is settled, the choice is about speed, and about what
-[stopping a run](#stopping-a-run) can do:
+[stopping an optimization](#stopping-a-run) can do:
 
 | Pool | Where evaluations run | Data | Speeds up heavy Python? | Use when |
 | --- | --- | --- | --- | --- |
@@ -395,12 +397,13 @@ Once that is settled, the choice is about speed, and about what
     it.
 
     Switching to a thread pool costs one argument, and if threads do not scale
-    on your objective the result is no speedup rather than a broken run.
+    on your objective the result is no speedup rather than a broken
+    optimization.
     Switching to processes costs a serializable objective and a process start
     per worker. So try threads first:
 
     1. Start with a thread pool. Time `workers=1` against `workers=4` on a
-       shortened run.
+       shortened optimization.
     2. If it scales, you are done, and you never needed to know what the GIL was
        doing.
     3. If it does not, set `OMP_NUM_THREADS=1` (see below) and time it again.
@@ -434,28 +437,28 @@ Once that is settled, the choice is about speed, and about what
 
 ### Pools inside an evaluation { #pools-inside-an-evaluation }
 
-An evaluation function may start a run of its own — that is how
+An evaluation function may start an optimization of its own — that is how
 [Nested Optimization](nested.md) works — and give it a pool, on two
 conditions.
 
-It must be a **different** pool. A nested run waits for its own evaluations
-to finish, so one handed the pool it is already running on would wait for
-the workers it is itself occupying — a deadlock as soon as they are all busy,
-which is the normal case, since a run fills its pool with one work item per
-realization. Rather than hang, the pool refuses work submitted by the
-evaluation itself with a [`WorkflowError`][ropt.exceptions.WorkflowError]. A
+It must be a **different** pool. A nested optimization waits for its own
+evaluations to finish, so one handed the pool it is already running on would
+wait for the workers it is itself occupying — a deadlock as soon as they are all
+busy, which is the normal case, since an optimization fills its pool with one
+work item per realization. Rather than hang, the pool refuses work submitted by
+the evaluation itself with a [`WorkflowError`][ropt.exceptions.WorkflowError]. A
 thread the evaluation starts is not recognized as a worker, so work submitted
-from it is not refused and can still deadlock on the pool. Give the inner run
-its own pool, or none at all, which evaluates inline.
+from it is not refused and can still deadlock on the pool. Give the inner
+optimization its own pool, or none at all, which evaluates inline.
 
 The evaluation must stay **in your process**, so on a thread pool or with no
 pool. On a process, local, or HPC pool the evaluation function is copied
 into a worker, and a pool cannot be copied with it: open a session and build
 the inner pool inside the worker, or run the inner optimization without one. An
 evaluation function that carries a pool along anyway is refused when the
-work item is sent, rather than failing somewhere deep inside the run.
+work item is sent, rather than failing somewhere deep inside the optimization.
 
-## Stopping a run
+## Stopping an optimization { #stopping-a-run }
 
 Press Ctrl-C and `ropt` stops dispatching new work at once. What happens to the
 evaluations already running depends on the pool, because what *can* be done
@@ -478,14 +481,14 @@ run long and has to be interruptible, put it on one of the other pools.
 
 **Stopping is a request, not a guarantee.** On the pools that kill,
 everything is signalled to end and not waited for. A program that ignores the
-request, or that is stuck inside the operating system, keeps running. The run
-exits promptly instead of waiting out the current batch, but processes it
-started may still be alive afterwards.
+request, or that is stuck inside the operating system, keeps running. The
+optimization exits promptly instead of waiting out the current batch, but
+processes it started may still be alive afterwards.
 
 **A process pool also finishes one evaluation it had not started.** It keeps one
 more evaluation submitted than it has workers, and a submitted evaluation can no
-longer be cancelled, so that one runs too, although the run does not wait for
-it. It is one evaluation however many are left to do.
+longer be cancelled, so that one runs too, although the optimization does not
+wait for it. It is one evaluation however many are left to do.
 
 !!! tip "If Ctrl-C seems to do nothing at all"
     Some third-party packages change a process-wide setting when imported that
@@ -506,7 +509,7 @@ Two kinds of failure can end an evaluation, and they reach you differently.
 
 **A failure of the machinery** is one the evaluation function had no part in: a
 worker process is killed, a cluster job never writes its result, or the file it
-wrote cannot be read back. The run ends with an
+wrote cannot be read back. The optimization ends with an
 [`ExecutionError`][ropt.exceptions.ExecutionError] naming the first lost
 evaluation's reason. The affected rows are *not* recorded as `numpy.nan`: a
 machine that broke is not a realization that failed to converge, and absorbing
@@ -524,7 +527,7 @@ surfaces as the exception you wrote, with the pool left usable. Return
 `float("nan")` instead when a realization that could not produce a value should
 be tolerated; see
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
-for how many a batch may contain before the run ends with
+for how many a batch may contain before the optimization ends with
 `TOO_FEW_REALIZATIONS`.
 
 On an HPC pool the exception crosses a process boundary, and no serialization
@@ -630,21 +633,21 @@ cancelled.
     several pieces must be coordinated — counted, collected, or held to one
     budget — keep them in your own process instead.
 
-!!! warning "Offloading from a handler holds up the runs feeding it"
-    A handler runs on the thread driving the run, so it can offload to a
-    pool. While it waits, it holds its own lock, so every other run waiting
-    on that handler waits too.
+!!! warning "Offloading from a handler holds up the optimizations feeding it"
+    A handler runs on the thread driving the optimization, so it can offload to
+    a pool. While it waits, it holds its own lock, so every other optimization
+    waiting on that handler waits too.
 
     An offloaded callable that reaches back into the same handler — by starting
-    a run that carries it in `handlers=` — fails differently per pool. On a
-    thread pool it blocks: the handler waits for the offloaded call, and the
+    an optimization that carries it in `handlers=` — fails differently per pool.
+    On a thread pool it blocks: the handler waits for the offloaded call, and the
     call waits for the lock the handler holds. On a process pool it
     raises an [`ExecutionError`][ropt.exceptions.ExecutionError], since a
     handler holds a lock and cannot be serialized. See
-    [Sharing a handler across concurrent runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
+    [Sharing a handler across concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
     Work offloaded from the evaluation function runs without that lock held,
-    so it does not make the other runs wait.
+    so it does not make the other optimizations wait.
 
 ## Configuring an HPC pool
 
@@ -806,7 +809,7 @@ set. The values available are the arguments described above — `job_name`,
 `output`, `working_directory`, `cores`, `memory_max`, `run_time_max`, `command`
 — plus whatever you pass in `submit_options`.
 
-Two of them carry the run: `{{command}}` is your evaluation and the
+Two of them carry the job: `{{command}}` is your evaluation and the
 script does nothing without it, and `{{output}}` is the file ropt reads back to
 explain a failed job. A script that omits `--output={{output}}` still runs, but a
 job that dies takes the only explanation with it.

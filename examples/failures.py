@@ -1,14 +1,14 @@
-"""What a failing realization does to a run, and how to allow some failures.
+"""What a failing realization does to an optimization, and how to allow failures.
 
 An evaluation reports failure by returning `NaN` for a realization; nothing
 raises. The optimizer needs a minimum number of successful realizations to form
 an aggregate, set by `realization_min_success`, which defaults to *all* of
-them. So one `NaN` is already enough to end a run with
+them. So one `NaN` is already enough to end an optimization with
 `TOO_FEW_REALIZATIONS` and no result at all.
 
 This example runs the same problem twice: once with the default, where a single
 failing realization stops everything, and once allowing that failure, where the
-run finishes on the realizations that did work.
+optimization finishes on the realizations that did work.
 """
 
 from __future__ import annotations
@@ -58,8 +58,8 @@ def objective(
 
 def main() -> None:
     """Run with the default minimum, then with the failure allowed."""
-    # Every realization must succeed, so the single NaN ends the run and
-    # leaves the run without a result at all.
+    # Every realization must succeed, so the single NaN ends the optimization
+    # and leaves it without a result at all.
     strict = optimize(CONFIG, INITIAL_VALUES, objective)
     print(f"all required: {strict.exit_code.message}, results={strict.results}")
     assert strict.exit_code == ExitCode.TOO_FEW_REALIZATIONS

@@ -92,7 +92,7 @@ class Gradients(ResultField):
         """Derive the configured gradients from the scaled ones.
 
         Args:
-            context: The context of the run.
+            context: The context of the optimization or evaluation.
             scaled:  The gradients as the optimizer sees them.
 
         Returns:

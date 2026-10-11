@@ -1,11 +1,11 @@
 """Restart an optimization from its own best point, collecting every result.
 
-Each call to `optimize` starts a fresh run, so restarting from the previous
-best point is just a loop: feed the returned `result.results.variables` back
-in as the next start point. The results at that point are passed back as `f0`
-and `g0`, so the new run does not evaluate it again. A `report` callback
-appending to one list collects every evaluation from every restart, not just
-the final one.
+Each call to `optimize` starts a fresh optimization, so restarting from the
+previous best point is just a loop: feed the returned `result.results.variables`
+back in as the next start point. The results at that point are passed back as
+`f0` and `g0`, so the new optimization does not evaluate it again. A `report`
+callback appending to one list collects every evaluation from every restart, not
+just the final one.
 """
 
 from typing import TYPE_CHECKING, Any

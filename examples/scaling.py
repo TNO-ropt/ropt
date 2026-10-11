@@ -8,13 +8,13 @@ brings an objective of any magnitude close to one.
 A result therefore carries the same quantity twice. `variables` and
 `functions.objectives` are in the units configured here, while
 `scaled.variables` and `scaled.functions.objectives` are in the units the
-optimizer works in. The `target_objective` that a run reports is the
+optimizer works in. The `target_objective` that an optimization reports is the
 optimizer's number, and has no counterpart in the configured units.
 
-The distinction matters when comparing runs. Switching `auto_scale` on makes
-the reported objective much smaller while the solution stays where it was, so
-two runs are only comparable through `functions.objectives` or the variables
-themselves.
+The distinction matters when comparing optimizations. Switching `auto_scale` on
+makes the reported objective much smaller while the solution stays where it was,
+so two optimizations are only comparable through `functions.objectives` or the
+variables themselves.
 """
 
 from collections.abc import Callable
@@ -43,7 +43,7 @@ def run(
     """Optimize, and report the optimum in both domains.
 
     Args:
-        label:     The name to print for this run.
+        label:     The name to print for this optimization.
         config:    The configuration to run.
         objective: The evaluation function.
 

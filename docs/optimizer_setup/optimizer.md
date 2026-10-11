@@ -1,9 +1,9 @@
 # Choosing an Optimizer
 
-Every run needs an algorithm and a criterion for stopping. `ropt` supplies a
-default for both — SciPy's SLSQP, running until it converges — so neither has to
-be configured for a first run. This page covers what to change when the default
-is not appropriate.
+Every optimization needs an algorithm and a criterion for stopping. `ropt`
+supplies a default for both — SciPy's SLSQP, running until it converges — so
+neither has to be configured for a first optimization. This page covers what to
+change when the default is not appropriate.
 
 The two settings live in different places: **`backend` selects and configures
 the algorithm**, while **`optimizer` sets the limits `ropt` enforces around
@@ -37,7 +37,7 @@ Options that belong to the algorithm itself, rather than to `ropt`, go in
 !!! note
 
     Not every method supports every kind of constraint, and a mismatch is
-    rejected when the run starts rather than ignored; see
+    rejected when the optimization starts rather than ignored; see
     [`backend`](configuration_sections.md#backend) for what that error is. The
     one case that *is* ignored silently is integer variables; see
     [Discrete and Mixed-Integer Variables](discrete.md).
@@ -61,19 +61,19 @@ parallel, which is about where your *objective* runs; see
 
 This is useful when a backend cannot safely share a process with the rest of
 your program — for example one that crashes the interpreter, leaks memory,
-keeps state between runs, or links against native libraries that clash with
-your other dependencies.
+keeps state between optimizations, or links against native libraries that clash
+with your other dependencies.
 
 It is also the answer for a backend that **cannot run alongside anything else in
 the same process**. Some optimizers need a working directory of their own, write
 to a file whose name is fixed, or keep state inside the library that a second
-simultaneous run corrupts. What such a backend rules out is not merely a second run of its own
-kind: changing the working directory applies to the whole process, so it breaks
-another run's relative output path, and any file your evaluation function opens
-by relative name, just as surely. Each backend states in its own documentation
-whether this applies to it; where it does, `external/` is what lets it run
-alongside anything else, because the state it needs is then its own. This
-matters as soon as runs overlap — see
+simultaneous optimization corrupts. What such a backend rules out is not merely a
+second optimization of its own kind: changing the working directory applies to
+the whole process, so it breaks another optimization's relative output path, and
+any file your evaluation function opens by relative name, just as surely. Each
+backend states in its own documentation whether this applies to it; where it
+does, `external/` is what lets it run alongside anything else, because the state
+it needs is then its own. This matters as soon as optimizations overlap — see
 [Several Optimizations at Once](../running/many_runs.md).
 
 Two details differ from the other backends:
@@ -107,9 +107,10 @@ evaluates many candidate points instead of following a gradient. It needs bounds
 on every variable, ignores `perturbation_magnitudes`, and is the only choice
 when any variable is an integer.
 
-## Limiting the length of a run
+## Limiting the length of an optimization { #limiting-the-length-of-a-run }
 
-Four settings can stop a run, and they are **split across the two sections**:
+Four settings can stop an optimization, and they are **split across the two
+sections**:
 
 | Setting | Section | Limits |
 | --- | --- | --- |
@@ -131,12 +132,12 @@ CONFIG = {
 }
 ```
 
-Which limit applies depends on which resource constrains the run. When each
-evaluation is expensive, `max_functions` bounds the total number of evaluations
-directly. When the evaluations within a batch are submitted concurrently,
-`max_batches` bounds the number of sequential submissions, which determines the
-elapsed time. A batch may contain many evaluations, so the two are not
-interchangeable.
+Which limit applies depends on which resource constrains the optimization. When
+each evaluation is expensive, `max_functions` bounds the total number of
+evaluations directly. When the evaluations within a batch are submitted
+concurrently, `max_batches` bounds the number of sequential submissions, which
+determines the elapsed time. A batch may contain many evaluations, so the two are
+not interchangeable.
 
 `convergence_tolerance` is compared against the quantities the optimizer works
 with, which are **scaled**. An objective that has been divided by a large number
@@ -159,13 +160,14 @@ Backends can report their own progress, which is disabled by default:
 
 `verbose` determines whether output is produced at all. Where it goes is separate:
 `optimizer.stdout` and `optimizer.stderr` capture it to files, resolved against
-`optimizer.output_dir`. Capture rewires process-global state, so only one run at
-a time can use it — leave those unset on runs that overlap. See
+`optimizer.output_dir`. Capture rewires process-global state, so only one
+optimization at a time can use it — leave those unset on optimizations that
+overlap. See
 [`optimizer`](configuration_sections.md#optimizer) for the details.
 
 ## See also
 
 - Watching results as they arrive, instead of reading optimizer output:
   [Result Handlers](../results/handlers.md).
-- When a run stops earlier than expected, or returns no result at all:
+- When an optimization stops earlier than expected, or returns no result at all:
   [Troubleshooting](../troubleshooting/index.md).

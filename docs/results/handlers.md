@@ -10,45 +10,48 @@ A handler is given [`Results`][ropt.results.Results] objects —
 [`GradientResults`][ropt.results.GradientResults] — which is what every other part of
 `ropt` provides too: a `report` callback receives one per evaluation, and
 `optimize` puts the best one on the `results` field of what it returns.
-Everything a run produces is in them, at the field paths described in
+Everything an optimization or evaluation produces is in them, at the field paths
+described in
 [Working with Results](results.md), which is the vocabulary the handlers below
 are configured in.
 
 The [`report`](../running/running.md#reporting-progress) callback you may already be using
 is only shorthand for this: `report=` builds a handler for you behind the
-scenes, added to the run it is given to. One is built per run, each with a lock
-of its own, so the same callback given to runs that execute concurrently can be
-entered from several threads at once. A handler object given to those runs is
-entered by one at a time, because the lock belongs to the handler. A callback
-that accumulates across concurrent runs needs synchronization of its own.
+scenes, added to the optimization it is given to. One is built per optimization,
+each with a lock of its own, so the same callback given to optimizations that
+execute concurrently can be entered from several threads at once. A handler
+object given to those optimizations is entered by one at a time, because the
+lock belongs to the handler. A callback that accumulates across concurrent
+optimizations needs synchronization of its own.
 
-Attach handlers to a run with the `handlers` argument. The same handler can be
-passed to several `optimize` calls, accumulating the results of each in turn:
+Attach handlers to an optimization with the `handlers` argument. The same
+handler can be passed to several `optimize` calls, accumulating the results of
+each in turn:
 
 ```python
 from ropt import HistoryHandler, optimize
 
 history = HistoryHandler()
 
-optimize(config, x0, objective, handlers=[history])       # a single run
+optimize(config, x0, objective, handlers=[history])       # a single optimization
 for x0 in start_points:                                   # ...or reused to
     optimize(config, x0, objective, handlers=[history])   # accumulate in turn
 
-print(history.results)   # every result collected, across all the runs above
+print(history.results)   # every result collected, across all the optimizations
 ```
 
 Handlers that store results expose them through `handler["results"]` (and, for
 `HistoryHandler`, the `history.results` shortcut).
 
-## Sharing a handler across concurrent runs
+## Sharing a handler across concurrent optimizations { #sharing-a-handler-across-concurrent-runs }
 
-The same handler may also be given to runs that execute **concurrently** — the
-optimizations started together with
-[`Session.offload`](../running/many_runs.md), or runs you start on threads of
+The same handler may also be given to optimizations that execute
+**concurrently** — those started together with
+[`Session.offload`](../running/many_runs.md), or ones you start on threads of
 your own. A handler's
 [`handle_event`][ropt.EventHandler.handle_event]
-takes a lock around each call, so a second run waits for the first to finish
-rather than interleaving with it:
+takes a lock around each call, so a second optimization waits for the first to
+finish rather than interleaving with it:
 
 ```python
 from functools import partial
@@ -68,36 +71,36 @@ with session() as s:
 print(history.results)
 ```
 
-The results of the concurrent runs arrive interleaved, in an order that depends
-on which run reaches the handler first. Take the order from the results
-themselves — `batch_id`, or a `metadata` field you set per run — rather than
-from the order they arrive in.
+The results of the concurrent optimizations arrive interleaved, in an order that
+depends on which optimization reaches the handler first. Take the order from the
+results themselves — `batch_id`, or a `metadata` field you set per optimization —
+rather than from the order they arrive in.
 
 [examples/handlers.py](https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py)
-feeds two handlers from the same set of concurrent runs:
+feeds two handlers from the same set of concurrent optimizations:
 
 ```python
 --8<-- "examples/handlers.py:shared"
 ```
 
-!!! warning "Do not start a run from inside a handler that the run can reach"
-    A handler is free to start a run of its own, but its own lock is held while
-    it does. If that run lists the same handler, the handler is entered a
-    second time. The outcome depends on the run the handler starts, not on the
-    call that is feeding the handler. A nested
+!!! warning "Do not start an optimization from inside a handler that it can reach"
+    A handler is free to start an optimization of its own, but its own lock is
+    held while it does. If that optimization lists the same handler, the handler
+    is entered a second time. The outcome depends on the optimization the
+    handler starts, not on the call that is feeding the handler. A nested
     [`optimize`][ropt.optimize] emits on the thread that called it — the
     one already inside the handler — so this raises a
     [`WorkflowError`][ropt.exceptions.WorkflowError]. A nested optimization
     started with [`Session.offload`][ropt.Session.offload] emits on a thread
     that `offload` started for it, which waits for a lock the first thread will
-    not release until the run ends, and both stop. The same holds for two
-    handlers that each start a run reaching the other. Give the inner run
-    handlers of its own.
+    not release until the optimization ends, and both stop. The same holds for
+    two handlers that each start an optimization reaching the other. Give the
+    inner optimization handlers of its own.
 
 Two handlers that write to the same external state are each serialized on their
-own, but not as a pair: a run can be inside one while another run is inside the
-other. Take a [`threading.Lock`][threading.Lock] of your own inside both
-`_handle_event` implementations if they must not overlap.
+own, but not as a pair: one optimization can be inside the first while another
+is inside the second. Take a [`threading.Lock`][threading.Lock] of your own
+inside both `_handle_event` implementations if they must not overlap.
 
 ## Built-in handlers
 
@@ -129,7 +132,7 @@ In general the first does not imply the second. The
 estimates is always at the point of the function evaluation it was constructed
 from, so for this gradient the second test always passes. `handler["gradient"]`
 is `None` while that gradient has not arrived, and stays `None` for a point
-where no gradient was computed — the best point of a run often is one.
+where no gradient was computed — the best point of an optimization often is one.
 
 
 ### `HistoryHandler`
@@ -201,7 +204,7 @@ Convenience methods:
   problem that defines bounds or constraints.
 - `add_column(table, name, title)` adds one column to an existing table.
 - `set_callback(fn)` calls `fn(output_dir)` whenever the tables are updated,
-  where `output_dir` is the run's configured
+  where `output_dir` is the optimization's configured
   [`output_dir`](../optimizer_setup/configuration_sections.md#optimizer) (`None` if it is
   not set).
 
@@ -223,15 +226,15 @@ Convenience methods:
     optimize(config, x0, objective, handlers=[tables])
     ```
 
-    Because this writes to disk on every update, the run that emitted the
-    result waits for the write to finish.
+    Because this writes to disk on every update, the optimization that emitted
+    the result waits for the write to finish.
 
 ## Writing your own handler
 
-The built-in handlers above, and the `report` callback, cover the results a run
-produces. A handler of your own is for everything else: reacting to the start or
-the end of a run, writing results out in a format of your own, or keeping a
-summary that none of the built-ins keeps.
+The built-in handlers above, and the `report` callback, cover the results an
+optimization produces. A handler of your own is for everything else: reacting to
+the start or the end of an optimization, writing results out in a format of your
+own, or keeping a summary that none of the built-ins keeps.
 
 Subclass [`EventHandler`][ropt.EventHandler] and implement two members:
 
@@ -267,9 +270,10 @@ print(counter.count)
 An [`EnOptEvent`][ropt.events.EnOptEvent] carries the `event_type` that
 triggered it and a `results` tuple, which holds the
 [`Results`][ropt.results.Results] objects of a `FINISHED_EVALUATION` and is
-empty for the other types. Its `source` is the run that emitted the event, and
-calling `event.source.stop()` ends that run at the next evaluation boundary,
-with exit code `STOPPED`. The types a run emits are:
+empty for the other types. Its `source` is the compute step of the optimization
+that emitted the event, and calling `event.source.stop()` ends that optimization
+at the next evaluation boundary, with exit code `STOPPED`. The types an
+optimization emits are:
 
 | Event type            | When it is emitted                                          |
 | --------------------- | ----------------------------------------------------------- |
@@ -279,30 +283,30 @@ with exit code `STOPPED`. The types a run emits are:
 | `FINISHED_EVALUATION` | After that batch completes; carries its results.            |
 
 An [`evaluate`][ropt.evaluate] or
-[`evaluate_batch`][ropt.evaluate_batch] run has no optimizer, and emits
+[`evaluate_batch`][ropt.evaluate_batch] task has no optimizer, and emits
 `START_ENSEMBLE_EVALUATOR` and `FINISHED_ENSEMBLE_EVALUATOR` around its single
 batch instead of the optimizer pair.
 
 Handlers are called on the thread that emits the event, in the order the
-`handlers` argument lists them, and the run waits until every handler for that
-event has returned. A handler that blocks therefore holds up the run that fed
-it, and any run waiting on the same handler's lock. Keep a handler shared by
-concurrent runs cheap; if one must do heavy I/O, buffer in memory and write once
-the runs have finished.
+`handlers` argument lists them, and the task waits until every handler for that
+event has returned. A handler that blocks therefore holds up the task that fed
+it, and any task waiting on the same handler's lock. Keep a handler shared by
+concurrent optimizations cheap; if one must do heavy I/O, buffer in memory and
+write once the optimizations have finished.
 
-!!! note "A handler failure ends the run"
-    An exception raised by a handler is fatal. It is raised on the run's own
+!!! note "A handler failure ends the task"
+    An exception raised by a handler is fatal. It is raised on the task's own
     stack, so it propagates as a single exception, and the handlers listed after
     it do not see that event.
 
-!!! note "Read a handler's state after its runs have finished"
+!!! note "Read a handler's state after the tasks feeding it have finished"
     State kept on a handler, or stored with `handler[key]`, is deliberately not
-    bound to a thread, so it can be read from anywhere once the runs feeding it
+    bound to a thread, so it can be read from anywhere once the tasks feeding it
     have returned. That return is what makes the latest values visible. Reading
-    it while a run is still feeding the handler on another thread gives a valid
-    but possibly stale value. To follow a run as it goes, use the handler's own
-    `_handle_event`, or a `report` callback, rather than polling another
-    handler's state.
+    it while a task is still feeding the handler on another thread gives a valid
+    but possibly stale value. To follow an optimization as it goes, use the
+    handler's own `_handle_event`, or a `report` callback, rather than polling
+    another handler's state.
 
 ## Handlers and separate processes
 
@@ -359,7 +363,7 @@ handlers and your main program never see it.
 !!! note "Pools stay in the main process"
     A pool is tied to the process that opened its session, so it is not usable
     in a worker. An objective that closes over one — to offload work, or to
-    start an inner run on it — is stopped in the worker, which reports the
+    start an inner optimization on it — is stopped in the worker, which reports the
     object by name. Do that work in the objective itself, or return what you
     need and act on it in the main process.
 

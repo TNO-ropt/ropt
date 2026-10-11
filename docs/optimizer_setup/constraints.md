@@ -78,14 +78,14 @@ violated by more than that amount.
 
 `result.results` is only ever the best
 **feasible** evaluation; if none satisfied the constraints to within the
-tolerance, the run returns `None` instead of a best result. A tolerance that is
-too tight is a common reason for an empty result — see
+tolerance, the optimization returns `None` instead of a best result. A tolerance
+that is too tight is a common reason for an empty result — see
 [Troubleshooting](../troubleshooting/index.md).
 
-To watch feasibility as the run proceeds, read `constraint_info` from the result
-the `report` callback receives. Its `nonlinear_violation` is zero where a
-constraint is met, positive by the amount it is exceeded, and `NaN` where the
-constraint value is `NaN`:
+To watch feasibility as the optimization proceeds, read `constraint_info` from
+the result the `report` callback receives. Its `nonlinear_violation` is zero
+where a constraint is met, positive by the amount it is exceeded, and `NaN` where
+the constraint value is `NaN`:
 
 ```python
 --8<-- "examples/constrained.py:report"

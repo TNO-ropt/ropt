@@ -160,11 +160,11 @@ class DataFrameHandler(EventHandler):
     def set_callback(self, callback: Callable[[Path | None], None]) -> None:
         """Set a function to call whenever the tables are updated.
 
-        The callback receives the output directory configured for the run
-        ([`OptimizerConfig.output_dir`][ropt.config.OptimizerConfig], `None` if
-        it is not set), and reads the tables from this handler. A callback that
-        performs blocking operations, for example writing tables to disk, holds
-        up the run that emitted the event.
+        The callback receives the output directory configured for the
+        optimization ([`OptimizerConfig.output_dir`][ropt.config.OptimizerConfig],
+        `None` if it is not set), and reads the tables from this handler. A
+        callback that performs blocking operations, for example writing tables to
+        disk, holds up the optimization that emitted the event.
 
         Args:
             callback: A function that is called when the tables are updated.

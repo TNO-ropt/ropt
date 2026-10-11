@@ -128,7 +128,8 @@ class SciPyBackend(Backend):
     A method without a gradient asks only for function values, so no
     perturbations are evaluated for it. Configuring a method with a constraint
     it does not support raises
-    [`UnsupportedError`][ropt.exceptions.UnsupportedError] when the run starts.
+    [`UnsupportedError`][ropt.exceptions.UnsupportedError] when the optimization
+    starts.
     `differential_evolution` requires bound constraints on all variables, and
     is the only method that handles integer variables; the others silently
     treat them as continuous.

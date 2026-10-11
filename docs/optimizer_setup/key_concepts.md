@@ -13,7 +13,7 @@ documentation and shows how they fit together. For the mathematical background
 behind ensemble-based robust optimization, see
 [Background](../getting_started/background.md).
 
-An optimization run works on a **variable vector**: the set of values the
+An optimization works on a **variable vector**: the set of values the
 optimizer changes to improve the objective. For robust problems the same
 variable vector is evaluated across an ensemble of **realizations**, where each
 realization is one version of the model. A **function evaluation** combines the

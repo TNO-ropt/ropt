@@ -1,13 +1,13 @@
 """Stopping an optimization from the `report` callback.
 
-A run normally ends when the optimizer converges or hits its own budget. The
-`report` callback sees every result as it arrives, so it can also end the run
-itself: returning `True` stops the run, and it finishes with
+An optimization normally ends when the optimizer converges or hits its own
+budget. The `report` callback sees every result as it arrives, so it can also
+end the optimization itself: returning `True` stops it, and it finishes with
 `STOPPED`.
 
-Stopping this way is graceful rather than abrupt. The run keeps the best result
-it has found, so a stopped run still returns a usable answer -- unlike a run
-that fails, which returns nothing.
+Stopping this way is graceful rather than abrupt. The optimization keeps the
+best result it has found, so a stopped optimization still returns a usable
+answer -- unlike one that fails, which returns nothing.
 """
 
 from __future__ import annotations
@@ -30,7 +30,8 @@ CONFIG: dict[str, Any] = {
         "variable_count": DIM,
         "perturbation_magnitudes": 1e-6,
     },
-    # Enough evaluations that the callback, not the optimizer, ends the run.
+    # Enough evaluations that the callback, not the optimizer, ends the
+    # optimization.
     "optimizer": {"max_functions": 50},
 }
 INITIAL_VALUES = np.zeros(DIM)
@@ -57,13 +58,13 @@ def objective(
 
 
 def stop_after_max_results(result: FunctionResults) -> bool:
-    """Count one result and decide whether the run should go on.
+    """Count one result and decide whether the optimization should go on.
 
     Args:
         result: The result that just arrived.
 
     Returns:
-        True once the maximum is reached, which stops the run.
+        True once the maximum is reached, which stops the optimization.
     """
     global _seen  # ruff: ignore[global-statement]
     _seen += 1
@@ -79,7 +80,7 @@ def main() -> None:
     assert result.exit_code == ExitCode.STOPPED
     assert _seen == MAX_RESULTS
 
-    # Stopping keeps what the run had already found.
+    # Stopping keeps what the optimization had already found.
     assert result.results is not None
     assert result.results.target_objective is not None
     print(f"best objective so far: {result.results.target_objective}")

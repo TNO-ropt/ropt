@@ -18,11 +18,11 @@ read that page with the script open beside it.
 | [`realization_filter.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py) | A custom filter that reweights realizations | [Realization Filters](../optimizer_setup/realization_filters.md) |
 | [`function_estimator.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/function_estimator.py) | A custom estimator that aggregates realizations | [Function Estimators](../optimizer_setup/function_estimators.md) |
 | [`sampler.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/sampler.py) | A custom sampler that perturbs one variable at a time | [Samplers](../optimizer_setup/samplers.md) |
-| [`metadata.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py) | Tagging a run, and recording per-realization data | [Working with Results](../results/results.md) |
+| [`metadata.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py) | Tagging an optimization, and recording per-realization data | [Working with Results](../results/results.md) |
 | [`export.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py) | Exporting results to a pandas or polars frame | [Working with Results](../results/results.md) |
 | [`scaling.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py) | Reading results in the configured and the optimizer's units | [Working with Results](../results/results.md) |
-| [`handlers.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py) | Collecting results from runs that overlap in time | [Result Handlers](../results/handlers.md) |
-| [`stopping.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py) | Stopping a run from the `report` callback | [Running Optimizations](../running/running.md) |
+| [`handlers.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py) | Collecting results from optimizations that overlap in time | [Result Handlers](../results/handlers.md) |
+| [`stopping.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py) | Stopping an optimization from the `report` callback | [Running Optimizations](../running/running.md) |
 | [`failures.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/failures.py) | What a failing realization does, and how to allow some | [Troubleshooting](../troubleshooting/index.md) |
 | [`restart.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/restart.py) | Restarting from the best point, collecting every result | [Restarting from the Best Point](../running/restart.md) |
 | [`initial_values.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/initial_values.py) | Restarting with a larger ensemble, reusing what is known there | [Reusing Results at the Starting Point](../running/initial_values.md) |

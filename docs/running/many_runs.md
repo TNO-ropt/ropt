@@ -71,7 +71,7 @@ its own metadata:
 `report=` belongs to one `optimize` call: give each optimization its own
 callback, or the same one to all of them. `handlers=` takes handlers that
 several optimizations may feed together — see [Sharing a handler across
-concurrent runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
+concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 !!! warning "A shared `report=` callback is called by every optimization at once"
     Each optimization calls its callback on its own thread. Nothing serializes

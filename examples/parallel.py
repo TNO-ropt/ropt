@@ -1,8 +1,8 @@
 """Run one optimization with parallel evaluation on a pool.
 
-Starting a run on a pool makes it evaluate its realizations and gradient
-perturbations there. Pass `-m`/`--multiprocessing` to use a process pool
-instead of a thread pool.
+Starting an optimization on a pool makes it evaluate its realizations and
+gradient perturbations there. Pass `-m`/`--multiprocessing` to use a process
+pool instead of a thread pool.
 """
 
 from __future__ import annotations

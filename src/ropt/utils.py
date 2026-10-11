@@ -2,9 +2,9 @@
 
 Nothing in `ropt` calls anything here. Three kinds of helper live here: a check
 on the options a backend accepts, for code that builds configurations
-dynamically or checks them before starting a long run; a converter from variable
-bounds to the scales and offsets that a configuration expects; and escape
-hatches for problems that come from outside the library.
+dynamically or checks them before starting a long optimization; a converter from
+variable bounds to the scales and offsets that a configuration expects; and
+escape hatches for problems that come from outside the library.
 """
 
 from __future__ import annotations

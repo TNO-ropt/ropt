@@ -1,10 +1,10 @@
-"""Aggregate results from concurrent runs with one shared handler.
+"""Aggregate results from concurrent optimizations with one shared handler.
 
 The same handler may be given to optimizations that run concurrently -- here
 the optimizations that `Session.offload` starts together. Its `handle_event`
-serializes its own calls, so a second run waits for the first instead of
-interleaving with it. A run may feed several handlers at once, for different
-purposes.
+serializes its own calls, so a second optimization waits for the first instead
+of interleaving with it. An optimization may feed several handlers at once, for
+different purposes.
 """
 
 from functools import partial
@@ -49,7 +49,7 @@ def rosenbrock(
 
 
 def main() -> None:
-    """Collect every result from concurrent runs, in two handlers at once."""
+    """Collect every result from concurrent optimizations, in two handlers."""
     history = HistoryHandler()
     per_run = HistoryHandler()
     # --8<-- [start:shared]
@@ -62,7 +62,7 @@ def main() -> None:
         s.offload([partial(optimize, start, rosenbrock) for start in STARTS])
     # --8<-- [end:shared]
     print(
-        f"collected results across {len(STARTS)} concurrent runs: "
+        f"collected results across {len(STARTS)} concurrent optimizations: "
         f"{len(history['results'])}"
     )
     assert history["results"]

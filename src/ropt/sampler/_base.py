@@ -41,8 +41,8 @@ class Sampler(ABC):
         """Create a new sampler instance.
 
         Called during instantiation. Subclasses should store the configuration
-        and perform any lightweight initialization. Validation and
-        run-dependent setup should usually be deferred to `init`.
+        and perform any lightweight initialization. Validation and setup that
+        depends on the optimization should usually be deferred to `init`.
 
         Args:
             sampler_config: Configuration specifying the method and its options.

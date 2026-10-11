@@ -66,8 +66,8 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
       batches, and each batch in a program gets its own number.
     - `context.row_idx` — the position of the evaluation within its batch,
       counted from 0.
-    - `context.metadata` — the `metadata` dict the run was started with, if
-      any (see [Attaching metadata](#attaching-metadata)).
+    - `context.metadata` — the `metadata` dict the optimization was started
+      with, if any (see [Attaching metadata](#attaching-metadata)).
 
 The function returns the objective value(s), followed by any constraint values.
 There are three ways to return them:
@@ -83,7 +83,7 @@ If a realization fails to compute, return `float("nan")` for it. `ropt` treats
 `NaN` as a failed realization and keeps going, as long as enough realizations
 succeed. How many is enough is set by
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations),
-which defaults to *all* of them — so a single `NaN` ends the run with
+which defaults to *all* of them — so a single `NaN` ends the optimization with
 `TOO_FEW_REALIZATIONS` unless you lower it.
 
 ## The result
@@ -94,7 +94,7 @@ which carries two things:
 ```python
 result = optimize(config, x0, objective)
 
-result.exit_code  # why the run stopped (an ExitCode)
+result.exit_code  # why the optimization stopped (an ExitCode)
 result.results      # the best evaluation, or None if none was valid
 ```
 
@@ -111,7 +111,8 @@ if result.results is not None:
     result.results.functions.constraints # the nonlinear constraint values
 ```
 
-`results` is `None` when the run produced no valid result: too few realizations
+`results` is `None` when the optimization produced no valid result: too few
+realizations
 succeeded, or no result ever satisfied the constraints — see
 [When something goes wrong](#when-something-goes-wrong). One check therefore
 covers every field.
@@ -132,7 +133,7 @@ optimize(config, x0, objective, report=report)
 ```
 
 `result.variables` is the point that was evaluated. During an optimization the
-optimizer chose it, so this is how you follow the path a run takes.
+optimizer chose it, so this is how you follow the path an optimization takes.
 
 ### Reporting gradients as well
 
@@ -186,7 +187,8 @@ optimization whose callback returned `True`; the others continue.
 
 The runnable script is
 [examples/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py),
-which stops a run after a fixed number of results and then reads the best point
+which stops an optimization after a fixed number of results and then reads the
+best point
 it had reached.
 
 !!! note "Nothing to stop on an evaluation"
@@ -195,11 +197,11 @@ it had reached.
     there the return value is **ignored**. An evaluation is a single batch with
     no optimizer loop to interrupt, so the callback reports and nothing more.
 
-### Aborting a run from outside { #stopping-from-outside }
+### Aborting from outside { #stopping-from-outside }
 
-The `report` callback runs inside the run it stops, which is no use to a signal
-handler or a user interface. [`Session.abort`][ropt.Session.abort] is
-the one that is called from another thread: it aborts every run that belongs
+The `report` callback runs inside the optimization it stops, which is no use to
+a signal handler or a user interface. [`Session.abort`][ropt.Session.abort] is
+the one that is called from another thread: it aborts every task that belongs
 to the session, and each raises [`AbortedError`][ropt.exceptions.AbortedError]
 with `USER_ABORT`.
 
@@ -214,51 +216,52 @@ with session() as s:
 ```
 
 The two are not the same kind of ending, which is why they have different exit
-codes. A `report` callback stops the run *on a criterion*, at a point it chose,
-and the run returns the best result it had reached. An abort applies no
-criterion, and the run returns no result. To keep what an aborted run had
-reached, collect its results as they arrive, with a `report` callback or a
-[handler](../results/handlers.md).
+codes. A `report` callback stops the optimization *on a criterion*, at a point it
+chose, and the optimization returns the best result it had reached. An abort
+applies no criterion, and the optimization returns no result. To keep what an
+aborted optimization had reached, collect its results as they arrive, with a
+`report` callback or a [handler](../results/handlers.md).
 
-An aborted run does not wait for the evaluations that are running. With no pool,
-the evaluation function runs in the calling thread, so the call in progress
+An aborted task does not wait for the evaluations that are running. With no
+pool, the evaluation function runs in the calling thread, so the call in progress
 returns first. On a thread or process pool, the evaluations already running
-continue after the run has ended, and their workers are free only once they
+continue after the task has ended, and their workers are free only once they
 return. On a local or HPC pool they are cancelled.
 
-`abort()` reaches the runs that are under way at the moment it is called, and
-nothing more. A run started afterwards is unaffected, so a
+`abort()` reaches the tasks that are under way at the moment it is called, and
+nothing more. A task started afterwards is unaffected, so a
 loop that abandons one attempt and starts another keeps working. An
 [`offload`][ropt.Session.offload] counts as one task here: a callable it has
 queued behind its `limit` is not started. Leaving the session's `with` block
-aborts its runs as well, and then releases its pools, which is what refuses a
-run started after that. Releasing a local or HPC pool cancels the jobs it still
-has, so none are left running when the block has ended. A run aborted that way
+aborts its tasks as well, and then releases its pools, which is what refuses a
+task started after that. Releasing a local or HPC pool cancels the jobs it still
+has, so none are left running when the block has ended. A task aborted that way
 raises with `ABORTED` rather than `USER_ABORT`, since it was the block ending
 rather than a request to abort.
 
-A run started with the module-level [`optimize`][ropt.optimize] belongs
+An optimization started with the module-level [`optimize`][ropt.optimize] belongs
 to no session you hold and cannot be aborted this way. It evaluates on the
 calling thread, which is the thread that would have to call `abort()`. Start it
 on a session or one of its pools to make it abortable.
 
 ## Attaching metadata
 
-You can attach arbitrary **metadata** to a run, from two sources:
+You can attach arbitrary **metadata** to an optimization or evaluation, from two
+sources:
 
-- **Constant, per run** — pass a `metadata` dict to `optimize`, `evaluate`, or
-  `evaluate_batch`. `ropt` copies it onto every result the run produces, which
-  is one way to tag a run:
+- **Constant, per task** — pass a `metadata` dict to `optimize`, `evaluate`, or
+  `evaluate_batch`. `ropt` copies it onto every result the task produces, which
+  is one way to tag an optimization:
 
   ```python
-  result = optimize(config, x0, objective, metadata={"run_id": 7})
-  print(result.results.metadata["run_id"])   # 7
+  result = optimize(config, x0, objective, metadata={"id": 7})
+  print(result.results.metadata["id"])   # 7
   ```
 
   The same dict also reaches the evaluation function itself, as
-  `context.metadata` — useful when the evaluation needs to know which run it is
-  part of. With several optimizations at once, this is how they are told apart;
-  see [Give each optimization an ID](many_runs.md).
+  `context.metadata` — useful when the evaluation needs to know which
+  optimization it is part of. With several optimizations at once, this is how
+  they are told apart; see [Give each optimization an ID](many_runs.md).
 
 - **Per evaluation** — return an
   [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
@@ -318,7 +321,7 @@ receives, so everything is read the same way wherever it came from. Here
 `report` callback, where the optimizer chose the point.
 
 An evaluation is a single batch, so it produces either every result or none.
-When [`Session.abort`](#stopping-from-outside) or a failing run on the same
+When [`Session.abort`](#stopping-from-outside) or a failing task on the same
 session aborts it, or when the pool it was evaluating on could no longer run the
 work, it raises [`AbortedError`][ropt.exceptions.AbortedError]. An abort that
 arrives after the batch has finished leaves it unaffected.
@@ -337,8 +340,9 @@ raised, raises [`AbortedError`][ropt.exceptions.AbortedError] instead (see
 [Failures and Aborts](failures.md)).
 [Exit Codes](../results/exit_codes.md) lists them all, and explains why a
 reason and a result are independent: `result.results` is `None` when no feasible
-result was ever recorded, whatever the reason the run ended, and a run that stops
-part-way still returns the best result it had reached before that. The
+result was ever recorded, whatever the reason the optimization ended, and an
+optimization that stops part-way still returns the best result it had reached
+before that. The
 evaluations it did make reach the [handlers](../results/handlers.md) attached to
 it either way.
 
@@ -347,7 +351,7 @@ What *is* raised falls into three groups:
 - **Mistakes in the configuration** surface as a `pydantic.ValidationError`
   from the `config` dictionary: an unknown field, a value of the wrong type, a
   method name no installed plugin provides, or a set of options the chosen
-  method does not accept. These are raised when the run starts, before
+  method does not accept. These are raised when the optimization starts, before
   anything is evaluated.
 
 - **Mistakes in the call to `optimize` itself** raise a `ValueError` — a start point of the
@@ -356,16 +360,16 @@ What *is* raised falls into three groups:
   [`WorkflowError`][ropt.exceptions.WorkflowError] when a pool or handler
   is used in a way it cannot be (a pool asked to run work from one of its
   own workers, a pool whose session has closed, a handler already claimed by
-  another run),
+  another optimization),
   [`UnsupportedError`][ropt.exceptions.UnsupportedError] when an optional
   dependency is missing, or when the chosen method cannot handle the problem
   as configured — a constraint it does not support, for instance, which is
-  checked as the run starts — and
+  checked as the optimization starts — and
   [`ExecutionError`][ropt.exceptions.ExecutionError] when the worker pool
   that runs your evaluations, or a callable handed to
   [`WorkerPool.offload`][ropt.WorkerPool.offload], cannot start or breaks
-  down, and [`AbortedError`][ropt.exceptions.AbortedError] when the run, or an
-  offload, was aborted before it finished.
+  down, and [`AbortedError`][ropt.exceptions.AbortedError] when the
+  optimization, or an offload, was aborted before it finished.
 
 - **Exceptions from your own evaluation function** are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process

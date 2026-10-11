@@ -18,12 +18,12 @@ from ropt import HistoryHandler, optimize
 
 history = HistoryHandler()
 result = optimize(config, x0, objective, handlers=[history])
-print(len(history.results))   # every evaluation from this run
+print(len(history.results))   # every evaluation from this optimization
 ```
 
 Compare this with the `report` callback from
 [Follow the progress](ensemble.md#4-follow-the-progress-optional):
-`report` is called once per evaluation, for one run. A handler is more
+`report` is called once per evaluation, for one optimization. A handler is more
 general — it keeps or reacts to results, and, unlike `report`, the same
 handler can be reused across several **sequential** calls to `optimize`,
 accumulating results from all of them.
@@ -38,4 +38,4 @@ accumulating results from all of them.
 - **[`DataFrameHandler`][ropt.DataFrameHandler]** — collects results into a `pandas` or `polars` table.
 
 See [Result handlers](../results/handlers.md) for the full
-list, and for what a handler shared between concurrent runs guarantees.
+list, and for what a handler shared between concurrent optimizations guarantees.

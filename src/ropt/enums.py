@@ -111,14 +111,15 @@ class EnOptEventType(IntEnum):
 
 
 class ExitCode(IntEnum):
-    """Enumerates the reasons a run ends.
+    """Enumerates the reasons a task ends.
 
-    A run either **stops** or is **aborted**. It stops when a condition on the
-    run is met — the optimizer converged, a budget ran out, a handler decided
-    the results were good enough — so it ends at a point that satisfied a stated
-    criterion, and its result carries the code. It is aborted when something
-    ends it regardless of the state of the run, and it then raises
-    [`AbortedError`][ropt.exceptions.AbortedError], which carries the code.
+    An optimization either **stops** or is **aborted**. It stops when a
+    condition on the optimization is met — the optimizer converged, a budget
+    ran out, a handler decided the results were good enough — so it ends at a
+    point that satisfied a stated criterion, and its result carries the code. A
+    task of any kind is aborted when something ends it regardless of its state,
+    and it then raises [`AbortedError`][ropt.exceptions.AbortedError], which
+    carries the code.
 
     Each member carries a short description in
     [`message`][ropt.enums.ExitCode.message], for reporting.
@@ -137,30 +138,30 @@ class ExitCode(IntEnum):
     """Returned when the maximum number of evaluation batches is reached."""
 
     STOPPED = 4
-    """Returned when an event handler asked the run to stop.
+    """Returned when an event handler asked the optimization to stop.
 
     A graceful end at an evaluation boundary, on a criterion the caller
     supplied. A `report` callback is such a handler.
     """
 
     FINISHED = 5
-    """Returned when the run terminated normally."""
+    """Returned when the optimizer ended the optimization."""
 
     EXECUTOR_SHUT_DOWN = 6
     """Carried by `AbortedError` when the executor could no longer run the work.
 
     Not a failure: in practice the interpreter was shutting down and the worker
-    pool was gone, so the run is released rather than left waiting. An executor
+    pool was gone, so the task is released rather than left waiting. An executor
     that breaks raises [`ExecutionError`][ropt.exceptions.ExecutionError]
     instead.
     """
 
     ABORTED = 7
-    """Carried by `AbortedError` when the run was aborted from outside, without
+    """Carried by `AbortedError` when the task was aborted from outside, without
     regard to where it had got to.
 
     This is what closing a session, or a `KeyboardInterrupt` passing through a
-    task, gives a run still under way.
+    task, gives a task still under way.
     """
 
     ABORTED_ON_ERROR = 8
@@ -170,7 +171,7 @@ class ExitCode(IntEnum):
 
     USER_ABORT = 9
     """Carried by `AbortedError` when [`Session.abort`][ropt.Session.abort]
-    aborted the run.
+    aborted the task.
 
     Set apart from [`ABORTED`][ropt.enums.ExitCode.ABORTED] so that an abort
     that was asked for can be told from one the library performed itself.
@@ -181,7 +182,7 @@ class ExitCode(IntEnum):
         """A short description of this exit code, for reporting.
 
         Note that `str()` and f-strings give the integer value, as they do for
-        any [`IntEnum`][enum.IntEnum]; use this or `name` to report a run.
+        any [`IntEnum`][enum.IntEnum]; use this or `name` to report the code.
 
         Returns:
             A capitalized phrase with no trailing period.
@@ -190,18 +191,18 @@ class ExitCode(IntEnum):
 
 
 # Kept beside the members rather than in the docs, so that one call site reports
-# a run the same way everywhere.
+# an exit code the same way everywhere.
 _MESSAGES: Final[dict[ExitCode, str]] = {
     ExitCode.UNKNOWN: "Exit code not set",
     ExitCode.TOO_FEW_REALIZATIONS: "Too few realizations evaluated successfully",
     ExitCode.MAX_FUNCTIONS_REACHED: "Maximum number of function evaluations reached",
     ExitCode.MAX_BATCHES_REACHED: "Maximum number of evaluation batches reached",
     ExitCode.STOPPED: "Stopped by an event handler",
-    ExitCode.FINISHED: "Run completed normally",
+    ExitCode.FINISHED: "Optimization completed normally",
     ExitCode.EXECUTOR_SHUT_DOWN: "Executor could no longer run the evaluations",
-    ExitCode.ABORTED: "Run aborted",
+    ExitCode.ABORTED: "Aborted",
     ExitCode.ABORTED_ON_ERROR: "Aborted because another task failed",
-    ExitCode.USER_ABORT: "Run aborted on request",
+    ExitCode.USER_ABORT: "Aborted on request",
 }
 
 

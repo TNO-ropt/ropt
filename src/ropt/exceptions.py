@@ -112,6 +112,6 @@ class ExecutorStopped(Exception):  # ruff: ignore[error-suffix-on-exception-name
     """Raised when the evaluation executor can no longer run the work.
 
     A generic signal, carrying no exit code. In practice this happens at
-    interpreter shutdown, when the worker pool is gone and a run that outlived
+    interpreter shutdown, when the worker pool is gone and a task that outlived
     its program is released rather than left waiting.
     """

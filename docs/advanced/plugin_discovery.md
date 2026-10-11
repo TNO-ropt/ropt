@@ -25,7 +25,7 @@ The area is one of `"backend"`, `"sampler"`, `"realization_filter"` or
 
 [`validate_backend_options`][ropt.utils.validate_backend_options] checks
 whether a set of backend-specific options is valid for a given method, raising
-an error if not. Call it before starting a long optimization run to catch
+an error if not. Call it before starting a long optimization to catch
 configuration mistakes early:
 
 ```python

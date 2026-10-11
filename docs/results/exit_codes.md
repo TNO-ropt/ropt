@@ -13,7 +13,7 @@ print(result.exit_code.message)
 
 Each code carries a short description in
 [`message`][ropt.enums.ExitCode.message], which is what to print or log when
-reporting a run. Use `name` where the identifier itself is wanted, and compare
+reporting it. Use `name` where the identifier itself is wanted, and compare
 against the member to branch on it. Note that `str()` and an f-string give the
 integer value, as they do for any `IntEnum`:
 
@@ -24,12 +24,12 @@ code.name     # 'MAX_FUNCTIONS_REACHED'
 str(code)     # '2'
 ```
 
-A run either **stops** or is **aborted**. It stops when a condition on the run
-is met — the optimizer converged, a budget ran out, a
+An optimization either **stops** or is **aborted**. It stops when a condition on
+the optimization is met — the optimizer converged, a budget ran out, a
 [`report` callback](../running/running.md#stopping-early-from-the-callback)
 returned `True` — so it ends at a point that satisfied a stated criterion, and
 returns its result with the code. It is aborted when something ends it
-regardless of the state of the run, and it then raises
+regardless of its state, and it then raises
 [`AbortedError`][ropt.exceptions.AbortedError], whose `exit_code` attribute
 holds the code:
 
@@ -44,25 +44,25 @@ except AbortedError as error:
 
 | Exit code               | Meaning                                                                                              |
 | ----------------------- | ---------------------------------------------------------------------------------------------------- |
-| `FINISHED`              | The run terminated normally. For an optimization this means the backend ended it, by converging or on a limit of its own such as `max_iterations`. |
+| `FINISHED`              | The optimizer ended the optimization, by converging or on a limit of its own such as `max_iterations`. |
 | `MAX_FUNCTIONS_REACHED` | The configured maximum number of function evaluations was reached.                                   |
 | `MAX_BATCHES_REACHED`   | The configured maximum number of evaluation batches was reached.                                     |
-| `STOPPED`               | A `report` callback returned `True`, ending the run at the next evaluation boundary.                 |
+| `STOPPED`               | A `report` callback returned `True`, ending the optimization at the next evaluation boundary.        |
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
-| `ABORTED`               | The run was aborted from outside, as closing a session, or a `KeyboardInterrupt`, does to a run still under way. |
+| `ABORTED`               | The task was aborted from outside, as closing a session, or a `KeyboardInterrupt`, does to a task still under way. |
 | `ABORTED_ON_ERROR`      | Another [task](../running/failures.md) raised, and this one was aborted with it.                    |
-| `USER_ABORT`            | [`Session.abort`](../running/running.md#stopping-from-outside) aborted the run.                      |
-| `EXECUTOR_SHUT_DOWN`    | The pool the run was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
-| `UNKNOWN`               | The zero value of the enumeration. No run reports it.                                                |
+| `USER_ABORT`            | [`Session.abort`](../running/running.md#stopping-from-outside) aborted the task.                     |
+| `EXECUTOR_SHUT_DOWN`    | The pool the task was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
+| `UNKNOWN`               | The zero value of the enumeration. No task reports it.                                               |
 
 The first five are stops, returned on the result, and the next four are aborts,
-raised with `AbortedError`; `UNKNOWN` is neither. `TOO_FEW_REALIZATIONS` ends a
-run at an evaluation boundary like the other stops, but unlike them it follows
-from a failure: one failed realization is enough to trigger it unless
+raised with `AbortedError`; `UNKNOWN` is neither. `TOO_FEW_REALIZATIONS` ends an
+optimization at an evaluation boundary like the other stops, but unlike them it
+follows from a failure: one failed realization is enough to trigger it unless
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
 is lowered.
 
-## What each kind of run reports
+## What each kind of task reports { #what-each-kind-of-run-reports }
 
 An **optimization** returns any of the stop codes above, and raises with any of
 the abort codes.

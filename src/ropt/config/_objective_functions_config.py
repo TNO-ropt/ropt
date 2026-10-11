@@ -32,7 +32,7 @@ class ObjectiveFunctionsConfig(BaseModel):
     detailed descriptions and usage examples.
 
     The reported `target_objective` is divided by the estimated `auto_scale`
-    factors, so runs that differ in that setting compare only through
+    factors, so optimizations that differ in that setting compare only through
     `functions.objectives` or their variables.
 
     Attributes:

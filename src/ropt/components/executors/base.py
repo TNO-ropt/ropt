@@ -42,7 +42,7 @@ _logger = get_logger(__name__)
 _ON_WORKER = (
     "This executor cannot be used from work that is already running on it: the "
     "caller would wait for the workers it is itself occupying, which deadlocks "
-    "once they are all busy. Give the inner run an executor of its own, or none "
+    "once they are all busy. Give the inner task an executor of its own, or none "
     "at all."
 )
 

@@ -2,7 +2,7 @@
 
 Pydantic models that together define a complete optimization setup. Each
 corresponds to a top-level section of the configuration dictionary that
-describes a single run. See
+describes a single optimization. See
 [Configuration Sections](../optimizer_setup/configuration_sections.md) for the
 fields, their defaults and worked examples.
 """

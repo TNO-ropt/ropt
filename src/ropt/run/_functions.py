@@ -1,12 +1,12 @@
-"""The entry points for a run that belongs to no session.
+"""The entry points for a task that belongs to no session.
 
-Each opens a session of its own for the length of the call, so a run always has
+Each opens a session of its own for the length of the call, so a task always has
 one. Nothing else can reach that session, which is exactly what "outside a
-session" means: no `Session.abort` reaches the run directly, and its failure
-aborts only what it started. Started from inside another run or offload, it is
-still nested there and is aborted with it.
+session" means: no `Session.abort` reaches the task directly, and its failure
+aborts only what it started. Started from inside another task, it is still
+nested there and is aborted with it.
 
-Give a run a [`session`][ropt.session], or one of its pools, when it
+Give a task a [`session`][ropt.session], or one of its pools, when it
 should be part of something larger.
 """
 
@@ -46,7 +46,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
 
     The evaluations run on the calling thread. See
     [Running Optimizations](../running/running.md) for a walkthrough, and
-    [`Session.optimize`][ropt.Session.optimize] for the same run on a
+    [`Session.optimize`][ropt.Session.optimize] for the same optimization on a
     session you hold.
 
     Args:

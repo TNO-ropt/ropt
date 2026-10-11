@@ -10,16 +10,17 @@ from pydantic import BaseModel, ConfigDict, PositiveInt
 class OptimizerConfig(BaseModel):
     """Configuration class for the optimization algorithm.
 
-    `OptimizerConfig` defines run-level settings for an optimization. It is the
-    `optimizer` section of the configuration.
+    `OptimizerConfig` defines the settings that control how an optimization is
+    managed. It is the `optimizer` section of the configuration.
 
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#optimizer) for
     detailed descriptions and usage examples.
 
     Warning:
-        Capturing output rewires process-global state, so one run at a time can
-        do it. A second run that sets `stdout` or `stderr` while another holds
-        the capture raises [`WorkflowError`][ropt.exceptions.WorkflowError].
+        Capturing output rewires process-global state, so one optimization at a
+        time can do it. A second optimization that sets `stdout` or `stderr`
+        while another holds the capture raises
+        [`WorkflowError`][ropt.exceptions.WorkflowError].
 
     Attributes:
         max_batches:    Maximum number of batch evaluations (optional).

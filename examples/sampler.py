@@ -133,7 +133,7 @@ def main() -> None:
         return float(objective)
 
     # Sharing is what makes the random steps identical across realizations, so
-    # only the second run gives each realization its own.
+    # only the second optimization gives each realization its own.
     for method, shared in (("forward", True), ("random", False)):
         config: dict[str, Any] = {
             "variables": {

@@ -1,4 +1,4 @@
-"""Result objects returned by a run."""
+"""Result objects returned by an optimization or evaluation."""
 
 from __future__ import annotations
 
@@ -12,10 +12,10 @@ if TYPE_CHECKING:
 
 @dataclass
 class OptimizationResult:
-    """The outcome of a single optimization run.
+    """The outcome of a single optimization.
 
-    A run ends at one evaluation, the best one it found, and that evaluation is
-    carried unchanged on `results`. See
+    An optimization ends at one evaluation, the best one it found, and that
+    evaluation is carried unchanged on `results`. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
     Attributes:
@@ -31,7 +31,7 @@ class OptimizationResult:
 
 @dataclass
 class EvaluationResult[T]:
-    """The outcome of a single evaluation run.
+    """The outcome of a single evaluation.
 
     What `results` holds depends on which method produced it: one
     [`FunctionResults`][ropt.results.FunctionResults] from

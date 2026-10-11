@@ -3,14 +3,15 @@
 Some problems split naturally into two layers: a few variables that are awkward
 for one method — integers, say, or switches — and the rest, which a gradient
 method handles well. **Nested optimization** solves them in two loops. An outer
-run varies the awkward variables, and every outer evaluation runs a complete
-inner optimization over the remaining ones, returning the best value it reached.
+optimization varies the awkward variables, and every outer evaluation runs a
+complete inner optimization over the remaining ones, returning the best value it
+reached.
 
 !!! tip "This page also covers four things that are not nesting"
     Nesting itself is a niche, but this page puts four things that are not
     into one program small enough to read end to end: choosing a pool per
     layer, and why one of them has to stay on threads; collecting results from
-    runs that overlap in time, in one handler; reusing an evaluation
+    optimizations that overlap in time, in one handler; reusing an evaluation
     the optimizer has already made; and moving the expensive layer to a cluster
     by changing a single line.
 
@@ -45,8 +46,8 @@ flowchart TB
     in2 ==>|"batch"| w2
 ```
 
-Solid arrows start a run, thick arrows carry evaluations out to a worker
-process, and dotted arrows carry results back to the handler. Both pools
+Solid arrows start an optimization, thick arrows carry evaluations out to a
+worker process, and dotted arrows carry results back to the handler. Both pools
 are drawn: the outer one is inside your process, the inner one is not. The
 sections below work through each part.
 
@@ -64,8 +65,9 @@ change. The `mask` field does this, and the two masks are complements:
 ```
 
 A masked-out variable keeps the value it was given and is not passed to the
-optimizer, so the inner run treats the outer variables as constants and the
-outer run never touches the inner ones. The two layers can otherwise be
+optimizer, so the inner optimization treats the outer variables as constants and
+the outer optimization never touches the inner ones. The two layers can otherwise
+be
 configured completely differently — here the outer is integer-valued and
 gradient-free, while the inner is continuous and uses an ensemble of five
 realizations. See [`variables`](../optimizer_setup/configuration_sections.md#variables)
@@ -90,19 +92,20 @@ that caused it, which is what makes the collected results traceable. The `memo`
 lookup above it is covered in
 [Reusing an outer evaluation](#reusing-an-outer-evaluation).
 
-An inner run that ends with `TOO_FEW_REALIZATIONS` has no result, and the outer
-evaluation reports `NaN` for it. That is the same value an ordinary evaluation
-function returns for a realization that failed, so the outer run applies its own
+An inner optimization that ends with `TOO_FEW_REALIZATIONS` has no result, and
+the outer evaluation reports `NaN` for it. That is the same value an ordinary
+evaluation function returns for a realization that failed, so the outer
+optimization applies its own
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
 to it.
 
-## When an inner run fails { #when-an-inner-run-fails }
+## When an inner optimization fails { #when-an-inner-run-fails }
 
-The inner run is started from the outer evaluation function, so it is
-[nested](failures.md#nested-tasks) in the outer run. An exception it
+The inner optimization is started from the outer evaluation function, so it is
+[nested](failures.md#nested-tasks) in the outer optimization. An exception it
 raises is raised in the outer evaluation function and aborts nothing outside the
-inner run. The evaluation function can catch it and return `NaN` for that
-realization:
+inner optimization. The evaluation function can catch it and return `NaN` for
+that realization:
 
 ```python
 try:
@@ -112,8 +115,8 @@ except RuntimeError:
 ```
 
 An exception that the outer evaluation function does not catch ends the outer
-run, as any exception from an evaluation function does. When the outer run is
-aborted, the inner runs are aborted with it. See
+optimization, as any exception from an evaluation function does. When the outer
+optimization is aborted, the inner optimizations are aborted with it. See
 [Failures and Aborts](failures.md) for the rules that apply to every task.
 
 ## Two pools, not one { #two-pools-not-one }
@@ -147,15 +150,16 @@ collect its own results, and return them as data for you to combine. Use that
 when the outer evaluations are genuinely independent; use the shape above when
 you want one pool and one table across all of them.
 
-The inner run passes `bundle_size=0`, which sends a whole inner batch to one
-worker at once. Within one inner run that gives up parallelism
+The inner optimization passes `bundle_size=0`, which sends a whole inner batch to
+one worker at once. Within one inner optimization that gives up parallelism
 completely — its five realizations are evaluated one after another — but the
 parallelism here comes from the layer above: two outer evaluations run at once,
 each feeding the inner pool one bundle, so both workers are busy and each
 batch costs one transfer instead of five. See
 [How a batch is split across workers](parallel.md#how-many-workers).
 
-Handing the inner run the pool it is already running on would deadlock, and
+Handing the inner optimization the pool it is already running on would deadlock,
+and
 `ropt` refuses it rather than hanging — see
 [Pools inside an evaluation](parallel.md#pools-inside-an-evaluation) for
 why.
@@ -185,17 +189,17 @@ missing and both compute it. The stored value is the same either way, so the
 cost is one repeated evaluation. A lock would close that window and serialize
 the outer layer with it.
 
-A repeat starts no inner run, so the table described next holds rows for the
-outer evaluations that were computed, not for every outer evaluation.
+A repeat starts no inner optimization, so the table described next holds rows
+for the outer evaluations that were computed, not for every outer evaluation.
 
-## Collecting results from runs that overlap
+## Collecting results from optimizations that overlap
 
-The inner runs are concurrent, and [one
+The inner optimizations are concurrent, and [one
 handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) collects them
-all: it takes a lock around every event it handles, so the runs wait for each
-other rather than interleaving. Give every inner run the same
+all: it takes a lock around every event it handles, so the optimizations wait for
+each other rather than interleaving. Give every inner optimization the same
 [`DataFrameHandler`](../results/handlers.md#dataframehandler) and every inner evaluation
-from every inner run lands in one table, keyed by the outer evaluation it
+from every inner optimization lands in one table, keyed by the outer evaluation it
 belongs to.
 
 Reading the answer takes one more step than usual:

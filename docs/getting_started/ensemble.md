@@ -86,9 +86,9 @@ computed.
 --8<-- "examples/ensemble.py:report"
 ```
 
-The callback belongs to one run and sees one evaluation at a time. To keep the
-results rather than just look at them — or to collect them across several runs
-— use a handler instead; see
+The callback belongs to one optimization and sees one evaluation at a time. To
+keep the results rather than just look at them — or to collect them across
+several optimizations — use a handler instead; see
 [Collecting Results with Handlers](handlers.md).
 
 ## 5. Run it
@@ -112,12 +112,13 @@ robust objective, which is what it optimizes.
 --8<-- "examples/ensemble.py:result"
 ```
 
-- `result.exit_code` indicates why the run stopped (a member of the
+- `result.exit_code` indicates why the optimization stopped (a member of the
   [`ExitCode`][ropt.enums.ExitCode] enumeration).
-- `result.results` is the best evaluation of the run, a
+- `result.results` is the best evaluation of the optimization, a
   [`FunctionResults`][ropt.results.FunctionResults] carrying every value that
   evaluation produced — the same object a handler receives. It is `None` if the
-  run produced no valid result, so one check covers every value read from it.
+  optimization produced no valid result, so one check covers every value read
+  from it.
 - `result.results.variables` is the best set of variables found, and
   `result.results.target_objective` the robust objective value there.
 

@@ -44,9 +44,10 @@ class Backend(ABC):
 
     **Process-global state**
 
-    While a run is in progress a backend must not change the working directory,
-    the environment, `sys.stdout` or `sys.stderr`, or file descriptors 1 and 2,
-    since it shares them with every other run in the process. See
+    While an optimization is in progress a backend must not change the working
+    directory, the environment, `sys.stdout` or `sys.stderr`, or file
+    descriptors 1 and 2, since it shares them with every other optimization in
+    the process. See
     [What a backend may not change](../advanced/writing_plugins.md#what-a-backend-may-not-change).
     """
 

@@ -73,8 +73,9 @@ specifies how to handle such violations (the values of
 perturbations back into the valid range. As with `types`, the enumeration
 members may be written in place of the strings.
 
-The `seed` value (default: `1`) ensures consistent results across repeated runs.
-To obtain unique results for each optimization run, modify the seed. A common
+The `seed` value (default: `1`) ensures consistent results across repeated
+optimizations. To obtain unique results for each optimization, modify the seed.
+A common
 approach is to use a tuple with a unique ID as the first
 element, ensuring reproducibility across nested and parallel evaluations.
 
@@ -122,8 +123,8 @@ scales, offsets = scales_and_offsets_from_bounds([0.0, 100.0], [1.0, 600.0])
 Scales must be positive: a scale is a change of units, and nothing else. The
 default is a scale of 1 and an offset of 0, which is the identity. There is no
 `auto_scale` for variables, because there is nothing to estimate one from: the
-bounds are the only information available before the run starts, and using them
-is a choice, not a default.
+bounds are the only information available before the optimization starts, and
+using them is a choice, not a default.
 
 Everything that describes the variables moves with them. The bounds are mapped,
 and so are the [perturbation magnitudes](#variable-perturbations) of type
@@ -215,13 +216,14 @@ the meaning of `weights` and, unlike a per-objective scale, the location of the
 optimum. Realizations that fail do not contribute.
 
 The estimate is computed once, from the first batch, and then fixed for the rest
-of the run. It *multiplies* `scales` rather than replacing it, so a configured
-scale still applies on top of an estimated one. An `offsets` entry is subtracted
-before the estimate is taken, so the estimate measures what is left after it.
+of the optimization. It *multiplies* `scales` rather than replacing it, so a
+configured scale still applies on top of an estimated one. An `offsets` entry is
+subtracted before the estimate is taken, so the estimate measures what is left
+after it.
 
 Because the estimate divides the objective the optimizer reports, switching
 `auto_scale` on lowers `target_objective` without changing the solution. Two
-runs that differ in this setting can only be compared through
+optimizations that differ in this setting can only be compared through
 `functions.objectives` or their variables; see
 [Scaling of results](../results/results.md#scaling-of-results).
 
@@ -244,8 +246,8 @@ tolerance of many methods. Subtracting a baseline of $10^9$ first and then
 dividing by $10^5$ leaves the variation at order one.
 
 Because it changes the value the optimizer tests against its tolerances, an
-offset can change where a run stops, even though it cannot change where the
-optimum is.
+offset can change where an optimization stops, even though it cannot change
+where the optimum is.
 
 An aggregate that measures dispersion rather than central tendency has its
 offset subtracted too. A standard deviation is unchanged by shifting the values
@@ -440,7 +442,7 @@ of realizations, meaning no failures are allowed).
 
 Validated into [`OptimizerConfig`][ropt.config.OptimizerConfig].
 
-Run-level settings that control how the optimization is managed. All
+Settings that control how the optimization is managed. All
 fields are optional and default to `None` (no limit) or `None` (no
 redirection):
 
@@ -474,19 +476,19 @@ is any: that is [`verbose`](#backend). The evaluation callback is excluded
 either way — anything your objective function or your result handlers print goes
 to the terminal as usual.
 
-!!! warning "Capture is for one run at a time"
+!!! warning "Capture is for one optimization at a time"
     Capturing rewires process-global state, so only one optimization at a time
-    can do it. A second run that tries while another holds it — one of
+    can do it. A second optimization that tries while another holds it — one of
     [several optimizations at once](../running/many_runs.md), or
     an optimization started from inside an evaluation callback — raises
     [`WorkflowError`][ropt.exceptions.WorkflowError]. Leave `stdout` and
-    `stderr` unset on runs that overlap.
+    `stderr` unset on optimizations that overlap.
 
     Whether an optimizer reports at all is decided by [`verbose`](#backend),
     independently of capture. To silence one, set `verbose=False`; to discard
     output you cannot switch off, capture to `os.devnull` — but this
-    discards anything *else* the process writes during the run, which a
-    throwaway file would not.
+    discards anything *else* the process writes during the optimization, which
+    a throwaway file would not.
 
 !!! note "What else lands in the file"
     Capture is scoped to a period of time, not to a source, so anything the
@@ -514,8 +516,8 @@ settings that are forwarded to the backend:
   backends support this setting. It is compared against the quantities the
   optimizer works with, which are scaled; see [Scaling
   objectives](#objective-scales). Setting `auto_scale` there brings the weighted
-  objective sum to a magnitude of one at the start of the run, which is what
-  makes a fixed tolerance mean the same thing across problems.
+  objective sum to a magnitude of one at the start of the optimization, which is
+  what makes a fixed tolerance mean the same thing across problems.
 - **`parallel`** (default: `False`): If `True`, allows the optimizer to use
   parallelized function evaluations. Typically applies to gradient-free methods;
   not all backends support this setting.
@@ -546,7 +548,7 @@ Which methods a backend supports, which kinds of constraint and variable each
 of them accepts, and which `options` they take, is documented by the backend
 itself. For the built-in SciPy backend, see
 [`SciPyBackend`][ropt.backend.scipy.SciPyBackend]. A method configured with a
-constraint it cannot handle is only rejected when the run starts, with
+constraint it cannot handle is only rejected when the optimization starts, with
 [`UnsupportedError`][ropt.exceptions.UnsupportedError], after the rest of the
 configuration has already been written.
 

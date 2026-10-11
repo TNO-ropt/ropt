@@ -7,7 +7,7 @@ example `from ropt import optimize, session`. See
 A name is re-exported here when a program written against `ropt` has to spell it
 out: the functions it calls, the classes it instantiates or subclasses, and the
 types it puts in its own signatures. A name that is only reached through a value
-a run returns keeps its own module. The fields of a
+an optimization or evaluation returns keeps its own module. The fields of a
 [`FunctionResults`][ropt.results.FunctionResults] are in
 [`ropt.results`][ropt.results], the remaining enumerations in
 [`ropt.enums`][ropt.enums], and the classes describing the configuration
@@ -18,12 +18,12 @@ from [`RoptError`][ropt.exceptions.RoptError] and is re-exported here; the
 control-flow signals that `ropt` raises and catches itself stay in
 [`ropt.exceptions`][ropt.exceptions].
 
-Nothing about a run depends on where it is called from. What it is started on
-says where its evaluations happen and which session it belongs to: a module
-function runs in-process and belongs to nothing, a [`Session`][ropt.Session]
-method runs in-process on that session, and a [`WorkerPool`][ropt.WorkerPool]
-method runs on that pool's workers. This holds wherever the run is started from,
-including a thread you spawn yourself.
+Nothing about an optimization or evaluation depends on where it is called from.
+What it is started on says where its evaluations happen and which session it
+belongs to: a module function runs in-process and belongs to nothing, a
+[`Session`][ropt.Session] method runs in-process on that session, and a
+[`WorkerPool`][ropt.WorkerPool] method runs on that pool's workers. This holds
+wherever it is started from, including a thread you spawn yourself.
 
 Pools come from a [`session`][ropt.session], which releases them when it closes.
 """

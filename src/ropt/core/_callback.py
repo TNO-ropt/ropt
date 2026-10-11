@@ -23,7 +23,7 @@ class OptimizerCallbackResult:
     them against zero and never needs a bound. A constraint with a finite lower
     and a finite upper bound contributes two values, an equality one, and a
     constraint with no finite bound none. Which of them are equalities is fixed
-    for the run and available from
+    for the optimization and available from
     [`nonlinear_equalities`][ropt.backend.OptimizationProblem.nonlinear_equalities].
 
     `functions` and `gradients` follow a fixed shape:

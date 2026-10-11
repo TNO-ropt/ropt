@@ -1,9 +1,9 @@
 """Ensemble optimization on an HPC cluster with `ropt`.
 
-An HPC pool submits evaluations to a cluster queue (through `pysqa`), so a run
-started on one evaluates its ensemble as cluster jobs. This is what the example
-does by default; it needs the `ropt[hpc]` extra and a reachable cluster. The
-cluster and queue come from the `pysqa` configuration of the `ropt`
+An HPC pool submits evaluations to a cluster queue (through `pysqa`), so an
+optimization started on one evaluates its ensemble as cluster jobs. This is what
+the example does by default; it needs the `ropt[hpc]` extra and a reachable
+cluster. The cluster and queue come from the `pysqa` configuration of the `ropt`
 installation unless `--queue` names one; other cluster parameters (such as
 `cluster` and `cores`) can be passed to `hpc_pool` when needed.
 

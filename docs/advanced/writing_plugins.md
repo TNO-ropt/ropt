@@ -173,7 +173,7 @@ Backends receive their method-specific settings through the `options` field of
 unchecked. A backend reports what it accepts by implementing
 `validate_options`, which is what
 [`validate_backend_options`][ropt.utils.validate_backend_options] calls so
-that users can catch mistakes before starting a long run.
+that users can catch mistakes before starting a long optimization.
 
 [`OptionsSchemaModel`][ropt.config.options.OptionsSchemaModel] describes the
 options of each method in one place, and both validates them and generates the
@@ -186,21 +186,21 @@ A backend runs in the caller's process, alongside whatever else is in it —
 including other optimizations, since
 [`Session.offload`][ropt.Session.offload] can run several at once, each on its
 own thread with its own configuration. Anything a backend changes *per process*
-is therefore shared with unrelated runs, and cannot carry per-run
-settings.
+is therefore shared with unrelated optimizations, and cannot carry
+per-optimization settings.
 
-So while a run is in progress a backend must not change the working directory,
-the environment, `sys.stdout` or `sys.stderr`, or file descriptors 1 and 2.
-Where the optimizer produces a log, configure the library to write it to a named
-file, which is per run, or to produce no output.
+So while an optimization is in progress a backend must not change the working
+directory, the environment, `sys.stdout` or `sys.stderr`, or file descriptors 1
+and 2. Where the optimizer produces a log, configure the library to write it to
+a named file, which is per optimization, or to produce no output.
 
 Not every library allows this, and `ropt` does not work around the ones that do
 not. Such a backend must instead **state this in its own
 documentation**: that it needs exclusive process state — a working directory, a
 fixed file name, or state kept in the library between calls. What that rules out
 is not "one at a time" but "anything at all at the same time": a changed working
-directory breaks another run in the process whatever backend it uses, and the
-user's evaluation function with it. Say that the backend cannot run
+directory breaks another optimization in the process whatever backend it uses,
+and the user's evaluation function with it. Say that the backend cannot run
 concurrently in-process, and point users at the
 [`external`][ropt.backend.external.ExternalBackend] backend, which gives it a
 process of its own.
@@ -236,8 +236,9 @@ flag instead of conflicting with it.
 ## Declaring native output { #declaring-native-output }
 
 `ropt` captures the optimizer's output by swapping `sys.stdout` and
-`sys.stderr` for the duration of the run. That catches anything printed from
-Python — which is most optimizers, including everything in SciPy except `tnc`.
+`sys.stderr` for the duration of the optimization. That catches anything printed
+from Python — which is most optimizers, including everything in SciPy except
+`tnc`.
 A compiled optimizer, though, commonly writes to file descriptors 1 and 2
 directly, and never touches `sys.stdout` at all.
 

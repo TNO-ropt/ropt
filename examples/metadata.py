@@ -1,7 +1,7 @@
-"""Attach metadata to a run with `ropt`.
+"""Attach metadata to an optimization with `ropt`.
 
 Metadata comes from two independent sources. Passing a `metadata` dict to
-`optimize` tags the run: the same dict is copied onto every result as
+`optimize` tags the optimization: the same dict is copied onto every result as
 `result.metadata`. Returning an `EvaluationFunctionResult` with a
 `metadata` field instead records per-realization metadata, stored as one array
 entry per realization on `result.evaluations.metadata`.
@@ -62,7 +62,7 @@ def objective(
 
 
 def main() -> None:
-    """Run one optimization, tagging the run and recording per-realization data."""
+    """Run one optimization, tagging it and recording per-realization data."""
     table = DataFrameHandler()
     table.add_table(
         "results",
@@ -75,7 +75,8 @@ def main() -> None:
             "metadata.run_id": "Run ID",
         },
     )
-    # `metadata` here is constant, per-run metadata copied onto every result.
+    # `metadata` here is constant, per-optimization metadata copied onto every
+    # result.
     result = optimize(
         CONFIG, np.zeros(DIM), objective, metadata={"run_id": RUN_ID}, handlers=[table]
     )

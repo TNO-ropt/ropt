@@ -29,11 +29,11 @@ statistic, such as the mean, over the ensemble.
   processes, as separate processes on the local machine, or as jobs on an HPC
   cluster. One set of workers serves every optimization started on it, and work
   of your own can be sent to it as well.
-- Stopping a run on a criterion of your own, or aborting it from another
-  thread; both return the best result reached so far.
-- Restarting an optimization from the point an earlier run reached, passing in
-  the function and gradient values already computed there so that they are not
-  evaluated again.
+- Stopping an optimization on a criterion of your own, which returns the best
+  result reached so far, or aborting it from another thread.
+- Restarting an optimization from the point an earlier optimization reached,
+  passing in the function and gradient values already computed there so that
+  they are not evaluated again.
 - An interface for running various continuous and discrete optimization methods.
   By default, optimizers from the
   [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
@@ -50,7 +50,7 @@ statistic, such as the mean, over the ensemble.
   [`pydantic`](https://docs.pydantic.dev/).
 - Support for tracking and processing optimization results generated during the
   optimization process, with a callback invoked for each evaluation, or with
-  handler objects that can be shared between runs.
+  handler objects that can be shared between optimizations.
 - Optional support for exporting results as
   [`pandas`](https://pandas.pydata.org/) or [`polars`](https://pola.rs/) data
   frames.
@@ -73,8 +73,8 @@ optimization. It is covered in the
 
 *How* to run a configured optimization is covered in
 [Running Optimizations](running/running.md), which describes the functions the
-`ropt` package exports. They start a run with a single function call and cover
-[parallel evaluation](running/parallel.md),
+`ropt` package exports. They start an optimization with a single function call
+and cover [parallel evaluation](running/parallel.md),
 [several optimizations at once](running/many_runs.md),
 [nested optimization](running/nested.md), and custom result handling.
 

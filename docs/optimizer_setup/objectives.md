@@ -91,12 +91,12 @@ which brings the weighted total near one while preserving the objectives'
 relative magnitudes — so it does not rebalance them, and does not move the
 optimum.
 
-!!! warning "A rescaled run reports a different objective"
+!!! warning "A rescaled optimization reports a different objective"
 
     `auto_scale` divides the objective the optimizer reports, so switching it on
-    lowers `target_objective` without improving the solution. Two runs that
-    differ in this setting can only be compared through `functions.objectives`
-    or their variables. The runnable demonstration is
+    lowers `target_objective` without improving the solution. Two optimizations
+    that differ in this setting can only be compared through
+    `functions.objectives` or their variables. The runnable demonstration is
     [examples/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py).
 
 An `offsets` entry is subtracted before the division. It cannot move the optimum
@@ -109,5 +109,5 @@ full field descriptions.
 
 ## See also
 
-- What a run reports in each domain, and which fields are comparable between
-  runs: [Working with Results](../results/results.md#scaling-of-results).
+- What an optimization reports in each domain, and which fields are comparable
+  between optimizations: [Working with Results](../results/results.md#scaling-of-results).

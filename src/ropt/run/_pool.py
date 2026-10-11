@@ -1,12 +1,12 @@
-"""The worker pool: the workers that a run's evaluations are given to.
+"""The worker pool: the workers that evaluations are given to.
 
 A pool comes from a session factory (`thread_pool`, `process_pool`,
 `local_pool`, `hpc_pool`), which is what ties its lifetime to a session:
 closing the session releases the pools it built.
 
-A run is started on the pool it should evaluate on, so where its evaluations
-happen is stated at the call site, and the session it belongs to follows from
-the pool rather than from where the call was made.
+An optimization or evaluation is started on the pool it should evaluate on, so
+where its evaluations happen is stated at the call site, and the session it
+belongs to follows from the pool rather than from where the call was made.
 """
 
 from __future__ import annotations
@@ -41,12 +41,12 @@ _RELEASED = (
 
 
 class WorkerPool:
-    """The workers that a run's evaluations are given to.
+    """The workers that evaluations are given to.
 
     Built by a session factory such as
     [`thread_pool`][ropt.Session.thread_pool], and released when that
-    session closes. Starting a run on a pool sets both where the
-    evaluations happen and which session the run belongs to. See
+    session closes. Starting an optimization or evaluation on a pool sets both
+    where its evaluations happen and which session it belongs to. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
     This is the type to annotate with when your own code takes a pool.

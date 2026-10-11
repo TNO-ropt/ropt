@@ -1,8 +1,8 @@
 """Ensemble optimization with `ropt`.
 
 An *ensemble* optimization minimizes the mean objective over a set of
-realizations with uncertain parameters. Compared to a deterministic run, the
-config gains a `realizations` section, and the per-realization objective uses
+realizations with uncertain parameters. Compared to a deterministic optimization,
+the config gains a `realizations` section, and the per-realization objective uses
 `context.realization` to return the value for its own realization. A
 `report` callback prints each evaluation as it lands.
 """
@@ -64,7 +64,7 @@ def rosenbrock(
 
 # --8<-- [start:report]
 def report(result: FunctionResults) -> None:
-    """Print the objective of each evaluation as the run proceeds.
+    """Print the objective of each evaluation as the optimization proceeds.
 
     Args:
         result: The result of a single function evaluation.

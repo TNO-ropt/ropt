@@ -2,12 +2,12 @@
 
 A **session** is what a pool belongs to. Its factories are the only way to build
 a pool with workers, and closing the session releases every pool it built, so
-most code needs no further cleanup. It is also what an abort reaches: each run
+most code needs no further cleanup. It is also what an abort reaches: each task
 registers a signal while it lasts, and `abort()` aborts them all.
 
-A run is started on the session or on one of its pools, so what it belongs to is
-stated at the call site and never discovered from the surroundings. Any number
-of pools — and any number of sessions — can be open at once.
+A task is started on the session or on one of its pools, so what it belongs to
+is stated at the call site and never discovered from the surroundings. Any
+number of pools — and any number of sessions — can be open at once.
 """
 
 from __future__ import annotations
@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     from ._result import EvaluationResult, OptimizationResult
 
 _CLOSED = (
-    "This session is not open; build pools and start runs inside its `with` "
+    "This session is not open; build pools and start work inside its `with` "
     "block, for example `with session() as s: pool = s.thread_pool()`."
 )
 
@@ -68,14 +68,14 @@ class Session:
     Bind the session with `as` and call its factories inside the block. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
-    A run started on the session itself evaluates in-process, on the calling
-    thread; a run started on one of its pools evaluates on that pool's workers.
-    Either way the run belongs to this session.
+    An optimization or evaluation started on the session itself evaluates
+    in-process, on the calling thread; one started on a pool of the session
+    evaluates on that pool's workers. Either way it belongs to this session.
 
     A session may be opened inside another, and pools from different sessions
     never interact. A session is single use — once closed it cannot be reopened.
 
-    [`abort`][ropt.Session.abort] aborts the runs that belong to it,
+    [`abort`][ropt.Session.abort] aborts the tasks that belong to it,
     which is what a caller on another thread — a signal handler, a user
     interface — calls to bring them down.
     """
@@ -105,8 +105,8 @@ class Session:
         return self
 
     def __exit__(self, *_exc: object) -> None:
-        """Close the session, aborting its runs and releasing every pool."""
-        # Closing and taking the snapshot are one step: a run that registers
+        """Close the session, aborting its tasks and releasing every pool."""
+        # Closing and taking the snapshot are one step: a task that registers
         # between them would be neither refused as late nor reached by the
         # abort, and would outlive the session.
         with self._lock:
@@ -118,21 +118,21 @@ class Session:
             pool._release()  # ruff: ignore[private-member-access]
 
     def abort(self) -> None:
-        """Abort the runs that belong to this session.
+        """Abort the tasks that belong to this session.
 
         Each optimization, evaluation and offload under way raises
         [`AbortedError`][ropt.exceptions.AbortedError] with
         `ExitCode.USER_ABORT`.
 
-        This reaches every run under way. Calling it is thread-safe, and safe on
-        a session with no runs. See
-        [Aborting a run from outside](../running/running.md#stopping-from-outside)
-        for which runs are reached and when.
+        This reaches every task under way. Calling it is thread-safe, and safe
+        on a session with no tasks. See
+        [Aborting from outside](../running/running.md#stopping-from-outside)
+        for which tasks are reached and when.
         """
         self._abort_all(ExitCode.USER_ABORT)
 
     def _fail(self) -> None:
-        # A run that failed brings down the rest, which is what makes a script
+        # A task that failed brings down the rest, which is what makes a script
         # stop at the first problem.
         self._abort_all(ExitCode.ABORTED_ON_ERROR)
 
@@ -557,9 +557,9 @@ class Session:
 def session() -> Session:
     """Open a session that owns the pools built on it.
 
-    Build pools with the session's factories, and start on them the runs that
-    should evaluate there. Closing the session releases every pool it built, so
-    most code needs no further cleanup:
+    Build pools with the session's factories, and start on each pool the
+    optimizations and evaluations that should use its workers. Closing the
+    session releases every pool it built, so most code needs no further cleanup:
 
     ```python
     with session() as s:
@@ -567,7 +567,7 @@ def session() -> Session:
         result = pool.optimize(config, x0, objective)
     ```
 
-    A run started with the module-level [`optimize`][ropt.optimize]
+    An optimization started with the module-level [`optimize`][ropt.optimize]
     evaluates in-process and needs no session. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 

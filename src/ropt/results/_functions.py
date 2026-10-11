@@ -80,7 +80,7 @@ class Functions(ResultField):
         """Derive the configured function values from the scaled ones.
 
         Args:
-            context: The context of the run.
+            context: The context of the optimization or evaluation.
             scaled:  The values as the optimizer sees them.
 
         Returns:

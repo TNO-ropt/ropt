@@ -76,7 +76,7 @@ by following a gradient, and the cost profile differs accordingly:
 
 - `perturbation_magnitudes` is unused. No perturbations are evaluated, because
   no gradient is estimated.
-- Limit the run with [`max_functions`](configuration_sections.md#optimizer) or
+- Limit the optimization with [`max_functions`](configuration_sections.md#optimizer) or
   `max_iterations` rather than a convergence tolerance.
 - The result is reproducible only if the method's own generator is seeded —
   hence `"options": {"rng": 4}` in both scripts.

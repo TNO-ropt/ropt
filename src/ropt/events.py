@@ -1,8 +1,8 @@
-"""The events a run emits at its lifecycle milestones.
+"""The events an optimization or evaluation emits at its lifecycle milestones.
 
 An [`EnOptEvent`][ropt.events.EnOptEvent] carries the event type, the
-configuration of the run, and any results produced. Event handlers consume these
-to track progress, store results, or stop the run. See
+configuration in use, and any results produced. Event handlers consume these
+to track progress, store results, or stop the optimization. See
 [`EnOptEventType`][ropt.enums.EnOptEventType] for the available types, and
 [Handling Results](../results/handlers.md#writing-your-own-handler) for usage.
 """
@@ -25,11 +25,12 @@ class EnOptEvent:
 
     Attributes:
         event_type: Type of event that occurred.
-        context:    The validated configuration of the run.
+        context:    The validated configuration in use.
         results:    Tuple of result objects associated with the event.
-        source:     The run that emitted the event.
+        source:     The compute step that emitted the event.
 
-    A handler may call `source.stop()` to stop the run that emitted the event.
+    A handler may call `source.stop()` to stop the optimization that emitted the
+    event.
 
     See [Handling Results](../results/handlers.md#writing-your-own-handler) for
     when each event fires and what it carries.

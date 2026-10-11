@@ -8,8 +8,8 @@ diagnose from scratch. Read on only if it has happened to you.
 ## The symptom
 
 You press Ctrl-C and nothing happens. Not "it takes a while" — nothing at all,
-however many times you press it. The run keeps going, and the only way out is
-to kill the process from another terminal.
+however many times you press it. The optimization keeps going, and the only way
+out is to kill the process from another terminal.
 
 It affects the *whole* program, not just the optimization:
 anything else that waits stops responding to Ctrl-C too.

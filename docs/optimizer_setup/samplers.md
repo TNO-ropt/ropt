@@ -78,5 +78,5 @@ The runnable script is
 which perturbs one variable at a time. With one perturbation per variable and a
 unit step, the gradient estimate is a forward finite difference — which shows
 that perturbations need not be random at all. Its second method scales each step
-by a random factor instead, and the two runs differ in `shared` to show where
-that flag changes the samples.
+by a random factor instead, and the two optimizations differ in `shared` to show
+where that flag changes the samples.
