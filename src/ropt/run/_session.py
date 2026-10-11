@@ -13,7 +13,7 @@ of pools — and any number of sessions — can be open at once.
 from __future__ import annotations
 
 import threading
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any, Self, overload
 
 from ropt.components.executors import (
     HPCExecutor,
@@ -21,10 +21,12 @@ from ropt.components.executors import (
     ProcessExecutor,
     ThreadExecutor,
 )
+from ropt.components.executors._daemon_thread_executor import DaemonThreadExecutor
 from ropt.enums import ExitCode
 from ropt.exceptions import WorkflowError
 
 from ._evaluate import _evaluate, _evaluate_batch
+from ._offload import _offload
 from ._optimize import _optimize, _optimize_many
 from ._pool import WorkerPool
 
@@ -359,6 +361,45 @@ class Session:
             bundle_size=None,
             metadata=metadata,
         )
+
+    @overload
+    def offload[T](self, work: Callable[[], T], *, limit: int | None = None) -> T: ...
+
+    @overload
+    def offload[T](
+        self, work: Sequence[Callable[[], T]], *, limit: int | None = None
+    ) -> tuple[T, ...]: ...
+
+    def offload[T](
+        self,
+        work: Callable[[], T] | Sequence[Callable[[], T]],
+        *,
+        limit: int | None = None,
+    ) -> T | tuple[T, ...]:
+        """Run one or more arbitrary callables in-process, on threads of their own.
+
+        Pass a single zero-argument callable to run one call and get its result,
+        or a sequence to run them concurrently and get a tuple of results in the
+        order of `work`. Bind arguments with `functools.partial`. Each call runs
+        on a daemon thread started for it, with a copy of the caller's context
+        variables. See
+        [Offloading your own work](../running/parallel.md#offloading-your-own-work)
+        for a walkthrough.
+
+        Args:
+            work:  A single zero-argument callable, or a sequence of them.
+            limit: The maximum number of calls running at once, or `None` for
+                   no limit.
+
+        Returns:
+            The single result, or a tuple of results in the order of `work`.
+
+        Raises:
+            AbortedError:  If an abort arrived before every callable finished.
+            ValueError:    If `limit` is less than one.
+            WorkflowError: If this session has closed.
+        """  # ruff: ignore[docstring-extraneous-exception]
+        return _offload(self, DaemonThreadExecutor(limit=limit), work)
 
     def thread_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker threads.

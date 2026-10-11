@@ -2,7 +2,8 @@
 
 `optimize`, `evaluate` and `evaluate_batch` each start one **task**;
 [`optimize_many`][ropt.Session.optimize_many] starts one per optimization, and
-[`offload`][ropt.WorkerPool.offload] one per function. Tasks can be under way at
+`offload`, on a [session][ropt.Session.offload] or a
+[pool][ropt.WorkerPool.offload], one per function. Tasks can be under way at
 the same time: side by side on one session, or started from inside one another,
 as when an evaluation function calls `offload`. When a task raises an exception,
 every task started from inside it is aborted, and so are the other tasks started
@@ -61,7 +62,8 @@ function that `offload` runs. This holds for the module-level functions as well
 as for the methods of a session or a pool.
 
 An evaluation function runs in your process when its optimization or evaluation
-has no pool or a thread pool, and so does a function offloaded to a thread pool.
+has no pool or a thread pool, and so does a function offloaded to a thread pool
+or with `Session.offload`.
 On a process, local or HPC pool they run in another process, and the tasks they
 start there are not nested. Neither is a task started from your script.
 
@@ -143,14 +145,14 @@ What happens to work that is already running depends on the pool:
 | Pool | Work already running when its task is aborted |
 | --- | --- |
 | none | runs to its end, and the task ends after it |
-| `thread_pool` or `process_pool` | runs to its end, but the task does not wait for it |
+| `thread_pool`, `process_pool`, or the threads of `Session.offload` | runs to its end, but the task does not wait for it |
 | `local_pool` | is killed, together with everything it launched |
 | `hpc_pool` | its cluster job is cancelled |
 
 Without a pool, the evaluation function runs in the thread that started the
-task, so the call in progress has to return first. On a thread or process pool,
-an exception raised by work that the task no longer waits for is logged as a
-warning, unless it is an `AbortedError`.
+task, so the call in progress has to return first. Where the task does not wait,
+an exception raised by work that is still running is logged as a warning, unless
+it is an `AbortedError`.
 
 `offload` also raises `AbortedError` when its pool can no longer run the work.
 In an evaluation function, returning `NaN` for that counts the realization as

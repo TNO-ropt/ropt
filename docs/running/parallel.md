@@ -540,7 +540,8 @@ submission script that does not redirect the job's output — with
 ## Offloading your own work
 
 You can hand **your own** functions to a pool with
-[`WorkerPool.offload`][ropt.WorkerPool.offload]. It is useful when code
+[`WorkerPool.offload`][ropt.WorkerPool.offload], or run them on threads of their
+own with [`Session.offload`][ropt.Session.offload]. It is useful when code
 you control — a custom handler, a custom component, or a helper you call between
 optimizations — has an expensive, self-contained piece of work you want to run
 on a pool instead of inline.
@@ -571,7 +572,23 @@ As with the evaluation function on a process, local, or HPC pool, the
 callables and their arguments are **copied to the workers**, since they run in
 separate processes.
 
-`offload` starts one task per callable, on its pool's session;
+Called on the session instead of on a pool, `offload` runs the callables **in
+your process, on threads of their own**: one thread per callable, started by that
+call, with at most `limit` of them running at once:
+
+```python
+with session() as s:
+    first, second = s.offload([partial(expensive, x), partial(other, y)], limit=2)
+```
+
+Without `limit`, all callables start at once. They are not copied, so they need
+not be picklable, and each one sees a copy of the context variables of the code
+that called `offload`. The threads are daemon threads: a callable still running
+when your program exits is stopped without completing, and does not keep the
+program from exiting.
+
+`offload` starts one task per callable, on the session it is called on or on its
+pool's session;
 [Failures and Aborts](failures.md) describes tasks and how a failure or an abort
 reaches them. When a callable raises, `offload` aborts the other callables and
 raises the exception at once. `offload` returns whatever its callables return
@@ -580,9 +597,9 @@ callables have finished, `offload` raises
 [`AbortedError`][ropt.exceptions.AbortedError] at once. Its `exit_code`
 distinguishes an abort that was asked for from one that a failure caused, and is
 `EXECUTOR_SHUT_DOWN` when the pool could no longer run the work. `offload` does
-not wait for a callable that is still running: on a thread or process pool it
-runs to its end, and an exception it raises is logged as a warning; on a local
-or HPC pool it is cancelled.
+not wait for a callable that is still running: on a thread of its own or on a
+thread or process pool it runs to its end, and an exception it raises is logged
+as a warning; on a local or HPC pool it is cancelled.
 
 !!! warning "Offloaded work coordinates with nothing"
     An offloaded callable runs wherever its pool puts it, and on a process,

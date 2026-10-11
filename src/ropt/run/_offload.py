@@ -1,13 +1,13 @@
-"""Offload arbitrary callables to a pool.
+"""Offload arbitrary callables to a pool, or to threads of their own.
 
-Offloading is defined by the relocation, so it needs workers and therefore a
-pool: a single callable, or a sequence of callables that run concurrently and
-may be entirely different functions. They must be picklable for a process or
+The work is a single callable, or a sequence of callables that run concurrently
+and may be entirely different functions. They must be picklable for a process or
 job pool.
 
 Which pool the work lands on is decided entirely by the pool it is called on:
 offloading from inside an evaluation function dispatches to the pool that call
-names, not to the one running the evaluation.
+names, not to the one running the evaluation. Offloading on a session runs the
+work on threads started for that call.
 """
 
 from __future__ import annotations

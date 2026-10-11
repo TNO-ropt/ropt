@@ -1,8 +1,9 @@
-"""Tests for the offload method on worker pools."""
+"""Tests for the offload method on sessions and worker pools."""
 
 from __future__ import annotations
 
 import asyncio
+import contextvars
 import os
 import sys
 import threading
@@ -18,7 +19,7 @@ from ropt.components.concurrency import AbortSignal, parent_signal
 from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.exceptions import AbortedError, ExecutionError
+from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 from ropt.run._offload import _run
 
 if TYPE_CHECKING:
@@ -277,3 +278,157 @@ def test_an_aborted_offload_reports_why_it_was_aborted(
     with pytest.raises(AbortedError) as exc_info:
         _run(ThreadExecutor(workers=1), [partial(_square, 2)], signal)
     assert exc_info.value.exit_code == exit_code
+
+
+def test_session_offload_runs_a_single_callable() -> None:
+    with session() as opened:
+        assert opened.offload(partial(add, 3, 4)) == 7
+
+
+@pytest.mark.timeout(60)
+def test_session_offload_runs_a_sequence_at_once_in_the_order_given() -> None:
+    # Each job waits for its successor, so the jobs finish in the reverse of the
+    # order they were given in, and only run at all if they all run at once.
+    count = 5
+    finished = [threading.Event() for _ in range(count)]
+
+    def square(index: int) -> int:
+        if index + 1 < count:
+            assert finished[index + 1].wait(timeout=30)
+        finished[index].set()
+        return (index + 1) * (index + 1)
+
+    with session() as opened:
+        jobs = [partial(square, index) for index in range(count)]
+        assert opened.offload(jobs) == (1, 4, 9, 16, 25)
+
+
+@pytest.mark.timeout(60)
+def test_session_offload_runs_no_more_than_limit_callables_at_once() -> None:
+    # The jobs meet in pairs, so two must run at once, and a third running
+    # beside them would raise the peak.
+    lock = threading.Lock()
+    barrier = threading.Barrier(2, timeout=30)
+    running = 0
+    peak = 0
+
+    def _meet() -> None:
+        nonlocal running, peak
+        with lock:
+            running += 1
+            peak = max(peak, running)
+        barrier.wait()
+        with lock:
+            running -= 1
+
+    with session() as opened:
+        opened.offload([_meet] * 4, limit=2)
+    assert peak == 2
+
+
+def test_session_offload_rejects_a_limit_below_one() -> None:
+    with session() as opened, pytest.raises(ValueError, match="at least one"):
+        opened.offload(partial(_square, 2), limit=0)
+
+
+def test_session_offload_runs_callables_on_daemon_threads() -> None:
+    with session() as opened:
+        assert opened.offload(lambda: threading.current_thread().daemon)
+
+
+def test_session_offload_gives_callables_the_context_of_the_caller() -> None:
+    marker: contextvars.ContextVar[str] = contextvars.ContextVar("marker")
+
+    def _offload_from_a_context() -> str:
+        marker.set("caller")
+        with session() as opened:
+            return opened.offload(marker.get)
+
+    assert contextvars.copy_context().run(_offload_from_a_context) == "caller"
+
+
+def test_session_offload_runs_callables_as_nested_tasks() -> None:
+    with session() as opened:
+        assert opened.offload(lambda: parent_signal() is not None)
+
+
+@pytest.mark.timeout(60)
+def test_session_offload_raises_the_first_exception_without_waiting() -> None:
+    release = threading.Event()
+
+    def _block() -> int:
+        assert release.wait(timeout=30)
+        return 0
+
+    def _fail() -> int:
+        msg = "first"
+        raise ValueError(msg)
+
+    with session() as opened:
+        try:
+            with pytest.raises(ValueError, match="first"):
+                opened.offload([_block, _fail])
+        finally:
+            release.set()
+
+
+@pytest.mark.timeout(60)
+def test_session_offload_aborted_while_a_callable_runs_raises_without_waiting() -> None:
+    release = threading.Event()
+    with session() as opened:
+
+        def _abort_then_block() -> int:
+            opened.abort()
+            assert release.wait(timeout=30)
+            return 0
+
+        try:
+            with pytest.raises(AbortedError) as raised:
+                opened.offload(_abort_then_block)
+        finally:
+            release.set()
+    assert raised.value.exit_code is ExitCode.USER_ABORT
+
+
+def test_session_offload_starts_no_queued_callable_after_an_abort() -> None:
+    ran: list[int] = []
+
+    def _record() -> int:
+        ran.append(1)
+        return 1
+
+    with session() as opened:
+
+        def _abort() -> int:
+            opened.abort()
+            return 0
+
+        with pytest.raises(AbortedError):
+            opened.offload([_abort, _record], limit=1)
+    assert not ran
+
+
+@pytest.mark.parametrize("error", [KeyboardInterrupt, SystemExit])
+def test_session_offload_ended_by_a_base_exception_aborts_the_work_it_started(
+    error: type[BaseException],
+) -> None:
+    seen: list[AbortSignal] = []
+
+    def _record_then_raise() -> int:
+        signal = parent_signal()
+        assert signal is not None
+        seen.append(signal)
+        raise error
+
+    with session() as opened:
+        with pytest.raises(error):
+            opened.offload(_record_then_raise)
+        assert seen[0].aborting
+        assert seen[0].exit_code is ExitCode.ABORTED
+
+
+def test_session_offload_on_a_closed_session_raises() -> None:
+    with session() as opened:
+        pass
+    with pytest.raises(WorkflowError):
+        opened.offload(partial(_square, 2))

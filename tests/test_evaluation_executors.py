@@ -50,6 +50,7 @@ from ropt.components.executors import (
     WorkNotRun,
 )
 from ropt.components.executors.__main__ import run_task
+from ropt.components.executors._daemon_thread_executor import DaemonThreadExecutor
 from ropt.components.executors._job_executor import (
     JobExecutorBase,
     _StateUpdate,
@@ -1410,7 +1411,17 @@ def test_a_returned_exception_is_a_result_rather_than_a_failure() -> None:
     assert isinstance(results[0], ValueError)
 
 
-def test_an_abort_does_not_wait_for_work_already_running() -> None:
+_ONE_WORKER_AT_A_TIME = pytest.mark.parametrize(
+    "make_executor",
+    [partial(ThreadExecutor, workers=1), partial(DaemonThreadExecutor, limit=1)],
+    ids=["thread", "daemon-thread"],
+)
+
+
+@_ONE_WORKER_AT_A_TIME
+def test_an_abort_does_not_wait_for_work_already_running(
+    make_executor: Callable[[], Executor],
+) -> None:
     # The first call holds the only worker, so the other two are still queued
     # when the abort arrives and must not start. A thread cannot be interrupted,
     # so `run` has to return while the first one is still blocked.
@@ -1418,7 +1429,7 @@ def test_an_abort_does_not_wait_for_work_already_running() -> None:
     started = threading.Event()
     release = threading.Event()
     ran: list[int] = []
-    executor = ThreadExecutor(workers=1)
+    executor = make_executor()
 
     def _record(value: int) -> int:
         ran.append(value)
@@ -1474,7 +1485,10 @@ def _waiting_for_log(text: str) -> Generator[threading.Event]:
         logger.removeHandler(waiter)
 
 
-def test_an_error_raised_by_work_left_running_is_logged() -> None:
+@_ONE_WORKER_AT_A_TIME
+def test_an_error_raised_by_work_left_running_is_logged(
+    make_executor: Callable[[], Executor],
+) -> None:
     signal = AbortSignal()
     started = threading.Event()
     release = threading.Event()
@@ -1492,7 +1506,7 @@ def test_an_error_raised_by_work_left_running_is_logged() -> None:
     aborter = threading.Thread(target=_abort_once_started)
     with _waiting_for_log("left running") as logged:
         aborter.start()
-        results = ThreadExecutor(workers=1).run(
+        results = make_executor().run(
             [WorkItem(function=_fail_once_released)], abort_signal=signal
         )
         aborter.join(timeout=5.0)
