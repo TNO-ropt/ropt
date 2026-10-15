@@ -925,6 +925,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#stopping-from-outside" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aborting from outside
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2437,6 +2448,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#stopping-from-outside" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aborting from outside
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2589,7 +2611,7 @@ something that marks the failure:</p>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">optimize_or_none</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">])</span>
 </span></code></pre></div>
 <p><code>SimulationError</code> stands for an exception that your own objective raises.</p>
-<p><a href="../running/#stopping-from-outside"><code>Session.abort</code></a> reaches every optimization on
+<p><a href="#stopping-from-outside"><code>Session.abort</code></a> reaches every optimization on
 the session, and <code>run</code> then raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with <code>USER_ABORT</code>. When a failure
 elsewhere aborted it, the exit code is <code>ABORTED_ON_ERROR</code>, so the exit code
@@ -2597,6 +2619,45 @@ distinguishes an abort that was asked for from one that a failure caused. A
 <code>KeyboardInterrupt</code> aborts the optimizations of the <code>run</code> call it passes through,
 and is raised at once. See <a href="../../results/exit_codes/">Exit Codes</a> for what each
 code means.</p>
+<h2 id="stopping-from-outside">Aborting from outside</h2>
+<p>The <code>report</code> callback runs inside the optimization it stops, which is no use to
+a signal handler or a user interface. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> is
+the one that is called from another thread: it aborts every task that belongs
+to the session, and each raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>
+with <code>USER_ABORT</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">abort</span><span class="p">())</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="k">except</span> <span class="n">AbortedError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">"aborted:"</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</span></code></pre></div>
+<p>The two are not the same kind of ending, which is why they have different exit
+codes. A <code>report</code> callback stops the optimization <em>on a criterion</em>, at a point it
+chose, and the optimization returns the best result it had reached. An abort
+applies no criterion, and the optimization returns no result. To keep what an
+aborted optimization had reached, collect its results as they arrive, with a
+<code>report</code> callback or a <a href="../../results/handlers/">handler</a>.</p>
+<p>An aborted task does not wait for the evaluations that are running. With no
+pool, the evaluation function runs in the calling thread, so the call in progress
+returns first. On a thread or process pool, the evaluations already running
+continue after the task has ended, and their workers are free only once they
+return. On a local or HPC pool they are cancelled.</p>
+<p><code>abort()</code> reaches the tasks that are under way at the moment it is called, and
+nothing more. A task started afterwards is unaffected, so a
+loop that abandons one attempt and starts another keeps working. A
+<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>run</code></a> call counts as one task here: a callable it has
+queued behind its <code>limit</code> is not started. Leaving the session's <code>with</code> block
+aborts its tasks as well, and then releases its pools, which is what refuses a
+task started after that. Releasing a local or HPC pool cancels the jobs it still
+has, so none are left running when the block has ended. A task aborted that way
+raises with <code>ABORTED</code> rather than <code>USER_ABORT</code>, since it was the block ending
+rather than a request to abort.</p>
+<p>An optimization started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> belongs
+to no session you hold and cannot be aborted this way. It evaluates on the
+calling thread, which is the thread that would have to call <code>abort()</code>. Start it
+on a session or one of its pools to make it abortable.</p>
 
 
 

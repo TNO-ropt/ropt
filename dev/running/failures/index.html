@@ -2608,7 +2608,7 @@ one that it aborts. A module-level function such as <a class="autorefs autorefs-
 opens a session of its own, which holds only the tasks started by that function.</p>
 <h2 id="what-an-abort-does">What an abort does</h2>
 <p>A nested task is aborted when its parent is, with the same exit code:
-<code>USER_ABORT</code> after <a href="../running/#stopping-from-outside"><code>Session.abort</code></a>, <code>ABORTED</code>
+<code>USER_ABORT</code> after <a href="../many_runs/#stopping-from-outside"><code>Session.abort</code></a>, <code>ABORTED</code>
 when the session's <code>with</code> block ends or a <code>KeyboardInterrupt</code> or <code>SystemExit</code>
 passes through the parent, and <code>ABORTED_ON_ERROR</code> after a failure.
 This also holds when the nested task belongs to another session, as one started
