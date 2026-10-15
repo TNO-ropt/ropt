@@ -2921,22 +2921,22 @@ it either way.</p>
   anything is evaluated.</p>
 </li>
 <li>
-<p><strong>Mistakes in the call to <code>optimize</code> itself</strong> raise a <code>ValueError</code> — a start point of the
-  wrong shape, an evaluation function returning the wrong number of values —
-  or one of the <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> types:
-  <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> when a pool or handler
-  is used in a way it cannot be (a pool asked to run work from one of its
-  own workers, a pool whose session has closed, a handler already claimed by
-  another optimization),
-  <a class="autorefs autorefs-internal" title="            UnsupportedError" href="../../reference/exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a> when an optional
-  dependency is missing, or when the chosen method cannot handle the problem
-  as configured — a constraint it does not support, for instance, which is
-  checked as the optimization starts — and
-  <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> when the worker pool
-  that runs your evaluations, or a callable handed to
-  <a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.WorkerPool.run"><code>WorkerPool.run</code></a>, cannot start or breaks
-  down, and <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> when the
-  optimization, or a <code>run</code> call, was aborted before it finished.</p>
+<p><strong>Mistakes in the call to <code>optimize</code> itself</strong> can raise:</p>
+<ul>
+<li><code>ValueError</code> when an argument has the wrong shape, or the evaluation
+  function returns the wrong number of values.</li>
+<li><a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> when an operation
+  conflicts with what is already happening, such as starting another
+  optimization from inside an evaluation or reusing an object that is
+  already in use.</li>
+<li><a class="autorefs autorefs-internal" title="            UnsupportedError" href="../../reference/exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a> when an optional
+  dependency is missing, or the chosen method cannot handle part of the
+  configured problem.</li>
+<li><a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> when <code>ropt</code> cannot
+  start or complete work needed for the optimization.</li>
+<li><a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> when the optimization or
+  work it started is stopped before it finishes.</li>
+</ul>
 </li>
 <li>
 <p><strong>Exceptions from your own evaluation function</strong> are not caught. They travel
@@ -2954,12 +2954,11 @@ configuration errors belong to pydantic, and errors from your evaluation
 function stay whatever you raised. The control-flow signals that <code>ropt</code> raises
 and catches itself are excluded as well, and stay in
 <a class="autorefs autorefs-internal" title="            ropt.exceptions" href="../../reference/exceptions/#ropt.exceptions"><code>ropt.exceptions</code></a>.</p>
-<p><code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> and <code>run</code> start
-<strong>tasks</strong>, which can be under way at the same time. When a task raises an
-exception, every task started from inside it is aborted, and the exception is
-raised in the code that started the task. If that code is your script, every
-other task on the session is aborted as well. <a href="../failures/">Failures and Aborts</a>
-describes each case.</p>
+<p><a href="../many_runs/">Several Optimizations at Once</a> shows how several optimization
+tasks can run in parallel. If a task raises an exception, every task started
+from inside it is aborted, and the exception is raised in the code that started
+the task. If that code is your script, every other task on the session is
+aborted as well. <a href="../failures/">Failures and Aborts</a> describes each case.</p>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations.
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, the type of <code>result.exit_code</code>, is imported

@@ -2836,29 +2836,34 @@
 
 
 <h1 id="evaluating-in-parallel">Evaluating in Parallel</h1>
-<p>Evaluations within one optimization can run in parallel, and so can work of your
-own. Both go through a <strong>pool</strong>.</p>
+<p>Evaluations within one optimization can run in parallel, and you can launch your
+own tasks in parallel using an evaluation <strong>pool</strong>.</p>
 <h2 id="running-in-parallel">Running in parallel</h2>
 <p>By default <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> runs on the calling thread, one
 evaluation at a time. To run the evaluations in parallel, open a
-<a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a>, build a <strong>pool</strong> on it and start the optimization on
-that pool:</p>
+<a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a>, build a <strong>pool</strong> on it and start the optimization
+using the <code>optimize</code> method of that pool:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The runnable script for this section is
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py">examples/parallel.py</a>,
-which takes <code>-m</code> to swap its thread pool for a process pool.</p>
-<p>The session owns the pools built on it and releases their workers when its
-block ends, so most code needs no further cleanup. Nothing is implicit: an
-optimization evaluates on the pool it was started on, and on no other. An
-optimization started with
-the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> evaluates inside your own
-program and needs no session, wherever it is called from — including from a
-thread you started yourself.</p>
-<p>Where an evaluation runs depends on which pool it was started on:</p>
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py">examples/parallel.py</a>.</p>
+<p>The session that created the pool releases their workers when its block ends, so
+most code needs no further cleanup. Nothing is implicit: an optimization
+evaluates its functions using the pool it was started on. An optimization
+started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> has no session, and
+executes its function evaluations serially.</p>
+<p>The available pools are:</p>
+<ul>
+<li><a href="#thread-pool"><code>thread_pool</code></a>: runs evaluations on threads in your process.</li>
+<li><a href="#process-pool"><code>process_pool</code></a>: runs evaluations in reused worker processes.</li>
+<li><a href="#local-pool"><code>local_pool</code></a>: runs each evaluation as a separate local process.</li>
+<li><a href="#running-on-an-hpc-cluster"><code>hpc_pool</code></a>: submits each evaluation as a job to
+  an HPC cluster.</li>
+</ul>
+<p>Where an evaluation runs depends on the type of pool used:</p>
 <pre class="mermaid"><code>flowchart TB
     subgraph proc["your program (one process)"]
         main(["your code&lt;br/&gt;(main thread)"])
@@ -2897,10 +2902,10 @@ an HPC pool runs each evaluation as a job on a cluster, which is the
 same arrangement spread over more machines.</p>
 </details>
 <h3 id="how-many-workers">How many workers?</h3>
-<p><code>ropt</code> parallelizes two things, and only these two: the <strong>evaluations within one
-optimization batch</strong>, and whole <strong>optimizations against each other</strong>. Nothing
-else overlaps — a single optimization is a sequence of batches, and the next one
-cannot start before the current one is complete.</p>
+<p>With in a single optimization <code>ropt</code> parallelizes the evaluations within one
+optimization batch. A single optimization is a sequence of batches, and the next
+one cannot start before the current one is complete. Furthermore, multiple
+optimizations can run at the same time, each parallizing their own batches.</p>
 <p>So the number of workers that can be kept busy is roughly</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>batch size  ×  optimizations running at once
 </span></code></pre></div>
@@ -2912,9 +2917,6 @@ over an ensemble that is one per realization, plus their perturbations on the
 batches where a gradient is estimated. The second factor is <code>1</code> unless you run
 <a href="../many_runs/">several optimizations at once</a>, where it is the <code>limit</code> argument
 of <code>run</code> (or the number of optimizations, if you set no limit).</p>
-<p>A worker is not free, so this is an upper bound rather than a target. Ask for
-what the work needs; the useful number is usually much smaller than the
-machine's core count.</p>
 <p>Each evaluation in a batch is sent to a worker as a separate task. Up to
 <code>workers</code> tasks can run at once on a pool; the rest wait until a worker is
 available. An optimization started without a pool evaluates inline.</p>
@@ -3017,7 +3019,7 @@ that works on one works on the other:</p>
 <td>Directory holding each evaluation's files. Defaults to a temporary directory the pool removes again, unless something is left in it to read.</td>
 </tr>
 <tr>
-<td><code>retries</code></td>
+<td><code>extra_polls</code></td>
 <td>Extra polls to wait for a result (default: 0; a local job writes its result before it exits).</td>
 </tr>
 </tbody>
@@ -3266,10 +3268,10 @@ busy, which is the normal case, since an optimization fills its pool with one
 work item per realization. Rather than hang, the pool refuses work submitted by
 the evaluation itself with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
 The same holds for work submitted from a thread that the evaluation starts with
-<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>Session.run</code></a>, or through <code>contextvars.copy_context().run</code>.
-A thread started in any other way is not recognized as a worker, so work
-submitted from it is not refused and can still deadlock on the pool. Give the
-inner optimization its own pool, or none at all, which evaluates inline.</p>
+<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>Session.run</code></a>. A thread started in any other way is not
+recognized as a worker, so work submitted from it is not refused and can still
+deadlock on the pool. Give the inner optimization its own pool, or none at all,
+which evaluates inline.</p>
 <p>The evaluation must stay <strong>in your process</strong>, so on a thread pool or with no
 pool. On a process, local, or HPC pool the evaluation function is copied
 into a worker, and a pool cannot be copied with it: open a session and build
@@ -3655,7 +3657,7 @@ with <code>config_path</code>, <code>cluster</code> or <code>queue</code>; passi
 <td>Extra variables for the submission script. <code>None</code> entries are dropped.</td>
 </tr>
 <tr>
-<td><code>retries</code></td>
+<td><code>extra_polls</code></td>
 <td>Extra polls to wait for a result that is missing or unreadable (default: 30).</td>
 </tr>
 </tbody>
