@@ -85,7 +85,7 @@ class _StateUpdate:
     )
     launched_jobs: dict[UUID, int] = field(default_factory=dict)
     results: dict[UUID, Any] = field(default_factory=dict)
-    retries: set[UUID] = field(default_factory=set)
+    extra_polls: set[UUID] = field(default_factory=set)
     queried: bool = False
     query_error: BaseException | None = None
     # Why the caller stopped early, used as the reason for whatever it was
@@ -114,7 +114,7 @@ class _State:
         self._queue: deque[tuple[_Results, int, WorkItem]] = deque()
         self._active: dict[UUID, tuple[_Results, int]] = {}
         self._jobs: dict[UUID, int] = {}
-        self._retries: dict[UUID, int] = {}
+        self._poll_counts: dict[UUID, int] = {}
         self._last_query = time.monotonic() - interval
         self._query_failures = 0
         self._backend_busy = False
@@ -132,7 +132,7 @@ class _State:
             jobs = list(self._jobs.items())
             self._jobs.clear()
             self._active.clear()
-            self._retries.clear()
+            self._poll_counts.clear()
             self._queue.clear()
             return jobs
 
@@ -190,7 +190,7 @@ class _State:
         # never asks after a job that cannot have finished.
         with self._lock:
             return [
-                (bundle_id, job_id, self._retries.get(bundle_id, 0))
+                (bundle_id, job_id, self._poll_counts.get(bundle_id, 0))
                 for bundle_id, job_id in self._jobs.items()
             ]
 
@@ -212,9 +212,11 @@ class _State:
                 if bundle_id in self._active:
                     self._complete(bundle_id, result)
                     self._output_kept |= isinstance(result, ExecutorFailure)
-            for bundle_id in update.retries:
+            for bundle_id in update.extra_polls:
                 if bundle_id in self._active:
-                    self._retries[bundle_id] = self._retries.get(bundle_id, 0) + 1
+                    self._poll_counts[bundle_id] = (
+                        self._poll_counts.get(bundle_id, 0) + 1
+                    )
             if update.queried:
                 self._last_query = time.monotonic()
                 self._note_query(update.query_error)
@@ -237,7 +239,7 @@ class _State:
                 if item_results is results
             ]:
                 del self._active[bundle_id]
-                self._retries.pop(bundle_id, None)
+                self._poll_counts.pop(bundle_id, None)
                 job_id = self._jobs.pop(bundle_id, None)
                 if job_id is not None:
                     jobs.append((bundle_id, job_id))
@@ -259,7 +261,7 @@ class _State:
     def _complete(self, bundle_id: UUID, result: Any) -> None:  # ruff: ignore[any-type]
         results, index = self._active.pop(bundle_id)
         self._jobs.pop(bundle_id, None)
-        self._retries.pop(bundle_id, None)
+        self._poll_counts.pop(bundle_id, None)
         results.append((index, result))
 
     def _fail_unlaunched(self, update: _StateUpdate) -> None:
@@ -330,7 +332,7 @@ class JobExecutorBase(ExecutorBase):
         workdir: Path,
         workers: int,
         interval: float,
-        retries: int,
+        extra_polls: int,
         cleanup: bool,
     ) -> None:
         """Initialize the shared state.
@@ -339,14 +341,14 @@ class JobExecutorBase(ExecutorBase):
         job may read and write is the one thing they do not agree on.
 
         Args:
-            workdir:  Directory holding each work item's files.
-            workers:  Maximum number of jobs running at once.
-            interval: Polling interval in seconds.
-            retries:  Extra polls to wait for a result after the first attempt.
-            cleanup:  Whether to remove work item files once they are done with.
+            workdir:     Directory holding each work item's files.
+            workers:     Maximum number of jobs running at once.
+            interval:    Polling interval in seconds.
+            extra_polls: Extra polls to wait for a result after the first attempt.
+            cleanup:     Whether to remove work item files once they are done with.
 
         Raises:
-            ValueError: If `workers`, `interval` or `retries` is out of range.
+            ValueError: If `workers`, `interval` or `extra_polls` is out of range.
         """
         super().__init__()
         if workers < 1:
@@ -355,11 +357,11 @@ class JobExecutorBase(ExecutorBase):
         if interval < 0:
             msg = f"The polling interval must not be negative: {interval}"
             raise ValueError(msg)
-        if retries < 0:
-            msg = f"The number of retries must not be negative: {retries}"
+        if extra_polls < 0:
+            msg = f"The number of extra polls must not be negative: {extra_polls}"
             raise ValueError(msg)
         self._workdir = workdir
-        self._retries_limit = retries
+        self._extra_polls_limit = extra_polls
         self._remove_files = cleanup
         self._state = _State(
             workers=workers,
@@ -471,14 +473,14 @@ class JobExecutorBase(ExecutorBase):
             # finished", so failed queries are acted on rather than ignored.
             update.query_error = exc
             return
-        for bundle_id, job_id, retries_used in self._state.jobs_to_check():
+        for bundle_id, job_id, polls_used in self._state.jobs_to_check():
             # Gone from the backend is the only sign that a job has ended; what
             # became of it has to be read from its output file.
             if job_id in live:
                 continue
-            result = self._read_result(bundle_id, retries_used)
+            result = self._read_result(bundle_id, polls_used)
             if result is _NOT_READY:
-                update.retries.add(bundle_id)
+                update.extra_polls.add(bundle_id)
                 continue
             update.results[bundle_id] = result
             if self._remove_files:
@@ -587,7 +589,7 @@ class JobExecutorBase(ExecutorBase):
             tmp_path.unlink(missing_ok=True)
             raise
 
-    def _read_result(self, bundle_id: UUID, retries_used: int) -> Any:  # ruff: ignore[any-type]
+    def _read_result(self, bundle_id: UUID, polls_used: int) -> Any:  # ruff: ignore[any-type]
         output_file = self._workdir / f"{bundle_id}.out"
         try:
             with output_file.open("rb") as fp:
@@ -595,26 +597,26 @@ class JobExecutorBase(ExecutorBase):
         except FileNotFoundError:
             # The file may simply not be visible yet, so give the filesystem a
             # bounded number of further polls to show it.
-            return self._retry_or_fail(
+            return self._poll_or_fail(
                 bundle_id,
-                retries_used,
+                polls_used,
                 f"Output file for work item {bundle_id} never appeared",
                 "output file never appeared",
             )
         except (OSError, EOFError, UnpicklingError):
             # Present but unreadable, which a partially visible file also looks
-            # like: retried on the same budget before giving up.
-            return self._retry_or_fail(
+            # like: polled again on the same budget before giving up.
+            return self._poll_or_fail(
                 bundle_id,
-                retries_used,
+                polls_used,
                 f"No valid result for work item {bundle_id} after "
-                f"{self._retries_limit} retries",
-                f"no valid result after {self._retries_limit} retries",
+                f"{self._extra_polls_limit} extra polls",
+                f"no valid result after {self._extra_polls_limit} extra polls",
             )
         except (ImportError, AttributeError) as exc:
             # The unpickler got as far as looking a name up, so the bytes were
             # already complete: reading them again cannot change the answer, and
-            # spending the retry budget here would only delay the failure and
+            # spending the poll budget here would only delay the failure and
             # then blame the filesystem, which is the one thing not at fault.
             msg = (
                 f"The result of work item {bundle_id} could not be reconstructed: "
@@ -630,12 +632,12 @@ class JobExecutorBase(ExecutorBase):
             msg = f"The result of work item {bundle_id} could not be read: {exc}"
             return self._failure_for(bundle_id, msg, exc)
 
-    def _retry_or_fail(
-        self, bundle_id: UUID, retries_used: int, msg: str, reason: str
+    def _poll_or_fail(
+        self, bundle_id: UUID, polls_used: int, msg: str, reason: str
     ) -> Any:  # ruff: ignore[any-type]
         # A shared filesystem may take a while to show a finished job's result,
         # so the same bounded budget covers "not there yet" and "not whole yet".
-        if retries_used < self._retries_limit:
+        if polls_used < self._extra_polls_limit:
             return _NOT_READY
         return self._failure_for(bundle_id, msg, reason)
 

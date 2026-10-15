@@ -80,7 +80,7 @@ class LocalJobExecutor(JobExecutorBase):
         workdir: Path | str | None = None,
         workers: int = 1,
         interval: float = 0.1,
-        retries: int = 0,
+        extra_polls: int = 0,
         cleanup: bool = True,
     ) -> None:
         """Initialize the local job executor.
@@ -93,14 +93,14 @@ class LocalJobExecutor(JobExecutorBase):
 
         A local process is finished the moment it exits, and writes and renames
         its result before it does, so the small `interval` is dead time rather
-        than restraint towards a scheduler, and `retries=0` is enough.
+        than restraint towards a scheduler, and `extra_polls=0` is enough.
 
         Args:
-            workdir:  Directory for each work item's files and captured output.
-            workers:  Maximum number of jobs running at once.
-            interval: Polling interval in seconds.
-            retries:  Number of extra polls to wait for a work item's result.
-            cleanup:  Whether to remove a work item's files once it settles.
+            workdir:     Directory for each work item's files and captured output.
+            workers:     Maximum number of jobs running at once.
+            interval:    Polling interval in seconds.
+            extra_polls: Extra polls to wait for a work item's result.
+            cleanup:     Whether to remove a work item's files once it settles.
 
         Raises:
             ValueError:     If `workdir` is missing or an argument is out of range.
@@ -129,7 +129,7 @@ class LocalJobExecutor(JobExecutorBase):
                 workdir=resolved,
                 workers=workers,
                 interval=interval,
-                retries=retries,
+                extra_polls=extra_polls,
                 cleanup=cleanup,
             )
         except ValueError:

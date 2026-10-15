@@ -397,7 +397,7 @@ class Session:
         workdir: Path | str | None = None,
         workers: int = 1,
         interval: float = 0.1,
-        retries: int = 0,
+        extra_polls: int = 0,
         cleanup: bool = True,
     ) -> WorkerPool:
         """Create a pool that runs each evaluation as a separate local process.
@@ -420,7 +420,7 @@ class Session:
             workdir:     The working directory, or `None` for a temporary one.
             workers:     The maximum number of concurrent jobs.
             interval:    Seconds between checks on the running jobs.
-            retries:     Times a failed job is retried.
+            extra_polls: Extra polls to wait for a work item's result.
             cleanup:     Whether to remove the job files afterwards.
 
         Returns:
@@ -434,7 +434,7 @@ class Session:
                 workdir=workdir,
                 workers=workers,
                 interval=interval,
-                retries=retries,
+                extra_polls=extra_polls,
                 cleanup=cleanup,
             )
         )
@@ -454,7 +454,7 @@ class Session:
         memory_max: int | str | None = None,
         run_time_max: int | None = None,
         submit_options: dict[str, Any] | None = None,
-        retries: int = 30,
+        extra_polls: int = 30,
         query_retries: int = 30,
         cleanup: bool = True,
     ) -> WorkerPool:
@@ -489,7 +489,7 @@ class Session:
             memory_max:     The memory per job.
             run_time_max:   The run time per job.
             submit_options: Extra variables for the submission script.
-            retries:        Times a failed job is retried.
+            extra_polls: Extra polls to wait for a work item's result.
             query_retries:  Times the cluster is re-polled for a result.
             cleanup:        Whether to remove the job files afterwards.
 
@@ -513,7 +513,7 @@ class Session:
                 memory_max=memory_max,
                 run_time_max=run_time_max,
                 submit_options=submit_options,
-                retries=retries,
+                extra_polls=extra_polls,
                 query_retries=query_retries,
                 cleanup=cleanup,
             )

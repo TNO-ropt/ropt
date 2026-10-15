@@ -72,7 +72,7 @@ class HPCExecutor(JobExecutorBase):
         memory_max: int | str | None = None,
         run_time_max: int | None = None,
         submit_options: dict[str, Any] | None = None,
-        retries: int = 30,
+        extra_polls: int = 30,
         query_retries: int = 30,
         cleanup: bool = True,
     ) -> None:
@@ -88,7 +88,7 @@ class HPCExecutor(JobExecutorBase):
         `workdir` must be an existing absolute path, and concurrently running
         executors need distinct ones: work item files are never overwritten. A
         `queue` is not a scheduler partition; it selects a configured entry
-        whose submission script names the partition. `retries` covers a result
+        whose submission script names the partition. `extra_polls` covers a result
         the shared filesystem does not yet show, `query_retries` a scheduler
         that cannot be reached; the grace period each allows is its count times
         `interval`.
@@ -125,7 +125,7 @@ class HPCExecutor(JobExecutorBase):
             memory_max:     Memory per work item.
             run_time_max:   Run time per work item, typically in seconds.
             submit_options: Extra variables for the submission script.
-            retries:        Extra polls to wait for a work item's result.
+            extra_polls:    Extra polls to wait for a work item's result.
             query_retries:  Extra attempts to query the scheduler after one fails.
             cleanup:        Whether to remove a work item's files once it settles.
 
@@ -151,7 +151,7 @@ class HPCExecutor(JobExecutorBase):
             workdir=workdir,
             workers=workers,
             interval=interval,
-            retries=retries,
+            extra_polls=extra_polls,
             cleanup=cleanup,
         )
         self._queue = queue

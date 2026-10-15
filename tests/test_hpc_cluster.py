@@ -10,8 +10,8 @@ These tests exist for the things a mocked `pysqa` cannot show: that the
 scheduler answers with a `jobid` column, that it reports several jobs at once,
 that a cancelled job really leaves the queue, that the submitting interpreter
 resolves on a compute node, and that a job's captured output survives to explain
-a failure. ropt's own arithmetic — `retries`, `query_retries`, worker limits —
-stays in the mocked tests, where it is deterministic and fast.
+a failure. ropt's own arithmetic — `extra_polls`, `query_retries`, worker
+limits — stays in the mocked tests, where it is deterministic and fast.
 
 The submitted callables are all resolvable from the standard library, because a
 compute node runs `sys.executable -m ropt.components.executors` and cannot
@@ -169,7 +169,7 @@ def test_hpc_cluster_concurrent_jobs_each_return_their_own_result(
 def test_hpc_cluster_failed_job_reports_where_its_output_is(
     executor: Any, workdir: Path
 ) -> None:
-    hpc = executor(retries=3)
+    hpc = executor(extra_polls=3)
     collected = hpc.run([WorkItem(function=exec, args=(_FAILING_JOB,))])
     assert len(collected) == 1
     failure = collected[0]

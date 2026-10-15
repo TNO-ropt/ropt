@@ -396,7 +396,7 @@ def test_hpc_scheduler_query_fails_after_retry_limit(
         workdir=tmp_path,
         workers=1,
         interval=0,
-        retries=0,
+        extra_polls=0,
         query_retries=2,
         template="",
     )
@@ -452,7 +452,7 @@ def test_hpc_missing_output_file_fails_work(
 
     _mock_scheduler(monkeypatch, _VanishingJob(tmp_path))
     executor = HPCExecutor(
-        workdir=tmp_path, workers=1, interval=0, retries=2, template=""
+        workdir=tmp_path, workers=1, interval=0, extra_polls=2, template=""
     )
     result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
@@ -479,7 +479,7 @@ def test_hpc_unreadable_output_file_fails_work(
 
     _mock_scheduler(monkeypatch, _CorruptResult(tmp_path))
     executor = HPCExecutor(
-        workdir=tmp_path, workers=1, interval=0, retries=2, template=""
+        workdir=tmp_path, workers=1, interval=0, extra_polls=2, template=""
     )
     result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
@@ -512,7 +512,7 @@ def test_hpc_result_of_an_unknown_type_fails_work(
 
     _mock_scheduler(monkeypatch, _AlienResult(tmp_path))
     executor = HPCExecutor(
-        workdir=tmp_path, workers=1, interval=0, retries=30, template=""
+        workdir=tmp_path, workers=1, interval=0, extra_polls=30, template=""
     )
     result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
@@ -543,7 +543,7 @@ def test_hpc_result_that_cannot_be_rebuilt_fails_work(
 
     _mock_scheduler(monkeypatch, _UnrebuildableResult(tmp_path))
     executor = HPCExecutor(
-        workdir=tmp_path, workers=1, interval=0, retries=30, template=""
+        workdir=tmp_path, workers=1, interval=0, extra_polls=30, template=""
     )
     result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
@@ -594,7 +594,7 @@ def test_hpc_failed_work_keeps_job_output(
 
     _mock_scheduler(monkeypatch, _CrashingJob(tmp_path))
     executor = HPCExecutor(
-        workdir=tmp_path, workers=1, interval=0, retries=2, template=""
+        workdir=tmp_path, workers=1, interval=0, extra_polls=2, template=""
     )
     result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
@@ -631,7 +631,7 @@ def test_hpc_failure_names_the_output_file_it_could_not_quote(
     adapter = _SilentJob(tmp_path)
     _mock_scheduler(monkeypatch, adapter)
     executor = HPCExecutor(
-        workdir=tmp_path, workers=1, interval=0, retries=0, template=""
+        workdir=tmp_path, workers=1, interval=0, extra_polls=0, template=""
     )
     result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
@@ -1710,7 +1710,7 @@ def test_unconfigured_hpc_executor_rejected(
         ({"workers": 0}, "workers must be at least one"),
         ({"workers": -1}, "workers must be at least one"),
         ({"interval": -1.0}, "interval must not be negative"),
-        ({"retries": -1}, "retries must not be negative"),
+        ({"extra_polls": -1}, "extra polls must not be negative"),
     ],
 )
 def test_hpc_out_of_range_setting_rejected(
@@ -2357,7 +2357,7 @@ class _ControlledJobExecutor(JobExecutorBase):
             workdir=workdir,
             workers=workers,
             interval=interval,
-            retries=0,
+            extra_polls=0,
             cleanup=True,
         )
         self.started: list[tuple[UUID, int]] = []
