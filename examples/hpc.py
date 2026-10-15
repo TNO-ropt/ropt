@@ -113,7 +113,6 @@ def main(
             INITIAL_VALUES,
             rosenbrock,
             report=report,
-            bundle_size=0,
         )
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")

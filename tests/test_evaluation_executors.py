@@ -744,7 +744,7 @@ def test_hpc_executor_refuses_to_overwrite_existing_work_item_files(
     bundle_id = uuid4()
     (tmp_path / f"{bundle_id}.out").touch()
     with pytest.raises(ExecutionError, match="already exist"):
-        executor._launch_job(bundle_id, [WorkItem(function=_function, args=(0,))])
+        executor._launch_job(bundle_id, WorkItem(function=_function, args=(0,)))
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1305,37 +1305,23 @@ def test_executor_evaluator_two_optimizations(
 class _RecordingExecutor(ThreadExecutor):
     def __init__(self) -> None:
         super().__init__(workers=2)
-        self.sizes: list[int] = []
+        self.submitted: list[WorkItem] = []
 
     @override
-    def _run_bundles(
+    def _submit(
         self,
-        bundles: list[list[WorkItem]],
-        store: Callable[[int, Any], None],
-        abort_signal: AbortSignal | None = None,
-    ) -> None:
-        self.sizes.extend(len(bundle) for bundle in bundles)
-        super()._run_bundles(bundles, store, abort_signal)
+        item: WorkItem,
+        abort_signal: AbortSignal | None,
+    ) -> Future[Any]:
+        self.submitted.append(item)
+        return super()._submit(item, abort_signal)
 
 
-@pytest.mark.parametrize("bundle_size", [1, 2, 4, 0])
-def test_executor_bundles_work_items(bundle_size: int) -> None:
+def test_executor_dispatches_work_items_individually() -> None:
     executor = _RecordingExecutor()
-    assert executor.run(
-        [WorkItem(function=_function, args=(idx,)) for idx in range(5)],
-        bundle_size=bundle_size,
-    ) == [1, 2, 3, 4, 5]
-    expected_max = max(executor.sizes) if bundle_size == 0 else bundle_size
-    assert executor.sizes
-    assert all(1 <= size <= expected_max for size in executor.sizes)
-
-
-def test_invalid_bundle_size() -> None:
-    with pytest.raises(ValueError, match="bundle_size"):
-        ThreadExecutor(bundle_size=-1)
-    executor = ThreadExecutor()
-    with pytest.raises(ValueError, match="bundle_size"):
-        executor.run([WorkItem(function=_function, args=(0,))], bundle_size=-1)
+    items = [WorkItem(function=_function, args=(idx,)) for idx in range(5)]
+    assert executor.run(items) == [1, 2, 3, 4, 5]
+    assert executor.submitted == items
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1372,7 +1358,7 @@ def test_broken_worker_pool_reported_at_startup(
 
 
 class _BreaksAfterStartup:
-    # A pool that accepts the startup probe and `accepted` bundles after it.
+    # A pool that accepts the startup probe and `accepted` items after it.
     accepted = 0
 
     def __init__(self, *_args: Any, **_kwargs: Any) -> None:
@@ -1391,7 +1377,7 @@ class _BreaksAfterStartup:
     def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
 
 
-def test_worker_pool_broken_before_a_bundle_is_sent_is_a_failed_work_item(
+def test_worker_pool_broken_before_an_item_is_sent_is_a_failed_work_item(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # A pool that broke under a caller is a failure of the work, not the
@@ -1408,8 +1394,8 @@ def test_worker_pool_broken_before_a_bundle_is_sent_is_a_failed_work_item(
 def test_worker_pool_broken_mid_batch_keeps_the_results_already_collected(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    # The payload gate caps how many bundles are in flight, so a batch larger
-    # than the gate still has bundles to send once the pool is already gone.
+    # The payload gate caps how many items are in flight, so a larger batch
+    # still has items to send once the pool is already gone.
     monkeypatch.setattr(_BreaksAfterStartup, "accepted", 1)
     monkeypatch.setattr(
         "ropt.components.executors._process_executor.ProcessPoolExecutor",
@@ -1422,7 +1408,7 @@ def test_worker_pool_broken_mid_batch_keeps_the_results_already_collected(
     assert all(isinstance(result, ExecutorFailure) for result in results[1:])
 
 
-def _mixed_bundle() -> list[WorkItem]:
+def _mixed_work_items() -> list[WorkItem]:
     return [
         WorkItem(function=_function, args=(0,)),
         WorkItem(function=_function, args=(1,), kwargs={"raise_error": True}),
@@ -1431,20 +1417,14 @@ def _mixed_bundle() -> list[WorkItem]:
 
 
 def test_collect_errors_keeps_a_failing_call_in_its_own_place() -> None:
-    # One bundle for the whole batch, so a call that raises would otherwise
-    # take its bundle mates with it.
-    results = ThreadExecutor(workers=1).run(
-        _mixed_bundle(), bundle_size=0, collect_errors=True
-    )
+    results = ThreadExecutor(workers=1).run(_mixed_work_items(), collect_errors=True)
     assert results[0] == 1
     assert isinstance(results[1], ValueError)
     assert results[2] == 3
 
 
 def test_collect_errors_carries_an_exception_out_of_a_worker_process() -> None:
-    results = ProcessExecutor(workers=1).run(
-        _mixed_bundle(), bundle_size=0, collect_errors=True
-    )
+    results = ProcessExecutor(workers=1).run(_mixed_work_items(), collect_errors=True)
     assert results[0] == 1
     assert isinstance(results[1], ValueError)
     assert "Test error in function 1" in str(results[1])
@@ -1453,7 +1433,7 @@ def test_collect_errors_carries_an_exception_out_of_a_worker_process() -> None:
 
 def test_without_collect_errors_a_failing_call_still_raises() -> None:
     with pytest.raises(ValueError, match="Test error in function 1"):
-        ThreadExecutor(workers=1).run(_mixed_bundle(), bundle_size=0)
+        ThreadExecutor(workers=1).run(_mixed_work_items())
 
 
 def test_a_returned_exception_is_a_result_rather_than_a_failure() -> None:
@@ -2396,12 +2376,10 @@ class _ControlledJobExecutor(JobExecutorBase):
         raise AssertionError((bundle_id, command))
 
     @override
-    def _launch_job(self, bundle_id: UUID, bundle: list[WorkItem]) -> int:
+    def _launch_job(self, bundle_id: UUID, item: WorkItem) -> int:
         job_id = len(self.started) + 1
         self.started.append((bundle_id, job_id))
-        self.results[bundle_id] = [
-            item.function(*item.args, **item.kwargs) for item in bundle
-        ]
+        self.results[bundle_id] = item.function(*item.args, **item.kwargs)
         return job_id
 
     @override
@@ -2426,8 +2404,8 @@ class _ControlledJobExecutor(JobExecutorBase):
                 error = self.raise_in_pass
                 self.raise_in_pass = None
                 raise error
-            for bundle_id, _caller, _index, bundle in update.jobs_to_launch:
-                update.launched_jobs[bundle_id] = self._launch_job(bundle_id, bundle)
+            for bundle_id, _caller, _index, item in update.jobs_to_launch:
+                update.launched_jobs[bundle_id] = self._launch_job(bundle_id, item)
                 update.results[bundle_id] = self.results[bundle_id]
         finally:
             with self._state._lock:
@@ -2491,9 +2469,7 @@ def test_job_executor_store_exception_releases_the_backend(tmp_path: Path) -> No
         raise ValueError(msg)
 
     with pytest.raises(ValueError, match="caller rejected"):
-        executor._run_bundles(
-            [[WorkItem(function=_function, args=(0,))]], _reject, None
-        )
+        executor._run_items([WorkItem(function=_function, args=(0,))], _reject, None)
     assert executor.run([WorkItem(function=_function, args=(1,))]) == [2]
 
 
@@ -2507,7 +2483,7 @@ def test_job_executor_result_stored_during_a_wait_is_taken(
     caller: list[tuple[int, Any]] = []
 
     def _wait(timeout: float | None = None) -> bool:
-        caller.append((0, [7]))
+        caller.append((0, 7))
         return True
 
     monkeypatch.setattr(state._condition, "wait", _wait)
@@ -2515,7 +2491,7 @@ def test_job_executor_result_stored_during_a_wait_is_taken(
         state._backend_busy = True
     assert state.pop_results(caller) == []
     executor._launch_and_collect(caller)
-    assert state.pop_results(caller) == [(0, [7])]
+    assert state.pop_results(caller) == [(0, 7)]
     assert executor.passes == 0
 
 
@@ -2559,7 +2535,7 @@ def test_job_executor_unlaunched_item_releases_its_caller(tmp_path: Path) -> Non
     caller: list[tuple[int, Any]] = []
     update = _StateUpdate()
     with state._lock:
-        state._queue.append((caller, 0, [WorkItem(function=_function, args=(0,))]))
+        state._queue.append((caller, 0, WorkItem(function=_function, args=(0,))))
         state._pick_jobs_to_launch(update)
     update.error = RuntimeError("claim failed")
     state.apply_update(update, release_backend=False)
@@ -2574,13 +2550,13 @@ def test_job_executor_drops_late_results_after_a_caller_left(tmp_path: Path) -> 
     # with results nobody will read.
     executor = _ControlledJobExecutor(tmp_path)
     state = executor._state
-    caller: list[tuple[int, Any]] = [(0, [1])]
+    caller: list[tuple[int, Any]] = [(0, 1)]
     bundle_id = uuid4()
     with state._lock:
         state._active[bundle_id] = (caller, 0)
         state._jobs[bundle_id] = 7
     assert state.drop(caller) == [(bundle_id, 7)]
-    state.apply_update(_StateUpdate(results={bundle_id: [2]}), release_backend=False)
+    state.apply_update(_StateUpdate(results={bundle_id: 2}), release_backend=False)
     assert caller == []
     assert bundle_id not in state._active
 
@@ -2632,7 +2608,7 @@ def test_job_executor_launch_only_claim_spends_no_retry(
     def _store(index: int, result: Any) -> None:
         results[index] = result
 
-    executor._run_bundles([[WorkItem(function=_function, args=(0,))]], _store, None)
-    assert results == [[1]]
+    executor._run_items([WorkItem(function=_function, args=(0,))], _store, None)
+    assert results == [1]
     assert state._last_query == clock
     assert state._query_failures == 1

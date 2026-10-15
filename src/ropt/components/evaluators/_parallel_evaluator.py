@@ -30,8 +30,7 @@ class ParallelEvaluator(Evaluator):
     """An evaluator that dispatches evaluations to an executor.
 
     Sends each active row of the evaluation batch to the executor as its own
-    work item and returns once every result is back. How many of them travel to
-    a worker together follows `bundle_size`.
+    work item and returns once every result is back.
 
     See [Parallel Evaluation](../advanced/parallel.md#parallelevaluator) for
     details.
@@ -43,7 +42,6 @@ class ParallelEvaluator(Evaluator):
         function: EvaluationFunctionCallback,
         executor: Executor,
         batch_id_callback: Callable[[], int] | None = None,
-        bundle_size: int | None = None,
         abort_signal: AbortSignal | None = None,
     ) -> None:
         """Initialize the ParallelEvaluator.
@@ -52,13 +50,11 @@ class ParallelEvaluator(Evaluator):
             function:          The function used for objectives and constraints.
             executor:          The executor to dispatch evaluations to.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
-            bundle_size:       Evaluations per worker task, `None` for the executor's own.
             abort_signal:      An optional signal that aborts a running batch.
         """
         super().__init__()
         self._function = function
         self._executor = executor
-        self._bundle_size = bundle_size
         self._abort_signal = abort_signal
         self._batch_id_callback = (
             batch_id_callback if batch_id_callback is not None else BatchIdCounter()
@@ -110,7 +106,6 @@ class ParallelEvaluator(Evaluator):
                 )
                 for row_idx, run_context in active
             ],
-            bundle_size=self._bundle_size,
             abort_signal=self._abort_signal,
         )
         # A `WorkNotRun` only appears when the signal aborted the batch, so the

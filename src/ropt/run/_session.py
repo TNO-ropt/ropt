@@ -200,7 +200,6 @@ class Session:
             handlers=handlers,
             report=report,
             constraint_tolerance=constraint_tolerance,
-            bundle_size=None,
             metadata=metadata,
             f0=f0,
             g0=g0,
@@ -247,7 +246,6 @@ class Session:
             function,
             handlers=handlers,
             report=report,
-            bundle_size=None,
             metadata=metadata,
         )
 
@@ -293,7 +291,6 @@ class Session:
             function,
             handlers=handlers,
             report=report,
-            bundle_size=None,
             metadata=metadata,
         )
 
@@ -343,7 +340,7 @@ class Session:
             raise
         return _run_work(self, executor, work)
 
-    def thread_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
+    def thread_pool(self, *, workers: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker threads.
 
         Use this where an evaluation spends its time waiting, or in a library
@@ -351,9 +348,7 @@ class Session:
         [Running Optimizations](../running/running.md) for a walkthrough.
 
         Args:
-            workers:     The number of worker threads.
-            bundle_size: Evaluations sent to a worker together, `0` for a whole
-                         batch.
+            workers: The number of worker threads.
 
         Returns:
             A pool backed by worker threads.
@@ -361,16 +356,13 @@ class Session:
         Raises:
             WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
-        return self._open_pool(
-            lambda: ThreadExecutor(workers=workers, bundle_size=bundle_size)
-        )
+        return self._open_pool(lambda: ThreadExecutor(workers=workers))
 
     def process_pool(
         self,
         *,
         workers: int = 1,
         max_tasks_per_child: int | None = None,
-        bundle_size: int = 1,
     ) -> WorkerPool:
         """Create a pool that runs evaluations in worker processes.
 
@@ -385,8 +377,6 @@ class Session:
         Args:
             workers:             The number of worker processes.
             max_tasks_per_child: Evaluations before a worker is replaced.
-            bundle_size:         Evaluations sent to a worker together, `0` for
-                                 a batch.
 
         Returns:
             A pool backed by worker processes.
@@ -398,11 +388,10 @@ class Session:
             lambda: ProcessExecutor(
                 workers=workers,
                 max_tasks_per_child=max_tasks_per_child,
-                bundle_size=bundle_size,
             )
         )
 
-    def local_pool(  # ruff: ignore[too-many-arguments]
+    def local_pool(
         self,
         *,
         workdir: Path | str | None = None,
@@ -410,7 +399,6 @@ class Session:
         interval: float = 0.1,
         retries: int = 0,
         cleanup: bool = True,
-        bundle_size: int = 1,
     ) -> WorkerPool:
         """Create a pool that runs each evaluation as a separate local process.
 
@@ -434,7 +422,6 @@ class Session:
             interval:    Seconds between checks on the running jobs.
             retries:     Times a failed job is retried.
             cleanup:     Whether to remove the job files afterwards.
-            bundle_size: Evaluations per job, `0` for a whole batch.
 
         Returns:
             A pool backed by local job processes.
@@ -449,7 +436,6 @@ class Session:
                 interval=interval,
                 retries=retries,
                 cleanup=cleanup,
-                bundle_size=bundle_size,
             )
         )
 
@@ -471,7 +457,6 @@ class Session:
         retries: int = 30,
         query_retries: int = 30,
         cleanup: bool = True,
-        bundle_size: int = 1,
     ) -> WorkerPool:
         """Create a pool that runs evaluations on an HPC cluster.
 
@@ -507,7 +492,6 @@ class Session:
             retries:        Times a failed job is retried.
             query_retries:  Times the cluster is re-polled for a result.
             cleanup:        Whether to remove the job files afterwards.
-            bundle_size:    Evaluations per job, `0` for a whole batch.
 
         Returns:
             A pool backed by an HPC cluster.
@@ -532,7 +516,6 @@ class Session:
                 retries=retries,
                 query_retries=query_retries,
                 cleanup=cleanup,
-                bundle_size=bundle_size,
             )
         )
 

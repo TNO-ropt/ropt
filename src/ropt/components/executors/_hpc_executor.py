@@ -75,7 +75,6 @@ class HPCExecutor(JobExecutorBase):
         retries: int = 30,
         query_retries: int = 30,
         cleanup: bool = True,
-        bundle_size: int = 1,
     ) -> None:
         """Initialize the HPC executor.
 
@@ -129,7 +128,6 @@ class HPCExecutor(JobExecutorBase):
             retries:        Extra polls to wait for a work item's result.
             query_retries:  Extra attempts to query the scheduler after one fails.
             cleanup:        Whether to remove a work item's files once it settles.
-            bundle_size:    Calls per job, `0` for a whole batch.
 
         Raises:
             ValueError:     If an argument is out of range or the modes are mixed.
@@ -155,7 +153,6 @@ class HPCExecutor(JobExecutorBase):
             interval=interval,
             retries=retries,
             cleanup=cleanup,
-            bundle_size=bundle_size,
         )
         self._queue = queue
         self._cores = cores

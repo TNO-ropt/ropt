@@ -99,50 +99,9 @@ A worker is not free, so this is an upper bound rather than a target. Ask for
 what the work needs; the useful number is usually much smaller than the
 machine's core count.
 
-!!! tip "How a batch is split across workers"
-    Each evaluation in a batch is transferred to a worker on its own by
-    default, which spreads the batch as widely as the pool allows. Every
-    transfer costs something, though, so when the evaluations are cheap the
-    transfers can dominate. Pass `bundle_size=` to
-    [`WorkerPool.optimize`][ropt.WorkerPool.optimize],
-    [`evaluate`][ropt.WorkerPool.evaluate] or
-    [`evaluate_batch`][ropt.WorkerPool.evaluate_batch] to send several
-    evaluations to a worker together, or `bundle_size=0` to send a whole batch
-    at once. The evaluations in one bundle run after each other, so `0` gives up
-    parallelism inside the batch entirely: it is for an optimization whose
-    parallelism comes from the layer above it, as in
-    [Nested Optimization](nested.md#two-pools-not-one).
-
-    `workers` and `bundle_size` are the two halves of matching work to capacity,
-    one on the pool and one on the optimization. `workers` sets how many bundles
-    may be in flight; `bundle_size` sets how much work one of them carries. With a
-    batch of 100 cheap evaluations and 8 workers, the default sends 100 separate
-    transfers to keep 8 workers busy; `bundle_size=13` sends 8. Raise it when
-    the evaluations are cheap relative to a transfer, which on a process, local
-    or HPC pool means copying data and starting something. Leave it at `1` when
-    the evaluations are expensive, or when they vary in cost and bundling would
-    leave one worker holding all the slow ones.
-
-    It belongs to the optimization rather than to the pool because it describes
-    the evaluation function, and one pool may serve several. Optimizations that
-    share a pool and differ in cost can each state their own:
-
-    ```python
-    s.run(
-        [
-            partial(pool.optimize, config, x0, cheap, bundle_size=25),
-            partial(pool.optimize, config, x0, costly, bundle_size=1),
-        ]
-    )
-    ```
-
-    Every pool honours it, including a thread pool: a bundle goes to one worker
-    as a whole, so `bundle_size=0` on a thread pool runs the whole batch on a
-    single thread. It is a pool argument only: an optimization started without
-    one evaluates inline, where a bundle has nothing to save.
-
-    A pool also takes a `bundle_size` of its own, used by any optimization that
-    does not state one.
+Each evaluation in a batch is sent to a worker as a separate task. Up to
+`workers` tasks can run at once on a pool; the rest wait until a worker is
+available. An optimization started without a pool evaluates inline.
 
 You can keep several pools open at once and choose per optimization:
 

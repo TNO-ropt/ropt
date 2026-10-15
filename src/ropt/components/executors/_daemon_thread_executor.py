@@ -11,14 +11,14 @@ from contextlib import nullcontext
 from functools import partial
 from typing import TYPE_CHECKING, Any, override
 
-from .base import ExecutorBase, WorkItem, _calls, _log_left_running, _run_bundle
+from .base import ExecutorBase, WorkItem, _log_left_running, _run_item
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable
 
     from ropt.components.concurrency import AbortSignal
 
-type _Job = tuple[Future[list[Any]], Callable[[], list[Any]]]
+type _Job = tuple[Future[Any], Callable[[], Any]]
 
 
 class DaemonThreadExecutor(ExecutorBase):
@@ -43,21 +43,21 @@ class DaemonThreadExecutor(ExecutorBase):
         Raises:
             ValueError: If `limit` is less than one.
         """
-        super().__init__(bundle_size=1)
+        super().__init__()
         if limit is not None and limit < 1:
             msg = f"The limit must be at least one: {limit}"
             raise ValueError(msg)
         self._limit = limit
 
     @override
-    def _run_bundles(
+    def _run_items(
         self,
-        bundles: list[list[WorkItem]],
+        items: list[WorkItem],
         store: Callable[[int, Any], None],
         abort_signal: AbortSignal | None,
     ) -> None:
-        done: queue.SimpleQueue[Future[list[Any]] | None] = queue.SimpleQueue()
-        futures, jobs = _prepare_jobs(bundles, done, abort_signal)
+        done: queue.SimpleQueue[Future[Any] | None] = queue.SimpleQueue()
+        futures, jobs = _prepare_jobs(items, done, abort_signal)
         wake = partial(done.put, None)
         if abort_signal is not None:
             abort_signal.add_callback(wake)
@@ -83,20 +83,20 @@ class DaemonThreadExecutor(ExecutorBase):
 
 
 def _prepare_jobs(
-    bundles: list[list[WorkItem]],
-    done: queue.SimpleQueue[Future[list[Any]] | None],
+    items: list[WorkItem],
+    done: queue.SimpleQueue[Future[Any] | None],
     abort_signal: AbortSignal | None,
-) -> tuple[dict[Future[list[Any]], int], deque[_Job]]:
-    futures: dict[Future[list[Any]], int] = {}
+) -> tuple[dict[Future[Any], int], deque[_Job]]:
+    futures: dict[Future[Any], int] = {}
     jobs: deque[_Job] = deque()
-    for index, bundle in enumerate(bundles):
-        future: Future[list[Any]] = Future()
+    for index, item in enumerate(items):
+        future: Future[Any] = Future()
         future.add_done_callback(done.put)
         futures[future] = index
         # Copied here, on the calling thread, and once per job: a context can
         # be entered by one thread at a time.
         context = contextvars.copy_context()
-        job = partial(context.run, _run_as_child, _calls(bundle), abort_signal)
+        job = partial(context.run, _run_as_child, item, abort_signal)
         jobs.append((future, job))
     return futures, jobs
 
@@ -121,8 +121,8 @@ def _take_jobs(jobs: deque[_Job], abort_signal: AbortSignal | None) -> None:
 
 
 def _run_as_child(
-    calls: Sequence[tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]],
+    item: WorkItem,
     abort_signal: AbortSignal | None,
-) -> list[Any]:
+) -> Any:  # ruff: ignore[any-type]
     with nullcontext() if abort_signal is None else abort_signal.as_parent():
-        return _run_bundle(calls)
+        return _run_item(item.function, item.args, item.kwargs)

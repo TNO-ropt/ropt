@@ -46,14 +46,13 @@ def _build_optimization(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     constraint_tolerance: float,
-    bundle_size: int | None,
     signal: AbortSignal,
     f0: FunctionResults | None,
     g0: GradientResults | None,
     report_gradients: bool,
 ) -> tuple[EnOptContext, OptimizationStep, ResultsHandler]:
     context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(context, function, executor, bundle_size, signal)
+    evaluator = make_evaluator(context, function, executor, signal)
     # This run's own handler, tracking the result the call returns; it is added
     # directly, so it stays out of the handlers the caller manages.
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
@@ -73,7 +72,6 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     constraint_tolerance: float,
-    bundle_size: int | None,
     metadata: dict[str, Any] | None,
     f0: FunctionResults | None = None,
     g0: GradientResults | None = None,
@@ -90,7 +88,6 @@ def _optimize(  # ruff: ignore[too-many-arguments]
             handlers=handlers,
             report=report,
             constraint_tolerance=constraint_tolerance,
-            bundle_size=bundle_size,
             signal=signal,
             f0=f0,
             g0=g0,

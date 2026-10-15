@@ -68,11 +68,8 @@ def _run_work[T](
 def _run(
     executor: Executor, functions: list[Callable[[], Any]], signal: AbortSignal
 ) -> list[Any]:
-    # A sequence of callables is documented to run concurrently, so
-    # they must not be bundled onto one worker.
     values = executor.run(
         [WorkItem(function=function) for function in functions],
-        bundle_size=1,
         abort_signal=signal,
     )
     not_run = any(isinstance(value, WorkNotRun) for value in values)

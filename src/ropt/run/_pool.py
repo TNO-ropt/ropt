@@ -86,7 +86,6 @@ class WorkerPool:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         constraint_tolerance: float = 1e-10,
-        bundle_size: int | None = None,
         metadata: dict[str, Any] | None = None,
         f0: FunctionResults | None = None,
         g0: GradientResults | None = None,
@@ -103,8 +102,6 @@ class WorkerPool:
             handlers:             Optional handlers, called in the order listed.
             report:               Optional callback invoked per evaluation.
             constraint_tolerance: The tolerance within which a constraint holds.
-            bundle_size:          Evaluations sent to a worker together, `None`
-                                  for the pool's own.
             metadata:             Optional dictionary attached to every result.
             f0:                   Optional function results at `x0`.
             g0:                   Optional gradient results at `x0`.
@@ -126,7 +123,6 @@ class WorkerPool:
             handlers=handlers,
             report=report,
             constraint_tolerance=constraint_tolerance,
-            bundle_size=bundle_size,
             metadata=metadata,
             f0=f0,
             g0=g0,
@@ -141,7 +137,6 @@ class WorkerPool:
         *,
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
-        bundle_size: int | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[FunctionResults]:
         """Evaluate a single variable vector on this pool, without optimizing.
@@ -149,14 +144,12 @@ class WorkerPool:
         See [Running Optimizations](../running/running.md) for a walkthrough.
 
         Args:
-            config:      The optimization configuration.
-            variables:   The variable vector to evaluate.
-            function:    The per-realization evaluation function.
-            handlers:    Optional handlers, called in the order listed.
-            report:      Optional callback invoked with the results.
-            bundle_size: Evaluations sent to a worker together, `None` for the
-                         pool's own.
-            metadata:    Optional dictionary attached to the results.
+            config:    The optimization configuration.
+            variables: The variable vector to evaluate.
+            function:  The per-realization evaluation function.
+            handlers:  Optional handlers, called in the order listed.
+            report:    Optional callback invoked with the results.
+            metadata:  Optional dictionary attached to the results.
 
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
@@ -176,7 +169,6 @@ class WorkerPool:
             function,
             handlers=handlers,
             report=report,
-            bundle_size=bundle_size,
             metadata=metadata,
         )
 
@@ -188,7 +180,6 @@ class WorkerPool:
         *,
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
-        bundle_size: int | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> EvaluationResult[tuple[FunctionResults, ...]]:
         """Evaluate a batch of variable vectors on this pool, without optimizing.
@@ -198,14 +189,12 @@ class WorkerPool:
         walkthrough.
 
         Args:
-            config:      The optimization configuration.
-            variables:   The variable vectors to evaluate, one per row.
-            function:    The per-realization evaluation function.
-            handlers:    Optional handlers, called in the order listed.
-            report:      Optional callback invoked with each evaluation.
-            bundle_size: Evaluations sent to a worker together, `None` for the
-                         pool's own.
-            metadata:    Optional dictionary attached to every result.
+            config:    The optimization configuration.
+            variables: The variable vectors to evaluate, one per row.
+            function:  The per-realization evaluation function.
+            handlers:  Optional handlers, called in the order listed.
+            report:    Optional callback invoked with each evaluation.
+            metadata:  Optional dictionary attached to every result.
 
         Returns:
             An [`EvaluationResult`][ropt.EvaluationResult] whose
@@ -225,7 +214,6 @@ class WorkerPool:
             function,
             handlers=handlers,
             report=report,
-            bundle_size=bundle_size,
             metadata=metadata,
         )
 

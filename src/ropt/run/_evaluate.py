@@ -68,7 +68,6 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
-    bundle_size: int | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[FunctionResults]:
     try:
@@ -87,7 +86,6 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         function,
         handlers=handlers,
         report=report,
-        bundle_size=bundle_size,
         metadata=metadata,
     )
     return EvaluationResult(results=outcome.results[0])
@@ -102,7 +100,6 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
-    bundle_size: int | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     try:
@@ -121,7 +118,6 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
         function,
         handlers=handlers,
         report=report,
-        bundle_size=bundle_size,
         metadata=metadata,
     )
 
@@ -133,11 +129,10 @@ def _build_evaluation(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
-    bundle_size: int | None,
     signal: AbortSignal,
 ) -> tuple[EnOptContext, EvaluationStep, HistoryHandler]:
     context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(context, function, executor, bundle_size, signal)
+    evaluator = make_evaluator(context, function, executor, signal)
     # The results are collected by this run's own handler, in the order the
     # vectors were given, which is the order they are returned in.
     history = HistoryHandler()
@@ -156,7 +151,6 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
-    bundle_size: int | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     parent = parent_signal()
@@ -169,7 +163,6 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
             function,
             handlers=handlers,
             report=report,
-            bundle_size=bundle_size,
             signal=signal,
         )
     except Exception:

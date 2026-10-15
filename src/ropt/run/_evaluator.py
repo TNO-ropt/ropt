@@ -22,7 +22,6 @@ def make_evaluator(
     context: EnOptContext,
     function: EvaluationFunction,
     executor: Executor | None,
-    bundle_size: int | None = None,
     abort_signal: AbortSignal | None = None,
 ) -> Evaluator:
     n_obj = context.objectives.weights.size
@@ -42,6 +41,5 @@ def make_evaluator(
         function=callback,
         executor=executor,
         batch_id_callback=next_batch_id,
-        bundle_size=bundle_size,
         abort_signal=abort_signal,
     )

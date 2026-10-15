@@ -74,7 +74,7 @@ class LocalJobExecutor(JobExecutorBase):
     _kind = "local"
     _backend_name = "local job backend"
 
-    def __init__(  # ruff: ignore[too-many-arguments]
+    def __init__(
         self,
         *,
         workdir: Path | str | None = None,
@@ -82,7 +82,6 @@ class LocalJobExecutor(JobExecutorBase):
         interval: float = 0.1,
         retries: int = 0,
         cleanup: bool = True,
-        bundle_size: int = 1,
     ) -> None:
         """Initialize the local job executor.
 
@@ -97,12 +96,11 @@ class LocalJobExecutor(JobExecutorBase):
         than restraint towards a scheduler, and `retries=0` is enough.
 
         Args:
-            workdir:     Directory for each work item's files and captured output.
-            workers:     Maximum number of jobs running at once.
-            interval:    Polling interval in seconds.
-            retries:     Number of extra polls to wait for a work item's result.
-            cleanup:     Whether to remove a work item's files once it settles.
-            bundle_size: Calls per job, `0` for a whole batch.
+            workdir:  Directory for each work item's files and captured output.
+            workers:  Maximum number of jobs running at once.
+            interval: Polling interval in seconds.
+            retries:  Number of extra polls to wait for a work item's result.
+            cleanup:  Whether to remove a work item's files once it settles.
 
         Raises:
             ValueError:     If `workdir` is missing or an argument is out of range.
@@ -133,7 +131,6 @@ class LocalJobExecutor(JobExecutorBase):
                 interval=interval,
                 retries=retries,
                 cleanup=cleanup,
-                bundle_size=bundle_size,
             )
         except ValueError:
             if self._own_workdir:

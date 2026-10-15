@@ -138,9 +138,6 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         np.where(MASK, INITIAL_VALUES, variables),
         function,
         handlers=[tables],
-        # A whole inner batch goes to one worker: the parallelism comes from the
-        # outer evaluations.
-        bundle_size=0,
         # Within a batch only (batch_id, row_idx) is unique: several rows share
         # a realization, so realization alone would not identify the caller.
         metadata={"outer_batch": context.batch_id, "outer_eval": context.row_idx},

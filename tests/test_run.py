@@ -807,105 +807,15 @@ def test_evaluation_function_can_open_its_own_process_pool(
     assert result.results is not None
 
 
-_BUNDLE_CONFIG: dict[str, Any] = {
+_PARALLEL_CONFIG: dict[str, Any] = {
     "variables": {"variable_count": 2},
     "realizations": {"weights": [1.0] * 4},
 }
 
 
-def _bundle_pid(
-    variables: NDArray[np.float64], _context: EvaluationFunctionContext
-) -> EvaluationFunctionResult:
-    return EvaluationFunctionResult(
-        objectives=float(np.sum(variables**2)), metadata={"pid": os.getpid()}
-    )
-
-
-@pytest.mark.slow
-@pytest.mark.timeout(60)
-def test_bundle_size_sends_the_whole_batch_to_one_worker(
+def test_thread_pool_runs_evaluations_concurrently(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    # The evaluations in one bundle run after each other, so a whole-batch
-    # bundle is observable as a single worker doing all four realizations.
-    history = HistoryHandler()
-    pools(ProcessExecutor, workers=4).evaluate(
-        _BUNDLE_CONFIG,
-        np.zeros(2),
-        _bundle_pid,
-        handlers=[history],
-        bundle_size=0,
-    )
-    pids: set[int] = set()
-    for item in history["results"]:
-        recorded = item.evaluations.metadata.get("pid")
-        if recorded is not None:
-            pids.update(int(pid) for pid in np.ravel(recorded))
-    assert len(pids) == 1
-
-
-@pytest.mark.slow
-@pytest.mark.timeout(60)
-def test_call_bundle_size_reaches_the_executor(
-    pools: Callable[..., WorkerPool], monkeypatch: pytest.MonkeyPatch
-) -> None:
-    sizes: list[int] = []
-    pool = pools(ProcessExecutor, workers=4)
-    submit = ProcessExecutor._submit  # ruff: ignore[private-member-access]
-
-    def _recording_submit(self: ProcessExecutor, bundle: list[Any]) -> Any:
-        sizes.append(len(bundle))
-        return submit(self, bundle)
-
-    monkeypatch.setattr(ProcessExecutor, "_submit", _recording_submit)
-    pool.evaluate(_BUNDLE_CONFIG, np.zeros(2), _bundle_pid, bundle_size=0)
-    # Without the argument this would have been [1, 1, 1, 1].
-    assert sizes == [4]
-
-
-def test_negative_call_bundle_size_refused(pools: Callable[..., WorkerPool]) -> None:
-    with (
-        pytest.raises(ValueError, match="bundle_size must be >= 0"),
-    ):
-        pools().evaluate(
-            _BUNDLE_CONFIG,
-            np.zeros(2),
-            _bundle_pid,
-            bundle_size=-1,
-        )
-
-
-def test_thread_pool_bundles_a_whole_batch_onto_one_thread(
-    pools: Callable[..., WorkerPool],
-) -> None:
-    # A thread pool used to ignore bundle_size. It no longer does: a whole
-    # batch in one bundle is one worker task, so one thread runs all four.
-    threads: set[int] = set()
-    lock = threading.Lock()
-
-    def _record_thread(
-        variables: NDArray[np.float64], _context: EvaluationFunctionContext
-    ) -> EvaluationFunctionResult:
-        with lock:
-            threads.add(threading.get_ident())
-        return EvaluationFunctionResult(objectives=float(np.sum(variables**2)))
-
-    results = pools(workers=4).evaluate(
-        _BUNDLE_CONFIG,
-        np.zeros(2),
-        _record_thread,
-        bundle_size=0,
-    )
-    assert results.results is not None
-    assert results.results.functions is not None
-    assert len(threads) == 1
-
-
-def test_thread_pool_runs_unbundled_calls_at_once(
-    pools: Callable[..., WorkerPool],
-) -> None:
-    # The counterpart: one call per bundle, so none of the four can pass the
-    # barrier until all four are in flight. Bundling would break it instead.
     barrier = threading.Barrier(4)
 
     def _wait_for_all(
@@ -915,10 +825,9 @@ def test_thread_pool_runs_unbundled_calls_at_once(
         return EvaluationFunctionResult(objectives=float(np.sum(variables**2)))
 
     results = pools(workers=4).evaluate(
-        _BUNDLE_CONFIG,
+        _PARALLEL_CONFIG,
         np.zeros(2),
         _wait_for_all,
-        bundle_size=1,
     )
     assert results.results is not None
     assert results.results.functions is not None

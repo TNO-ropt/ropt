@@ -4,7 +4,7 @@ An executor runs [`WorkItem`][ropt.components.executors.WorkItem] objects on a
 concrete mechanism: threads, processes, local jobs, or an HPC cluster.
 [`Executor`][ropt.components.executors.Executor] is the interface a compute step
 sees; [`ExecutorBase`][ropt.components.executors.ExecutorBase] adds the
-lifecycle and bundling the built-in executors share. See
+lifecycle the built-in executors share. See
 [Parallel Evaluation](../advanced/parallel.md) for usage.
 """
 

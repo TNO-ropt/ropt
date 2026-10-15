@@ -273,7 +273,7 @@ def test_session_abort_aborts_the_batch_in_flight() -> None:
 
 @pytest.mark.timeout(60)
 def test_session_abort_of_an_evaluation_batch_raises() -> None:
-    # One worker and one vector per bundle, so the two rows behind the one that
+    # One worker and one task per vector, so the two rows behind the one that
     # aborts are still queued and are dropped. A batch is all or nothing, so
     # the row that did run is not reported either.
     matrix = np.array([_INITIAL, np.zeros(_INITIAL.size), np.ones(_INITIAL.size)])
@@ -288,7 +288,7 @@ def test_session_abort_of_an_evaluation_batch_raises() -> None:
             return _sphere(variables, context)
 
         with pytest.raises(AbortedError) as raised:
-            pool.evaluate_batch(_CONFIG, matrix, objective, bundle_size=1)
+            pool.evaluate_batch(_CONFIG, matrix, objective)
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
 
@@ -543,7 +543,7 @@ def test_an_aborted_run_does_not_report_a_failure() -> None:
 
 @pytest.mark.timeout(60)
 def test_a_failing_run_aborts_an_evaluation_beside_it() -> None:
-    # One worker and one vector per bundle, so the second row is still queued
+    # One worker and one task per vector, so the second row is still queued
     # when the other run fails; each run has a pool of its own so that the two
     # can overlap on one worker each.
     started = threading.Barrier(2, timeout=30)
@@ -559,7 +559,6 @@ def test_a_failing_run_aborts_an_evaluation_beside_it() -> None:
             _CONFIG,
             matrix,
             _waits_then_holds(started, release),
-            bundle_size=1,
         )
         driver = threading.Thread(target=_records_abort, args=(run, codes))
         driver.start()

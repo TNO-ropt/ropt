@@ -52,8 +52,7 @@ from .base import (
     ExecutorFailure,
     WorkItem,
     WorkNotRun,
-    _calls,
-    _run_bundle,
+    _run_item,
 )
 
 if TYPE_CHECKING:
@@ -81,7 +80,7 @@ class _StateUpdate:
     # What one caller changed while the backend was its own. Every field names
     # the shared state it feeds. It is filled with no lock held, so that the
     # slow work does not block anyone, and merged by `apply_update`.
-    jobs_to_launch: list[tuple[UUID, _Results, int, list[WorkItem]]] = field(
+    jobs_to_launch: list[tuple[UUID, _Results, int, WorkItem]] = field(
         default_factory=list
     )
     launched_jobs: dict[UUID, int] = field(default_factory=dict)
@@ -112,7 +111,7 @@ class _State:
         self._backend_name = backend_name
         self._lock = threading.Lock()
         self._condition = threading.Condition(self._lock)
-        self._queue: deque[tuple[_Results, int, list[WorkItem]]] = deque()
+        self._queue: deque[tuple[_Results, int, WorkItem]] = deque()
         self._active: dict[UUID, tuple[_Results, int]] = {}
         self._jobs: dict[UUID, int] = {}
         self._retries: dict[UUID, int] = {}
@@ -137,10 +136,10 @@ class _State:
             self._queue.clear()
             return jobs
 
-    def queue(self, results: _Results, bundles: list[list[WorkItem]]) -> None:
+    def queue(self, results: _Results, items: list[WorkItem]) -> None:
         with self._condition:
-            for index, bundle in enumerate(bundles):
-                self._queue.append((results, index, bundle))
+            for index, item in enumerate(items):
+                self._queue.append((results, index, item))
             self._condition.notify_all()
 
     def wake(self) -> None:
@@ -251,10 +250,10 @@ class _State:
         # update records them, so work that never starts can still be failed
         # back to the run waiting for it.
         while len(self._active) < self._workers and self._queue:
-            results, index, bundle = self._queue.popleft()
+            results, index, item = self._queue.popleft()
             # The id is the stem of the files this job reads and writes.
             bundle_id = uuid4()
-            update.jobs_to_launch.append((bundle_id, results, index, bundle))
+            update.jobs_to_launch.append((bundle_id, results, index, item))
             self._active[bundle_id] = (results, index)
 
     def _complete(self, bundle_id: UUID, result: Any) -> None:  # ruff: ignore[any-type]
@@ -267,7 +266,7 @@ class _State:
         # Given a slot but never launched: the caller raised before reaching
         # them.
         reason = "the caller stopped" if update.error is None else f"{update.error}"
-        for bundle_id, _results, _index, _bundle in update.jobs_to_launch:
+        for bundle_id, _results, _index, _item in update.jobs_to_launch:
             if bundle_id in update.launched_jobs or bundle_id in update.results:
                 continue
             if bundle_id not in self._active:
@@ -325,7 +324,7 @@ class JobExecutorBase(ExecutorBase):
     # have a bad moment raises this; one that cannot has nothing to wait for.
     _query_retries = 0
 
-    def __init__(  # ruff: ignore[too-many-arguments]
+    def __init__(
         self,
         *,
         workdir: Path,
@@ -333,7 +332,6 @@ class JobExecutorBase(ExecutorBase):
         interval: float,
         retries: int,
         cleanup: bool,
-        bundle_size: int = 1,
     ) -> None:
         """Initialize the shared state.
 
@@ -341,17 +339,16 @@ class JobExecutorBase(ExecutorBase):
         job may read and write is the one thing they do not agree on.
 
         Args:
-            workdir:     Directory holding each work item's files.
-            workers:     Maximum number of jobs running at once.
-            interval:    Polling interval in seconds.
-            retries:     Extra polls to wait for a result after the first attempt.
-            cleanup:     Whether to remove work item files once they are done with.
-            bundle_size: Calls per job, `0` for a whole batch.
+            workdir:  Directory holding each work item's files.
+            workers:  Maximum number of jobs running at once.
+            interval: Polling interval in seconds.
+            retries:  Extra polls to wait for a result after the first attempt.
+            cleanup:  Whether to remove work item files once they are done with.
 
         Raises:
             ValueError: If `workers`, `interval` or `retries` is out of range.
         """
-        super().__init__(bundle_size=bundle_size)
+        super().__init__()
         if workers < 1:
             msg = f"The number of workers must be at least one: {workers}"
             raise ValueError(msg)
@@ -406,9 +403,9 @@ class JobExecutorBase(ExecutorBase):
         self._cancel_jobs(self._state.clear())
 
     @override
-    def _run_bundles(
+    def _run_items(
         self,
-        bundles: list[list[WorkItem]],
+        items: list[WorkItem],
         store: Callable[[int, Any], None],
         abort_signal: AbortSignal | None,
     ) -> None:
@@ -417,8 +414,8 @@ class JobExecutorBase(ExecutorBase):
         if abort_signal is not None:
             abort_signal.add_callback(wake)
         try:
-            self._state.queue(results, bundles)
-            remaining = len(bundles)
+            self._state.queue(results, items)
+            remaining = len(items)
             while remaining > 0:
                 if abort_signal is not None and abort_signal.aborting:
                     break
@@ -459,9 +456,9 @@ class JobExecutorBase(ExecutorBase):
                 )
 
     def _launch_jobs(self, update: _StateUpdate) -> None:
-        for bundle_id, _results, _index, bundle in update.jobs_to_launch:
+        for bundle_id, _results, _index, item in update.jobs_to_launch:
             try:
-                update.launched_jobs[bundle_id] = self._launch_job(bundle_id, bundle)
+                update.launched_jobs[bundle_id] = self._launch_job(bundle_id, item)
             except Exception as exc:  # ruff: ignore[blind-except]
                 update.results[bundle_id] = exc
 
@@ -529,7 +526,7 @@ class JobExecutorBase(ExecutorBase):
             if self._remove_files:
                 self._cleanup_files(bundle_id)
 
-    def _launch_job(self, bundle_id: UUID, bundle: list[WorkItem]) -> int:
+    def _launch_job(self, bundle_id: UUID, item: WorkItem) -> int:
         existing = any(
             (self._workdir / f"{bundle_id}{suffix}").exists()
             for suffix in (".in", ".out", ".txt")
@@ -539,7 +536,7 @@ class JobExecutorBase(ExecutorBase):
             raise ExecutionError(msg)
         input_file = self._workdir / f"{bundle_id}.in"
         output_file = self._workdir / f"{bundle_id}.out"
-        self._write_input(bundle_id, input_file, bundle)
+        self._write_input(bundle_id, input_file, item)
         try:
             job_id = self._start_job(
                 bundle_id,
@@ -560,9 +557,7 @@ class JobExecutorBase(ExecutorBase):
         _logger.debug("Started %s job %s (job id: %s)", self._kind, bundle_id, job_id)
         return job_id
 
-    def _write_input(
-        self, bundle_id: UUID, input_file: Path, bundle: list[WorkItem]
-    ) -> None:
+    def _write_input(self, bundle_id: UUID, input_file: Path, item: WorkItem) -> None:
         # Written to a temporary file and renamed, so the job can never observe
         # a half-written input: on a shared filesystem the rename is what makes
         # it visible, and fsync is what makes the content precede it.
@@ -570,7 +565,14 @@ class JobExecutorBase(ExecutorBase):
         tmp_path = Path(tmp_path_str)
         try:
             with os.fdopen(tmp_fd, "wb") as fp:
-                dump((_run_bundle, (_calls(bundle),), {"sendable": True}), fp)
+                dump(
+                    (
+                        _run_item,
+                        (item.function, item.args, item.kwargs),
+                        {"sendable": True},
+                    ),
+                    fp,
+                )
                 fp.flush()
                 os.fsync(fp.fileno())
             tmp_path.rename(input_file)

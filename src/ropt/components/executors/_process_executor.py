@@ -9,7 +9,7 @@ from collections import deque
 from concurrent.futures import Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
-from typing import TYPE_CHECKING, Any, cast, override
+from typing import TYPE_CHECKING, Any, override
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
@@ -20,9 +20,8 @@ from .base import (
     ExecutorBase,
     ExecutorFailure,
     WorkItem,
-    _calls,
     _log_left_running,
-    _run_bundle,
+    _run_item,
     _stopped,
 )
 
@@ -52,8 +51,8 @@ class ProcessExecutor(ExecutorBase):
         an evaluation launches external programs.
 
     Note:
-        An abort also leaves one bundle running that was submitted but not yet
-        started: the pool marks a bundle as running when it moves it towards a
+        An abort also leaves one item running that was submitted but not yet
+        started: the pool marks an item as running when it moves it towards a
         worker, so it can no longer be withdrawn. See
         [Stopping a run](../running/parallel.md#stopping-a-run).
     """
@@ -63,7 +62,6 @@ class ProcessExecutor(ExecutorBase):
         *,
         workers: int = 1,
         max_tasks_per_child: int | None = None,
-        bundle_size: int = 1,
     ) -> None:
         """Initialize the executor.
 
@@ -73,13 +71,12 @@ class ProcessExecutor(ExecutorBase):
         Args:
             workers:             Number of worker processes.
             max_tasks_per_child: Restart workers after this many items, or never.
-            bundle_size:         Calls per worker task, `0` for a whole batch.
 
         Raises:
             ValueError:     If `workers` is less than one.
             ExecutionError: If the worker processes could not be started.
         """  # ruff: ignore[docstring-extraneous-exception]
-        super().__init__(bundle_size=bundle_size)
+        super().__init__()
         if workers < 1:
             msg = f"The number of workers must be at least one: {workers}"
             raise ValueError(msg)
@@ -88,9 +85,9 @@ class ProcessExecutor(ExecutorBase):
             mp_context=multiprocessing.get_context("spawn"),
             max_tasks_per_child=max_tasks_per_child,
         )
-        # A submitted bundle's pickled bytes stay in memory until its result
+        # A submitted item's pickled bytes stay in memory until its result
         # comes back, so this caps how many are submitted at once: one for each
-        # worker, plus one so a worker that finishes finds the next bundle
+        # worker, plus one so a worker that finishes finds the next item
         # already waiting.
         self._payload_gate = _PayloadGate(workers + 1)
         self._check_worker_startup()
@@ -108,14 +105,14 @@ class ProcessExecutor(ExecutorBase):
             raise ExecutionError(msg) from exc
 
     @override
-    def _run_bundles(
+    def _run_items(
         self,
-        bundles: list[list[WorkItem]],
+        items: list[WorkItem],
         store: Callable[[int, Any], None],
         abort_signal: AbortSignal | None,
     ) -> None:
-        pending = deque(enumerate(bundles))
-        # Finished bundles arrive here rather than through
+        pending = deque(enumerate(items))
+        # Finished items arrive here rather than through
         # `concurrent.futures.wait`, which would block forever on a future
         # cancelled before the pool dispatched it; a done callback still fires.
         done: queue.SimpleQueue[Future[tuple[bool, bytes]] | None] = queue.SimpleQueue()
@@ -140,7 +137,7 @@ class ProcessExecutor(ExecutorBase):
                 index = futures.pop(item)
                 self._payload_gate.release()
                 if not item.cancelled():
-                    store(index, _bundle_result(item))
+                    store(index, _item_result(item))
         finally:
             if abort_signal is not None:
                 abort_signal.remove_callback(wake)
@@ -154,11 +151,11 @@ class ProcessExecutor(ExecutorBase):
     def _end_left_running(self, future: Future[tuple[bool, bytes]]) -> None:
         # A payload holds its slot until its work ends, waited for or not.
         self._payload_gate.release()
-        _log_left_running(_bundle_result, future)
+        _log_left_running(_item_result, future)
 
     def _submit_pending(
         self,
-        pending: deque[tuple[int, list[WorkItem]]],
+        pending: deque[tuple[int, WorkItem]],
         futures: dict[Future[tuple[bool, bytes]], int],
         done: queue.SimpleQueue[Future[tuple[bool, bytes]] | None],
         abort_signal: AbortSignal | None,
@@ -168,9 +165,9 @@ class ProcessExecutor(ExecutorBase):
         while pending and self._payload_gate.acquire(
             blocking=not futures, abort_signal=abort_signal
         ):
-            index, bundle = pending.popleft()
+            index, item = pending.popleft()
             try:
-                future = self._submit(bundle)
+                future = self._submit(item)
             except BrokenProcessPool:
                 self._payload_gate.release()
                 # The pool cannot be restarted, so the rest of the batch is
@@ -185,12 +182,14 @@ class ProcessExecutor(ExecutorBase):
             future.add_done_callback(done.put)
         return []
 
-    def _submit(self, bundle: list[WorkItem]) -> Future[tuple[bool, bytes]]:
+    def _submit(self, item: WorkItem) -> Future[tuple[bool, bytes]]:
         # The payload is built here rather than in a worker, so that `ropt`'s
         # own serialization is used and a failure to build it is raised in the
         # caller instead of surfacing as an opaque pool failure.
         try:
-            payload = dumps((_run_bundle, (_calls(bundle),), {"sendable": True}))
+            payload = dumps(
+                (_run_item, (item.function, item.args, item.kwargs), {"sendable": True})
+            )
         except Exception as exc:
             msg = (
                 "The work item could not be sent to a worker process: "
@@ -214,9 +213,7 @@ def _store_unsent(unsent: list[int], store: Callable[[int, Any], None]) -> None:
         store(index, ExecutorFailure(_POOL_GONE))
 
 
-def _bundle_result(
-    future: Future[tuple[bool, bytes]],
-) -> list[Any] | ExecutorFailure:
+def _item_result(future: Future[tuple[bool, bytes]]) -> Any:  # ruff: ignore[any-type]
     try:
         ok, blob = future.result()
     except BrokenProcessPool:
@@ -225,7 +222,7 @@ def _bundle_result(
     value = loads(blob)
     if not ok:
         raise value
-    return cast("list[Any]", value)
+    return value
 
 
 def _terminate_workers(executor: ProcessPoolExecutor) -> None:
