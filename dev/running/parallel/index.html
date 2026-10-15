@@ -3347,7 +3347,7 @@ unsupported.</p>
 worker process is killed, a cluster job never writes its result, or the file it
 wrote cannot be read back. The optimization ends with an
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> naming the first lost
-evaluation's reason. The affected rows are <em>not</em> recorded as <code>numpy.nan</code>: a
+evaluation's reason. The affected evaluations do <em>not</em> return <code>numpy.nan</code>: a
 machine that broke is not a realization that failed to converge, and absorbing
 it would continue the optimization on whichever workers happened to survive and
 produce a result indistinguishable from one computed over the whole ensemble.</p>
@@ -3390,9 +3390,9 @@ on a pool instead of inline.</p>
 </span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
 </span></code></pre></div>
 <p><code>run</code> takes <strong>zero-argument</strong> callables — bind arguments with
-<code>functools.partial</code> (or a closure). Pass a <strong>sequence</strong> of callables to run them
-concurrently and get a tuple of results in order; they may be entirely different
-functions:</p>
+<code>functools.partial</code> or use an object method. Pass a <strong>sequence</strong> of callables to
+run them concurrently and get a tuple of results in order; they may be entirely
+different functions:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">partial</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span>
