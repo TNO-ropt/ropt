@@ -1,14 +1,14 @@
 # Evaluating in Parallel
 
-Evaluations within one optimization can run in parallel, and so can work of your
-own. Both go through a **pool**.
+Evaluations within one optimization can run in parallel, and you can launch your
+own tasks in parallel using an evaluation **pool**.
 
 ## Running in parallel
 
 By default [`optimize`][ropt.optimize] runs on the calling thread, one
 evaluation at a time. To run the evaluations in parallel, open a
-[`session`][ropt.session], build a **pool** on it and start the optimization on
-that pool:
+[`session`][ropt.session], build a **pool** on it and start the optimization
+using the `optimize` method of that pool:
 
 ```python
 from ropt import session
@@ -18,18 +18,23 @@ with session() as s:
 ```
 
 The runnable script for this section is
-[examples/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py),
-which takes `-m` to swap its thread pool for a process pool.
+[examples/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py).
 
-The session owns the pools built on it and releases their workers when its
-block ends, so most code needs no further cleanup. Nothing is implicit: an
-optimization evaluates on the pool it was started on, and on no other. An
-optimization started with
-the module-level [`optimize`][ropt.optimize] evaluates inside your own
-program and needs no session, wherever it is called from — including from a
-thread you started yourself.
+The session that created the pool releases their workers when its block ends, so
+most code needs no further cleanup. Nothing is implicit: an optimization
+evaluates its functions using the pool it was started on. An optimization
+started with the module-level [`optimize`][ropt.optimize] has no session, and
+executes its function evaluations serially.
 
-Where an evaluation runs depends on which pool it was started on:
+The available pools are:
+
+- [`thread_pool`](#thread-pool): runs evaluations on threads in your process.
+- [`process_pool`](#process-pool): runs evaluations in reused worker processes.
+- [`local_pool`](#local-pool): runs each evaluation as a separate local process.
+- [`hpc_pool`](#running-on-an-hpc-cluster): submits each evaluation as a job to
+  an HPC cluster.
+
+Where an evaluation runs depends on the type of pool used:
 
 ```mermaid
 flowchart TB
@@ -74,10 +79,10 @@ means that process.
 
 ### How many workers?
 
-`ropt` parallelizes two things, and only these two: the **evaluations within one
-optimization batch**, and whole **optimizations against each other**. Nothing
-else overlaps — a single optimization is a sequence of batches, and the next one
-cannot start before the current one is complete.
+With in a single optimization `ropt` parallelizes the evaluations within one
+optimization batch. A single optimization is a sequence of batches, and the next
+one cannot start before the current one is complete. Furthermore, multiple
+optimizations can run at the same time, each parallizing their own batches.
 
 So the number of workers that can be kept busy is roughly
 
@@ -94,10 +99,6 @@ over an ensemble that is one per realization, plus their perturbations on the
 batches where a gradient is estimated. The second factor is `1` unless you run
 [several optimizations at once](many_runs.md), where it is the `limit` argument
 of `run` (or the number of optimizations, if you set no limit).
-
-A worker is not free, so this is an upper bound rather than a target. Ask for
-what the work needs; the useful number is usually much smaller than the
-machine's core count.
 
 Each evaluation in a batch is sent to a worker as a separate task. Up to
 `workers` tasks can run at once on a pool; the rest wait until a worker is
@@ -472,7 +473,7 @@ Two kinds of failure can end an evaluation, and they reach you differently.
 worker process is killed, a cluster job never writes its result, or the file it
 wrote cannot be read back. The optimization ends with an
 [`ExecutionError`][ropt.exceptions.ExecutionError] naming the first lost
-evaluation's reason. The affected rows are *not* recorded as `numpy.nan`: a
+evaluation's reason. The affected evaluations do *not* return `numpy.nan`: a
 machine that broke is not a realization that failed to converge, and absorbing
 it would continue the optimization on whichever workers happened to survive and
 produce a result indistinguishable from one computed over the whole ensemble.
@@ -525,9 +526,9 @@ with session() as s:
 ```
 
 `run` takes **zero-argument** callables — bind arguments with
-`functools.partial` (or a closure). Pass a **sequence** of callables to run them
-concurrently and get a tuple of results in order; they may be entirely different
-functions:
+`functools.partial` or use an object method. Pass a **sequence** of callables to
+run them concurrently and get a tuple of results in order; they may be entirely
+different functions:
 
 ```python
 with session() as s:

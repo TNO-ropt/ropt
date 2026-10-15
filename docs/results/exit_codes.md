@@ -51,7 +51,7 @@ except AbortedError as error:
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
 | `ABORTED`               | The task was aborted from outside, as closing a session, or a `KeyboardInterrupt`, does to a task still under way. |
 | `ABORTED_ON_ERROR`      | Another [task](../running/failures.md) raised, and this one was aborted with it.                    |
-| `USER_ABORT`            | [`Session.abort`](../running/running.md#stopping-from-outside) aborted the task.                     |
+| `USER_ABORT`            | [`Session.abort`](../running/many_runs.md#stopping-from-outside) aborted the task.                   |
 | `EXECUTOR_SHUT_DOWN`    | The pool the task was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
 | `UNKNOWN`               | The zero value of the enumeration. No task reports it.                                               |
 

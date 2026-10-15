@@ -181,6 +181,9 @@ the [`names`](../optimizer_setup/configuration_sections.md#names) mapping: a len
 column names follow
 [`results_to_pandas`](results.md#metadata-columns), both
 result-level and per-realization metadata can be included and renamed.
+The runnable [metadata example](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py)
+shows a per-realization array with a configured `names` entry and exports it
+through `evaluations.metadata.residual`.
 
 Tables are built with polars by default. Pass `engine="pandas"` to get pandas
 DataFrames instead:

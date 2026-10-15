@@ -140,7 +140,7 @@ results = s.run([partial(optimize_or_none, x0) for x0 in start_points])
 
 `SimulationError` stands for an exception that your own objective raises.
 
-[`Session.abort`](running.md#stopping-from-outside) reaches every optimization on
+[`Session.abort`](#stopping-from-outside) reaches every optimization on
 the session, and `run` then raises
 [`AbortedError`][ropt.exceptions.AbortedError] with `USER_ABORT`. When a failure
 elsewhere aborted it, the exit code is `ABORTED_ON_ERROR`, so the exit code
@@ -148,3 +148,50 @@ distinguishes an abort that was asked for from one that a failure caused. A
 `KeyboardInterrupt` aborts the optimizations of the `run` call it passes through,
 and is raised at once. See [Exit Codes](../results/exit_codes.md) for what each
 code means.
+
+## Aborting from outside { #stopping-from-outside }
+
+The `report` callback runs inside the optimization it stops, which is no use to
+a signal handler or a user interface. [`Session.abort`][ropt.Session.abort] is
+the one that is called from another thread: it aborts every task that belongs
+to the session, and each raises [`AbortedError`][ropt.exceptions.AbortedError]
+with `USER_ABORT`.
+
+```python
+with session() as s:
+    pool = s.thread_pool(workers=4)
+    signal.signal(signal.SIGINT, lambda *_: s.abort())
+    try:
+        result = pool.optimize(config, x0, objective)
+    except AbortedError as error:
+        print("aborted:", error.exit_code.message)
+```
+
+The two are not the same kind of ending, which is why they have different exit
+codes. A `report` callback stops the optimization *on a criterion*, at a point it
+chose, and the optimization returns the best result it had reached. An abort
+applies no criterion, and the optimization returns no result. To keep what an
+aborted optimization had reached, collect its results as they arrive, with a
+`report` callback or a [handler](../results/handlers.md).
+
+An aborted task does not wait for the evaluations that are running. With no
+pool, the evaluation function runs in the calling thread, so the call in progress
+returns first. On a thread or process pool, the evaluations already running
+continue after the task has ended, and their workers are free only once they
+return. On a local or HPC pool they are cancelled.
+
+`abort()` reaches the tasks that are under way at the moment it is called, and
+nothing more. A task started afterwards is unaffected, so a
+loop that abandons one attempt and starts another keeps working. A
+[`run`][ropt.Session.run] call counts as one task here: a callable it has
+queued behind its `limit` is not started. Leaving the session's `with` block
+aborts its tasks as well, and then releases its pools, which is what refuses a
+task started after that. Releasing a local or HPC pool cancels the jobs it still
+has, so none are left running when the block has ended. A task aborted that way
+raises with `ABORTED` rather than `USER_ABORT`, since it was the block ending
+rather than a request to abort.
+
+An optimization started with the module-level [`optimize`][ropt.optimize] belongs
+to no session you hold and cannot be aborted this way. It evaluates on the
+calling thread, which is the thread that would have to call `abort()`. Start it
+on a session or one of its pools to make it abortable.

@@ -125,7 +125,7 @@ opens a session of its own, which holds only the tasks started by that function.
 ## What an abort does
 
 A nested task is aborted when its parent is, with the same exit code:
-`USER_ABORT` after [`Session.abort`](running.md#stopping-from-outside), `ABORTED`
+`USER_ABORT` after [`Session.abort`](many_runs.md#stopping-from-outside), `ABORTED`
 when the session's `with` block ends or a `KeyboardInterrupt` or `SystemExit`
 passes through the parent, and `ABORTED_ON_ERROR` after a failure.
 This also holds when the nested task belongs to another session, as one started
