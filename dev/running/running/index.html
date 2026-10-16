@@ -12,7 +12,7 @@
         <link rel="prev" href="../../getting_started/examples/">
       
       
-        <link rel="next" href="../parallel/">
+        <link rel="next" href="../sessions/">
       
       
         
@@ -845,6 +845,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="The evaluation function">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-an-external-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running an external program
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -945,6 +962,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2513,6 +2558,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="The evaluation function">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-an-external-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running an external program
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2630,6 +2692,14 @@
 
 
 <h1 id="running-optimizations">Running Optimizations</h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This page uses the module-level functions <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>, which evaluate one point at a time and return
+when they have finished. Parallel evaluation, several optimizations at once and
+aborting from outside need a <a href="../sessions/">session</a>. Everything this page
+explains applies there unchanged.</p>
+</div>
 <p>Everything needed to run an optimization is imported from the <code>ropt</code> package
 itself:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
@@ -2718,6 +2788,28 @@ succeed. How many is enough is set by
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>,
 which defaults to <em>all</em> of them — so a single <code>NaN</code> ends the optimization with
 <code>TOO_FEW_REALIZATIONS</code> unless you lower it.</p>
+<h3 id="running-an-external-program">Running an external program</h3>
+<p>When the evaluation function runs a simulator or another external program,
+start it with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>. It is the supported way to
+run external programs from <code>ropt</code>. It takes the program and its arguments as a
+list, like <code>subprocess.run</code>, waits for the program to exit, and returns its exit
+status:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_program</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">status</span> <span class="o">=</span> <span class="n">run_program</span><span class="p">([</span><span class="s2">"my_simulator"</span><span class="p">,</span> <span class="s2">"input.json"</span><span class="p">],</span> <span class="n">cwd</span><span class="o">=</span><span class="n">workdir</span><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="k">return</span> <span class="n">read_objective</span><span class="p">(</span><span class="n">workdir</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Unlike <code>subprocess.run</code>, <code>run_program</code> terminates the program, together with
+every program it started, when the optimization is stopped. This matters most
+when evaluations run in parallel or several optimizations run at once: an abort
+or a failure then stops every program that is still running. A program started
+with <code>subprocess.run</code> keeps running after an abort, and on a thread pool your
+script cannot exit before it does. See
+<a href="../programs/">Running External Programs</a>.</p>
 <h2 id="the-result">The result</h2>
 <p><code>optimize</code> returns an <a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
 
@@ -2726,10 +2818,10 @@ which defaults to <em>all</em> of them — so a single <code>NaN</code> ends the
       dataclass
   " href="../../reference/api/#ropt.OptimizationResult"><code>OptimizationResult</code></a>,
 which carries two things:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span>  <span class="c1"># why the optimization stopped (an ExitCode)</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">result</span><span class="o">.</span><span class="n">results</span>    <span class="c1"># the best evaluation, or None if none was valid</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span>  <span class="c1"># why the optimization stopped (an ExitCode)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">result</span><span class="o">.</span><span class="n">results</span>    <span class="c1"># the best evaluation, or None if none was valid</span>
 </span></code></pre></div>
 <p><code>results</code> is a <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
@@ -2740,11 +2832,11 @@ which carries two things:</p>
 object a <a href="../../results/handlers/">handler</a> receives — so the best point and its
 values are read from it at the paths described in
 <a href="../../results/results/">Working with Results</a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span>             <span class="c1"># the best variables</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span>      <span class="c1"># the objective value there</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">objectives</span>  <span class="c1"># the separate objective values</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span> <span class="c1"># the nonlinear constraint values</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span>             <span class="c1"># the best variables</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span>      <span class="c1"># the objective value there</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">objectives</span>  <span class="c1"># the separate objective values</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span> <span class="c1"># the nonlinear constraint values</span>
 </span></code></pre></div>
 <p><code>results</code> is <code>None</code> when the optimization produced no valid result: too few
 realizations
@@ -2761,12 +2853,16 @@ for every function evaluation, with the
       dataclass
   " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> of that evaluation — the same
 object a handler is given:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span></code></pre></div>
+<p>To store results rather than print them, pass a <strong>handler</strong> with the <code>handlers</code>
+argument. <a class="autorefs autorefs-internal" title="            ropt.HistoryHandler" href="../../reference/api/#ropt.HistoryHandler"><code>HistoryHandler</code></a> keeps every result, and
+<a class="autorefs autorefs-internal" title="            ropt.DataFrameHandler" href="../../reference/api/#ropt.DataFrameHandler"><code>DataFrameHandler</code></a> collects selected fields into
+<code>polars</code> or <code>pandas</code> tables. See <a href="../../results/handlers/">Result Handlers</a>.</p>
 <h3 id="reporting-gradients-as-well">Reporting gradients as well</h3>
 <p>Set <code>report_gradients=True</code> and the callback is also called with each
 <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
@@ -2776,17 +2872,17 @@ object a handler is given:</p>
       dataclass
   " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a>, which arrives in its own
 evaluation. The callback then receives both kinds and has to tell them apart:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionResults</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">FunctionResults</span><span class="p">):</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">"objective"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">"gradient"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_gradient</span><span class="p">)</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">,</span> <span class="n">report_gradients</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionResults</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">FunctionResults</span><span class="p">):</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">"objective"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">"gradient"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_gradient</span><span class="p">)</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">,</span> <span class="n">report_gradients</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Gradients are generally paired with a function evaluation at the same point. A
 <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
@@ -2808,17 +2904,17 @@ same ID.</p>
 <code>True</code> and the optimization stops gracefully after the current evaluation, with
 exit code <code>STOPPED</code>. Any other return value (including <code>None</code>) lets it
 continue.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># good enough — stop this optimization</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="k">return</span> <span class="kc">None</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># good enough — stop this optimization</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="k">return</span> <span class="kc">None</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
 </span></code></pre></div>
 <p>With <a href="../many_runs/">several optimizations at once</a>, this stops only the
 optimization whose callback returned <code>True</code>; the others continue.</p>
@@ -2845,8 +2941,8 @@ sources:</p>
   <code>evaluate_batch</code>. <code>ropt</code> copies it onto every result the task produces, which
   is one way to tag an optimization:</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>   <span class="c1"># 7</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>   <span class="c1"># 7</span>
 </span></code></pre></div>
 <p>The same dict also reaches the evaluation function itself, as
   <code>context.metadata</code> — useful when the evaluation needs to know which
@@ -2863,15 +2959,15 @@ sources:</p>
   from the evaluation function with a <code>metadata</code> field. This value is stored per
   realization, next to the objective values:</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationFunctionResult</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">value</span> <span class="o">=</span> <span class="o">...</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">residual</span> <span class="o">=</span> <span class="n">variables</span> <span class="o">-</span> <span class="n">x0</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="k">return</span> <span class="n">EvaluationFunctionResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"residual"</span><span class="p">:</span> <span class="n">residual</span><span class="p">})</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"residual"</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># (3, 3)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationFunctionResult</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">value</span> <span class="o">=</span> <span class="o">...</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">residual</span> <span class="o">=</span> <span class="n">variables</span> <span class="o">-</span> <span class="n">x0</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="k">return</span> <span class="n">EvaluationFunctionResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"residual"</span><span class="p">:</span> <span class="n">residual</span><span class="p">})</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"residual"</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># (3, 3)</span>
 </span></code></pre></div>
 <p>A key does not have to be set by every realization; those that do not set it
   get <code>np.nan</code> for numeric values and <code>None</code> otherwise, so a numeric column with
@@ -2899,13 +2995,13 @@ each appears in the pandas export. The full runnable script is
 <p>Sometimes you only want the objective value for a point, without running an
 optimizer. Use <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> for one point and
 <a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> for several:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">evaluate_batch</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_batch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">single</span><span class="o">.</span><span class="n">results</span>  <span class="c1"># one FunctionResults</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">batch</span><span class="o">.</span><span class="n">results</span>   <span class="c1"># one per row of the matrix</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">evaluate_batch</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_batch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">single</span><span class="o">.</span><span class="n">results</span>  <span class="c1"># one FunctionResults</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">batch</span><span class="o">.</span><span class="n">results</span>   <span class="c1"># one per row of the matrix</span>
 </span></code></pre></div>
 <p>Both return an <a class="autorefs autorefs-internal" title="            ropt.EvaluationResult
 
@@ -2975,7 +3071,7 @@ it either way.</p>
 </ul>
 <p>The <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> types above are imported from
 <code>ropt</code> itself, and catching the base class catches all of them at once:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoptError</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoptError</span>
 </span></code></pre></div>
 <p>It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
@@ -2991,7 +3087,7 @@ aborted as well. <a href="../failures/">Failures and Aborts</a> describes each c
 <p>A few config values and result fields use enumerations.
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, the type of <code>result.exit_code</code>, is imported
 from <code>ropt</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
 </span></code></pre></div>
 <p>The enumerations that name configuration values —
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a>,
@@ -2999,9 +3095,9 @@ from <code>ropt</code>:</p>
 <a class="autorefs autorefs-internal" title="            PerturbationType" href="../../reference/enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a> — are in
 <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>. Their members are strings, so a configuration
 accepts either the member or the value it equals:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">VariableType</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"types"</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">}}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">VariableType</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"types"</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">}}</span>
 </span></code></pre></div>
 <p>Writing <code>"integer"</code> instead gives the same configuration. A validated
 configuration reports these fields as enum members, whichever form was written.</p>
@@ -3057,13 +3153,13 @@ configuration reports these fields as enum members, whichever form was written.<
         
         
           
-          <a href="../parallel/" class="md-footer__link md-footer__link--next" aria-label="Next: Evaluating in Parallel">
+          <a href="../sessions/" class="md-footer__link md-footer__link--next" aria-label="Next: Sessions">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Evaluating in Parallel
+                Sessions
               </div>
             </div>
             <div class="md-footer__button md-icon">

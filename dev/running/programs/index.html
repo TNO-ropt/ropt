@@ -805,6 +805,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../parallel/" class="md-nav__link">
         
   
@@ -993,10 +1021,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when-the-optimization-is-aborted" class="md-nav__link">
+  <a href="#when-the-program-is-stopped" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When the optimization is aborted
+        When the program is stopped
       
     </span>
   </a>
@@ -2499,10 +2527,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when-the-optimization-is-aborted" class="md-nav__link">
+  <a href="#when-the-program-is-stopped" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When the optimization is aborted
+        When the program is stopped
       
     </span>
   </a>
@@ -2661,23 +2689,37 @@ a string cannot be split into arguments.</p>
 </ul>
 <p><code>subprocess.PIPE</code> raises a <code>ValueError</code>: to process the output, write it to a
 file and read the file. Standard input is empty.</p>
-<h2 id="when-the-optimization-is-aborted">When the optimization is aborted</h2>
-<p>When the task that runs the evaluation is aborted, for example by Ctrl-C or by
-<a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, the program and every program it
-started receive <code>SIGTERM</code>. Those still running five seconds later receive
-<code>SIGKILL</code>. <code>run_program</code> then raises
-<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>; see
-<a href="../failures/">Failures and Aborts</a> for how that reaches the caller. Called when
-the task is already being aborted, <code>run_program</code> raises at once and does not
-start the program.</p>
-<p>The same happens when the process that called <code>run_program</code> ends while the
-program is running, for example when a process pool kills a worker that is
-still busy five seconds after an abort.</p>
-<p><code>run_program</code> works in any code that a task runs: an evaluation function, an
-event handler, a report callback, or a function given to
-<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>run</code></a>, on every pool. In an HPC job no abort reaches the
-program, but cancelling the job ends the process that called <code>run_program</code>,
-which ends the program as described above.</p>
+<h2 id="when-the-program-is-stopped">When the program is stopped</h2>
+<p><code>run_program</code> never stops the program on its own account. It stops the program
+only when its caller is stopped, in one of three ways:</p>
+<ul>
+<li><strong>The task that runs the caller is aborted</strong>, for example by Ctrl-C, by
+  <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, or by a failure elsewhere in the
+  session. <code>run_program</code> then raises
+  <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>; see
+  <a href="../failures/">Failures and Aborts</a> for how that reaches the caller. Called
+  when the task is already being aborted, <code>run_program</code> raises at once and does
+  not start the program.</li>
+<li><strong>An exception interrupts the call</strong>, for example <code>KeyboardInterrupt</code> in the
+  main thread. The exception is re-raised.</li>
+<li><strong>The process that called <code>run_program</code> ends</strong>, for example when a process
+  pool kills a worker that is still busy five seconds after an abort, or when an
+  HPC job is cancelled.</li>
+</ul>
+<p>In each case the program and every program it started receive <code>SIGTERM</code>, and
+those still running five seconds later receive <code>SIGKILL</code>.</p>
+<p><code>run_program</code> behaves the same wherever it is called: in an evaluation function,
+an event handler, a report callback, a function given to
+<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>run</code></a>, on every pool, or in your own code outside any
+optimization. Only the ways in which the caller can be stopped differ.
+<a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> reaches only the tasks of its session.
+It does not reach code that no task runs, such as the main thread of your
+script inside a <code>with session()</code> block or an evaluation function that you call
+directly. Nor does it reach an optimization started with the module-level
+<a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, which is not part of the session. In the main
+thread these calls still end on Ctrl-C, through the <code>KeyboardInterrupt</code>. In an
+HPC job no abort reaches the program, but cancelling the job ends the process
+that called <code>run_program</code>.</p>
 <div class="admonition note">
 <p class="admonition-title">Programs that leave the process group</p>
 <p>On POSIX the program runs in a process group of its own, and an abort

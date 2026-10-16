@@ -805,6 +805,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../parallel/" class="md-nav__link">
         
   
@@ -2670,17 +2698,13 @@ happens to work that is already running depends on the pool:</p>
 <td>as on a thread pool, and its worker is killed if it is still running five seconds later</td>
 </tr>
 <tr>
-<td><code>hpc_pool</code>, local queue</td>
-<td>is terminated, together with every program it started, and killed five seconds later if still running</td>
-</tr>
-<tr>
 <td><code>hpc_pool</code></td>
-<td>its cluster job is cancelled</td>
+<td>its cluster job is cancelled; on the local queue, the job is terminated, together with every program it started, and killed five seconds later if still running</td>
 </tr>
 </tbody>
 </table>
-<p>Without a pool, the evaluation function runs in the thread that started the
-task, so the call in progress has to return first. Where the task does not wait,
+<p>Without a pool, the task calls the evaluation function itself, so the call in
+progress has to return first. Where the task does not wait,
 an exception raised by work that is still running is logged as a warning, unless
 it is an <code>AbortedError</code>.</p>
 <p><code>run</code>, an optimization and an evaluation also raise <code>AbortedError</code> when

@@ -815,6 +815,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../running/sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../running/parallel/" class="md-nav__link">
         
   
@@ -2391,14 +2419,15 @@ there is nothing to close. The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py">examples/parallel.py</a>,
 which evaluates one optimization on a thread pool, or on a process pool
 when it is passed <code>--multiprocessing</code>.</p>
-<p>A thread pool is one of four kinds. The others run each evaluation in a separate
-process, as a local job, or as a job on an HPC cluster.
-<a href="../../running/parallel/">Evaluating in Parallel</a> covers all four: which one
+<p>A thread pool is one of three kinds. The others run each evaluation in a separate
+process, or as a job on an HPC cluster.
+<a href="../../running/parallel/">Evaluating in Parallel</a> covers all three: which one
 suits a given evaluation function, how many workers to ask for, what stopping an
 optimization does to each, and the one property of your objective that rules
 some of them out.</p>
 <p>To run several optimizations at the same time, rather than parallelizing within
-one, see <a href="../../running/many_runs/">Several Optimizations at Once</a>.</p>
+one, see <a href="../../running/many_runs/">Several Optimizations at Once</a>. What a
+session provides besides pools is described in <a href="../../running/sessions/">Sessions</a>.</p>
 
 
 

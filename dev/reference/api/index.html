@@ -802,6 +802,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../running/sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../running/parallel/" class="md-nav__link">
         
   
@@ -5015,7 +5043,7 @@ session releases every pool it built, so most code needs no further cleanup:</p>
 </span></code></pre></div>
 <p>An optimization started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="#ropt.optimize"><code>optimize</code></a>
 evaluates in-process and needs no session. See
-<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<a href="../../running/sessions/">Sessions</a> for an overview.</p>
 <p>A task that fails aborts the other tasks on the session, which is what makes
 a script stop at the first problem, and its exception is raised where the
 task was started. A task started from inside another task does not abort the
@@ -5071,7 +5099,7 @@ built here rather than constructed on their own. Everything a session
 creates is returned to the caller and passed on explicitly; nothing is
 discovered from the surroundings.</p>
 <p>Bind the session with <code>as</code> and call its factories inside the block. See
-<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<a href="../../running/sessions/">Sessions</a> for an overview.</p>
 <p>An optimization or evaluation started on the session itself evaluates
 in-process, on the calling thread; one started on a pool of the session
 evaluates on that pool's workers. Either way it belongs to this session.</p>
@@ -8034,10 +8062,13 @@ abort. See
 
     <div class="doc doc-contents first">
 
-        <p>Run an external program, and kill it when the calling task is aborted.</p>
-<p>Blocks until the program exits. Called from code that a task runs, an abort
-of that task terminates the program and everything it started, and raises
-<a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>.</p>
+        <p>Run an external program, and stop it when its caller is stopped.</p>
+<p>Blocks until the program exits. The program, and everything it started, is
+terminated when the task that runs the caller is aborted, when an exception
+such as <code>KeyboardInterrupt</code> interrupts the call, or when the calling process
+ends. An abort of the task raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. Code that no task runs is
+not reached by an abort.</p>
 <p><code>stdout</code> and <code>stderr</code> take <code>None</code> to inherit the caller's, a path to write
 to, an open file, a file descriptor, or <code>subprocess.DEVNULL</code>; <code>stderr</code> also
 takes <code>subprocess.STDOUT</code>. A relative path is relative to <code>cwd</code>. Standard
