@@ -261,6 +261,7 @@ optimize(
 """
 
 
+@pytest.mark.slow
 def test_capture_is_not_defeated_by_a_block_buffered_stdout(tmp_path: Path) -> None:
     # Piping stdout makes both Python and libc fully buffer it, so anything that
     # is not flushed at the boundaries drains after the redirect is undone.

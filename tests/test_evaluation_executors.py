@@ -1428,6 +1428,7 @@ def test_collect_errors_keeps_a_failing_call_in_its_own_place() -> None:
     assert results[2] == 3
 
 
+@pytest.mark.slow
 def test_collect_errors_carries_an_exception_out_of_a_worker_process() -> None:
     results = ProcessExecutor(workers=1).run(_mixed_work_items(), collect_errors=True)
     assert results[0] == 1
@@ -1676,7 +1677,9 @@ def test_the_payload_gate_refuses_a_waiter_when_a_slot_frees_after_the_abort() -
     "build",
     [
         pytest.param(partial(ThreadExecutor, workers=1), id="thread"),
-        pytest.param(partial(ProcessExecutor, workers=1), id="process"),
+        pytest.param(
+            partial(ProcessExecutor, workers=1), id="process", marks=pytest.mark.slow
+        ),
     ],
 )
 def test_a_batch_given_an_aborted_signal_does_not_run(

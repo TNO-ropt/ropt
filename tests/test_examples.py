@@ -134,6 +134,7 @@ def test_example_hpc_on_the_local_queue(tmp_path: Path, monkeypatch: Any) -> Non
     _load_from_file("hpc").main(queue="local", workdir=tmp_path)
 
 
+@pytest.mark.slow
 def test_example_programs(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     _load_from_file("programs").main()

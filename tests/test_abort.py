@@ -735,6 +735,7 @@ def test_session_close_waits_for_aborted_work_to_end(where: str) -> None:
     driver.join(timeout=30)
 
 
+@pytest.mark.slow
 @pytest.mark.timeout(60)
 @pytest.mark.parametrize("where", ["thread_pool", "session_run"])
 def test_session_close_stops_waiting_after_the_grace_period(
@@ -796,6 +797,7 @@ def _one_in_a_process() -> int:
     return 1
 
 
+@pytest.mark.slow
 @pytest.mark.timeout(60)
 def test_session_abort_reaches_work_running_in_a_process_pool(tmp_path: Path) -> None:
     codes: list[ExitCode] = []
@@ -815,6 +817,7 @@ def test_session_abort_reaches_work_running_in_a_process_pool(tmp_path: Path) ->
     assert codes == [ExitCode.USER_ABORT]
 
 
+@pytest.mark.slow
 @pytest.mark.timeout(60)
 def test_session_abort_kills_busy_process_workers_after_the_grace_period(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -841,6 +844,7 @@ def test_session_abort_kills_busy_process_workers_after_the_grace_period(
         assert pool.run(_one_in_a_process) == 1
 
 
+@pytest.mark.slow
 @pytest.mark.timeout(60)
 def test_session_close_kills_busy_process_workers_after_the_grace_period(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -863,6 +867,7 @@ def test_session_close_kills_busy_process_workers_after_the_grace_period(
         driver.join(timeout=30)
 
 
+@pytest.mark.slow
 @pytest.mark.skipif(os.name != "posix", reason="needs POSIX")
 @pytest.mark.timeout(60)
 def test_session_abort_kills_a_program_run_in_a_process_pool(tmp_path: Path) -> None:
@@ -906,6 +911,7 @@ def test_session_abort_kills_a_program_run_by_session_run(tmp_path: Path) -> Non
     assert codes == [ExitCode.USER_ABORT]
 
 
+@pytest.mark.slow
 @pytest.mark.skipif(os.name != "posix", reason="needs POSIX")
 @pytest.mark.timeout(60)
 def test_session_abort_kills_a_program_run_in_a_local_job(tmp_path: Path) -> None:
@@ -934,6 +940,7 @@ def _interrupt_own_process() -> int:
     return 1
 
 
+@pytest.mark.slow
 @pytest.mark.skipif(os.name != "posix", reason="needs POSIX")
 @pytest.mark.timeout(60)
 def test_process_workers_ignore_keyboard_interrupt() -> None:

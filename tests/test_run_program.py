@@ -185,6 +185,7 @@ def test_run_program_abort_ends_the_grace_period_when_the_program_exits(
 
 
 @posix_only
+@pytest.mark.slow
 @pytest.mark.timeout(60)
 @pytest.mark.usefixtures("short_grace")
 def test_run_program_kills_a_program_that_ignores_sigterm(
@@ -214,6 +215,7 @@ def test_run_program_does_not_start_once_aborted(tmp_path: Path) -> None:
     assert not marker.exists()
 
 
+@pytest.mark.slow
 @posix_only
 @pytest.mark.timeout(60)
 def test_run_program_ends_with_the_process_that_started_it(
