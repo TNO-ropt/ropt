@@ -886,6 +886,49 @@ def test_session_abort_kills_a_program_run_in_a_process_pool(tmp_path: Path) -> 
     assert codes == [ExitCode.USER_ABORT]
 
 
+@pytest.mark.skipif(os.name != "posix", reason="needs POSIX")
+@pytest.mark.timeout(60)
+def test_session_abort_kills_a_program_run_by_session_run(tmp_path: Path) -> None:
+    fifo = tmp_path / "fifo"
+    os.mkfifo(fifo)
+    codes: list[ExitCode] = []
+    with session() as opened:
+        driver = threading.Thread(
+            target=_records_abort,
+            args=(partial(opened.run, partial(_run_into_fifo, str(fifo))), codes),
+        )
+        driver.start()
+        with fifo.open("rb") as stream:
+            assert stream.readline() == b"started\n"
+            opened.abort()
+            assert stream.read() == b""
+        driver.join(timeout=30)
+    assert codes == [ExitCode.USER_ABORT]
+
+
+@pytest.mark.skipif(os.name != "posix", reason="needs POSIX")
+@pytest.mark.timeout(60)
+def test_session_abort_kills_a_program_run_in_a_local_job(tmp_path: Path) -> None:
+    # No abort signal reaches a job: ending the job process is what ends the
+    # program it started.
+    fifo = tmp_path / "fifo"
+    os.mkfifo(fifo)
+    codes: list[ExitCode] = []
+    with session() as opened:
+        pool = opened.hpc_pool(workdir=tmp_path, queue="local")
+        driver = threading.Thread(
+            target=_records_abort,
+            args=(partial(pool.run, partial(_run_into_fifo, str(fifo))), codes),
+        )
+        driver.start()
+        with fifo.open("rb") as stream:
+            assert stream.readline() == b"started\n"
+            opened.abort()
+            assert stream.read() == b""
+        driver.join(timeout=30)
+    assert codes == [ExitCode.USER_ABORT]
+
+
 def _interrupt_own_process() -> int:
     os.kill(os.getpid(), signal.SIGINT)
     return 1
