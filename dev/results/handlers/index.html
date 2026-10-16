@@ -12,7 +12,7 @@
         <link rel="prev" href="../results/">
       
       
-        <link rel="next" href="../exit_codes/">
+        <link rel="next" href="../tables/">
       
       
         
@@ -1292,6 +1292,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Tables to Disk
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2805,8 +2833,8 @@ DataFrames instead:</p>
 <p>The tables carry the same columns under the same titles. As explained in
 <a href="../results/#exporting-to-polars">Exporting to polars</a>, polars
 has no index, so the key columns (<code>batch_id</code>, <code>realization</code>, and the other axis
-names) appear as ordinary leading columns rather than in the index; with pandas
-they form the index instead. Both engines align fields of differing
+names) appear as ordinary leading columns. The handler gives pandas tables the
+same shape: the key columns are ordinary columns, not the index. Both engines align fields of differing
 granularity, broadcasting a per-batch field across the per-realization rows.</p>
 <p>Convenience methods:</p>
 <ul>
@@ -2819,26 +2847,20 @@ granularity, broadcasting a per-batch field across the per-realization rows.</p>
   where <code>output_dir</code> is the optimization's configured
   <a href="../../optimizer_setup/configuration_sections/#optimizer"><code>output_dir</code></a> (<code>None</code> if it is
   not set).</li>
+<li><code>write_tables(directory, file_format="text", significant_digits=6)</code> writes
+  each table to <code>&lt;name&gt;.txt</code> in <code>directory</code>, as a fixed-width table with the
+  labels of each column on a second header line and numbers aligned on the
+  decimal point. Floating point numbers are rounded to <code>significant_digits</code>.
+  <code>file_format="csv"</code> writes <code>&lt;name&gt;.csv</code> instead, at full precision.</li>
 </ul>
-<div class="admonition tip">
-<p class="admonition-title">Write the tables to a file as they update</p>
-<p><code>set_callback</code> fires on every update, so it is a convenient hook for saving
-the tables — to watch progress live or to write a final report. Pandas'
-<code>to_string()</code> gives aligned, human-readable columns with no extra
-dependencies; use <code>to_csv()</code> for machine-readable data, or <code>to_markdown()</code>
-if you have <code>tabulate</code> installed:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"progress.txt"</span><span class="p">)</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"progress.txt"</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"# </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
+<p><code>write_tables</code> takes the same argument as a callback, so the handler can write
+its tables to the optimization's <code>output_dir</code> on every update:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">tables</span><span class="o">.</span><span class="n">write_tables</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
 </span></code></pre></div>
-<p>Because this writes to disk on every update, the optimization that emitted
-the result waits for the write to finish.</p>
-</div>
+<p>Every update rewrites all the files, and the optimization waits until the
+writing is done. <a href="../tables/">Writing Tables to Disk</a> walks through a complete
+example that writes the default tables.</p>
 <h2 id="writing-your-own-handler">Writing your own handler</h2>
 <p>The built-in handlers above, and the <code>report</code> callback, cover the results an
 optimization produces. A handler of your own is for everything else: reacting to
@@ -3057,13 +3079,13 @@ returning the data works everywhere.</p>
         
         
           
-          <a href="../exit_codes/" class="md-footer__link md-footer__link--next" aria-label="Next: Exit Codes">
+          <a href="../tables/" class="md-footer__link md-footer__link--next" aria-label="Next: Writing Tables to Disk">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Exit Codes
+                Writing Tables to Disk
               </div>
             </div>
             <div class="md-footer__button md-icon">
