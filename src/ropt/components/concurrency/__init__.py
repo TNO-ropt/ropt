@@ -13,9 +13,11 @@ it was marked with: the parent signal of a task started from that code.
 from __future__ import annotations
 
 from ._abort_signal import AbortSignal, aborting, parent_signal
+from ._program import run_program
 
 __all__ = [
     "AbortSignal",
     "aborting",
     "parent_signal",
+    "run_program",
 ]

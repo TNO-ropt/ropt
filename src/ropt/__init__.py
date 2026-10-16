@@ -33,7 +33,7 @@ from __future__ import annotations
 
 import logging
 
-from ropt.components.concurrency import aborting
+from ropt.components.concurrency import aborting, run_program
 from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
@@ -102,5 +102,6 @@ __all__ = [
     "optimize",
     "results_to_pandas",
     "results_to_polars",
+    "run_program",
     "session",
 ]
