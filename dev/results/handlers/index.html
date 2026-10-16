@@ -2847,11 +2847,11 @@ granularity, broadcasting a per-batch field across the per-realization rows.</p>
   where <code>output_dir</code> is the optimization's configured
   <a href="../../optimizer_setup/configuration_sections/#optimizer"><code>output_dir</code></a> (<code>None</code> if it is
   not set).</li>
-<li><code>write_tables(directory, file_format="text", significant_digits=6)</code> writes
-  each table to <code>&lt;name&gt;.txt</code> in <code>directory</code>, as a fixed-width table with the
-  labels of each column on a second header line and numbers aligned on the
-  decimal point. Floating point numbers are rounded to <code>significant_digits</code>.
-  <code>file_format="csv"</code> writes <code>&lt;name&gt;.csv</code> instead, at full precision.</li>
+<li><code>write_tables(directory, format="text", digits=6)</code> writes each table to
+  <code>&lt;name&gt;.txt</code> in <code>directory</code>, as a fixed-width table with the labels of each
+  column on a second header line and numbers aligned on the decimal point.
+  Floating point numbers are rounded to <code>digits</code> significant digits.
+  <code>format="csv"</code> writes <code>&lt;name&gt;.csv</code> instead, at full precision.</li>
 </ul>
 <p><code>write_tables</code> takes the same argument as a callback, so the handler can write
 its tables to the optimization's <code>output_dir</code> on every update:</p>

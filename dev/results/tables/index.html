@@ -2702,9 +2702,9 @@ waits while the files are written.</p>
 <p>In a text file, every column has a fixed width. The labels of each column are
 printed on a second header line, under the title, and numbers are aligned on
 the decimal point. Floating point numbers are written with 6 significant
-digits; set another number with <code>significant_digits=</code>, for example
-<code>partial(handler.write_tables, significant_digits=10)</code>.
-<code>write_tables(directory, file_format="csv")</code> writes CSV files instead, at full
+digits; set another number with <code>digits=</code>, for example
+<code>partial(handler.write_tables, digits=10)</code>.
+<code>write_tables(directory, format="csv")</code> writes CSV files instead, at full
 precision. In a CSV file, the title and the labels are joined with the
 separator of the handler (<code>,</code> by default, set with <code>sep=</code>), giving column names
 such as <code>Variable,x</code>.</p>
