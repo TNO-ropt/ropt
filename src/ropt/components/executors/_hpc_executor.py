@@ -245,6 +245,32 @@ def _reject_configuration_arguments(
         raise ValueError(msg)
 
 
+def clusters_with_queue(config_path: Path | str | None, queue: str) -> list[str]:
+    """Return the configured HPC clusters that define a queue.
+
+    Without `pysqa` or a configuration there are no clusters to search.
+
+    Args:
+        config_path: The `pysqa` configuration directory, or `None` for the
+                     configuration installed alongside `ropt`.
+        queue:       The queue name.
+
+    Returns:
+        The names of the clusters that define the queue.
+    """
+    if not _HAVE_HPC:
+        return []
+    resolved = _get_config_path(config_path)
+    if resolved is None:
+        return []
+    queue_adapter = pysqa.QueueAdapter(directory=str(resolved))
+    return [
+        name
+        for name in queue_adapter.list_clusters()
+        if _cluster_has_queue(queue_adapter, name, queue)
+    ]
+
+
 def _get_config_path(config_path: Path | str | None) -> Path | None:
     if config_path is None:
         # Falls back to a site-wide configuration installed alongside ropt, so

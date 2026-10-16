@@ -14,10 +14,8 @@ filesystem and nothing to install.
 from __future__ import annotations
 
 import contextlib
-import os
 import queue
 import shutil
-import signal
 import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import tempfile
 import threading
@@ -25,7 +23,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, override
 
 from ropt._logging import get_logger
-from ropt.exceptions import ExecutionError
+from ropt.components.concurrency._program import Program
 
 from ._job_executor import JobExecutorBase
 
@@ -35,7 +33,7 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
-def _run_teardown(jobs: queue.Queue[subprocess.Popen[bytes] | Path | None]) -> None:
+def _run_teardown(jobs: queue.Queue[Program | Path | None]) -> None:
     # Finishes tearing a `LocalJobExecutor` down, off the thread that dropped
     # it: cancelling a job may not wait there, but a killed job that is never
     # waited for lingers as a zombie, and its directory may not go until it is
@@ -43,7 +41,7 @@ def _run_teardown(jobs: queue.Queue[subprocess.Popen[bytes] | Path | None]) -> N
     # while this thread is still finishing.
     while True:
         item = jobs.get()
-        if not isinstance(item, subprocess.Popen):
+        if not isinstance(item, Program):
             workdir = item
             break
         with contextlib.suppress(OSError, ValueError):
@@ -67,8 +65,9 @@ class LocalJobExecutor(JobExecutorBase):
     Needs no extras and no configuration. See
     [Parallel Evaluation](../advanced/parallel.md#localjobexecutor) for details.
 
-    POSIX only: cancelling kills a job's whole process group, so that whatever
-    the job started itself goes with it, and Windows has no equivalent.
+    Cancelling a job terminates it and whatever it started, and kills them if
+    they are still running five seconds later. Outside POSIX only the job
+    itself is terminated, and what it started may outlive it.
     """
 
     _kind = "local"
@@ -103,16 +102,8 @@ class LocalJobExecutor(JobExecutorBase):
             cleanup:     Whether to remove a work item's files once it settles.
 
         Raises:
-            ValueError:     If `workdir` is missing or an argument is out of range.
-            ExecutionError: If the system is not POSIX.
+            ValueError: If `workdir` is missing or an argument is out of range.
         """
-        if os.name != "posix":
-            msg = (
-                "The local job executor requires a POSIX system: cancelling a "
-                "job kills its whole process group, which Windows has no "
-                "equivalent for."
-            )
-            raise ExecutionError(msg)
         self._own_workdir = workdir is None
         if workdir is None:
             resolved = Path(tempfile.mkdtemp(prefix="ropt-local-"))
@@ -141,13 +132,11 @@ class LocalJobExecutor(JobExecutorBase):
         # backend (`_start_job` and `_live_job_ids`) and by a departing caller
         # (`_cancel_job`), which may overlap, so they need a lock of their own,
         # as the module docstring of the base says.
-        self._processes: dict[int, subprocess.Popen[bytes]] = {}
+        self._processes: dict[int, Program] = {}
         self._processes_lock = threading.Lock()
         # Started last, with nothing left that can raise: a constructor that
         # fails must not leave a thread behind for `__del__` to find.
-        self._teardown_queue: queue.Queue[subprocess.Popen[bytes] | Path | None] = (
-            queue.Queue()
-        )
+        self._teardown_queue: queue.Queue[Program | Path | None] = queue.Queue()
         self._teardown_thread = threading.Thread(
             target=_run_teardown,
             args=(self._teardown_queue,),
@@ -189,20 +178,10 @@ class LocalJobExecutor(JobExecutorBase):
         # register.
         with self._processes_lock:
             with output_file.open("wb") as fp:
-                process = subprocess.Popen(  # ruff: ignore[subprocess-without-shell-equals-true]
-                    command,
-                    # The working directory is inherited rather than set to the
-                    # one the files live in: a job has to be able to import
-                    # whatever the caller could, and for a script that means its
-                    # own directory.
-                    stdin=subprocess.DEVNULL,
-                    stdout=fp,
-                    stderr=subprocess.STDOUT,
-                    # A session of its own, so the job leads a process group that
-                    # cancelling can reach as a whole: killing only the job itself
-                    # would orphan anything it started.
-                    start_new_session=True,
-                )
+                # The working directory is inherited rather than set to the one
+                # the files live in: a job has to be able to import whatever the
+                # caller could, and for a script that means its own directory.
+                process = Program(command, stdout=fp, stderr=subprocess.STDOUT)
             self._next_job_id += 1
             job_id = self._next_job_id
             self._processes[job_id] = process
@@ -212,7 +191,7 @@ class LocalJobExecutor(JobExecutorBase):
     def _live_job_ids(self) -> set[int]:
         with self._processes_lock:
             entries = list(self._processes.items())
-        live = {job_id for job_id, process in entries if process.poll() is None}
+        live = {job_id for job_id, process in entries if not process.poll()}
         if len(live) < len(entries):
             # `poll` collected their exit status on the way past, so this thread
             # is where a job that ended on its own stops being a child.
@@ -226,12 +205,9 @@ class LocalJobExecutor(JobExecutorBase):
     def _cancel_job(self, job_id: int) -> None:
         with self._processes_lock:
             process = self._processes.pop(job_id, None)
-        if process is None or process.poll() is not None:
+        if process is None or process.poll():
             return
-        with contextlib.suppress(OSError):
-            # The group rather than the process: `start_new_session` made the
-            # job lead one, so this reaches whatever it started as well.
-            os.killpg(process.pid, signal.SIGTERM)
+        process.abort()
         # This runs on a departing caller's thread, which must never wait for a
         # process to die: a Ctrl-C that waits is the thing this design is here
         # to avoid. The teardown thread waits instead, and it is the only thing

@@ -129,6 +129,6 @@ def test_example_mixed(tmp_path: Path, monkeypatch: Any) -> None:
 
 
 @pytest.mark.slow
-def test_example_hpc_on_a_local_pool(tmp_path: Path, monkeypatch: Any) -> None:
+def test_example_hpc_on_the_local_queue(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    _load_from_file("hpc").main(local=True, workdir=tmp_path)
+    _load_from_file("hpc").main(queue="local", workdir=tmp_path)

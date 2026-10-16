@@ -1,7 +1,7 @@
 """The worker pool: the workers that evaluations are given to.
 
 A pool comes from a session factory (`thread_pool`, `process_pool`,
-`local_pool`, `hpc_pool`), which is what ties its lifetime to a session:
+`hpc_pool`), which is what ties its lifetime to a session:
 closing the session releases the pools it built.
 
 An optimization or evaluation is started on the pool it should evaluate on, so

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import threading
 import time
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Self, overload
 
 from ropt.components.concurrency import _grace, parent_signal
@@ -27,8 +28,9 @@ from ropt.components.executors._daemon_thread_executor import (
     DaemonThreadExecutor,
     ThreadGroup,
 )
+from ropt.components.executors._hpc_executor import clusters_with_queue
 from ropt.enums import ExitCode
-from ropt.exceptions import WorkflowError
+from ropt.exceptions import ExecutionError, WorkflowError
 
 from ._evaluate import _evaluate, _evaluate_batch
 from ._optimize import _optimize
@@ -37,7 +39,6 @@ from ._work import _run_work
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
-    from pathlib import Path
 
     from numpy.typing import ArrayLike
 
@@ -49,6 +50,8 @@ if TYPE_CHECKING:
     from ._function import EvaluationFunction
     from ._report import ReportCallback
     from ._result import EvaluationResult, OptimizationResult
+
+_LOCAL_QUEUE = "local"
 
 _CLOSED = (
     "This session is not open; build pools and start work inside its `with` "
@@ -412,60 +415,12 @@ class Session:
             )
         )
 
-    def local_pool(
-        self,
-        *,
-        workdir: Path | str | None = None,
-        workers: int = 1,
-        interval: float = 0.1,
-        extra_polls: int = 0,
-        cleanup: bool = True,
-    ) -> WorkerPool:
-        """Create a pool that runs each evaluation as a separate local process.
-
-        Between a process pool and a cluster: every evaluation gets an
-        interpreter of its own, which can be stopped outright and whose output
-        is captured to a file, but there is no queueing system and nothing to
-        install. This is the local stand-in for
-        [`hpc_pool`][ropt.Session.hpc_pool]: the same job shape, so an
-        evaluation function that works here works there.
-
-        Each job is a fresh command rather than a re-import of your script, so
-        the evaluation function must live in a module the job can import, or
-        the `ropt[cloudpickle]` extra must be installed.
-
-        POSIX only. See [Running Optimizations](../running/running.md) for a
-        walkthrough.
-
-        Args:
-            workdir:     The working directory, or `None` for a temporary one.
-            workers:     The maximum number of concurrent jobs.
-            interval:    Seconds between checks on the running jobs.
-            extra_polls: Extra polls to wait for a work item's result.
-            cleanup:     Whether to remove the job files afterwards.
-
-        Returns:
-            A pool backed by local job processes.
-
-        Raises:
-            WorkflowError: If this session has closed.
-        """  # ruff: ignore[docstring-extraneous-exception]
-        return self._open_pool(
-            lambda: LocalJobExecutor(
-                workdir=workdir,
-                workers=workers,
-                interval=interval,
-                extra_polls=extra_polls,
-                cleanup=cleanup,
-            )
-        )
-
     def hpc_pool(  # ruff: ignore[too-many-arguments]
         self,
         *,
         workdir: Path | str,
         workers: int = 1,
-        interval: float = 1,
+        interval: float | None = None,
         config_path: Path | str | None = None,
         cluster: str | None = None,
         queue: str | None = None,
@@ -475,7 +430,7 @@ class Session:
         memory_max: int | str | None = None,
         run_time_max: int | None = None,
         submit_options: dict[str, Any] | None = None,
-        extra_polls: int = 30,
+        extra_polls: int | None = None,
         query_retries: int = 30,
         cleanup: bool = True,
     ) -> WorkerPool:
@@ -485,22 +440,27 @@ class Session:
         requires the `ropt[hpc]` extra. Each evaluation is a job started as its
         own command, so the evaluation function must live in a module the
         compute nodes can import, or the `ropt[cloudpickle]` extra must be
-        installed. Develop against
-        [`local_pool`][ropt.Session.local_pool] first: it has the same
-        shape and the same rule, without a cluster. The cluster is selected from
-        `cluster`/`queue`: give a queue to search for its cluster, a cluster to
-        use its default queue, or both to be explicit.
+        installed. The cluster is selected from `cluster`/`queue`: give a queue
+        to search for its cluster, a cluster to use its default queue, or both
+        to be explicit.
 
-        A `template` is the alternative to all of that: it submits without a
-        configuration, so it cannot be combined with `config_path`, `cluster` or
-        `queue`. See [Running on an HPC
-        cluster](../running/parallel.md#running-on-an-hpc-cluster) for the
+        The queue `"local"` without a `cluster` runs each job as a process on
+        this machine instead, with the same job files and the same rule for the
+        evaluation function. It needs neither `pysqa` nor a configuration, and
+        it ignores `cores`, `memory_max`, `run_time_max`, `submit_options` and
+        `query_retries`. It is an error if a configured cluster also has a
+        queue named `"local"`; pass that `cluster` to submit to it.
+
+        A `template` is the alternative to a configuration: it cannot be
+        combined with `config_path`, `cluster` or `queue`. See [Running on an
+        HPC cluster](../running/parallel.md#running-on-an-hpc-cluster) for the
         configuration layout and Slurm examples.
 
         Args:
             workdir:        The shared-filesystem working directory.
             workers:        The maximum number of concurrent cluster jobs.
-            interval:       Seconds between polls of the cluster.
+            interval:       Seconds between polls of the cluster (default:
+                            1, or 0.1 for local jobs).
             config_path:    The `pysqa` configuration directory.
             cluster:        The cluster name.
             queue:          The queue name.
@@ -510,21 +470,35 @@ class Session:
             memory_max:     The memory per job.
             run_time_max:   The run time per job.
             submit_options: Extra variables for the submission script.
-            extra_polls: Extra polls to wait for a work item's result.
+            extra_polls:    Extra polls to wait for a work item's result
+                            (default: 30, or 0 for local jobs).
             query_retries:  Times the cluster is re-polled for a result.
             cleanup:        Whether to remove the job files afterwards.
 
         Returns:
-            A pool backed by an HPC cluster.
+            A pool backed by an HPC cluster, or by local job processes.
 
         Raises:
             WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
+        if queue == _LOCAL_QUEUE and cluster is None:
+            return self._open_pool(
+                lambda: _local_queue_executor(
+                    workdir=workdir,
+                    workers=workers,
+                    interval=0.1 if interval is None else interval,
+                    extra_polls=0 if extra_polls is None else extra_polls,
+                    cleanup=cleanup,
+                    config_path=config_path,
+                    template=template,
+                    scheduler=scheduler,
+                )
+            )
         return self._open_pool(
             lambda: HPCExecutor(
                 workdir=workdir,
                 workers=workers,
-                interval=interval,
+                interval=1 if interval is None else interval,
                 config_path=config_path,
                 cluster=cluster,
                 queue=queue,
@@ -534,7 +508,7 @@ class Session:
                 memory_max=memory_max,
                 run_time_max=run_time_max,
                 submit_options=submit_options,
-                extra_polls=extra_polls,
+                extra_polls=30 if extra_polls is None else extra_polls,
                 query_retries=query_retries,
                 cleanup=cleanup,
             )
@@ -556,6 +530,39 @@ class Session:
         with self._lock:
             if self._pools is None:
                 raise WorkflowError(_CLOSED)
+
+
+def _local_queue_executor(  # ruff: ignore[too-many-arguments]
+    *,
+    workdir: Path | str,
+    workers: int,
+    interval: float,
+    extra_polls: int,
+    cleanup: bool,
+    config_path: Path | str | None,
+    template: str | None,
+    scheduler: str | None,
+) -> LocalJobExecutor:
+    if template is not None or scheduler is not None:
+        msg = "The local queue cannot be combined with a template or a scheduler."
+        raise ValueError(msg)
+    if not Path(workdir).is_absolute():
+        msg = f"The HPC working directory must be an absolute path: {workdir}"
+        raise ValueError(msg)
+    clusters = clusters_with_queue(config_path, _LOCAL_QUEUE)
+    if clusters:
+        msg = (
+            f"Queue '{_LOCAL_QUEUE}' is ambiguous: it is defined on HPC "
+            f"cluster(s) {', '.join(clusters)}. Specify a cluster to submit to it."
+        )
+        raise ExecutionError(msg)
+    return LocalJobExecutor(
+        workdir=workdir,
+        workers=workers,
+        interval=interval,
+        extra_polls=extra_polls,
+        cleanup=cleanup,
+    )
 
 
 def session() -> Session:

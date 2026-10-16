@@ -73,7 +73,7 @@ def pools_fixture() -> Iterator[Callable[..., WorkerPool]]:
         factories: dict[type[Executor], Callable[..., WorkerPool]] = {
             ThreadExecutor: opened.thread_pool,
             ProcessExecutor: opened.process_pool,
-            LocalJobExecutor: opened.local_pool,
+            LocalJobExecutor: partial(opened.hpc_pool, queue="local"),
             HPCExecutor: opened.hpc_pool,
         }
 

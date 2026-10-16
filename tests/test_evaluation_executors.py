@@ -33,7 +33,7 @@ import pytest
 from ropt import session
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.components.compute_steps import OptimizationStep
-from ropt.components.concurrency import AbortSignal, parent_signal
+from ropt.components.concurrency import AbortSignal, _program, parent_signal
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -50,6 +50,7 @@ from ropt.components.executors import (
     ThreadExecutor,
     WorkItem,
     WorkNotRun,
+    _hpc_executor,
 )
 from ropt.components.executors.__main__ import run_task
 from ropt.components.executors._daemon_thread_executor import DaemonThreadExecutor
@@ -72,6 +73,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from ropt import WorkerPool
     from ropt.components.executors import Executor
     from ropt.components.executors.base import ExecutorBase
     from ropt.results import FunctionResults
@@ -306,7 +308,6 @@ def _teardown_threads() -> set[threading.Thread]:
     }
 
 
-@pytest.mark.skipif(os.name != "posix", reason="local jobs are POSIX only")
 def test_dropping_a_local_executor_removes_its_temporary_directory() -> None:
     # `__del__` must not be reachable from anything the executor keeps alive, so
     # what this checks is that dropping the last reference is enough to run it.
@@ -323,7 +324,6 @@ def test_dropping_a_local_executor_removes_its_temporary_directory() -> None:
     assert not workdir.exists()
 
 
-@pytest.mark.skipif(os.name != "posix", reason="local jobs are POSIX only")
 def test_dropping_a_local_executor_keeps_a_directory_it_was_given(
     tmp_path: Path,
 ) -> None:
@@ -333,7 +333,6 @@ def test_dropping_a_local_executor_keeps_a_directory_it_was_given(
     assert tmp_path.is_dir()
 
 
-@pytest.mark.skipif(os.name != "posix", reason="local jobs are POSIX only")
 def test_local_executor_rejecting_an_argument_leaves_no_thread_or_directory() -> None:
     # The teardown thread starts only after the base has accepted every
     # argument, and the temporary directory goes if the base rejects one.
@@ -1811,6 +1810,98 @@ def test_hpc_configuration_rejects_a_scheduler(
         HPCExecutor(workdir=tmp_path, config_path=pysqa_config, scheduler="slurm")
 
 
+def _executor_of(pool: WorkerPool) -> Executor:
+    return pool._live_executor
+
+
+def test_hpc_pool_local_queue_runs_local_jobs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Neither `pysqa` nor a configuration is needed for the local queue.
+    monkeypatch.setattr(_hpc_executor, "_HAVE_HPC", False)
+    with session() as opened:
+        executor = _executor_of(opened.hpc_pool(workdir=tmp_path, queue="local"))
+        assert isinstance(executor, LocalJobExecutor)
+        assert executor._state._interval == pytest.approx(0.1)
+        assert executor._extra_polls_limit == 0
+
+
+def test_hpc_pool_local_queue_keeps_explicit_polling_settings(tmp_path: Path) -> None:
+    with session() as opened:
+        pool = opened.hpc_pool(
+            workdir=tmp_path,
+            queue="local",
+            interval=0.5,
+            extra_polls=3,
+        )
+        executor = _executor_of(pool)
+        assert isinstance(executor, LocalJobExecutor)
+        assert executor._state._interval == pytest.approx(0.5)
+        assert executor._extra_polls_limit == 3
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        ({"template": ""}, "template or a scheduler"),
+        ({"scheduler": "slurm"}, "template or a scheduler"),
+        ({"workdir": "relative"}, "absolute path"),
+    ],
+)
+def test_hpc_pool_local_queue_rejects_hpc_only_arguments(
+    tmp_path: Path, kwargs: dict[str, Any], match: str
+) -> None:
+    with session() as opened, pytest.raises(ValueError, match=match):
+        opened.hpc_pool(**{"workdir": tmp_path, "queue": "local", **kwargs})
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+def test_hpc_pool_local_queue_is_ambiguous_when_a_cluster_defines_it(
+    tmp_path: Path, pysqa_config: Path
+) -> None:
+    with (pysqa_config / "cluster_b.yaml").open("a") as fp:
+        fp.write(
+            "  local: {cores_max: 1, cores_min: 1, run_time_max: 60, script: job.sh}\n"
+        )
+    with (
+        session() as opened,
+        pytest.raises(ExecutionError, match=r"ambiguous.*cluster_b"),
+    ):
+        opened.hpc_pool(workdir=tmp_path, queue="local", config_path=pysqa_config)
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+def test_hpc_pool_local_queue_with_a_cluster_submits_to_it(
+    tmp_path: Path, pysqa_config: Path
+) -> None:
+    with (pysqa_config / "cluster_b.yaml").open("a") as fp:
+        fp.write(
+            "  local: {cores_max: 1, cores_min: 1, run_time_max: 60, script: job.sh}\n"
+        )
+    with session() as opened:
+        pool = opened.hpc_pool(
+            workdir=tmp_path,
+            queue="local",
+            cluster="cluster_b",
+            config_path=pysqa_config,
+        )
+        executor = _executor_of(pool)
+        assert isinstance(executor, HPCExecutor)
+        assert executor._state._interval == pytest.approx(1.0)
+        assert executor._extra_polls_limit == 30
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+def test_hpc_pool_local_queue_without_a_local_cluster_queue_runs_local_jobs(
+    tmp_path: Path, pysqa_config: Path
+) -> None:
+    with session() as opened:
+        pool = opened.hpc_pool(
+            workdir=tmp_path, queue="local", config_path=pysqa_config
+        )
+        assert isinstance(_executor_of(pool), LocalJobExecutor)
+
+
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
 def test_hpc_template_uses_the_scheduler_it_is_given(tmp_path: Path) -> None:
     executor = HPCExecutor(workdir=tmp_path, template="", scheduler="lsf")
@@ -2347,12 +2438,15 @@ def test_local_executor_refuses_a_missing_directory(tmp_path: Path) -> None:
         LocalJobExecutor(workdir=tmp_path / "nowhere")
 
 
-def test_local_executor_refuses_a_non_posix_system(
-    monkeypatch: pytest.MonkeyPatch,
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+def test_local_executor_runs_jobs_without_the_wrapper(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    monkeypatch.setattr(os, "name", "nt")
-    with pytest.raises(ExecutionError, match="POSIX"):
-        LocalJobExecutor()
+    # Without the wrapper, as outside POSIX, jobs are started directly.
+    monkeypatch.setattr(_program, "_use_wrapper", lambda: False)
+    executor = LocalJobExecutor(workdir=tmp_path, workers=1)
+    assert executor.run([WorkItem(function=_function, args=(1,))]) == [2]
 
 
 class _ControlledJobExecutor(JobExecutorBase):

@@ -7,12 +7,12 @@ cluster. The cluster and queue come from the `pysqa` configuration of the `ropt`
 installation unless `--queue` names one; other cluster parameters (such as
 `cluster` and `cores`) can be passed to `hpc_pool` when needed.
 
-If you have no cluster available, pass `--local` to run the identical
-optimization on a local pool instead. That pool runs each evaluation as its own
-process, exactly as a cluster job does, so it is the local stand-in for an HPC
-pool and lets the example be exercised anywhere.
+If you have no cluster available, pass `--queue local` to run the identical
+optimization on this machine instead. The `local` queue runs each evaluation as
+its own process, with the same job files as a cluster job, and needs neither
+`pysqa` nor a cluster configuration.
 
-Both pools send the evaluation function to a separate interpreter that cannot
+Either way the pool sends the evaluation function to a separate interpreter that cannot
 import this script, so this example needs the `ropt[cloudpickle]` extra.
 """
 
@@ -83,30 +83,21 @@ def report(result: FunctionResults) -> None:
         print(f"  objective: {result.target_objective}")
 
 
-def main(
-    *,
-    local: bool = False,
-    queue: str | None = None,
-    workdir: Path | None = None,
-) -> None:
+def main(*, queue: str | None = None, workdir: Path | None = None) -> None:
     """Run the optimization on the cluster, or in local processes.
 
     Args:
-        local:   Run on a local pool instead of submitting to a cluster.
-        queue:   The cluster queue to submit to; the configured default if None.
+        queue:   The cluster queue to submit to; the configured default if None,
+                 or `"local"` to run on this machine.
         workdir: Directory for the job files, the current directory by default.
                  On a cluster it must be on a filesystem the compute nodes
                  share.
     """
     with session() as s:
-        pool = (
-            s.local_pool(workers=WORKERS, workdir=workdir)
-            if local
-            else s.hpc_pool(
-                workers=WORKERS,
-                queue=queue,
-                workdir=Path.cwd() if workdir is None else workdir.resolve(),
-            )
+        pool = s.hpc_pool(
+            workers=WORKERS,
+            queue=queue,
+            workdir=Path.cwd() if workdir is None else workdir.resolve(),
         )
         result = pool.optimize(
             CONFIG,
@@ -123,14 +114,9 @@ def main(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--local",
-        action="store_true",
-        help="run in local processes instead of submitting to a cluster",
-    )
-    parser.add_argument(
         "--queue",
         default=None,
-        help="the cluster queue to submit to (default: the configured queue)",
+        help="the cluster queue to submit to, or 'local' (default: the configured queue)",
     )
     parser.add_argument(
         "--workdir",
