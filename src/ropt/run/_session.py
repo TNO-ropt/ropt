@@ -13,16 +13,20 @@ number of pools — and any number of sessions — can be open at once.
 from __future__ import annotations
 
 import threading
+import time
 from typing import TYPE_CHECKING, Any, Self, overload
 
-from ropt.components.concurrency import parent_signal
+from ropt.components.concurrency import _grace, parent_signal
 from ropt.components.executors import (
     HPCExecutor,
     LocalJobExecutor,
     ProcessExecutor,
     ThreadExecutor,
 )
-from ropt.components.executors._daemon_thread_executor import DaemonThreadExecutor
+from ropt.components.executors._daemon_thread_executor import (
+    DaemonThreadExecutor,
+    ThreadGroup,
+)
 from ropt.enums import ExitCode
 from ropt.exceptions import WorkflowError
 
@@ -87,6 +91,7 @@ class Session:
         self._pools: list[WorkerPool] | None = None
         self._entered = False
         self._signals: set[AbortSignal] = set()
+        self._run_threads = ThreadGroup()
 
     def __enter__(self) -> Self:
         """Open the session.
@@ -105,7 +110,12 @@ class Session:
         return self
 
     def __exit__(self, *_exc: object) -> None:
-        """Close the session, aborting its tasks and releasing every pool."""
+        """Close the session, aborting its tasks and releasing every pool.
+
+        Work still running on its threads is waited for, five seconds at most
+        in total, which gives the programs it started with
+        [`run_program`][ropt.run_program] the time to end.
+        """
         # Closing and taking the snapshot are one step: a task that registers
         # between them would be neither refused as late nor reached by the
         # abort, and would outlive the session.
@@ -114,8 +124,14 @@ class Session:
             signals = list(self._signals)
         for signal in signals:
             signal.abort()
-        for pool in pools or ():
-            pool._release()  # ruff: ignore[private-member-access]
+        deadline = time.monotonic() + _grace.GRACE_PERIOD
+        # Every pool is stopped before any is waited for, so that they all
+        # share the one grace period.
+        executors = [pool._release() for pool in pools or ()]  # ruff: ignore[private-member-access]
+        for executor in executors:
+            if executor is not None:
+                executor._close(deadline)  # ruff: ignore[private-member-access]
+        self._run_threads.wait(deadline)
 
     def abort(self) -> None:
         """Abort the tasks that belong to this session.
@@ -332,7 +348,7 @@ class Session:
             WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
         try:
-            executor = DaemonThreadExecutor(limit=limit)
+            executor = DaemonThreadExecutor(limit=limit, threads=self._run_threads)
         except ValueError:
             # Arguments that do not fit fail the call before it starts.
             if parent_signal() is None:

@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import threading
+import time
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -16,7 +17,7 @@ import pytest
 from pydantic import ValidationError
 
 from ropt import aborting, session
-from ropt.components.concurrency import parent_signal
+from ropt.components.concurrency import _grace, parent_signal
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
 
@@ -694,3 +695,68 @@ def test_a_failing_optimization_aborts_a_pool_run_beside_it() -> None:
 
     assert not driver.is_alive()
     assert [exc.exit_code for exc in raised] == [ExitCode.ABORTED_ON_ERROR]
+
+
+def _start_on(opened: Session, where: str, work: Callable[[], object]) -> Any:
+    if where == "thread_pool":
+        return opened.thread_pool(workers=1).run(work)
+    return opened.run(work)
+
+
+@pytest.mark.timeout(60)
+@pytest.mark.parametrize("where", ["thread_pool", "session_run"])
+def test_session_close_waits_for_aborted_work_to_end(where: str) -> None:
+    # The work ends only once it sees the abort, which closing the session
+    # sends, so it can only have finished if closing waited for it.
+    started = threading.Event()
+    finished = threading.Event()
+
+    def work() -> None:
+        signal = parent_signal()
+        assert signal is not None
+        aborted = threading.Event()
+        signal.add_callback(aborted.set)
+        started.set()
+        assert aborted.wait(timeout=30)
+        finished.set()
+
+    with session() as opened:
+        driver = threading.Thread(
+            target=_records_abort, args=(partial(_start_on, opened, where, work), [])
+        )
+        driver.start()
+        assert started.wait(timeout=30)
+
+    assert finished.is_set()
+    driver.join(timeout=30)
+
+
+@pytest.mark.timeout(60)
+@pytest.mark.parametrize("where", ["thread_pool", "session_run"])
+def test_session_close_stops_waiting_after_the_grace_period(
+    where: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Work that ignores the abort is waited for until the grace period ends,
+    # and then left running.
+    monkeypatch.setattr(_grace, "GRACE_PERIOD", 0.2)
+    started = threading.Event()
+    release = threading.Event()
+
+    def work() -> None:
+        started.set()
+        assert release.wait(timeout=30)
+
+    try:
+        with session() as opened:
+            driver = threading.Thread(
+                target=_records_abort,
+                args=(partial(_start_on, opened, where, work), []),
+            )
+            driver.start()
+            assert started.wait(timeout=30)
+            closing = time.monotonic()
+        assert time.monotonic() - closing >= 0.2
+        assert not release.is_set()
+    finally:
+        release.set()
+        driver.join(timeout=30)

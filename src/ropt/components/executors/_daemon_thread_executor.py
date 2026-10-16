@@ -11,7 +11,7 @@ from contextlib import nullcontext
 from functools import partial
 from typing import TYPE_CHECKING, Any, override
 
-from .base import ExecutorBase, WorkItem, _log_left_running, _run_item
+from .base import ExecutorBase, WorkItem, _log_left_running, _run_item, _wait_for
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -33,12 +33,15 @@ class DaemonThreadExecutor(ExecutorBase):
         running at exit is stopped without completing.
     """
 
-    def __init__(self, *, limit: int | None = None) -> None:
+    def __init__(
+        self, *, limit: int | None = None, threads: ThreadGroup | None = None
+    ) -> None:
         """Initialize the executor.
 
         Args:
-            limit: The maximum number of calls running at once, or `None` for
-                   no limit.
+            limit:   The maximum number of calls running at once, or `None` for
+                     no limit.
+            threads: The group that starts the threads, or `None` for a new one.
 
         Raises:
             ValueError: If `limit` is less than one.
@@ -48,6 +51,7 @@ class DaemonThreadExecutor(ExecutorBase):
             msg = f"The limit must be at least one: {limit}"
             raise ValueError(msg)
         self._limit = limit
+        self._threads = ThreadGroup() if threads is None else threads
 
     @override
     def _run_items(
@@ -64,9 +68,7 @@ class DaemonThreadExecutor(ExecutorBase):
         try:
             threads = len(jobs) if self._limit is None else min(self._limit, len(jobs))
             for _ in range(threads):
-                threading.Thread(
-                    target=_take_jobs, args=(jobs, abort_signal), daemon=True
-                ).start()
+                self._threads.start(partial(_take_jobs, jobs, abort_signal))
             while futures:
                 item = done.get()
                 if item is None:
@@ -80,6 +82,57 @@ class DaemonThreadExecutor(ExecutorBase):
             for future in futures:
                 if not future.cancel():
                     future.add_done_callback(partial(_log_left_running, Future.result))
+
+
+class ThreadGroup:
+    """Daemon threads that can be waited for together.
+
+    Shared by the executors of one owner, so that the owner can wait for every
+    thread they started when it closes.
+    """
+
+    def __init__(self) -> None:
+        """Initialize an empty group."""
+        self._changed = threading.Condition()
+        self._threads: set[threading.Thread] = set()
+
+    def start(self, target: Callable[[], object]) -> None:
+        """Run `target` on a new daemon thread of this group.
+
+        Args:
+            target: The function the thread runs.
+        """
+        thread = threading.Thread(target=self._run, args=(target,), daemon=True)
+        with self._changed:
+            self._threads.add(thread)
+        try:
+            thread.start()
+        except BaseException:
+            self._leave(thread)
+            raise
+
+    def wait(self, deadline: float) -> bool:
+        """Wait for the threads of this group, other than the calling one.
+
+        Args:
+            deadline: The `time.monotonic` time to stop waiting at.
+
+        Returns:
+            Whether they all ended before the deadline.
+        """
+        current = threading.current_thread()
+        return _wait_for(self._changed, lambda: not self._threads - {current}, deadline)
+
+    def _run(self, target: Callable[[], object]) -> None:
+        try:
+            target()
+        finally:
+            self._leave(threading.current_thread())
+
+    def _leave(self, thread: threading.Thread) -> None:
+        with self._changed:
+            self._threads.discard(thread)
+            self._changed.notify_all()
 
 
 def _prepare_jobs(

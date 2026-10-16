@@ -21,6 +21,7 @@ turns a deadlock into an error, and does nothing else.
 
 from __future__ import annotations
 
+import time
 from abc import ABC, abstractmethod
 from contextvars import ContextVar
 from dataclasses import dataclass, field
@@ -32,6 +33,7 @@ from ropt.exceptions import AbortedError, ExecutorStopped, WorkflowError
 from ._picklable import picklable_exception
 
 if TYPE_CHECKING:
+    import threading
     from collections.abc import Callable, Sequence
     from concurrent.futures import Future
 
@@ -51,6 +53,10 @@ _STOPPED = "The executor can no longer run this work."
 _NOT_RUN = "The work item has no result: the batch was aborted."
 
 _LEFT_RUNNING = "A work item that was still running when its batch returned raised: %r"
+
+# How long a bounded wait may block before Python gets to run a pending signal
+# handler, which some extension modules otherwise hold off until the wait ends.
+_POLL_INTERVAL = 0.1
 
 
 @dataclass(kw_only=True)
@@ -224,6 +230,15 @@ class ExecutorBase(Executor):
         """Initialize the executor."""
         super().__init__()
 
+    def _stop(self) -> None:
+        # Called when the owner releases the executor, after aborting its work:
+        # refuse new work and start ending what runs, without waiting.
+        pass
+
+    def _close(self, deadline: float) -> None:
+        # Called after `_stop`: wait until `deadline` at most for running work.
+        pass
+
     @override
     def run(
         self,
@@ -296,3 +311,15 @@ class ExecutorBase(Executor):
 
 def _stopped() -> ExecutorStopped:
     return ExecutorStopped(_STOPPED)
+
+
+def _wait_for(
+    condition: threading.Condition, predicate: Callable[[], bool], deadline: float
+) -> bool:
+    with condition:
+        while not predicate():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return False
+            condition.wait(min(remaining, _POLL_INTERVAL))
+    return True

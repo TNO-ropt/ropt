@@ -405,6 +405,12 @@ class JobExecutorBase(ExecutorBase):
         self._cancel_jobs(self._state.clear())
 
     @override
+    def _stop(self) -> None:
+        # A task's thread cancels its jobs when it leaves its batch, which a
+        # thread still busy, or cut off at exit, has not done yet.
+        self._cancel_all_jobs()
+
+    @override
     def _run_items(
         self,
         items: list[WorkItem],

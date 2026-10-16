@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import queue
+import threading
 from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import nullcontext
 from functools import partial
@@ -19,6 +20,7 @@ from .base import (
     _run_item,
     _running_on,
     _stopped,
+    _wait_for,
 )
 
 if TYPE_CHECKING:
@@ -36,10 +38,12 @@ class ThreadExecutor(ExecutorBase):
     concurrent callers.
 
     Warning:
-        A thread cannot be interrupted. Work that has already started runs to
-        completion, and the interpreter waits for it before exiting. An abort
+        A thread cannot be interrupted. Work that has already started runs until
+        it returns, and the interpreter waits for it before exiting. An abort
         does not wait for it: `run` returns at once, and an exception the work
-        raises afterwards is logged.
+        raises afterwards is logged. Work that checks
+        [`aborting`][ropt.aborting], or runs its programs with
+        [`run_program`][ropt.run_program], ends soon after an abort.
     """
 
     def __init__(self, *, workers: int = 1) -> None:
@@ -56,6 +60,8 @@ class ThreadExecutor(ExecutorBase):
             msg = f"The number of workers must be at least one: {workers}"
             raise ValueError(msg)
         self._pool = ThreadPoolExecutor(max_workers=workers)
+        self._idle = threading.Condition()
+        self._running = 0
         _logger.debug("Started thread executor with %d worker(s)", workers)
 
     @override
@@ -97,6 +103,14 @@ class ThreadExecutor(ExecutorBase):
                 if not future.cancel():
                     future.add_done_callback(partial(_log_left_running, Future.result))
 
+    @override
+    def _stop(self) -> None:
+        self._pool.shutdown(wait=False, cancel_futures=True)
+
+    @override
+    def _close(self, deadline: float) -> None:
+        _wait_for(self._idle, lambda: self._running == 0, deadline)
+
     def _submit(self, item: WorkItem, abort_signal: AbortSignal | None) -> Future[Any]:
         try:
             return self._pool.submit(partial(self._run_tracked, item, abort_signal))
@@ -110,6 +124,8 @@ class ThreadExecutor(ExecutorBase):
         # whether an item starts is decided here rather than there.
         if abort_signal is not None and abort_signal.aborting:
             return WorkNotRun(_NOT_RUN)
+        with self._idle:
+            self._running += 1
         # Runs on the pool thread, so it marks that thread's context, not the caller's.
         token = _running_on.set(self)
         try:
@@ -117,3 +133,6 @@ class ThreadExecutor(ExecutorBase):
                 return _run_item(item.function, item.args, item.kwargs)
         finally:
             _running_on.reset(token)
+            with self._idle:
+                self._running -= 1
+                self._idle.notify_all()

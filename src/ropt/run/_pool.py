@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, overload
 
-from ropt.components.executors._job_executor import JobExecutorBase
+from ropt.components.executors.base import ExecutorBase
 from ropt.exceptions import WorkflowError
 
 from ._evaluate import _evaluate, _evaluate_batch
@@ -68,14 +68,16 @@ class WorkerPool:
             raise WorkflowError(_RELEASED)
         return self._executor
 
-    def _release(self) -> None:
+    def _release(self) -> ExecutorBase | None:
         # Dropping the executor is what releases its workers. The pool itself
-        # may outlive this, as a name the caller still holds.
+        # may outlive this, as a name the caller still holds. The executor is
+        # returned so that the session can wait for it, at most until a
+        # deadline it shares with its other pools.
         executor, self._executor = self._executor, None
-        if isinstance(executor, JobExecutorBase):
-            # A task's thread cancels its jobs when it leaves its batch, which a
-            # thread still busy, or cut off at exit, has not done yet.
-            executor._cancel_all_jobs()  # ruff: ignore[private-member-access]
+        if not isinstance(executor, ExecutorBase):
+            return None
+        executor._stop()  # ruff: ignore[private-member-access]
+        return executor
 
     def optimize(  # ruff: ignore[too-many-arguments]
         self,
