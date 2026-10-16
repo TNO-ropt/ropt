@@ -886,6 +886,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../running/programs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running External Programs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../running/nested/" class="md-nav__link">
         
   
@@ -2896,7 +2924,7 @@ another handler's state.</p>
 in the <strong>same process</strong> and share memory: a handler can see anything the
 objective left behind — a global it set, a list it appended to, an object it
 mutated.</p>
-<p>A process, local, or HPC pool breaks that. The objective runs in a <strong>separate
+<p>A process or HPC pool breaks that. The objective runs in a <strong>separate
 worker process</strong>, while the optimizer, your handlers, and the rest of your
 program stay
 in the <strong>main process</strong>. They cannot share memory. The objective's <em>only</em> way to

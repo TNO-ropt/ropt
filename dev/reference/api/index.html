@@ -886,6 +886,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../running/programs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running External Programs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../running/nested/" class="md-nav__link">
         
   
@@ -2141,17 +2169,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.Session.local_pool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        local_pool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.Session.hpc_pool" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2244,6 +2261,17 @@
     <span class="md-ellipsis">
       
         aborting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.run_program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_program
       
     </span>
   </a>
@@ -3367,17 +3395,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.Session.local_pool" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        local_pool
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.Session.hpc_pool" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3470,6 +3487,17 @@
     <span class="md-ellipsis">
       
         aborting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.run_program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run_program
       
     </span>
   </a>
@@ -5181,6 +5209,10 @@ interface — calls to bring them down.</p>
     <div class="doc doc-contents ">
 
         <p>Close the session, aborting its tasks and releasing every pool.</p>
+<p>Work still running is waited for, five seconds at most in total, which
+gives the programs it started with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="#ropt.run_program"><code>run_program</code></a>
+the time to end. Worker processes still busy after that are killed;
+threads are no longer waited for.</p>
 
 
     </div>
@@ -6359,10 +6391,11 @@ that releases the GIL. See
         <p>Create a pool that runs evaluations in worker processes.</p>
 <p>The evaluation function must be picklable. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-<p>Releasing the pool terminates its worker processes and nothing else. A
-program an evaluation started itself keeps running, without an error
-being raised; use <a class="autorefs autorefs-internal" title="            local_pool" href="#ropt.Session.local_pool"><code>local_pool</code></a> where
-an evaluation launches external programs.</p>
+<p>An abort reaches an evaluation that is still running, as it does on a
+thread pool: <a class="autorefs autorefs-internal" title="            ropt.aborting" href="#ropt.aborting"><code>aborting</code></a> turns <code>True</code>, and a program
+started with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="#ropt.run_program"><code>run_program</code></a> is terminated. Workers
+still busy five seconds after an abort, or after the session closes,
+are killed, and the pool starts new ones for the work that follows.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6470,190 +6503,6 @@ an evaluation launches external programs.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.Session.local_pool" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">local_pool</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">local_pool</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">workdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">extra_polls</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">cleanup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Create a pool that runs each evaluation as a separate local process.</p>
-<p>Between a process pool and a cluster: every evaluation gets an
-interpreter of its own, which can be stopped outright and whose output
-is captured to a file, but there is no queueing system and nothing to
-install. This is the local stand-in for
-<a class="autorefs autorefs-internal" title="            hpc_pool" href="#ropt.Session.hpc_pool"><code>hpc_pool</code></a>: the same job shape, so an
-evaluation function that works here works there.</p>
-<p>Each job is a fresh command rather than a re-import of your script, so
-the evaluation function must live in a module the job can import, or
-the <code>ropt[cloudpickle]</code> extra must be installed.</p>
-<p>POSIX only. See <a href="../../running/running/">Running Optimizations</a> for a
-walkthrough.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>workdir</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The working directory, or <code>None</code> for a temporary one.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>workers</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The maximum number of concurrent jobs.</p>
-              </div>
-            </td>
-            <td>
-                  <code>1</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>interval</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#float">float</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Seconds between checks on the running jobs.</p>
-              </div>
-            </td>
-            <td>
-                  <code>0.1</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>extra_polls</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Extra polls to wait for a work item's result.</p>
-              </div>
-            </td>
-            <td>
-                  <code>0</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>cleanup</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether to remove the job files afterwards.</p>
-              </div>
-            </td>
-            <td>
-                  <code>True</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.run._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A pool backed by local job processes.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If this session has closed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
 <h3 id="ropt.Session.hpc_pool" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">hpc_pool</span>
 
@@ -6663,7 +6512,7 @@ walkthrough.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">workdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">cluster</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">queue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -6673,7 +6522,7 @@ walkthrough.</p>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">memory_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">run_time_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">submit_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">extra_polls</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">extra_polls</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">query_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">cleanup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
@@ -6686,15 +6535,18 @@ walkthrough.</p>
 requires the <code>ropt[hpc]</code> extra. Each evaluation is a job started as its
 own command, so the evaluation function must live in a module the
 compute nodes can import, or the <code>ropt[cloudpickle]</code> extra must be
-installed. Develop against
-<a class="autorefs autorefs-internal" title="            local_pool" href="#ropt.Session.local_pool"><code>local_pool</code></a> first: it has the same
-shape and the same rule, without a cluster. The cluster is selected from
-<code>cluster</code>/<code>queue</code>: give a queue to search for its cluster, a cluster to
-use its default queue, or both to be explicit.</p>
-<p>A <code>template</code> is the alternative to all of that: it submits without a
-configuration, so it cannot be combined with <code>config_path</code>, <code>cluster</code> or
-<code>queue</code>. See <a href="../../running/parallel/#running-on-an-hpc-cluster">Running on an HPC
-cluster</a> for the
+installed. The cluster is selected from <code>cluster</code>/<code>queue</code>: give a queue
+to search for its cluster, a cluster to use its default queue, or both
+to be explicit.</p>
+<p>The queue <code>"local"</code> without a <code>cluster</code> runs each job as a process on
+this machine instead, with the same job files and the same rule for the
+evaluation function. It needs neither <code>pysqa</code> nor a configuration, and
+it ignores <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code>, <code>submit_options</code> and
+<code>query_retries</code>. It is an error if a configured cluster also has a
+queue named <code>"local"</code>; pass that <code>cluster</code> to submit to it.</p>
+<p>A <code>template</code> is the alternative to a configuration: it cannot be
+combined with <code>config_path</code>, <code>cluster</code> or <code>queue</code>. See <a href="../../running/parallel/#running-on-an-hpc-cluster">Running on an
+HPC cluster</a> for the
 configuration layout and Slurm examples.</p>
 
 
@@ -6746,15 +6598,16 @@ configuration layout and Slurm examples.</p>
                 <code>interval</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#float">float</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#float">float</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Seconds between polls of the cluster.</p>
+                <p>Seconds between polls of the cluster (default:
+            1, or 0.1 for local jobs).</p>
               </div>
             </td>
             <td>
-                  <code>1</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -6906,15 +6759,16 @@ configuration layout and Slurm examples.</p>
                 <code>extra_polls</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Extra polls to wait for a work item's result.</p>
+                <p>Extra polls to wait for a work item's result
+            (default: 30, or 0 for local jobs).</p>
               </div>
             </td>
             <td>
-                  <code>30</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -6968,7 +6822,7 @@ configuration layout and Slurm examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A pool backed by an HPC cluster.</p>
+                <p>A pool backed by an HPC cluster, or by local job processes.</p>
               </div>
             </td>
           </tr>
@@ -8127,8 +7981,9 @@ must be picklable for a process or job pool.</p>
 <p>Code that a task runs — an evaluation function, an event handler, a report
 callback, or a function given to <a class="autorefs autorefs-internal" title="            run" href="#ropt.Session.run"><code>run</code></a> — can call this
 to stop early once its task is aborted. It returns <code>False</code> in code that no
-task runs, which includes the worker processes of a process, local or HPC
-pool. See
+task runs, which includes the jobs of an HPC pool. In the worker processes
+of a process pool it turns <code>True</code> within a fraction of a second of the
+abort. See
 <a href="../../running/failures/#stopping-early-when-aborted">Failures and Aborts</a>.</p>
 
 
@@ -8148,6 +8003,211 @@ pool. See
             <td>
               <div class="doc-md-description">
                 <p>Whether the task that runs the calling code is being aborted.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ropt.run_program" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.run_program</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_program</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">cmd</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">cwd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">env</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">stdout</span><span class="p">:</span> <span class="n">ProgramOutput</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">stderr</span><span class="p">:</span> <span class="n">ProgramOutput</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Run an external program, and kill it when the calling task is aborted.</p>
+<p>Blocks until the program exits. Called from code that a task runs, an abort
+of that task terminates the program and everything it started, and raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>.</p>
+<p><code>stdout</code> and <code>stderr</code> take <code>None</code> to inherit the caller's, a path to write
+to, an open file, a file descriptor, or <code>subprocess.DEVNULL</code>; <code>stderr</code> also
+takes <code>subprocess.STDOUT</code>. A relative path is relative to <code>cwd</code>. Standard
+input is empty. See <a href="../../running/programs/">Running External Programs</a>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>cmd</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="os.PathLike" href="https://docs.python.org/3/library/os.html#os.PathLike">PathLike</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The program and its arguments.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>cwd</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="os.PathLike" href="https://docs.python.org/3/library/os.html#os.PathLike">PathLike</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The working directory, or <code>None</code> to inherit it.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>env</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Mapping" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Mapping">Mapping</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The environment, or <code>None</code> to inherit it.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>stdout</code>
+            </td>
+            <td>
+                  <code><span title="ropt.components.concurrency._program.ProgramOutput">ProgramOutput</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Where standard output goes.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>stderr</code>
+            </td>
+            <td>
+                  <code><span title="ropt.components.concurrency._program.ProgramOutput">ProgramOutput</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Where standard error goes.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The exit status of the program, negative for a signal as in <code>subprocess</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            AbortedError (ropt.exceptions.AbortedError)" href="../exceptions/#ropt.exceptions.AbortedError">AbortedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the calling task was aborted.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#OSError">OSError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the program could not be started.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#TypeError">TypeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>cmd</code> is a single string.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>stdout</code> or <code>stderr</code> is <code>subprocess.PIPE</code>.</p>
               </div>
             </td>
           </tr>

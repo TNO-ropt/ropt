@@ -886,6 +886,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../running/programs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running External Programs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../running/nested/" class="md-nav__link">
         
   
@@ -2585,8 +2613,8 @@ from one computed over the whole ensemble.</p>
 </table>
 <h2 id="your-evaluation-function">Your evaluation function</h2>
 <p><strong>Outside your process, your objective works on a copy.</strong> On a
-<a href="../running/parallel/#process-pool">process pool</a>, a
-<a href="../running/parallel/#local-pool">local pool</a> or an HPC pool,
+<a href="../running/parallel/#process-pool">process pool</a> or an HPC pool, including
+<a href="../running/parallel/#local-jobs">local jobs</a>,
 your evaluation function is sent to a worker together with the data it uses. Anything
 it writes there — a global, a cache, a list it appends to — is thrown away when
 the worker finishes. Return what you need instead; see
@@ -2640,8 +2668,10 @@ module-level <a class="autorefs autorefs-internal" title="            ropt.optim
 the thread that called it — even if a pool exists next to it.</p>
 <p><strong>Threads cannot be interrupted.</strong> Evaluations on a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
-outside. If an evaluation may run long and has to be interruptible, put it on a
-local pool or an HPC pool; see
+outside. An evaluation that checks <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../reference/api/#ropt.aborting"><code>aborting</code></a>, or runs its
+external programs with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../reference/api/#ropt.run_program"><code>run_program</code></a>, stops early; any other
+evaluation that may run long and has to be interruptible belongs on a process
+pool or an HPC pool; see
 <a href="../running/parallel/#stopping-a-run">Stopping an optimization</a>.</p>
 <p><strong>A process pool re-imports your script.</strong> Its workers are started with
 <code>spawn</code>, so each of them imports the file your program was started from, and
@@ -2661,11 +2691,11 @@ the loop or function that uses it rather than around the whole program; see
 <tbody>
 <tr>
 <td>Ctrl-C appears to do nothing</td>
-<td>A process-wide signal setting, changed by an imported package. Call <a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a>; see <a href="keyboard_interrupt/">Keyboard Interrupts</a>.</td>
+<td>A process-wide signal setting, changed by <code>polars</code> when <code>ropt</code> imports it. Call <a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a>; see <a href="keyboard_interrupt/">Keyboard Interrupts</a>.</td>
 </tr>
 <tr>
 <td>The program will not exit after Ctrl-C</td>
-<td>Evaluations on a thread pool are still running and cannot be interrupted.</td>
+<td>Evaluations on a thread pool are still running and cannot be interrupted. Check <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../reference/api/#ropt.aborting"><code>aborting</code></a> in them, or start their programs with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../reference/api/#ropt.run_program"><code>run_program</code></a>.</td>
 </tr>
 <tr>
 <td>Pages of <code>multiprocessing</code> tracebacks, ending in <code>ExecutionError: Could not start worker processes</code></td>
@@ -2685,7 +2715,7 @@ the loop or function that uses it rather than around the whole program; see
 </tr>
 <tr>
 <td>Simulators keep running after the optimization stopped</td>
-<td>A process pool kills only its own workers. Use a <a href="../running/parallel/#local-pool">local pool</a>, which signals the whole process group.</td>
+<td>They were not started with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../reference/api/#ropt.run_program"><code>run_program</code></a>, which terminates a program and everything it started on an abort; see <a href="../running/programs/">Running External Programs</a>.</td>
 </tr>
 <tr>
 <td>A cluster directive has no effect</td>

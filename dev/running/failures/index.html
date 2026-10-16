@@ -12,7 +12,7 @@
         <link rel="prev" href="../many_runs/">
       
       
-        <link rel="next" href="../nested/">
+        <link rel="next" href="../programs/">
       
       
         
@@ -979,6 +979,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../programs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running External Programs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2557,8 +2585,9 @@ methods of a session or a pool.</p>
 <p>An evaluation function runs in your process when its optimization or evaluation
 has no pool or a thread pool, and so does a function given to <code>run</code> on a thread
 pool or on a session.
-On a process, local or HPC pool they run in another process, and the tasks they
-start there are not nested. Neither is a task started from your script.</p>
+On a process or HPC pool they run in another process. A task they start in the
+worker of a process pool is aborted when their own task is; a task they start in
+an HPC job is not nested. Neither is a task started from your script.</p>
 <div class="admonition note">
 <p class="admonition-title">Threads that your code starts</p>
 <p>A task started from a thread that your own code starts is not nested, even
@@ -2617,10 +2646,9 @@ parent was aborted is aborted at once.</p>
 <p>An aborted task raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
 <code>exit_code</code> is the exit code of the abort; see
 <a href="../../results/exit_codes/">Exit Codes</a>. It raises without waiting for the work it
-has running, and returns no result. A function given to <code>run</code> cannot be
-stopped from outside. If it has not started, it never starts, and if it is
-running, <code>run</code> does not wait for it. What happens to work that is already
-running depends on the pool:</p>
+has running, and returns no result. A function given to <code>run</code> that has not
+started never starts, and if it is running, <code>run</code> does not wait for it. What
+happens to work that is already running depends on the pool:</p>
 <table>
 <thead>
 <tr>
@@ -2634,12 +2662,16 @@ running depends on the pool:</p>
 <td>runs to its end, and the task ends after it</td>
 </tr>
 <tr>
-<td><code>thread_pool</code>, <code>process_pool</code>, or the threads of <code>Session.run</code></td>
-<td>runs to its end, but the task does not wait for it</td>
+<td><code>thread_pool</code>, or the threads of <code>Session.run</code></td>
+<td>runs to its end unless it <a href="#stopping-early-when-aborted">stops early</a>, but the task does not wait for it</td>
 </tr>
 <tr>
-<td><code>local_pool</code></td>
-<td>is killed, together with everything it launched</td>
+<td><code>process_pool</code></td>
+<td>as on a thread pool, and its worker is killed if it is still running five seconds later</td>
+</tr>
+<tr>
+<td><code>hpc_pool</code>, local queue</td>
+<td>is terminated, together with every program it started, and killed five seconds later if still running</td>
 </tr>
 <tr>
 <td><code>hpc_pool</code></td>
@@ -2657,7 +2689,8 @@ their pool can no longer run the work. In an evaluation function, returning
 that your own code raises, as the example above does.</p>
 <h2 id="stopping-early-when-aborted">Stopping early when aborted</h2>
 <p>Work that is left running after its task was aborted runs to its end, unless it
-stops by itself. Call <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> in long-running code — an
+stops by itself or, on a process pool, its worker is killed five seconds later.
+Call <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> in long-running code — an
 evaluation function, an event handler, a report callback, or a function given to
 <code>run</code> — to find out whether the task that runs it is being aborted:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">aborting</span>
@@ -2670,9 +2703,13 @@ evaluation function, an event handler, a report callback, or a function given to
 </span></code></pre></div>
 <p>A task nested in an aborted task is aborted as well, so code that starts an
 optimization, an evaluation or a <code>run</code> call needs no check of its own: the
-nested task raises <code>AbortedError</code> at once. <code>aborting</code> returns <code>False</code> in code
-that no task runs, which includes the worker processes of a process, local or
-HPC pool.</p>
+nested task raises <code>AbortedError</code> at once. An external program started with
+<a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> is terminated when the task is aborted, and
+<code>run_program</code> then raises <code>AbortedError</code>; see
+<a href="../programs/">Running External Programs</a>.</p>
+<p><code>aborting</code> returns <code>False</code> in code that no task runs, which includes the jobs of
+an HPC pool. In the worker processes of a process pool it turns <code>True</code> within a
+fraction of a second of the abort.</p>
 
 
 
@@ -2725,13 +2762,13 @@ HPC pool.</p>
         
         
           
-          <a href="../nested/" class="md-footer__link md-footer__link--next" aria-label="Next: Nested Optimization">
+          <a href="../programs/" class="md-footer__link md-footer__link--next" aria-label="Next: Running External Programs">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Nested Optimization
+                Running External Programs
               </div>
             </div>
             <div class="md-footer__button md-icon">

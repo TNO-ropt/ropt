@@ -886,6 +886,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../running/programs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running External Programs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../running/nested/" class="md-nav__link">
         
   
@@ -2799,9 +2827,9 @@ that cannot vary has no scale.</p>
 on <code>SIGINT</code> when they are imported, after which Ctrl-C no longer breaks
 into a program that is waiting. This clears the flag, and is a no-op on
 platforms that do not have one.</p>
-<p>Entirely optional: call it at the top of a script, after the imports, only
-if Ctrl-C stops working. See
-<a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a>.</p>
+<p><code>ropt</code> imports <code>polars</code> when it is installed, which sets the flag. Call
+this at the top of a script that uses a thread or process pool, after the
+imports. See <a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a>.</p>
 
 
     </div>

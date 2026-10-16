@@ -886,6 +886,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../running/programs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running External Programs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../running/nested/" class="md-nav__link">
         
   
@@ -1714,10 +1742,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-fix" class="md-nav__link">
+  <a href="#where-to-call-it" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The fix
+        Where to call it
       
     </span>
   </a>
@@ -2449,10 +2477,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-fix" class="md-nav__link">
+  <a href="#where-to-call-it" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The fix
+        Where to call it
       
     </span>
   </a>
@@ -2502,10 +2530,15 @@
 
 
 <h1 id="keyboard-interrupts">Keyboard Interrupts</h1>
-<p><strong>You probably do not need this page.</strong> Ctrl-C works normally in most programs
-that use <code>ropt</code>, and nothing in <code>ropt</code> calls the function described here. It is
-an escape hatch for one specific failure that is easy to recognise and hard to
-diagnose from scratch. Read on only if it has happened to you.</p>
+<p>When <code>polars</code> is installed, importing <code>ropt</code> stops Ctrl-C from breaking into a
+program that is waiting. A program that uses a thread pool or a process pool
+waits for its evaluations, so there Ctrl-C can have no effect at all. Call
+<a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a> at the
+top of every script that uses a pool, after the imports:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">restore_keyboard_interrupt</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">restore_keyboard_interrupt</span><span class="p">()</span>
+</span></code></pre></div>
 <h2 id="the-symptom">The symptom</h2>
 <p>You press Ctrl-C and nothing happens. Not "it takes a while" — nothing at all,
 however many times you press it. The optimization keeps going, and the only way
@@ -2528,15 +2561,10 @@ error is reported, and you need not have imported the culprit yourself — a
 package <code>ropt</code> imports on your behalf is enough. Importing <code>ropt</code> alone
 sets the flag (at the time of writing by way of polars, which <code>ropt</code> loads
 whenever it is installed).</p>
-<h2 id="the-fix">The fix</h2>
-<p>One line, at the top of your script, <strong>after</strong> the imports:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">restore_keyboard_interrupt</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">restore_keyboard_interrupt</span><span class="p">()</span>
-</span></code></pre></div>
-<p>After the imports because an import is what sets the flag: calling this first
-and importing afterwards leaves you exactly where you started. If you import
-lazily, inside a function, call it after that import instead.</p>
+<h2 id="where-to-call-it">Where to call it</h2>
+<p>Call it <strong>after</strong> the imports, because an import is what sets the flag: calling
+this first and importing afterwards leaves you exactly where you started. If you
+import lazily, inside a function, call it after that import instead.</p>
 <h2 id="why-ropt-does-not-do-this-for-you">Why <code>ropt</code> does not do this for you</h2>
 <p><code>SA_RESTART</code> is process-global state that belongs to your program. A library
 that quietly changes it does so for every other part of that program,
