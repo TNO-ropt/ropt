@@ -5,12 +5,9 @@ which rows must be evaluated, an
 [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] carries the
 objective and constraint values back, and
 [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] is the
-protocol such a callable must follow. For the
-[`Evaluator`][ropt.components.evaluators.Evaluator] classes that wrap them, see
-[Evaluators](../reference/components_evaluators.md).
-
-See [Writing Evaluation Callbacks](../advanced/evaluation_callbacks.md) for
-usage.
+protocol such a callable must follow. The
+[`Evaluator`][ropt.components.evaluators.Evaluator] classes that wrap them are
+in `ropt.components.evaluators`.
 """
 
 from dataclasses import dataclass, field
@@ -25,9 +22,6 @@ from ropt.context import EnOptContext
 @dataclass(slots=True)
 class EvaluationBatchContext:
     """Per-batch metadata passed to evaluator functions.
-
-    See [Writing Evaluation Callbacks](../advanced/evaluation_callbacks.md) for
-    usage details and examples.
 
     Attributes:
         context:       The [`EnOptContext`][ropt.context.EnOptContext] for the run.
@@ -90,9 +84,6 @@ class EvaluationBatchResult:
     Stores objective values (and optional constraint values) for a batch of
     variable vectors. Inactive rows should be set to zero; failed active rows
     should be set to `numpy.nan`.
-
-    See [Writing Evaluation Callbacks](../advanced/evaluation_callbacks.md) for
-    `batch_id` management and other conventions.
 
     Args:
         objectives:  Objective values, shape `(n_rows, n_objectives)`.

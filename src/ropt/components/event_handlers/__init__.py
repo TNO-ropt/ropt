@@ -7,8 +7,7 @@ builds a table, and [`CallbackHandler`][ropt.components.event_handlers.CallbackH
 forwards selected events to a callback.
 
 A handler serializes its own calls, so the same handler may be attached to
-several compute steps running at once. See
-[Optimization Workflows](../advanced/workflows.md) for usage.
+several compute steps running at once.
 """
 
 from __future__ import annotations

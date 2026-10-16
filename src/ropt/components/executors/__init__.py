@@ -5,7 +5,7 @@ concrete mechanism: threads, processes, local jobs, or an HPC cluster.
 [`Executor`][ropt.components.executors.Executor] is the interface a compute step
 sees; [`ExecutorBase`][ropt.components.executors.ExecutorBase] adds the
 lifecycle the built-in executors share. See
-[Parallel Evaluation](../advanced/parallel.md) for usage.
+[Evaluating in Parallel](../running/parallel.md) for usage.
 """
 
 from __future__ import annotations

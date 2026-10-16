@@ -146,7 +146,7 @@ class Session:
 
         This reaches every task under way. Calling it is thread-safe, and safe
         on a session with no tasks. See
-        [Aborting from outside](../running/running.md#stopping-from-outside)
+        [Aborting from outside](../running/many_runs.md#stopping-from-outside)
         for which tasks are reached and when.
         """
         self._abort_all(ExitCode.USER_ABORT)

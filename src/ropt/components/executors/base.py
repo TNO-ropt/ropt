@@ -147,9 +147,10 @@ class Executor(ABC):
     An executor is constructed, run on, and dropped. Its workers are released
     when it is collected, so there is nothing to close.
 
-    See [Error handling](../advanced/parallel.md#error-handling) for the
-    distinction an implementation must make between an infrastructure failure,
-    returned in the call's position as an
+    See
+    [When an evaluation fails](../running/parallel.md#when-an-evaluation-fails)
+    for the distinction an implementation must make between an infrastructure
+    failure, returned in the call's position as an
     [`ExecutorFailure`][ropt.components.executors.ExecutorFailure], and an
     exception from the work item's own function, which is re-raised in the
     caller.

@@ -52,9 +52,9 @@ type _Result = Future[tuple[bool, bytes]]
 class ProcessExecutor(ExecutorBase):
     """An executor that employs a pool of multiprocessing workers.
 
-    See [Parallel Evaluation](../advanced/parallel.md#processexecutor) for
-    details, including the `if __name__ == "__main__":` guard that the entry
-    point must use.
+    See [Evaluating in worker processes](../running/parallel.md#process-pool)
+    for details, and [Your evaluation function](../troubleshooting/index.md#your-evaluation-function)
+    for the `if __name__ == "__main__":` guard that the entry point must use.
 
     An abort reaches a work item that is still running: code in it that
     calls [`aborting`][ropt.aborting], or runs a program with

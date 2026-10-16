@@ -36,9 +36,6 @@ class OptimizationStep(ComputeStep[ExitCode]):
     Executes an optimization algorithm, iteratively performing function and
     gradient evaluations. Emits `START_OPTIMIZER`, `START_EVALUATION`,
     `FINISHED_EVALUATION`, and `FINISHED_OPTIMIZER` events.
-
-    See [Optimization Workflows](../advanced/workflows.md#events-emitted-by-optimizationstep)
-    for the full event lifecycle description.
     """
 
     def __init__(

@@ -5,8 +5,7 @@ emits events about it. Two implementations ship with `ropt`:
 [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] runs an
 optimization algorithm, and
 [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep] runs a single
-ensemble evaluation. See
-[Optimization Workflows](../advanced/workflows.md) for usage.
+ensemble evaluation.
 """
 
 from __future__ import annotations

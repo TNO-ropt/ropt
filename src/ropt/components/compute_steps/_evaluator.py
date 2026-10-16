@@ -36,9 +36,6 @@ class EvaluationStep(ComputeStep[None]):
     [`FunctionResults`][ropt.results.FunctionResults] objects. Emits
     `START_ENSEMBLE_EVALUATOR`, `START_EVALUATION`, `FINISHED_EVALUATION`,
     and `FINISHED_ENSEMBLE_EVALUATOR` events.
-
-    See [Optimization Workflows](../advanced/workflows.md#events-emitted-by-evaluationstep)
-    for the full event lifecycle description.
     """
 
     def __init__(

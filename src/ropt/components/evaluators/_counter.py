@@ -13,9 +13,6 @@ class BatchIdCounter:
 
     Pass the same instance to multiple evaluators to share a single counter
     across them, so that their batch IDs remain unique.
-
-    See [Writing Evaluation Callbacks](../advanced/evaluation_callbacks.md) for
-    usage details and examples.
     """
 
     def __init__(self) -> None:

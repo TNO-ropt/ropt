@@ -3,8 +3,7 @@
 [`EnsembleEvaluator`][ropt.core.EnsembleEvaluator] orchestrates the
 per-realization function calls of one evaluation, and
 [`EnsembleOptimizer`][ropt.core.EnsembleOptimizer] drives the configured
-backend. Both are exposed for plugin authors and workflow developers; see
-[Optimization Workflows](../advanced/workflows.md) for the layer above them.
+backend. Both are exposed for plugin authors and workflow developers.
 """
 
 from ._callback import OptimizerCallback, OptimizerCallbackResult

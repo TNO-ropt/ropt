@@ -32,8 +32,7 @@ class ParallelEvaluator(Evaluator):
     Sends each active row of the evaluation batch to the executor as its own
     work item and returns once every result is back.
 
-    See [Parallel Evaluation](../advanced/parallel.md#parallelevaluator) for
-    details.
+    See [Evaluating in Parallel](../running/parallel.md) for details.
     """
 
     def __init__(
@@ -71,8 +70,8 @@ class ParallelEvaluator(Evaluator):
         exception is re-raised unchanged, leaving the executor usable. Raises
         [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] if the executor
         could no longer run the work. See
-        [error handling](../advanced/parallel.md#error-handling) for the full
-        contract.
+        [When an evaluation fails](../running/parallel.md#when-an-evaluation-fails)
+        for the full contract.
 
         Args:
             variables:         The matrix of variables to evaluate.

@@ -50,8 +50,8 @@ class HPCExecutor(JobExecutorBase):
     Interfaces with an HPC queueing system (for example Slurm) via `pysqa`.
     Requires `ropt[hpc]` to be installed.
 
-    See [Parallel Evaluation](../advanced/parallel.md#hpcexecutor) for full
-    details on configuration and lifecycle.
+    See [Configuring an HPC pool](../running/parallel.md#configuring-an-hpc-pool)
+    for configuration details.
     """
 
     _kind = "HPC"
@@ -109,8 +109,8 @@ class HPCExecutor(JobExecutorBase):
         failed keeps its captured output even under `cleanup`, which is the only
         record of why.
 
-        See [Parallel Evaluation](../advanced/parallel.md#hpcexecutor) for
-        configuration details.
+        See [Configuring an HPC pool](../running/parallel.md#configuring-an-hpc-pool)
+        for configuration details.
 
         Args:
             workdir:        Shared-filesystem directory for each work item's files.
