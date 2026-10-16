@@ -9,9 +9,10 @@ does the work of getting them, and an executor owns no thread of its own.
 Whatever a scope acquires, that scope releases. A batch acquires cluster jobs
 and worker processes, and `run`'s `finally` releases them, so nothing a batch
 started outlives it. The exception is a call already running on a worker thread
-or process when the batch is aborted: it cannot be stopped, so it runs to its
-end after `run` has returned. An executor acquires its workers, and releases
-them when it is collected, so there is nothing for a caller to close.
+or process when the batch is aborted: it cannot be interrupted, so it runs
+after `run` has returned, until it notices the abort or ends. An executor
+acquires its workers, and releases them when it is collected, so there is
+nothing for a caller to close.
 
 Reading the caller's context to refuse a call that could only hang leaves the
 meaning of an operation fixed by its arguments: code running one of the
@@ -178,10 +179,13 @@ class Executor(ABC):
         started, started ones are cancelled where the mechanism allows it, and
         `run` returns without waiting for the rest. Each call that did not
         finish gets a `WorkNotRun`. A call already running on a worker thread
-        or process cannot be stopped, and neither can a call the mechanism has
-        handed to a worker but can no longer withdraw: both run to their end
+        or process cannot be interrupted, and neither can a call the mechanism
+        has handed to a worker but can no longer withdraw: both keep running
         after `run` has returned, and an exception they raise is logged as a
-        warning. See [Stopping a run](../running/parallel.md#stopping-a-run).
+        warning. An executor that runs work items in this process, or in its
+        own worker processes, runs each inside an abort signal that `abort_signal`
+        aborts, so such a call can end early. See
+        [Stopping a run](../running/parallel.md#stopping-a-run).
 
         May be called from any thread, except from work running on one of the
         executor's own workers, or from a thread started by that work with a
@@ -237,6 +241,11 @@ class ExecutorBase(Executor):
 
     def _close(self, deadline: float) -> None:
         # Called after `_stop`: wait until `deadline` at most for running work.
+        pass
+
+    def _retire(self) -> None:
+        # Called after the owner aborted the work: end what still runs once a
+        # grace period has passed, without waiting for it here.
         pass
 
     @override

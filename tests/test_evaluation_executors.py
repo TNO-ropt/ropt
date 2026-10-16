@@ -22,6 +22,7 @@ from concurrent.futures import Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 from multiprocessing.connection import Client, Listener
+from multiprocessing.sharedctypes import RawArray
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast, override
 from uuid import UUID, uuid4
@@ -60,7 +61,8 @@ from ropt.components.executors._picklable import picklable_exception
 from ropt.components.executors._process_executor import (
     _PayloadGate,
     _run_payload,
-    _terminate_workers,
+    _Slot,
+    _stop_workers,
 )
 from ropt.context import EnOptContext
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
@@ -792,7 +794,7 @@ def test_rejected_hpc_submission_leaves_no_input_file(
 
 def test_worker_records_the_worker_traceback_as_a_note() -> None:
     payload = dumps((partial(_function, 0, raise_error=True), (), {}))
-    ok, blob = _run_payload(payload)
+    ok, blob = _run_payload(payload, 0)
     assert not ok
     exc = loads(blob)
     assert isinstance(exc, ValueError)
@@ -801,7 +803,7 @@ def test_worker_records_the_worker_traceback_as_a_note() -> None:
 
 def test_worker_wraps_an_unpicklable_exception() -> None:
     payload = dumps((_raise_unpicklable_error, (0,), {}))
-    ok, blob = _run_payload(payload)
+    ok, blob = _run_payload(payload, 0)
     assert not ok
     exc = loads(blob)
     assert isinstance(exc, RuntimeError)
@@ -811,7 +813,7 @@ def test_worker_wraps_an_unpicklable_exception() -> None:
 def test_a_result_that_cannot_be_sent_is_not_blamed_on_the_function() -> None:
     # The call itself succeeded and only its result could not be serialized.
     payload = dumps((_return_unpicklable, (), {}))
-    ok, blob = _run_payload(payload)
+    ok, blob = _run_payload(payload, 0)
     assert not ok
     exc = loads(blob)
     assert any("Could not send the result back" in note for note in exc.__notes__)
@@ -858,7 +860,7 @@ def test_a_work_item_the_worker_cannot_rebuild_reports_why(
     # not, which is why no send-side check can catch this.
     payload = pickle.dumps((_vanishing_work_item, (), {}))
     monkeypatch.delattr(sys.modules[__name__], "_vanishing_work_item")
-    ok, blob = _run_payload(payload)
+    ok, blob = _run_payload(payload, 0)
     assert not ok
     exc = loads(blob)
     assert isinstance(exc, AttributeError)
@@ -949,14 +951,17 @@ def test_max_tasks_per_child_restarts_worker() -> None:
 @pytest.mark.slow
 @pytest.mark.timeout(30)
 @pytest.mark.parametrize("public_api", [True, False])
+@pytest.mark.parametrize("kill", [True, False])
 def test_terminating_workers_kills_a_busy_one(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, public_api: bool
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, public_api: bool, kill: bool
 ) -> None:
     # An idle worker leaves on its own when the pool shuts down, so only a
     # worker busy with work that never ends shows whether terminating reaches
-    # it. This is the path a pool that could not be started takes.
+    # it. Terminating is the path a pool that could not be started takes, and
+    # killing the one an abort takes.
     if not public_api:
         monkeypatch.delattr(ProcessPoolExecutor, "terminate_workers", raising=False)
+        monkeypatch.delattr(ProcessPoolExecutor, "kill_workers", raising=False)
     listener = Listener(str(tmp_path / "worker"))
     executor = ProcessExecutor(workers=1)
     connection = None
@@ -969,7 +974,8 @@ def test_terminating_workers_kills_a_busy_one(
         )
         runner.start()
         connection = listener.accept()
-        _terminate_workers(executor._pool)
+        assert executor._current is not None
+        _stop_workers(executor._current.pool, kill=kill)
         assert connection.poll(10.0)
         with pytest.raises(EOFError):
             connection.recv()
@@ -1623,10 +1629,11 @@ def test_an_abort_wakes_a_run_waiting_for_a_payload_slot(tmp_path: Path) -> None
 
 def test_the_payload_gate_refuses_a_waiter_once_the_signal_aborts() -> None:
     signal = AbortSignal()
-    gate = _PayloadGate(1)
-    assert gate.acquire(blocking=True)
+    gate = _PayloadGate(RawArray("i", 1), 1)
+    slot = gate.acquire(blocking=True)
+    assert slot is not None
     waiting = threading.Event()
-    acquired: list[bool] = []
+    acquired: list[_Slot | None] = []
 
     def _wait_for_the_slot() -> None:
         waiting.set()
@@ -1639,15 +1646,16 @@ def test_the_payload_gate_refuses_a_waiter_once_the_signal_aborts() -> None:
     gate.wake()
     waiter.join(timeout=4.0)
     assert not waiter.is_alive()
-    assert acquired == [False]
+    assert acquired == [None]
 
 
 def test_the_payload_gate_refuses_a_waiter_when_a_slot_frees_after_the_abort() -> None:
     signal = AbortSignal()
-    gate = _PayloadGate(1)
-    assert gate.acquire(blocking=True)
+    gate = _PayloadGate(RawArray("i", 1), 1)
+    slot = gate.acquire(blocking=True)
+    assert slot is not None
     waiting = threading.Event()
-    acquired: list[bool] = []
+    acquired: list[_Slot | None] = []
 
     def _wait_for_the_slot() -> None:
         waiting.set()
@@ -1659,10 +1667,10 @@ def test_the_payload_gate_refuses_a_waiter_when_a_slot_frees_after_the_abort() -
     # Released rather than woken, so the waiter finds a free slot and leaves the
     # loop without the abort ever being tested for it.
     signal.abort()
-    gate.release()
+    gate.release(slot)
     waiter.join(timeout=4.0)
     assert not waiter.is_alive()
-    assert acquired == [False]
+    assert acquired == [None]
 
 
 @pytest.mark.parametrize(

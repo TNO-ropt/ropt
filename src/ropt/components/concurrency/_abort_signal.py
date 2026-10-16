@@ -192,8 +192,9 @@ def aborting() -> bool:
     Code that a task runs — an evaluation function, an event handler, a report
     callback, or a function given to [`run`][ropt.Session.run] — can call this
     to stop early once its task is aborted. It returns `False` in code that no
-    task runs, which includes the worker processes of a process, local or HPC
-    pool. See
+    task runs, which includes the jobs of an HPC pool. In the worker processes
+    of a process pool it turns `True` within a fraction of a second of the
+    abort. See
     [Failures and Aborts](../running/failures.md#stopping-early-when-aborted).
 
     Returns:

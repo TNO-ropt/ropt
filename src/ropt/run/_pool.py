@@ -79,6 +79,11 @@ class WorkerPool:
         executor._stop()  # ruff: ignore[private-member-access]
         return executor
 
+    def _retire(self) -> None:
+        executor = self._executor
+        if isinstance(executor, ExecutorBase):
+            executor._retire()  # ruff: ignore[private-member-access]
+
     def optimize(  # ruff: ignore[too-many-arguments]
         self,
         config: dict[str, Any],

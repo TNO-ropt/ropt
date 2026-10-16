@@ -7,22 +7,26 @@
 
 from __future__ import annotations
 
+import os
+import signal
 import threading
 import time
 from functools import partial
+from multiprocessing.connection import Client, Listener
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt import aborting, session
+from ropt import aborting, run_program, session
 from ropt.components.concurrency import _grace, parent_signal
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from pathlib import Path
 
     from numpy.typing import NDArray
 
@@ -760,3 +764,137 @@ def test_session_close_stops_waiting_after_the_grace_period(
     finally:
         release.set()
         driver.join(timeout=30)
+
+
+def _report_abort(address: str) -> int:
+    # Runs in a worker process, where only an address can be passed in.
+    connection = Client(address)
+    signal = parent_signal()
+    assert signal is not None
+    aborted = threading.Event()
+    signal.add_callback(aborted.set)
+    connection.send("started")
+    if aborted.wait(timeout=30):
+        connection.send(int(signal.exit_code))
+    return 0
+
+
+def _ignore_abort(address: str) -> int:
+    # Blocks until the test closes the connection, which never happens while
+    # the test is waiting for this process to be killed.
+    connection = Client(address)
+    connection.send("started")
+    connection.recv()
+    return 0
+
+
+def _run_into_fifo(fifo: str) -> int:
+    return run_program(["sh", "-c", "echo started; exec sleep 60"], stdout=fifo)
+
+
+def _one_in_a_process() -> int:
+    return 1
+
+
+@pytest.mark.timeout(60)
+def test_session_abort_reaches_work_running_in_a_process_pool(tmp_path: Path) -> None:
+    codes: list[ExitCode] = []
+    with Listener(str(tmp_path / "socket")) as listener, session() as opened:
+        pool = opened.process_pool(workers=1)
+        driver = threading.Thread(
+            target=_records_abort,
+            args=(partial(pool.run, partial(_report_abort, listener.address)), codes),
+        )
+        driver.start()
+        with listener.accept() as connection:
+            assert connection.recv() == "started"
+            opened.abort()
+            assert connection.poll(30)
+            assert connection.recv() == ExitCode.USER_ABORT
+        driver.join(timeout=30)
+    assert codes == [ExitCode.USER_ABORT]
+
+
+@pytest.mark.timeout(60)
+def test_session_abort_kills_busy_process_workers_after_the_grace_period(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # The work ignores the abort, so only killing its worker ends it. The pool
+    # starts new workers for the work that follows.
+    monkeypatch.setattr(_grace, "GRACE_PERIOD", 0.2)
+    codes: list[ExitCode] = []
+    with Listener(str(tmp_path / "socket")) as listener, session() as opened:
+        pool = opened.process_pool(workers=1)
+        driver = threading.Thread(
+            target=_records_abort,
+            args=(partial(pool.run, partial(_ignore_abort, listener.address)), codes),
+        )
+        driver.start()
+        with listener.accept() as connection:
+            assert connection.recv() == "started"
+            opened.abort()
+            assert connection.poll(30)
+            with pytest.raises(EOFError):
+                connection.recv()
+        driver.join(timeout=30)
+        assert codes == [ExitCode.USER_ABORT]
+        assert pool.run(_one_in_a_process) == 1
+
+
+@pytest.mark.timeout(60)
+def test_session_close_kills_busy_process_workers_after_the_grace_period(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(_grace, "GRACE_PERIOD", 0.2)
+    with Listener(str(tmp_path / "socket")) as listener:
+        with session() as opened:
+            pool = opened.process_pool(workers=1)
+            driver = threading.Thread(
+                target=_records_abort,
+                args=(partial(pool.run, partial(_ignore_abort, listener.address)), []),
+            )
+            driver.start()
+            connection = listener.accept()
+            assert connection.recv() == "started"
+        with connection:
+            assert connection.poll(30)
+            with pytest.raises(EOFError):
+                connection.recv()
+        driver.join(timeout=30)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="needs POSIX")
+@pytest.mark.timeout(60)
+def test_session_abort_kills_a_program_run_in_a_process_pool(tmp_path: Path) -> None:
+    # Whoever holds the FIFO open for writing keeps it from reaching end of
+    # file, so reaching it shows that the program has exited.
+    fifo = tmp_path / "fifo"
+    os.mkfifo(fifo)
+    codes: list[ExitCode] = []
+    with session() as opened:
+        pool = opened.process_pool(workers=1)
+        driver = threading.Thread(
+            target=_records_abort,
+            args=(partial(pool.run, partial(_run_into_fifo, str(fifo))), codes),
+        )
+        driver.start()
+        with fifo.open("rb") as stream:
+            assert stream.readline() == b"started\n"
+            opened.abort()
+            assert stream.read() == b""
+        driver.join(timeout=30)
+    assert codes == [ExitCode.USER_ABORT]
+
+
+def _interrupt_own_process() -> int:
+    os.kill(os.getpid(), signal.SIGINT)
+    return 1
+
+
+@pytest.mark.skipif(os.name != "posix", reason="needs POSIX")
+@pytest.mark.timeout(60)
+def test_process_workers_ignore_keyboard_interrupt() -> None:
+    # Ctrl-C at a terminal reaches every process in the foreground group, and
+    # handling it is up to the main process.
+    with session() as opened:
+        assert opened.process_pool(workers=1).run(_interrupt_own_process) == 1

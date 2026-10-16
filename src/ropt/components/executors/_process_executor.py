@@ -2,37 +2,51 @@
 
 from __future__ import annotations
 
+import contextlib
 import multiprocessing
 import queue
+import signal
 import threading
+import time
 from collections import deque
 from concurrent.futures import Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
+from dataclasses import dataclass
 from functools import partial
 from typing import TYPE_CHECKING, Any, override
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
+from ropt.components.concurrency import AbortSignal, _grace
+from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError
 
 from ._picklable import picklable_exception
 from .base import (
+    _NOT_RUN,
     ExecutorBase,
     ExecutorFailure,
     WorkItem,
+    WorkNotRun,
     _log_left_running,
     _run_item,
     _stopped,
+    _wait_for,
 )
 
 if TYPE_CHECKING:
+    import ctypes
     from collections.abc import Callable
-
-    from ropt.components.concurrency import AbortSignal
 
 _logger = get_logger(__name__)
 
 _POOL_GONE = "The work item was not sent: the worker processes are gone."
+
+# How often a worker looks for an abort of the item it runs.
+_FLAG_INTERVAL = 0.05
+
+type _Flags = ctypes.Array[ctypes.c_int]
+type _Result = Future[tuple[bool, bytes]]
 
 
 class ProcessExecutor(ExecutorBase):
@@ -42,18 +56,18 @@ class ProcessExecutor(ExecutorBase):
     details, including the `if __name__ == "__main__":` guard that the entry
     point must use.
 
-    Warning:
-        A worker process runs its work item to the end, and an abort does not
-        wait for it: `run` returns at once, and an exception the work item
-        raises afterwards is logged. A program a work item started itself keeps
-        running, without an error being raised. Use
-        [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] where
-        an evaluation launches external programs.
+    An abort reaches a work item that is still running: code in it that
+    calls [`aborting`][ropt.aborting], or runs a program with
+    [`run_program`][ropt.run_program], sees it. When this executor belongs to a
+    [`Session`][ropt.Session], an abort of the session also kills the worker
+    processes still busy five seconds later, and the next work item starts a new
+    set of them.
 
     Note:
         An abort also leaves one item running that was submitted but not yet
         started: the pool marks an item as running when it moves it towards a
-        worker, so it can no longer be withdrawn. See
+        worker, so it can no longer be withdrawn. Such an item sees the abort
+        when it starts, and returns at once. See
         [Stopping a run](../running/parallel.md#stopping-a-run).
     """
 
@@ -80,29 +94,100 @@ class ProcessExecutor(ExecutorBase):
         if workers < 1:
             msg = f"The number of workers must be at least one: {workers}"
             raise ValueError(msg)
-        self._pool = ProcessPoolExecutor(
-            max_workers=workers,
-            mp_context=multiprocessing.get_context("spawn"),
-            max_tasks_per_child=max_tasks_per_child,
-        )
+        self._workers = workers
+        self._max_tasks_per_child = max_tasks_per_child
+        self._context = multiprocessing.get_context("spawn")
         # A submitted item's pickled bytes stay in memory until its result
         # comes back, so this caps how many are submitted at once: one for each
         # worker, plus one so a worker that finishes finds the next item
-        # already waiting.
-        self._payload_gate = _PayloadGate(workers + 1)
-        self._check_worker_startup()
+        # already waiting. Each slot also carries the abort flag of its item.
+        slots = workers + 1
+        self._flags: _Flags = self._context.RawArray("i", slots)
+        self._payload_gate = _PayloadGate(self._flags, slots)
+        # Guards which worker set is current. Never taken by a future's done
+        # callback: the pool runs those holding a lock of its own, which
+        # `submit` and `shutdown` take while this one is held.
+        self._state = threading.Lock()
+        self._closed = False
+        self._retiring: _Workers | None = None
+        self._current: _Workers | None = self._start_workers()
         _logger.debug("Started process executor with %d worker(s)", workers)
 
-    def _check_worker_startup(self) -> None:
+    def _start_workers(self) -> _Workers:
+        pool = ProcessPoolExecutor(
+            max_workers=self._workers,
+            mp_context=self._context,
+            max_tasks_per_child=self._max_tasks_per_child,
+            initializer=_init_worker,
+            initargs=(self._flags, _grace.GRACE_PERIOD),
+        )
         try:
-            self._pool.submit(_dummy).result()
+            pool.submit(_dummy).result()
         except BrokenProcessPool as exc:
-            _terminate_workers(self._pool)
+            _stop_workers(pool, kill=False)
             msg = (
                 "Could not start worker processes; guard the program entry point "
                 'with `if __name__ == "__main__":`.'
             )
             raise ExecutionError(msg) from exc
+        return _Workers(pool)
+
+    def _live_workers(self) -> _Workers:
+        # Called with `_state` held.
+        if self._closed:
+            raise _stopped()
+        retiring, self._retiring = self._retiring, None
+        if retiring is not None and retiring.busy():
+            # Work after an abort does not wait for the workers that the abort
+            # left busy: they are killed now rather than at their deadline.
+            _stop_workers(retiring.pool, kill=True)
+            if self._current is retiring:
+                self._current = None
+        if self._current is None:
+            self._current = self._start_workers()
+        return self._current
+
+    @override
+    def _retire(self) -> None:
+        with self._state:
+            workers = self._current
+            if workers is None or not workers.busy():
+                return
+            self._retiring = workers
+        deadline = time.monotonic() + _grace.GRACE_PERIOD
+        threading.Thread(
+            target=self._kill_when_due, args=(workers, deadline), daemon=True
+        ).start()
+
+    def _kill_when_due(self, workers: _Workers, deadline: float) -> None:
+        workers.wait_idle(deadline)
+        with self._state:
+            if self._retiring is not workers:
+                return
+            self._retiring = None
+            if not workers.busy():
+                return
+            _stop_workers(workers.pool, kill=True)
+            if self._current is workers:
+                self._current = None
+
+    @override
+    def _close(self, deadline: float) -> None:
+        with self._state:
+            self._closed = True
+            self._retiring = None
+            workers, self._current = self._current, None
+        if workers is None:
+            return
+        try:
+            idle = workers.wait_idle(deadline)
+        except BaseException:
+            _stop_workers(workers.pool, kill=True)
+            raise
+        if idle:
+            workers.pool.shutdown(wait=False, cancel_futures=True)
+        else:
+            _stop_workers(workers.pool, kill=True)
 
     @override
     def _run_items(
@@ -115,8 +200,8 @@ class ProcessExecutor(ExecutorBase):
         # Finished items arrive here rather than through
         # `concurrent.futures.wait`, which would block forever on a future
         # cancelled before the pool dispatched it; a done callback still fires.
-        done: queue.SimpleQueue[Future[tuple[bool, bytes]] | None] = queue.SimpleQueue()
-        futures: dict[Future[tuple[bool, bytes]], int] = {}
+        done: queue.SimpleQueue[_Result | None] = queue.SimpleQueue()
+        futures: dict[_Result, tuple[int, _Slot]] = {}
         # The waits this call can be parked on are the result queue and the
         # payload gate; an abort has to break both.
         wake = partial(done.put, None)
@@ -134,55 +219,83 @@ class ProcessExecutor(ExecutorBase):
                 item = done.get()
                 if item is None:
                     break
-                index = futures.pop(item)
-                self._payload_gate.release()
+                index, slot = futures.pop(item)
+                self._payload_gate.release(slot)
                 if not item.cancelled():
                     store(index, _item_result(item))
         finally:
             if abort_signal is not None:
                 abort_signal.remove_callback(wake)
                 abort_signal.remove_callback(self._payload_gate.wake)
-            for future in futures:
+            for future, (_, slot) in futures.items():
                 if future.cancel():
-                    self._payload_gate.release()
+                    self._payload_gate.release(slot)
                 else:
-                    future.add_done_callback(self._end_left_running)
+                    self._leave_running(future, slot, abort_signal)
 
-    def _end_left_running(self, future: Future[tuple[bool, bytes]]) -> None:
+    def _leave_running(
+        self, future: _Result, slot: _Slot, abort_signal: AbortSignal | None
+    ) -> None:
+        # The item keeps its parent: an abort of the signal that sent it, now
+        # or later, still reaches it, as it would on a thread.
+        forward = None
+        if abort_signal is not None:
+            forward = partial(self._payload_gate.abort, slot, abort_signal)
+            abort_signal.add_callback(forward)
+        future.add_done_callback(
+            partial(self._end_left_running, slot, abort_signal, forward)
+        )
+
+    def _end_left_running(
+        self,
+        slot: _Slot,
+        abort_signal: AbortSignal | None,
+        forward: Callable[[], None] | None,
+        future: _Result,
+    ) -> None:
+        if abort_signal is not None and forward is not None:
+            abort_signal.remove_callback(forward)
         # A payload holds its slot until its work ends, waited for or not.
-        self._payload_gate.release()
+        self._payload_gate.release(slot)
+        if future.cancelled() or isinstance(future.exception(), BrokenProcessPool):
+            # Killed by an abort, or with a pool that is reported broken anyway.
+            return
         _log_left_running(_item_result, future)
 
     def _submit_pending(
         self,
         pending: deque[tuple[int, WorkItem]],
-        futures: dict[Future[tuple[bool, bytes]], int],
-        done: queue.SimpleQueue[Future[tuple[bool, bytes]] | None],
+        futures: dict[_Result, tuple[int, _Slot]],
+        done: queue.SimpleQueue[_Result | None],
         abort_signal: AbortSignal | None,
     ) -> list[int]:
         # Waiting for a slot is safe only with nothing in flight: the slots this
         # batch holds are given back by the loop that calls this.
-        while pending and self._payload_gate.acquire(
-            blocking=not futures, abort_signal=abort_signal
-        ):
+        while pending:
+            slot = self._payload_gate.acquire(
+                blocking=not futures, abort_signal=abort_signal
+            )
+            if slot is None:
+                break
             index, item = pending.popleft()
             try:
-                future = self._submit(item)
+                future = self._submit(item, slot)
             except BrokenProcessPool:
-                self._payload_gate.release()
-                # The pool cannot be restarted, so the rest of the batch is
-                # lost too and building its payloads would run nothing.
+                self._payload_gate.release(slot)
+                # A pool broken by anything other than an abort is not
+                # replaced, so the rest of the batch is lost too and building
+                # its payloads would run nothing.
                 unsent = [index, *(other for other, _ in pending)]
                 pending.clear()
                 return unsent
             except BaseException:
-                self._payload_gate.release()
+                self._payload_gate.release(slot)
                 raise
-            futures[future] = index
+            futures[future] = (index, slot)
             future.add_done_callback(done.put)
         return []
 
-    def _submit(self, item: WorkItem) -> Future[tuple[bool, bytes]]:
+    def _submit(self, item: WorkItem, slot: _Slot) -> _Result:
         # The payload is built here rather than in a worker, so that `ropt`'s
         # own serialization is used and a failure to build it is raised in the
         # caller instead of surfacing as an opaque pool failure.
@@ -197,7 +310,11 @@ class ProcessExecutor(ExecutorBase):
             )
             raise ExecutionError(msg) from exc
         try:
-            return self._pool.submit(_run_payload, payload)
+            with self._state:
+                workers = self._live_workers()
+                return workers.track(
+                    workers.pool.submit(_run_payload, payload, slot.index)
+                )
         except BrokenProcessPool:
             # Caught ahead of RuntimeError, which it subclasses, so that a dead
             # pool is not mistaken for interpreter shutdown below.
@@ -213,7 +330,7 @@ def _store_unsent(unsent: list[int], store: Callable[[int, Any], None]) -> None:
         store(index, ExecutorFailure(_POOL_GONE))
 
 
-def _item_result(future: Future[tuple[bool, bytes]]) -> Any:  # ruff: ignore[any-type]
+def _item_result(future: _Result) -> Any:  # ruff: ignore[any-type]
     try:
         ok, blob = future.result()
     except BrokenProcessPool:
@@ -225,11 +342,13 @@ def _item_result(future: Future[tuple[bool, bytes]]) -> Any:  # ruff: ignore[any
     return value
 
 
-def _terminate_workers(executor: ProcessPoolExecutor) -> None:
-    terminate_workers = getattr(executor, "terminate_workers", None)
-    if terminate_workers is not None:
+def _stop_workers(executor: ProcessPoolExecutor, *, kill: bool) -> None:
+    stop_workers = getattr(
+        executor, "kill_workers" if kill else "terminate_workers", None
+    )
+    if stop_workers is not None:
         # Python 3.14 and later. This shuts the pool down as part of its job.
-        terminate_workers()
+        stop_workers()
         return
 
     # The same algorithm by hand. The lock is taken for one thing only: reading
@@ -248,15 +367,54 @@ def _terminate_workers(executor: ProcessPoolExecutor) -> None:
     # needs the internal "force shutting down" flag that only 3.14 and later
     # have, so the alternative would be a wait, which is what this removes.
     for process in processes:
-        try:
-            if not process.is_alive():
-                continue
-            process.terminate()
-        except (ValueError, ProcessLookupError):
-            continue
+        with contextlib.suppress(ValueError, ProcessLookupError):
+            if process.is_alive():
+                stop = process.kill if kill else process.terminate
+                stop()
 
 
-def _run_payload(payload: bytes) -> tuple[bool, bytes]:
+class _WorkerFlags:
+    # Set in each worker process by `_init_worker`.
+    flags: _Flags | None = None
+
+
+def _init_worker(flags: _Flags, grace: float) -> None:
+    # Ctrl-C is the main process's to handle: a worker that raised it would
+    # report the interrupt as the result of whatever it was running.
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    _WorkerFlags.flags = flags
+    _grace.GRACE_PERIOD = grace
+
+
+def _watch_flag(
+    flags: _Flags, index: int, abort_signal: AbortSignal, finished: threading.Event
+) -> None:
+    while not finished.wait(_FLAG_INTERVAL):
+        code = flags[index]
+        if code:
+            abort_signal.abort(ExitCode(code))
+            return
+
+
+def _run_payload(payload: bytes, index: int) -> tuple[bool, bytes]:
+    flags = _WorkerFlags.flags
+    if flags is None:
+        return _run_unpacked(payload)
+    if flags[index]:
+        return True, dumps(WorkNotRun(_NOT_RUN))
+    abort_signal = AbortSignal()
+    finished = threading.Event()
+    threading.Thread(
+        target=_watch_flag, args=(flags, index, abort_signal, finished), daemon=True
+    ).start()
+    try:
+        with abort_signal.as_parent():
+            return _run_unpacked(payload)
+    finally:
+        finished.set()
+
+
+def _run_unpacked(payload: bytes) -> tuple[bool, bytes]:
     try:
         function, args, kwargs = loads(payload)
     except Exception as exc:  # ruff: ignore[blind-except]
@@ -278,35 +436,82 @@ def _dummy() -> None:
     pass
 
 
+class _Workers:
+    # One set of worker processes, and the items submitted to it that have not
+    # finished. The condition is the one lock a done callback takes here.
+
+    def __init__(self, pool: ProcessPoolExecutor) -> None:
+        self.pool = pool
+        self._changed = threading.Condition()
+        self._running: set[_Result] = set()
+
+    def track(self, future: _Result) -> _Result:
+        with self._changed:
+            self._running.add(future)
+        future.add_done_callback(self._finished)
+        return future
+
+    def busy(self) -> bool:
+        with self._changed:
+            return bool(self._running)
+
+    def wait_idle(self, deadline: float) -> bool:
+        return _wait_for(self._changed, lambda: not self._running, deadline)
+
+    def _finished(self, future: _Result) -> None:
+        with self._changed:
+            self._running.discard(future)
+            self._changed.notify_all()
+
+
+@dataclass(eq=False)
+class _Slot:
+    # Identifies one use of a slot, so that a late abort of an item that has
+    # finished does not reach the item that reused its slot.
+    index: int
+
+
 class _PayloadGate:
     # The slots are shared by every concurrent caller of one executor, so a
     # caller with nothing in flight waits here for work that is not its own. A
     # semaphore has no way back out of that wait, hence the condition.
 
-    def __init__(self, slots: int) -> None:
+    def __init__(self, flags: _Flags, slots: int) -> None:
         self._condition = threading.Condition()
-        self._free = slots
+        self._flags = flags
+        self._free = list(range(slots))
+        self._owners: list[_Slot | None] = [None] * slots
 
     def acquire(
         self, *, blocking: bool, abort_signal: AbortSignal | None = None
-    ) -> bool:
+    ) -> _Slot | None:
         with self._condition:
             while True:
                 # Tested before the slot, so a waiter woken by a freed slot
                 # rather than by the abort does not take it.
                 if abort_signal is not None and abort_signal.aborting:
-                    return False
-                if self._free > 0:
-                    self._free -= 1
-                    return True
+                    return None
+                if self._free:
+                    slot = _Slot(self._free.pop())
+                    self._owners[slot.index] = slot
+                    self._flags[slot.index] = 0
+                    return slot
                 if not blocking:
-                    return False
+                    return None
                 self._condition.wait()
 
-    def release(self) -> None:
+    def release(self, slot: _Slot) -> None:
         with self._condition:
-            self._free += 1
+            if self._owners[slot.index] is not slot:
+                return
+            self._owners[slot.index] = None
+            self._free.append(slot.index)
             self._condition.notify()
+
+    def abort(self, slot: _Slot, abort_signal: AbortSignal) -> None:
+        with self._condition:
+            if self._owners[slot.index] is slot:
+                self._flags[slot.index] = int(abort_signal.exit_code)
 
     def wake(self) -> None:
         with self._condition:

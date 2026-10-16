@@ -112,9 +112,10 @@ class Session:
     def __exit__(self, *_exc: object) -> None:
         """Close the session, aborting its tasks and releasing every pool.
 
-        Work still running on its threads is waited for, five seconds at most
-        in total, which gives the programs it started with
-        [`run_program`][ropt.run_program] the time to end.
+        Work still running is waited for, five seconds at most in total, which
+        gives the programs it started with [`run_program`][ropt.run_program]
+        the time to end. Worker processes still busy after that are killed;
+        threads are no longer waited for.
         """
         # Closing and taking the snapshot are one step: a task that registers
         # between them would be neither refused as late nor reached by the
@@ -155,8 +156,11 @@ class Session:
     def _abort_all(self, exit_code: ExitCode) -> None:
         with self._lock:
             signals = list(self._signals)
+            pools = list(self._pools or ())
         for signal in signals:
             signal.abort(exit_code)
+        for pool in pools:
+            pool._retire()  # ruff: ignore[private-member-access]
 
     def _register(self, signal: AbortSignal) -> None:
         with self._lock:
@@ -385,10 +389,11 @@ class Session:
         The evaluation function must be picklable. See
         [Running Optimizations](../running/running.md) for a walkthrough.
 
-        Releasing the pool terminates its worker processes and nothing else. A
-        program an evaluation started itself keeps running, without an error
-        being raised; use [`local_pool`][ropt.Session.local_pool] where
-        an evaluation launches external programs.
+        An abort reaches an evaluation that is still running, as it does on a
+        thread pool: [`aborting`][ropt.aborting] turns `True`, and a program
+        started with [`run_program`][ropt.run_program] is terminated. Workers
+        still busy five seconds after an abort, or after the session closes,
+        are killed, and the pool starts new ones for the work that follows.
 
         Args:
             workers:             The number of worker processes.
