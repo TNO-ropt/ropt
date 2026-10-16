@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pytest
 
 from ropt.components.event_handlers import DataFrameHandler
+from ropt.components.event_handlers._text_table import format_text_table
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
@@ -557,3 +559,83 @@ def test_table_handler_fills_a_column_from_a_nested_scaled_field(
     assert np.isclose(df["Obj,0"][0], 2.0)
     assert np.isclose(df["Scaled,0"][0], 1.0)
     assert np.isclose(df["Total"][0], 1.0)
+
+
+def _objectives_handler(engine: DataFrameEngine) -> DataFrameHandler:
+    handler = DataFrameHandler(engine=engine)
+    handler.add_table(
+        "objectives",
+        "functions",
+        {"batch_id": "Batch", "evaluations.objectives": "Objective"},
+    )
+    handler.handle_event(_make_event_two_realizations(1))
+    return handler
+
+
+def test_write_tables_text_puts_labels_on_a_second_header_line(
+    engine: DataFrameEngine, tmp_path: Path
+) -> None:
+    _objectives_handler(engine).write_tables(tmp_path / "out")
+    lines = (tmp_path / "out" / "objectives.txt").read_text().splitlines()
+    assert lines == [
+        "Batch  Objective",
+        "               0",
+        "-----  ---------",
+        "    1          1",
+        "    1          2",
+    ]
+
+
+def test_write_tables_csv_writes_flat_column_names(
+    engine: DataFrameEngine, tmp_path: Path
+) -> None:
+    _objectives_handler(engine).write_tables(tmp_path, format="csv")
+    lines = (tmp_path / "objectives.csv").read_text().splitlines()
+    assert lines == ['Batch,"Objective,0"', "1,1.0", "1,2.0"]
+
+
+def test_text_table_aligns_numbers_on_the_decimal_point() -> None:
+    text = format_text_table(
+        [["x"], ["name"]], [[1.5, 10.25, 3.0, None], ["a", "bb", None, "c"]]
+    )
+    assert text.splitlines() == [
+        "    x  name",
+        "-----  ----",
+        " 1.5   a",
+        "10.25  bb",
+        " 3",
+        "       c",
+    ]
+
+
+def test_write_tables_text_rounds_to_significant_digits(
+    engine: DataFrameEngine, tmp_path: Path
+) -> None:
+    handler = DataFrameHandler(engine=engine)
+    handler.add_table("t", "functions", {"target_objective": "Obj"})
+    handler.handle_event(_make_event(1, objective=1.23456789))
+    handler.write_tables(tmp_path, digits=3)
+    assert (tmp_path / "t.txt").read_text().splitlines()[-1] == "1.23"
+
+
+def test_write_tables_rejects_fewer_than_one_digit(
+    engine: DataFrameEngine, tmp_path: Path
+) -> None:
+    with pytest.raises(ValueError, match="digits"):
+        _objectives_handler(engine).write_tables(tmp_path, digits=0)
+
+
+def test_write_tables_without_directory_raises(engine: DataFrameEngine) -> None:
+    with pytest.raises(ValueError, match="output_dir"):
+        _objectives_handler(engine).write_tables(None, format="csv")
+
+
+def test_write_tables_as_callback_writes_to_output_dir(
+    engine: DataFrameEngine, tmp_path: Path
+) -> None:
+    handler = DataFrameHandler(engine=engine)
+    handler.add_table("t", "functions", {"target_objective": "Obj"})
+    handler.set_callback(partial(handler.write_tables, format="csv"))
+    handler.handle_event(_make_event(1, output_dir=tmp_path))
+    handler.handle_event(_make_event(2, objective=3.0, output_dir=tmp_path))
+    assert (tmp_path / "t.csv").read_text().splitlines() == ["Obj", "1.0", "3.0"]

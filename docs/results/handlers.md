@@ -195,8 +195,8 @@ tables = DataFrameHandler(engine="pandas")
 The tables carry the same columns under the same titles. As explained in
 [Exporting to polars](results.md#exporting-to-polars), polars
 has no index, so the key columns (`batch_id`, `realization`, and the other axis
-names) appear as ordinary leading columns rather than in the index; with pandas
-they form the index instead. Both engines align fields of differing
+names) appear as ordinary leading columns. The handler gives pandas tables the
+same shape: the key columns are ordinary columns, not the index. Both engines align fields of differing
 granularity, broadcasting a per-batch field across the per-realization rows.
 
 Convenience methods:
@@ -210,27 +210,23 @@ Convenience methods:
   where `output_dir` is the optimization's configured
   [`output_dir`](../optimizer_setup/configuration_sections.md#optimizer) (`None` if it is
   not set).
+- `write_tables(directory, format="text", digits=6)` writes each table to
+  `<name>.txt` in `directory`, as a fixed-width table with the labels of each
+  column on a second header line and numbers aligned on the decimal point.
+  Floating point numbers are rounded to `digits` significant digits.
+  `format="csv"` writes `<name>.csv` instead, at full precision.
 
-!!! tip "Write the tables to a file as they update"
-    `set_callback` fires on every update, so it is a convenient hook for saving
-    the tables — to watch progress live or to write a final report. Pandas'
-    `to_string()` gives aligned, human-readable columns with no extra
-    dependencies; use `to_csv()` for machine-readable data, or `to_markdown()`
-    if you have `tabulate` installed:
+`write_tables` takes the same argument as a callback, so the handler can write
+its tables to the optimization's `output_dir` on every update:
 
-    ```python
-    def dump(output_dir):
-        path = Path("progress.txt") if output_dir is None else output_dir / "progress.txt"
-        with path.open("w") as fh:
-            for name, df in tables.get_tables().items():
-                fh.write(f"# {name}\n{df.to_string()}\n\n")
+```python
+tables.set_callback(tables.write_tables)
+optimize(config, x0, objective, handlers=[tables])
+```
 
-    tables.set_callback(dump)
-    optimize(config, x0, objective, handlers=[tables])
-    ```
-
-    Because this writes to disk on every update, the optimization that emitted
-    the result waits for the write to finish.
+Every update rewrites all the files, and the optimization waits until the
+writing is done. [Writing Tables to Disk](tables.md) walks through a complete
+example that writes the default tables.
 
 ## Writing your own handler
 

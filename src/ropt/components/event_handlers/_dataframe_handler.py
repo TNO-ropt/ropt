@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import threading
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Literal, cast, override
 
 from ropt.enums import EnOptEventType
@@ -18,11 +19,12 @@ from ropt.results._frame_support import (
     missing_engine_message,
 )
 
+from ._text_table import format_text_table
 from .base import EventHandler
 
 if TYPE_CHECKING:
+    import os
     from collections.abc import Callable, Sequence
-    from pathlib import Path
 
     from ropt.events import EnOptEvent
 
@@ -44,22 +46,21 @@ _FUNCTION_TABLES: Final[dict[str, dict[str, str]]] = {
     "evaluations": {
         "batch_id": "Batch",
         "realization": "Realization",
-        "variable": "Variable-name",
         "variables": "Variable",
         "evaluations.objectives": "Objective",
         "evaluations.constraints": "Constraint",
     },
     "constraints": {
         "batch_id": "Batch",
-        "constraint_info.bound_lower": "BCD-lower",
-        "constraint_info.bound_upper": "BCD-upper",
-        "constraint_info.linear_lower": "ICD-lower",
-        "constraint_info.linear_upper": "ICD-upper",
-        "constraint_info.nonlinear_lower": "OCD-lower",
-        "constraint_info.nonlinear_upper": "OCD-upper",
-        "constraint_info.bound_violation": "BCD-violation",
-        "constraint_info.linear_violation": "ICD-violation",
-        "constraint_info.nonlinear_violation": "OCD-violation",
+        "constraint_info.bound_lower": "Bound-lower",
+        "constraint_info.bound_upper": "Bound-upper",
+        "constraint_info.linear_lower": "Linear-lower",
+        "constraint_info.linear_upper": "Linear-upper",
+        "constraint_info.nonlinear_lower": "Nonlinear-lower",
+        "constraint_info.nonlinear_upper": "Nonlinear-upper",
+        "constraint_info.bound_violation": "Bound-violation",
+        "constraint_info.linear_violation": "Linear-violation",
+        "constraint_info.nonlinear_violation": "Nonlinear-violation",
     },
 }
 _GRADIENT_TABLES: Final[dict[str, dict[str, str]]] = {
@@ -206,6 +207,58 @@ class DataFrameHandler(EventHandler):
             variable.
         """
         return {key: table.get_table() for key, table in self._tables.items()}
+
+    def write_tables(
+        self,
+        directory: str | os.PathLike[str] | None,
+        *,
+        format: Literal["text", "csv"] = "text",  # ruff: ignore[builtin-argument-shadowing]
+        digits: int = 6,
+    ) -> None:
+        """Write each table to a file named after it in a directory.
+
+        The `"text"` format writes a fixed-width table to `<name>.txt`, with
+        the column labels on separate header lines and numbers aligned on the
+        decimal point. Floating point numbers are rounded to `digits`
+        significant digits. The `"csv"` format writes `<name>.csv`, at full
+        precision. Existing files are overwritten, and the directory is created
+        if it does not exist. Pass
+        this method to [`set_callback`][ropt.DataFrameHandler.set_callback] to
+        write the tables to the configured output directory on every update.
+
+        Args:
+            directory: The directory to write to.
+            format:    `"text"` (default) or `"csv"`.
+            digits:    The number of significant digits of floating point
+                       numbers in text files.
+
+        Raises:
+            ValueError: If `directory` is `None`, the format is invalid, or
+                        `digits` is less than 1.
+        """
+        if directory is None:
+            msg = "No directory to write the tables to; set optimizer.output_dir"
+            raise ValueError(msg)
+        if format not in {"text", "csv"}:
+            msg = f"Invalid table file format: {format}"
+            raise ValueError(msg)
+        if digits < 1:
+            msg = f"digits must be at least 1, got {digits}"
+            raise ValueError(msg)
+        path = Path(directory)
+        path.mkdir(parents=True, exist_ok=True)
+        for name, table in self.get_tables().items():
+            if format == "text":
+                text = format_text_table(
+                    [column.split(self._sep) for column in table.columns],
+                    [table[column].to_list() for column in table.columns],
+                    digits=digits,
+                )
+                (path / f"{name}.txt").write_text(text, encoding="utf-8")
+            elif self._engine == "polars":
+                cast("pl.DataFrame", table).write_csv(path / f"{name}.csv")
+            else:
+                cast("pd.DataFrame", table).to_csv(path / f"{name}.csv", index=False)
 
     @override
     def _handle_event(self, event: EnOptEvent) -> None:

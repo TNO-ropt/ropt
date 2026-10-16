@@ -138,3 +138,16 @@ def test_example_hpc_on_the_local_queue(tmp_path: Path, monkeypatch: Any) -> Non
 def test_example_programs(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     _load_from_file("programs").main()
+
+
+def test_example_tables(tmp_path: Path, monkeypatch: Any) -> None:
+    pytest.importorskip("polars")
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("tables").main()
+    assert sorted(path.name for path in (tmp_path / "tables").iterdir()) == [
+        "constraints.txt",
+        "evaluations.txt",
+        "functions.txt",
+        "gradients.txt",
+        "perturbations.txt",
+    ]

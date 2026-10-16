@@ -127,6 +127,7 @@ nav:
   - "Results":
       - "Working with Results": results/results.md
       - "Result Handlers": results/handlers.md
+      - "Writing Tables to Disk": results/tables.md
       - "Exit Codes": results/exit_codes.md
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
