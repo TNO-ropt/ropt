@@ -5,9 +5,9 @@ own tasks in parallel using an evaluation **pool**.
 
 ## Running in parallel
 
-By default [`optimize`][ropt.optimize] runs on the calling thread, one
-evaluation at a time. To run the evaluations in parallel, open a
-[`session`][ropt.session], build a **pool** on it and start the optimization
+By default [`optimize`][ropt.optimize] calls the evaluation function itself,
+one evaluation at a time. To run the evaluations in parallel, open a
+[`session`](sessions.md), build a **pool** on it and start the optimization
 using the `optimize` method of that pool:
 
 ```python
@@ -31,8 +31,7 @@ The available pools are:
 - [`thread_pool`](#thread-pool): runs evaluations on threads in your process.
 - [`process_pool`](#process-pool): runs evaluations in reused worker processes.
 - [`hpc_pool`](#running-on-an-hpc-cluster): submits each evaluation as a job to
-  an HPC cluster, or, with the queue `"local"`, runs it as a
-  [local job](#local-jobs) on this machine.
+  an HPC cluster.
 
 Where an evaluation runs depends on the type of pool used:
 
@@ -44,17 +43,15 @@ flowchart TB
         th["thread_pool —<br/>worker threads<br/>(share memory)"]
     end
     wp["process_pool —<br/>a few reused processes<br/>(data copied)"]
-    loc["hpc_pool, local queue —<br/>one process per eval<br/>(data copied)"]
     clu["hpc_pool —<br/>cluster jobs<br/>(data copied)"]
     main --> seq
     main --> th
     main --> wp
-    main --> loc
     main --> clu
 ```
 
 Threads stay **inside** your program and share its memory, so any Python
-function works and nothing is copied. The other three run the work **outside**
+function works and nothing is copied. The other two run the work **outside**
 it, so the objective and its data are copied there.
 
 Only the evaluations ever leave. The optimizer itself, the pool object and your
@@ -102,7 +99,8 @@ of `run` (or the number of optimizations, if you set no limit).
 
 Each evaluation in a batch is sent to a worker as a separate task. Up to
 `workers` tasks can run at once on a pool; the rest wait until a worker is
-available. An optimization started without a pool evaluates inline.
+available. An optimization started without a pool calls the evaluation
+function itself, one evaluation at a time.
 
 You can keep several pools open at once and choose per optimization:
 
@@ -191,67 +189,6 @@ workers for the work that follows. A program started in another way, for
 example with `subprocess.run`, keeps running after its worker is killed; see
 [Running External Programs](programs.md).
 
-### Running each evaluation as a local job { #local-jobs }
-
-An [`hpc_pool`][ropt.Session.hpc_pool] given the queue `"local"` runs each
-evaluation as a separate process on this machine instead of submitting it to a
-cluster. It needs neither the `ropt[hpc]` extra nor a cluster configuration.
-Otherwise it is an HPC pool: each evaluation is a job, with the same files and
-its output captured to a file, so an objective that works on the local queue
-works on a cluster:
-
-```python
-with session() as s:
-    pool = s.hpc_pool(workers=4, queue="local", workdir="/scratch/my-run")
-    result = pool.optimize(config, x0, objective)
-```
-
-As on a cluster, `workdir` is required and must be an existing absolute
-directory, and a job is a fresh command, so the evaluation function must live
-in a module the job can import, or the `ropt[cloudpickle]` extra must be
-installed. Give each pool that runs at the same time a directory of its own:
-files are named after the evaluations, and the pool refuses to overwrite one
-that already exists.
-
-The cluster settings `cores`, `memory_max`, `run_time_max`, `submit_options`
-and `query_retries` are ignored, and a `template` or a `scheduler` raises a
-`ValueError`. `interval` defaults to 0.1 seconds instead of 1, and
-`extra_polls` to 0 instead of 30, because a local job writes its result before
-it exits.
-
-!!! warning "A cluster queue named `local`"
-    If a cluster in the `pysqa` configuration defines a queue named `local`,
-    `queue="local"` without a `cluster` is ambiguous and raises an
-    [`ExecutionError`][ropt.exceptions.ExecutionError]. Pass `cluster` to
-    submit to that queue. Local jobs need a configuration without such a
-    queue.
-
-#### Process pool or local jobs? { #process-or-local }
-
-Both run your objective in a separate process. They differ in whether a process
-is a *worker* that runs many evaluations, or a *job* that runs one:
-
-|  | `process_pool` | `hpc_pool`, local queue |
-| --- | --- | --- |
-| Processes | a few, **reused** for many evaluations | one **fresh** process per evaluation |
-| Start-up cost | paid once, when the pool is built | paid again on every evaluation |
-| When aborted | [`aborting`][ropt.aborting] turns `True`, programs started with [`run_program`][ropt.run_program] are terminated, and workers still busy five seconds later are killed | each job **and every program it started** is terminated, and killed five seconds later if still running |
-| Output of an evaluation | goes to your program's output | captured to a file, and the last lines of a failed evaluation are attached to the error |
-| Sending the objective | your script is re-imported, so a function defined in it can be found by name | a fresh command; needs an importable module or `ropt[cloudpickle]` |
-| Working directory | none | required |
-
-For work on this machine, use a process pool. Use the local queue to develop and
-test an objective that is meant to run on a cluster: it runs each evaluation as
-the same job a cluster would run, without a queue, the `ropt[hpc]` extra, or a
-cluster configuration. When it works, drop the queue, or name a cluster queue:
-
-```python
-# Develop and test here:
-pool = s.hpc_pool(workers=4, queue="local", workdir="/scratch/my-run")
-# Then run here:
-pool = s.hpc_pool(workers=100, workdir="/scratch/my-run")
-```
-
 ### Running on an HPC cluster
 
 An [`hpc_pool`][ropt.Session.hpc_pool] submits each evaluation as a job to
@@ -271,14 +208,32 @@ with session() as s:
 
 The runnable script is
 [examples/hpc.py](https://github.com/TNO-ropt/ropt/blob/main/examples/hpc.py).
-Pass it `--queue local` and it runs the identical optimization as
-[local jobs](#local-jobs), so the example works with or without a cluster.
+Pass it `--queue local` and it runs the identical optimization on
+[the local queue](#local-jobs), so the example works with or without a cluster.
 
 A job is nothing more than a submission script with your evaluation command in
 it, and there are **two mutually exclusive ways** to say what that script should
 be: a `pysqa` configuration, or a `template` you write yourself. Both of those,
 and the resources a job asks for, are set out in
 [Configuring an HPC pool](#configuring-an-hpc-pool) at the end of this page.
+
+#### The local queue { #local-jobs }
+
+The queue `"local"` runs each job as a process on this machine instead of on
+another node. It needs neither the `ropt[hpc]` extra nor a cluster
+configuration, so an objective can be tested on it before it is run on a
+cluster:
+
+```python
+pool = s.hpc_pool(workers=4, queue="local", workdir="/scratch/my-run")
+```
+
+The cluster settings `cores`, `memory_max`, `run_time_max`, `submit_options`
+and `query_retries` are ignored, and a `template` or a `scheduler` raises a
+`ValueError`. If a cluster in the `pysqa` configuration defines a queue named
+`local`, `queue="local"` without a `cluster` raises an
+[`ExecutionError`][ropt.exceptions.ExecutionError]; pass `cluster` to submit to
+that queue.
 
 ### Which pool should I use? { #which-pool }
 
@@ -305,10 +260,9 @@ Once that is settled, the choice is about speed, and about what
 
 | Pool | Where evaluations run | Data | Speeds up heavy Python? | Use when |
 | --- | --- | --- | --- | --- |
-| none | the calling thread, one at a time | shared | no | evaluations are fast |
+| none | your program, one at a time | shared | no | evaluations are fast |
 | `thread_pool` | background threads, one process | shared | no — one interpreter | each evaluation mostly **waits** (external tool, I/O), or spends its time in `numpy` |
 | `process_pool` | a few reused processes | copied | yes | each evaluation runs heavy **Python code**, or needs a process of its own |
-| `hpc_pool`, local queue | one process per evaluation | copied | yes | you are preparing an objective for a cluster |
 | `hpc_pool` | jobs on a cluster | copied | yes | each evaluation is a big **cluster job** |
 
 ??? tip "How to decide, without guessing"
@@ -373,7 +327,7 @@ The same holds for work submitted from a thread that the evaluation starts with
 [`Session.run`][ropt.Session.run]. A thread started in any other way is not
 recognized as a worker, so work submitted from it is not refused and can still
 deadlock on the pool. Give the inner optimization its own pool, or none at all,
-which evaluates inline.
+so that it calls the evaluation function itself.
 
 The evaluation must stay **in your process**, so on a thread pool or with no
 pool. On a process or HPC pool the evaluation function is copied
@@ -393,8 +347,7 @@ to them differs:
 | none | the current one finishes |
 | `thread_pool` | [`aborting`][ropt.aborting] turns `True` and programs started with [`run_program`][ropt.run_program] are terminated; otherwise they **run to completion** |
 | `process_pool` | as on a thread pool, and workers still busy five seconds later are **killed** |
-| `hpc_pool`, local queue | each job **and every program it started** is terminated, and killed five seconds later if still running |
-| `hpc_pool` | the jobs are **deleted from the queue** |
+| `hpc_pool` | the jobs are **deleted from the queue**; on the local queue, each job **and every program it started** is terminated, and killed five seconds later if still running |
 
 The optimization raises at once and does not wait for them. When the session
 closes, it waits up to five seconds for its pools to become idle.
@@ -410,8 +363,9 @@ A program the evaluation started with `run_program` is terminated with it; a
 program started in another way keeps running.
 
 **A terminated program gets five seconds to exit.** A program started with
-`run_program`, and a local job, are first asked to exit, together with every
-program they started. Whatever is still running five seconds later is killed.
+`run_program`, and a job on the local queue, are first asked to exit, together
+with every program they started. Whatever is still running five seconds later is
+killed.
 
 !!! warning "Call `restore_keyboard_interrupt` in scripts that use a pool"
     Importing `ropt` changes a process-wide setting that stops Ctrl-C from
@@ -423,7 +377,7 @@ program they started. Whatever is still running five seconds later is killed.
     [Keyboard Interrupts](../troubleshooting/keyboard_interrupt.md).
 
 !!! note "Platforms"
-    Outside POSIX, terminating a local job or a program started with
+    Outside POSIX, terminating a job on the local queue or a program started with
     `run_program` reaches only that process, and programs it started may keep
     running. `ropt` is not tested on Windows. Free-threaded (no-GIL) builds of
     Python are untested and unsupported.
@@ -442,7 +396,7 @@ it would continue the optimization on whichever workers happened to survive and
 produce a result indistinguishable from one computed over the whole ensemble.
 
 Whether the pool can run further work afterwards depends on which pool it is. An
-HPC pool, local queue included, starts fresh jobs for the next batch. A process
+HPC pool starts fresh jobs for the next batch. A process
 pool that killed its own workers after an abort starts new workers for the work
 that follows. A process pool that lost a worker in any other way, for example
 to the out-of-memory killer, cannot be restarted: every later batch fails the
@@ -463,7 +417,7 @@ to the exception as a note, so it travels with it. An exception that cannot be
 serialized at all arrives as a `RuntimeError` carrying its `repr` and notes.
 
 A job that died before writing a result leaves its only trace in the file
-holding its captured output. On an HPC pool, local queue included, that file is kept
+holding its captured output. On an HPC pool that file is kept
 when an evaluation fails, even when the pool removes the rest, and its last
 lines are added to the error message. The message names the file whether or not
 it could be read: a shared filesystem need not show its contents yet, and a
@@ -477,7 +431,7 @@ You can hand **your own** functions to a pool with
 own with [`Session.run`][ropt.Session.run]. It is useful when code
 you control — a custom handler, a custom component, or a helper you call between
 optimizations — has an expensive, self-contained piece of work you want to run
-on a pool instead of inline.
+on a pool instead of in your own code.
 
 Pass a single callable to run it once and get its result back:
 

@@ -86,26 +86,39 @@ a string cannot be split into arguments.
 `subprocess.PIPE` raises a `ValueError`: to process the output, write it to a
 file and read the file. Standard input is empty.
 
-## When the optimization is aborted
+## When the program is stopped
 
-When the task that runs the evaluation is aborted, for example by Ctrl-C or by
-[`Session.abort`][ropt.Session.abort], the program and every program it
-started receive `SIGTERM`. Those still running five seconds later receive
-`SIGKILL`. `run_program` then raises
-[`AbortedError`][ropt.exceptions.AbortedError]; see
-[Failures and Aborts](failures.md) for how that reaches the caller. Called when
-the task is already being aborted, `run_program` raises at once and does not
-start the program.
+`run_program` never stops the program on its own account. It stops the program
+only when its caller is stopped, in one of three ways:
 
-The same happens when the process that called `run_program` ends while the
-program is running, for example when a process pool kills a worker that is
-still busy five seconds after an abort.
+- **The task that runs the caller is aborted**, for example by Ctrl-C, by
+  [`Session.abort`][ropt.Session.abort], or by a failure elsewhere in the
+  session. `run_program` then raises
+  [`AbortedError`][ropt.exceptions.AbortedError]; see
+  [Failures and Aborts](failures.md) for how that reaches the caller. Called
+  when the task is already being aborted, `run_program` raises at once and does
+  not start the program.
+- **An exception interrupts the call**, for example `KeyboardInterrupt` in the
+  main thread. The exception is re-raised.
+- **The process that called `run_program` ends**, for example when a process
+  pool kills a worker that is still busy five seconds after an abort, or when an
+  HPC job is cancelled.
 
-`run_program` works in any code that a task runs: an evaluation function, an
-event handler, a report callback, or a function given to
-[`run`][ropt.Session.run], on every pool. In an HPC job no abort reaches the
-program, but cancelling the job ends the process that called `run_program`,
-which ends the program as described above.
+In each case the program and every program it started receive `SIGTERM`, and
+those still running five seconds later receive `SIGKILL`.
+
+`run_program` behaves the same wherever it is called: in an evaluation function,
+an event handler, a report callback, a function given to
+[`run`][ropt.Session.run], on every pool, or in your own code outside any
+optimization. Only the ways in which the caller can be stopped differ.
+[`Session.abort`][ropt.Session.abort] reaches only the tasks of its session.
+It does not reach code that no task runs, such as the main thread of your
+script inside a `with session()` block or an evaluation function that you call
+directly. Nor does it reach an optimization started with the module-level
+[`optimize`][ropt.optimize], which is not part of the session. In the main
+thread these calls still end on Ctrl-C, through the `KeyboardInterrupt`. In an
+HPC job no abort reaches the program, but cancelling the job ends the process
+that called `run_program`.
 
 !!! note "Programs that leave the process group"
     On POSIX the program runs in a process group of its own, and an abort

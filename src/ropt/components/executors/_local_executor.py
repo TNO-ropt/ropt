@@ -63,7 +63,7 @@ class LocalJobExecutor(JobExecutorBase):
     """An executor that runs each work item as a separate local process.
 
     Needs no extras and no configuration. See
-    [Running each evaluation as a local job](../running/parallel.md#local-jobs)
+    [The local queue](../running/parallel.md#local-jobs)
     for details.
 
     Cancelling a job terminates it and whatever it started, and kills them if

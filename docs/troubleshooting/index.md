@@ -74,8 +74,7 @@ from one computed over the whole ensemble.
 ## Your evaluation function
 
 **Outside your process, your objective works on a copy.** On a
-[process pool](../running/parallel.md#process-pool) or an HPC pool, including
-[local jobs](../running/parallel.md#local-jobs),
+[process pool](../running/parallel.md#process-pool) or an HPC pool,
 your evaluation function is sent to a worker together with the data it uses. Anything
 it writes there — a global, a cache, a list it appends to — is thrown away when
 the worker finishes. Return what you need instead; see

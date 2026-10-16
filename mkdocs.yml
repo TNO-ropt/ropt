@@ -115,6 +115,7 @@ nav:
       - "Examples": getting_started/examples.md
   - "Running":
       - "Running Optimizations": running/running.md
+      - "Sessions": running/sessions.md
       - "Evaluating in Parallel": running/parallel.md
       - "Several Optimizations at Once": running/many_runs.md
       - "Failures and Aborts": running/failures.md

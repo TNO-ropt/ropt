@@ -258,11 +258,14 @@ def run_program(
     stdout: ProgramOutput = None,
     stderr: ProgramOutput = None,
 ) -> int:
-    """Run an external program, and kill it when the calling task is aborted.
+    """Run an external program, and stop it when its caller is stopped.
 
-    Blocks until the program exits. Called from code that a task runs, an abort
-    of that task terminates the program and everything it started, and raises
-    [`AbortedError`][ropt.exceptions.AbortedError].
+    Blocks until the program exits. The program, and everything it started, is
+    terminated when the task that runs the caller is aborted, when an exception
+    such as `KeyboardInterrupt` interrupts the call, or when the calling process
+    ends. An abort of the task raises
+    [`AbortedError`][ropt.exceptions.AbortedError]. Code that no task runs is
+    not reached by an abort.
 
     `stdout` and `stderr` take `None` to inherit the caller's, a path to write
     to, an open file, a file descriptor, or `subprocess.DEVNULL`; `stderr` also

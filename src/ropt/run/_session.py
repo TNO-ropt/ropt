@@ -73,7 +73,7 @@ class Session:
     discovered from the surroundings.
 
     Bind the session with `as` and call its factories inside the block. See
-    [Running Optimizations](../running/running.md) for a walkthrough.
+    [Sessions](../running/sessions.md) for an overview.
 
     An optimization or evaluation started on the session itself evaluates
     in-process, on the calling thread; one started on a pool of the session
@@ -580,7 +580,7 @@ def session() -> Session:
 
     An optimization started with the module-level [`optimize`][ropt.optimize]
     evaluates in-process and needs no session. See
-    [Running Optimizations](../running/running.md) for a walkthrough.
+    [Sessions](../running/sessions.md) for an overview.
 
     A task that fails aborts the other tasks on the session, which is what makes
     a script stop at the first problem, and its exception is raised where the

@@ -1,5 +1,12 @@
 # Running Optimizations
 
+!!! note
+    This page uses the module-level functions [`optimize`][ropt.optimize] and
+    [`evaluate`][ropt.evaluate], which evaluate one point at a time and return
+    when they have finished. Parallel evaluation, several optimizations at once and
+    aborting from outside need a [session](sessions.md). Everything this page
+    explains applies there unchanged.
+
 Everything needed to run an optimization is imported from the `ropt` package
 itself:
 
@@ -86,6 +93,33 @@ succeed. How many is enough is set by
 which defaults to *all* of them — so a single `NaN` ends the optimization with
 `TOO_FEW_REALIZATIONS` unless you lower it.
 
+### Running an external program
+
+When the evaluation function runs a simulator or another external program,
+start it with [`run_program`][ropt.run_program]. It is the supported way to
+run external programs from `ropt`. It takes the program and its arguments as a
+list, like `subprocess.run`, waits for the program to exit, and returns its exit
+status:
+
+```python
+from ropt import run_program
+
+
+def objective(variables, context):
+    status = run_program(["my_simulator", "input.json"], cwd=workdir)
+    if status != 0:
+        return float("nan")
+    return read_objective(workdir)
+```
+
+Unlike `subprocess.run`, `run_program` terminates the program, together with
+every program it started, when the optimization is stopped. This matters most
+when evaluations run in parallel or several optimizations run at once: an abort
+or a failure then stops every program that is still running. A program started
+with `subprocess.run` keeps running after an abort, and on a thread pool your
+script cannot exit before it does. See
+[Running External Programs](programs.md).
+
 ## The result
 
 `optimize` returns an [`OptimizationResult`][ropt.OptimizationResult],
@@ -131,6 +165,11 @@ def report(result):
 
 optimize(config, x0, objective, report=report)
 ```
+
+To store results rather than print them, pass a **handler** with the `handlers`
+argument. [`HistoryHandler`][ropt.HistoryHandler] keeps every result, and
+[`DataFrameHandler`][ropt.DataFrameHandler] collects selected fields into
+`polars` or `pandas` tables. See [Result Handlers](../results/handlers.md).
 
 ### Reporting gradients as well
 

@@ -21,12 +21,13 @@ there is nothing to close. The runnable script is
 which evaluates one optimization on a thread pool, or on a process pool
 when it is passed `--multiprocessing`.
 
-A thread pool is one of four kinds. The others run each evaluation in a separate
-process, as a local job, or as a job on an HPC cluster.
-[Evaluating in Parallel](../running/parallel.md) covers all four: which one
+A thread pool is one of three kinds. The others run each evaluation in a separate
+process, or as a job on an HPC cluster.
+[Evaluating in Parallel](../running/parallel.md) covers all three: which one
 suits a given evaluation function, how many workers to ask for, what stopping an
 optimization does to each, and the one property of your objective that rules
 some of them out.
 
 To run several optimizations at the same time, rather than parallelizing within
-one, see [Several Optimizations at Once](../running/many_runs.md).
+one, see [Several Optimizations at Once](../running/many_runs.md). What a
+session provides besides pools is described in [Sessions](../running/sessions.md).

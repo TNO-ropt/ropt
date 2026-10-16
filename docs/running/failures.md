@@ -145,11 +145,10 @@ happens to work that is already running depends on the pool:
 | none | runs to its end, and the task ends after it |
 | `thread_pool`, or the threads of `Session.run` | runs to its end unless it [stops early](#stopping-early-when-aborted), but the task does not wait for it |
 | `process_pool` | as on a thread pool, and its worker is killed if it is still running five seconds later |
-| `hpc_pool`, local queue | is terminated, together with every program it started, and killed five seconds later if still running |
-| `hpc_pool` | its cluster job is cancelled |
+| `hpc_pool` | its cluster job is cancelled; on the local queue, the job is terminated, together with every program it started, and killed five seconds later if still running |
 
-Without a pool, the evaluation function runs in the thread that started the
-task, so the call in progress has to return first. Where the task does not wait,
+Without a pool, the task calls the evaluation function itself, so the call in
+progress has to return first. Where the task does not wait,
 an exception raised by work that is still running is logged as a warning, unless
 it is an `AbortedError`.
 

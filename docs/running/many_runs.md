@@ -175,10 +175,10 @@ aborted optimization had reached, collect its results as they arrive, with a
 `report` callback or a [handler](../results/handlers.md).
 
 An aborted task does not wait for the evaluations that are running. With no
-pool, the evaluation function runs in the calling thread, so the call in progress
+pool, the task calls the evaluation function itself, so the call in progress
 returns first. On a thread or process pool, the evaluations already running
 continue after the task has ended, and their workers are free only once they
-return. On a local or HPC pool they are cancelled.
+return. On an HPC pool they are cancelled.
 
 `abort()` reaches the tasks that are under way at the moment it is called, and
 nothing more. A task started afterwards is unaffected, so a
@@ -186,12 +186,11 @@ loop that abandons one attempt and starts another keeps working. A
 [`run`][ropt.Session.run] call counts as one task here: a callable it has
 queued behind its `limit` is not started. Leaving the session's `with` block
 aborts its tasks as well, and then releases its pools, which is what refuses a
-task started after that. Releasing a local or HPC pool cancels the jobs it still
+task started after that. Releasing an HPC pool cancels the jobs it still
 has, so none are left running when the block has ended. A task aborted that way
 raises with `ABORTED` rather than `USER_ABORT`, since it was the block ending
 rather than a request to abort.
 
 An optimization started with the module-level [`optimize`][ropt.optimize] belongs
-to no session you hold and cannot be aborted this way. It evaluates on the
-calling thread, which is the thread that would have to call `abort()`. Start it
-on a session or one of its pools to make it abortable.
+to no session you hold and cannot be aborted this way. Start it on a session
+or one of its pools to make it abortable.
