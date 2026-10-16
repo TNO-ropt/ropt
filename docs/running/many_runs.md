@@ -50,7 +50,7 @@ There are two independent levels of concurrency here:
   that each `optimize` call is made on, and the pool determines how they are
   parallelized. With `thread_pool(workers=1)` the optimizations still progress
   together, but their evaluations are executed one at a time. A larger pool —
-  `thread_pool(workers=n)`, or a process, local or HPC pool — runs several
+  `thread_pool(workers=n)`, or a process or HPC pool — runs several
   evaluations at once.
 
 One pool is one budget: `workers=10` means ten evaluations at a time across all

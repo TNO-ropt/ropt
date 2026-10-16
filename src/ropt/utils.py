@@ -55,9 +55,9 @@ def restore_keyboard_interrupt() -> None:
     into a program that is waiting. This clears the flag, and is a no-op on
     platforms that do not have one.
 
-    Entirely optional: call it at the top of a script, after the imports, only
-    if Ctrl-C stops working. See
-    [Keyboard Interrupts](../troubleshooting/keyboard_interrupt.md).
+    `ropt` imports `polars` when it is installed, which sets the flag. Call
+    this at the top of a script that uses a thread or process pool, after the
+    imports. See [Keyboard Interrupts](../troubleshooting/keyboard_interrupt.md).
     """
     if not hasattr(signal, "siginterrupt"):
         return

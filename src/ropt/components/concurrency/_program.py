@@ -267,7 +267,7 @@ def run_program(
     `stdout` and `stderr` take `None` to inherit the caller's, a path to write
     to, an open file, a file descriptor, or `subprocess.DEVNULL`; `stderr` also
     takes `subprocess.STDOUT`. A relative path is relative to `cwd`. Standard
-    input is empty.
+    input is empty. See [Running External Programs](../running/programs.md).
 
     Args:
         cmd:    The program and its arguments.

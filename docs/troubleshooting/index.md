@@ -74,8 +74,8 @@ from one computed over the whole ensemble.
 ## Your evaluation function
 
 **Outside your process, your objective works on a copy.** On a
-[process pool](../running/parallel.md#process-pool), a
-[local pool](../running/parallel.md#local-pool) or an HPC pool,
+[process pool](../running/parallel.md#process-pool) or an HPC pool, including
+[local jobs](../running/parallel.md#local-jobs),
 your evaluation function is sent to a worker together with the data it uses. Anything
 it writes there — a global, a cache, a list it appends to — is thrown away when
 the worker finishes. Return what you need instead; see
@@ -116,8 +116,10 @@ the thread that called it — even if a pool exists next to it.
 
 **Threads cannot be interrupted.** Evaluations on a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
-outside. If an evaluation may run long and has to be interruptible, put it on a
-local pool or an HPC pool; see
+outside. An evaluation that checks [`aborting`][ropt.aborting], or runs its
+external programs with [`run_program`][ropt.run_program], stops early; any other
+evaluation that may run long and has to be interruptible belongs on a process
+pool or an HPC pool; see
 [Stopping an optimization](../running/parallel.md#stopping-a-run).
 
 **A process pool re-imports your script.** Its workers are started with
@@ -132,13 +134,13 @@ the loop or function that uses it rather than around the whole program; see
 
 | What you see | Most likely cause |
 | --- | --- |
-| Ctrl-C appears to do nothing | A process-wide signal setting, changed by an imported package. Call [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt]; see [Keyboard Interrupts](keyboard_interrupt.md). |
-| The program will not exit after Ctrl-C | Evaluations on a thread pool are still running and cannot be interrupted. |
+| Ctrl-C appears to do nothing | A process-wide signal setting, changed by `polars` when `ropt` imports it. Call [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt]; see [Keyboard Interrupts](keyboard_interrupt.md). |
+| The program will not exit after Ctrl-C | Evaluations on a thread pool are still running and cannot be interrupted. Check [`aborting`][ropt.aborting] in them, or start their programs with [`run_program`][ropt.run_program]. |
 | Pages of `multiprocessing` tracebacks, ending in `ExecutionError: Could not start worker processes` | The script has no `if __name__ == "__main__":` guard, so every worker re-ran it from the top. |
 | A process pool keeps hundreds of megabytes resident | Each worker is a separate interpreter. Close the session that built the pool when the optimizations that use it are done. |
 | `WorkflowError` about a pool released when its session closed | The pool outlived its `with session()` block. Build a new one inside an open session. |
 | More workers made everything slower | `numpy` and similar libraries already use every core. Set `OMP_NUM_THREADS=1` and let the pool provide the parallelism; see [Which pool should I use?](../running/parallel.md#which-pool). |
-| Simulators keep running after the optimization stopped | A process pool kills only its own workers. Use a [local pool](../running/parallel.md#local-pool), which signals the whole process group. |
+| Simulators keep running after the optimization stopped | They were not started with [`run_program`][ropt.run_program], which terminates a program and everything it started on an abort; see [Running External Programs](../running/programs.md). |
 | A cluster directive has no effect | The submission script never mentions that variable, or the value was clamped to the queue's limit; see [Running on an HPC cluster](../running/parallel.md#running-on-an-hpc-cluster). |
 
 ## Running many at once

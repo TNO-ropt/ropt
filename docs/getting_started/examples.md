@@ -29,4 +29,6 @@ read that page with the script open beside it.
 | [`parallel.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py) | Evaluating on a thread or process pool | [Evaluating in Parallel](../running/parallel.md) |
 | [`several_optimizations.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/several_optimizations.py) | Running several optimizations concurrently | [Several Optimizations at Once](../running/many_runs.md) |
 | [`nested_optimization.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/nested_optimization.py) | An inner optimization per outer evaluation, on its own pool | [Nested Optimization](../running/nested.md) |
+| [`programs.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/programs.py) | Running a simulator from the objective, and stopping it on an abort | [Running External Programs](../running/programs.md) |
+| [`simulator.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simulator.py) | A stand-in simulator, run by `programs.py` | [Running External Programs](../running/programs.md) |
 | [`hpc.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/hpc.py) | Submitting evaluations to a cluster queue | [Evaluating in Parallel](../running/parallel.md#running-on-an-hpc-cluster) |

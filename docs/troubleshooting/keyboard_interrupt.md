@@ -1,9 +1,16 @@
 # Keyboard Interrupts
 
-**You probably do not need this page.** Ctrl-C works normally in most programs
-that use `ropt`, and nothing in `ropt` calls the function described here. It is
-an escape hatch for one specific failure that is easy to recognise and hard to
-diagnose from scratch. Read on only if it has happened to you.
+When `polars` is installed, importing `ropt` stops Ctrl-C from breaking into a
+program that is waiting. A program that uses a thread pool or a process pool
+waits for its evaluations, so there Ctrl-C can have no effect at all. Call
+[`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt] at the
+top of every script that uses a pool, after the imports:
+
+```python
+from ropt.utils import restore_keyboard_interrupt
+
+restore_keyboard_interrupt()
+```
 
 ## The symptom
 
@@ -34,19 +41,11 @@ package `ropt` imports on your behalf is enough. Importing `ropt` alone
 sets the flag (at the time of writing by way of polars, which `ropt` loads
 whenever it is installed).
 
-## The fix
+## Where to call it
 
-One line, at the top of your script, **after** the imports:
-
-```python
-from ropt.utils import restore_keyboard_interrupt
-
-restore_keyboard_interrupt()
-```
-
-After the imports because an import is what sets the flag: calling this first
-and importing afterwards leaves you exactly where you started. If you import
-lazily, inside a function, call it after that import instead.
+Call it **after** the imports, because an import is what sets the flag: calling
+this first and importing afterwards leaves you exactly where you started. If you
+import lazily, inside a function, call it after that import instead.
 
 ## Why `ropt` does not do this for you
 

@@ -63,8 +63,9 @@ methods of a session or a pool.
 An evaluation function runs in your process when its optimization or evaluation
 has no pool or a thread pool, and so does a function given to `run` on a thread
 pool or on a session.
-On a process, local or HPC pool they run in another process, and the tasks they
-start there are not nested. Neither is a task started from your script.
+On a process or HPC pool they run in another process. A task they start in the
+worker of a process pool is aborted when their own task is; a task they start in
+an HPC job is not nested. Neither is a task started from your script.
 
 !!! note "Threads that your code starts"
     A task started from a thread that your own code starts is not nested, even
@@ -135,16 +136,16 @@ parent was aborted is aborted at once.
 An aborted task raises [`AbortedError`][ropt.exceptions.AbortedError], whose
 `exit_code` is the exit code of the abort; see
 [Exit Codes](../results/exit_codes.md). It raises without waiting for the work it
-has running, and returns no result. A function given to `run` cannot be
-stopped from outside. If it has not started, it never starts, and if it is
-running, `run` does not wait for it. What happens to work that is already
-running depends on the pool:
+has running, and returns no result. A function given to `run` that has not
+started never starts, and if it is running, `run` does not wait for it. What
+happens to work that is already running depends on the pool:
 
 | Pool | Work already running when its task is aborted |
 | --- | --- |
 | none | runs to its end, and the task ends after it |
-| `thread_pool`, `process_pool`, or the threads of `Session.run` | runs to its end, but the task does not wait for it |
-| `local_pool` | is killed, together with everything it launched |
+| `thread_pool`, or the threads of `Session.run` | runs to its end unless it [stops early](#stopping-early-when-aborted), but the task does not wait for it |
+| `process_pool` | as on a thread pool, and its worker is killed if it is still running five seconds later |
+| `hpc_pool`, local queue | is terminated, together with every program it started, and killed five seconds later if still running |
 | `hpc_pool` | its cluster job is cancelled |
 
 Without a pool, the evaluation function runs in the thread that started the
@@ -160,7 +161,8 @@ that your own code raises, as the example above does.
 ## Stopping early when aborted { #stopping-early-when-aborted }
 
 Work that is left running after its task was aborted runs to its end, unless it
-stops by itself. Call [`aborting`][ropt.aborting] in long-running code — an
+stops by itself or, on a process pool, its worker is killed five seconds later.
+Call [`aborting`][ropt.aborting] in long-running code — an
 evaluation function, an event handler, a report callback, or a function given to
 `run` — to find out whether the task that runs it is being aborted:
 
@@ -176,6 +178,11 @@ def work(steps):
 
 A task nested in an aborted task is aborted as well, so code that starts an
 optimization, an evaluation or a `run` call needs no check of its own: the
-nested task raises `AbortedError` at once. `aborting` returns `False` in code
-that no task runs, which includes the worker processes of a process, local or
-HPC pool.
+nested task raises `AbortedError` at once. An external program started with
+[`run_program`][ropt.run_program] is terminated when the task is aborted, and
+`run_program` then raises `AbortedError`; see
+[Running External Programs](programs.md).
+
+`aborting` returns `False` in code that no task runs, which includes the jobs of
+an HPC pool. In the worker processes of a process pool it turns `True` within a
+fraction of a second of the abort.
