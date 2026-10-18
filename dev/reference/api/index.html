@@ -1171,34 +1171,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../results/tables/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Writing Tables to Disk
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../results/exit_codes/" class="md-nav__link">
         
   
@@ -2563,17 +2535,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.DataFrameHandler.set_default_tables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        set_default_tables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.DataFrameHandler.set_callback" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2600,17 +2561,6 @@
     <span class="md-ellipsis">
       
         get_tables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.DataFrameHandler.write_tables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        write_tables
       
     </span>
   </a>
@@ -3800,17 +3750,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.DataFrameHandler.set_default_tables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        set_default_tables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.DataFrameHandler.set_callback" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3837,17 +3776,6 @@
     <span class="md-ellipsis">
       
         get_tables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.DataFrameHandler.write_tables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        write_tables
       
     </span>
   </a>
@@ -9177,8 +9105,7 @@ details on scaling and accumulation behavior.</p>
   
       dataclass
   " href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> into named tables.
-Tables are defined via <code>add_table</code> with a column specification, or
-registered in bulk with <code>set_default_tables</code>.</p>
+Tables are defined via <code>add_table</code> with a column specification.</p>
 <p>The frame library is chosen with the <code>engine</code> argument. The <code>"polars"</code>
 engine, the default, produces long-format tables in which batch and axis
 labels are ordinary leading columns; the <code>"pandas"</code> engine produces tables
@@ -9192,7 +9119,7 @@ indexed by those instead.</p>
 in this way. When multiple accesses are needed, it is more efficient to
 first store them in a variable.</p>
 </details>        <p>See <a href="../../results/handlers/#dataframehandler">Result Handlers</a> for the column
-specification, default tables, and callback details.</p>
+specification, the available fields, and callback details.</p>
 
 
 
@@ -9361,34 +9288,6 @@ specification, default tables, and callback details.</p>
           </tr>
       </tbody>
     </table>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.DataFrameHandler.set_default_tables" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_default_tables</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_default_tables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Register a standard set of result tables.</p>
-<p>Adds the default <code>functions</code>, <code>evaluations</code>, and <code>constraints</code> tables
-for function results, and the default <code>gradients</code> and <code>perturbations</code>
-tables for gradient results.</p>
-
 
     </div>
 
@@ -9601,132 +9500,6 @@ syntax.</p>
 access is needed, it is more efficient to first store them in a
 variable.</p>
 </details>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.DataFrameHandler.write_tables" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">write_tables</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">write_tables</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="nb">format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">"csv"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"text"</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Write each table to a file named after it in a directory.</p>
-<p>The <code>"text"</code> format writes a fixed-width table to <code>&lt;name&gt;.txt</code>, with
-the column labels on separate header lines and numbers aligned on the
-decimal point. Floating point numbers are rounded to <code>digits</code>
-significant digits. The <code>"csv"</code> format writes <code>&lt;name&gt;.csv</code>, at full
-precision. Existing files are overwritten, and the directory is created
-if it does not exist. Pass
-this method to <a class="autorefs autorefs-internal" title="            set_callback" href="#ropt.DataFrameHandler.set_callback"><code>set_callback</code></a> to
-write the tables to the configured output directory on every update.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>directory</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" title="os.PathLike" href="https://docs.python.org/3/library/os.html#os.PathLike">PathLike</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The directory to write to.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>format</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;text&#39;, &#39;csv&#39;]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>"text"</code> (default) or <code>"csv"</code>.</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;text&#39;</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>digits</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The number of significant digits of floating point
-       numbers in text files.</p>
-              </div>
-            </td>
-            <td>
-                  <code>6</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>directory</code> is <code>None</code>, the format is invalid, or
-        <code>digits</code> is less than 1.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
 
     </div>
 
