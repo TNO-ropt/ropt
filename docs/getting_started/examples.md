@@ -22,6 +22,7 @@ read that page with the script open beside it.
 | [`export.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py) | Exporting results to a pandas or polars frame | [Working with Results](../results/results.md) |
 | [`scaling.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py) | Reading results in the configured and the optimizer's units | [Working with Results](../results/results.md) |
 | [`handlers.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py) | Collecting results from optimizations that overlap in time | [Result Handlers](../results/handlers.md) |
+| [`tables.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/tables.py) | Collecting results into tables of both types with `DataFrameHandler` | [Result Handlers](../results/handlers.md#example-tables-of-both-types) |
 | [`stopping.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py) | Stopping an optimization from the `report` callback | [Running Optimizations](../running/running.md) |
 | [`failures.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/failures.py) | What a failing realization does, and how to allow some | [Troubleshooting](../troubleshooting/index.md) |
 | [`restart.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/restart.py) | Restarting from the best point, collecting every result | [Restarting from the Best Point](../running/restart.md) |

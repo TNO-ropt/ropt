@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import threading
-from typing import TYPE_CHECKING, Any, Final, Literal, cast, override
+from typing import TYPE_CHECKING, Any, Literal, cast, override
 
 from ropt.enums import EnOptEventType
 from ropt.exceptions import UnsupportedError
@@ -33,60 +33,12 @@ if HAVE_POLARS:
     import polars as pl
 
 
-_FUNCTION_TABLES: Final[dict[str, dict[str, str]]] = {
-    "functions": {
-        "batch_id": "Batch",
-        "target_objective": "Target-Objective",
-        "functions.objectives": "Objective",
-        "functions.constraints": "Constraint",
-        "variables": "Variable",
-    },
-    "evaluations": {
-        "batch_id": "Batch",
-        "realization": "Realization",
-        "variable": "Variable-name",
-        "variables": "Variable",
-        "evaluations.objectives": "Objective",
-        "evaluations.constraints": "Constraint",
-    },
-    "constraints": {
-        "batch_id": "Batch",
-        "constraint_info.bound_lower": "BCD-lower",
-        "constraint_info.bound_upper": "BCD-upper",
-        "constraint_info.linear_lower": "ICD-lower",
-        "constraint_info.linear_upper": "ICD-upper",
-        "constraint_info.nonlinear_lower": "OCD-lower",
-        "constraint_info.nonlinear_upper": "OCD-upper",
-        "constraint_info.bound_violation": "BCD-violation",
-        "constraint_info.linear_violation": "ICD-violation",
-        "constraint_info.nonlinear_violation": "OCD-violation",
-    },
-}
-_GRADIENT_TABLES: Final[dict[str, dict[str, str]]] = {
-    "gradients": {
-        "batch_id": "Batch",
-        "target_gradient": "Target-Gradient",
-        "gradients.objectives": "Grad-objective",
-        "gradients.constraints": "Grad-constraint",
-    },
-    "perturbations": {
-        "batch_id": "Batch",
-        "realization": "Realization",
-        "perturbation": "Perturbation",
-        "perturbed_variables": "Variable",
-        "evaluations.perturbed_objectives": "Objective",
-        "evaluations.perturbed_constraints": "Constraint",
-    },
-}
-
-
 class DataFrameHandler(EventHandler):
     """Build pandas or polars DataFrames from optimization results.
 
     Collects [`FunctionResults`][ropt.results.FunctionResults] and
     [`GradientResults`][ropt.results.GradientResults] into named tables.
-    Tables are defined via `add_table` with a column specification, or
-    registered in bulk with `set_default_tables`.
+    Tables are defined via `add_table` with a column specification.
 
     The frame library is chosen with the `engine` argument. The `"polars"`
     engine, the default, produces long-format tables in which batch and axis
@@ -101,7 +53,7 @@ class DataFrameHandler(EventHandler):
         first store them in a variable.
 
     See [Result Handlers](../results/handlers.md#dataframehandler) for the column
-    specification, default tables, and callback details.
+    specification, the available fields, and callback details.
     """
 
     def __init__(
@@ -144,18 +96,6 @@ class DataFrameHandler(EventHandler):
             Either `"pandas"` or `"polars"`.
         """
         return self._engine
-
-    def set_default_tables(self) -> None:
-        """Register a standard set of result tables.
-
-        Adds the default `functions`, `evaluations`, and `constraints` tables
-        for function results, and the default `gradients` and `perturbations`
-        tables for gradient results.
-        """
-        for name, columns in _FUNCTION_TABLES.items():
-            self.add_table(name, "functions", columns)
-        for name, columns in _GRADIENT_TABLES.items():
-            self.add_table(name, "gradients", columns)
 
     def set_callback(self, callback: Callable[[Path | None], None]) -> None:
         """Set a function to call whenever the tables are updated.
