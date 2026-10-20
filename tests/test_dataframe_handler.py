@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, cast
 import numpy as np
 import pytest
 
-from ropt.components.event_handlers import DataFrameHandler
+from ropt._handlers import DataFrameHandler
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent

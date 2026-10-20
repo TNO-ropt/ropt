@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.components.evaluators import (
+from ropt._components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,

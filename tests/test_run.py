@@ -27,17 +27,17 @@ from ropt import (
     run,
     session,
 )
-from ropt.components.event_handlers import EventHandler
-from ropt.components.executors import (
+from ropt._components.executors import (
     HPCExecutor,
     LocalJobExecutor,
     ProcessExecutor,
     ThreadExecutor,
 )
+from ropt._handlers import EventHandler
+from ropt._running._function import adapt_function
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 from ropt.results import FunctionResults
-from ropt.running._function import adapt_function
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -46,14 +46,14 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt import WorkerPool
-    from ropt.components.executors import Executor
+    from ropt._components.executors import Executor
     from ropt.events import EnOptEvent
 
 try:
     # The job path needs no extras of its own, so these tests run either way.
     import pysqa  # ruff: ignore[unused-import]
 
-    from ropt.components.executors.__main__ import run_task
+    from ropt._components.executors.__main__ import run_task
 
     _TEST_HPC = True
 except ImportError:
@@ -769,7 +769,7 @@ def test_a_run_on_a_shut_down_pool_raises_with_the_exit_code(
     call: str,
 ) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._thread_executor.ThreadPoolExecutor",
+        "ropt._components.executors._thread_executor.ThreadPoolExecutor",
         _ShutdownPool,
     )
     variables = (
@@ -1106,7 +1106,7 @@ def test_process_pool_without_cloudpickle(
     pools: Callable[..., WorkerPool], config: Any, monkeypatch: Any
 ) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor.dumps",
+        "ropt._components.executors._process_executor.dumps",
         pickle.dumps,
     )
     result = optimize(
@@ -1121,7 +1121,7 @@ def test_evaluate_without_cloudpickle(
     pools: Callable[..., WorkerPool], config: Any, monkeypatch: Any
 ) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor.dumps",
+        "ropt._components.executors._process_executor.dumps",
         pickle.dumps,
     )
     result = evaluate(
@@ -1269,7 +1269,7 @@ if _TEST_HPC:
         # there; that the real one answers with a table is `pysqa`'s business,
         # so the mocks never build one.
         monkeypatch.setattr(
-            "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+            "ropt._components.executors._hpc_executor.pysqa.QueueAdapter",
             lambda *args, **kwargs: adapter,  # ruff: ignore[unused-lambda-argument]
         )
         monkeypatch.setattr(

@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from ropt import optimize
-from ropt.components.event_handlers import CallbackHandler
+from ropt._handlers import CallbackHandler
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import GradientResults

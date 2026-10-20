@@ -8,9 +8,9 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt import optimize
+from ropt._components.evaluators import EvaluationFunctionContext
 from ropt._core import EnsembleEvaluator
-from ropt.components.evaluators import EvaluationFunctionContext
-from ropt.components.event_handlers import CallbackHandler
+from ropt._handlers import CallbackHandler
 from ropt.config._realization_filter_config import RealizationFilterConfig
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode

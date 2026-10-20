@@ -75,7 +75,7 @@ class EnsembleEvaluator:
 
     Uses the settings in an [`EnOptContext`][ropt.context.EnOptContext] to turn
     the raw values from an evaluator callable, usually provided by an
-    [`Evaluator`][ropt.components.evaluators.Evaluator], into function and
+    [`Evaluator`][ropt._components.evaluators.Evaluator], into function and
     gradient estimates.
     """
 

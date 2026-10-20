@@ -8,11 +8,11 @@ import numpy as np
 import pytest
 
 from ropt import optimize
-from ropt.backend.utils import resolve_verbosity
-from ropt.components.evaluators import (
+from ropt._components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
+from ropt.backend.utils import resolve_verbosity
 from ropt.config import BackendConfig
 
 if TYPE_CHECKING:

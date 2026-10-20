@@ -14,18 +14,18 @@ import numpy as np
 import pytest
 
 from ropt import optimize, run, session
-from ropt.components.concurrency import AbortScope, current_abort_scope
-from ropt.components.event_handlers import EventHandler
-from ropt.components.executors import ProcessExecutor, ThreadExecutor
+from ropt._components.concurrency import AbortScope, current_abort_scope
+from ropt._components.executors import ProcessExecutor, ThreadExecutor
+from ropt._handlers import EventHandler
+from ropt._running._work import _run
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import AbortedError, ExecutionError
-from ropt.running._work import _run
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
     from ropt import WorkerPool
-    from ropt.components.executors import Executor
+    from ropt._components.executors import Executor
     from ropt.events import EnOptEvent
 
 
@@ -98,7 +98,7 @@ def test_pool_run_on_a_shut_down_pool_raises_aborted_with_the_exit_code(
     monkeypatch: pytest.MonkeyPatch, pools: Callable[..., WorkerPool]
 ) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._thread_executor.ThreadPoolExecutor",
+        "ropt._components.executors._thread_executor.ThreadPoolExecutor",
         _ShutdownPool,
     )
     with pytest.raises(AbortedError) as raised:

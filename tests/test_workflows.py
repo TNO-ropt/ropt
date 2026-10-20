@@ -10,15 +10,15 @@ from typing import TYPE_CHECKING, Any, override
 import numpy as np
 import pytest
 
-from ropt.components.compute_steps import EvaluationStep, OptimizationStep
-from ropt.components.concurrency import AbortScope, current_abort_scope
-from ropt.components.evaluators import (
+from ropt._components.compute_steps import EvaluationStep, OptimizationStep
+from ropt._components.concurrency import AbortScope, current_abort_scope
+from ropt._components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     Evaluator,
     FunctionEvaluator,
 )
-from ropt.components.event_handlers import (
+from ropt._handlers import (
     CallbackHandler,
     EventHandler,
     HistoryHandler,

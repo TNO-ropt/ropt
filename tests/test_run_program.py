@@ -19,7 +19,7 @@ import numpy as np
 import pytest
 
 from ropt import AbortedError, evaluate_batch, run_program, session
-from ropt.components.concurrency import AbortScope, _grace, _program
+from ropt._components.concurrency import AbortScope, _grace, _program
 from ropt.enums import ExitCode
 
 if TYPE_CHECKING:

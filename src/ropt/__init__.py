@@ -34,16 +34,29 @@ from __future__ import annotations
 
 import logging
 
-from ropt.components.concurrency import aborting, run_program
-from ropt.components.evaluators import (
+from ropt._components.concurrency import aborting, run_program
+from ropt._components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
-from ropt.components.event_handlers import (
+from ropt._handlers import (
     DataFrameHandler,
     EventHandler,
     HistoryHandler,
     ResultsHandler,
+)
+from ropt._running import (
+    EvaluationFunction,
+    EvaluationResult,
+    OptimizationResult,
+    ReportCallback,
+    Session,
+    WorkerPool,
+    evaluate,
+    evaluate_batch,
+    optimize,
+    run,
+    session,
 )
 from ropt.enums import ExitCode
 from ropt.exceptions import (
@@ -59,19 +72,6 @@ from ropt.results import (
     Results,
     results_to_pandas,
     results_to_polars,
-)
-from ropt.running import (
-    EvaluationFunction,
-    EvaluationResult,
-    OptimizationResult,
-    ReportCallback,
-    Session,
-    WorkerPool,
-    evaluate,
-    evaluate_batch,
-    optimize,
-    run,
-    session,
 )
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())

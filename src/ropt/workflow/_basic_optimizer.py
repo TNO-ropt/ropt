@@ -12,9 +12,9 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.components.compute_steps import OptimizationStep
-from ropt.components.evaluators import BatchEvaluator, Evaluator
-from ropt.components.event_handlers import CallbackHandler, ResultsHandler
+from ropt._components.compute_steps import OptimizationStep
+from ropt._components.evaluators import BatchEvaluator, Evaluator
+from ropt._handlers import CallbackHandler, ResultsHandler
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 
@@ -38,12 +38,12 @@ class BasicOptimizer:
     1. validates `config` into an [`EnOptContext`][ropt.context.EnOptContext];
     2. wraps a plain
        [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] in a
-       [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator], or uses a
-       supplied [`Evaluator`][ropt.components.evaluators.Evaluator] as given;
+       [`BatchEvaluator`][ropt._components.evaluators.BatchEvaluator], or uses a
+       supplied [`Evaluator`][ropt._components.evaluators.Evaluator] as given;
     3. creates an
-       [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] and
+       [`OptimizationStep`][ropt._components.compute_steps.OptimizationStep] and
        attaches a
-       [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] to
+       [`ResultsHandler`][ropt.ResultsHandler] to
        remember the best result;
     4. runs the step, exposing the best
        [`FunctionResults`][ropt.results.FunctionResults] via
@@ -71,7 +71,7 @@ class BasicOptimizer:
     ```
 
     Each referenced class must be importable from the active environment and must
-    subclass [`EventHandler`][ropt.components.event_handlers.EventHandler] with no
+    subclass [`EventHandler`][ropt.EventHandler] with no
     required constructor arguments; it is instantiated and attached to every run.
     Entries whose module cannot be imported are skipped, and a missing or
     malformed file is ignored.
@@ -91,7 +91,7 @@ class BasicOptimizer:
             evaluator:            An
                 [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback]
                 callable that evaluates a batch of variable vectors, or an
-                [`Evaluator`][ropt.components.evaluators.Evaluator] instance for
+                [`Evaluator`][ropt._components.evaluators.Evaluator] instance for
                 advanced features such as caching, parallel, or HPC evaluation.
             constraint_tolerance: The constraint violation tolerance; a
                 constraint within this tolerance is considered satisfied.

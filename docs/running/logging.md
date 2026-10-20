@@ -21,12 +21,12 @@ A short optimization over four realizations then reports:
 ```
 ropt.components.compute_steps - INFO - Starting optimization
 ropt.core - INFO - Function evaluation: 4/4 realizations succeeded
-ropt.components.event_handlers - INFO - New best objective: 2
+ropt.handlers - INFO - New best objective: 2
 ropt.core - INFO - Gradient evaluation: 4/4 realizations succeeded
 ropt.core - INFO - Function evaluation: 4/4 realizations succeeded
-ropt.components.event_handlers - INFO - New best objective: 1.99886
+ropt.handlers - INFO - New best objective: 1.99886
 ropt.core - INFO - Function evaluation: 4/4 realizations succeeded
-ropt.components.event_handlers - INFO - New best objective: 1.50006
+ropt.handlers - INFO - New best objective: 1.50006
 ropt.core - INFO - Stopping: Maximum number of function evaluations reached (3)
 ropt.components.compute_steps - INFO - Optimization finished: MAX_FUNCTIONS_REACHED
 ```
@@ -136,7 +136,7 @@ generally comes from the optimizer.
     | `ropt.core` | per-batch realization counts, stopping conditions, optimizer callbacks, and reuse of cached results |
     | `ropt.components.executors` | executor start-up, job submission and cancellation, retained working directories, and exceptions raised by work that an aborted call no longer waits for |
     | `ropt.components.evaluators` | work-item dispatch |
-    | `ropt.components.event_handlers` | each new best objective, and any handler that raised |
+    | `ropt.handlers` | each new best objective, and any handler that raised |
     | `ropt.backend.scipy`, `ropt.backend.external` | the method in use, and the external subprocess lifecycle |
     | `ropt.plugins` | plugin registration |
 

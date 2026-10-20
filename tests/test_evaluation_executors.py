@@ -31,18 +31,16 @@ import numpy as np
 import pytest
 
 from ropt import run, session
-from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
-from ropt.components.compute_steps import OptimizationStep
-from ropt.components.concurrency import AbortScope, _program, current_abort_scope
-from ropt.components.evaluators import (
+from ropt._components.compute_steps import OptimizationStep
+from ropt._components.concurrency import AbortScope, _program, current_abort_scope
+from ropt._components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     ParallelEvaluator,
 )
-from ropt.components.evaluators._parallel_evaluator import _handle_result
-from ropt.components.event_handlers import ResultsHandler
-from ropt.components.executors import (
+from ropt._components.evaluators._parallel_evaluator import _handle_result
+from ropt._components.executors import (
     ExecutorFailure,
     HPCExecutor,
     LocalJobExecutor,
@@ -52,18 +50,20 @@ from ropt.components.executors import (
     WorkNotRun,
     _hpc_executor,
 )
-from ropt.components.executors.__main__ import run_task
-from ropt.components.executors._job_executor import (
+from ropt._components.executors.__main__ import run_task
+from ropt._components.executors._job_executor import (
     JobExecutorBase,
     _StateUpdate,
 )
-from ropt.components.executors._picklable import picklable_exception
-from ropt.components.executors._process_executor import (
+from ropt._components.executors._picklable import picklable_exception
+from ropt._components.executors._process_executor import (
     _PayloadGate,
     _run_payload,
     _Slot,
     _stop_workers,
 )
+from ropt._handlers import ResultsHandler
+from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
@@ -74,8 +74,8 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt import WorkerPool
-    from ropt.components.executors import Executor
-    from ropt.components.executors.base import ExecutorBase
+    from ropt._components.executors import Executor
+    from ropt._components.executors.base import ExecutorBase
     from ropt.results import FunctionResults
 
 try:
@@ -370,7 +370,7 @@ def test_hpc_reads_job_ids_from_the_scheduler_table(
             return _Table(sorted(self.live_job_ids()))
 
     monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+        "ropt._components.executors._hpc_executor.pysqa.QueueAdapter",
         lambda *args, **kwargs: _TableScheduler(tmp_path),
     )
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
@@ -570,7 +570,7 @@ def test_hpc_job_command_uses_submitting_interpreter(
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
     assert commands
-    assert commands[0].startswith(f"{sys.executable} -m ropt.components.executors ")
+    assert commands[0].startswith(f"{sys.executable} -m ropt._components.executors ")
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -832,8 +832,8 @@ def test_job_wraps_an_exception_the_standard_library_cannot_send(
 ) -> None:
     # `cloudpickle` is optional on the job path, so whether an exception can
     # travel has to be decided with the serializer that will do the sending.
-    monkeypatch.setattr("ropt.components.executors._picklable.dumps", pickle.dumps)
-    monkeypatch.setattr("ropt.components.executors.__main__.dump", pickle.dump)
+    monkeypatch.setattr("ropt._components.executors._picklable.dumps", pickle.dumps)
+    monkeypatch.setattr("ropt._components.executors.__main__.dump", pickle.dump)
     input_file = tmp_path / "job.in"
     output_file = tmp_path / "job.out"
     input_file.write_bytes(pickle.dumps((_raise_locally_defined_error, (), {})))
@@ -1155,7 +1155,7 @@ if _TEST_HPC:
         monkeypatch: pytest.MonkeyPatch, adapter: MockedHPCAdapter
     ) -> None:
         monkeypatch.setattr(
-            "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+            "ropt._components.executors._hpc_executor.pysqa.QueueAdapter",
             lambda *args, **kwargs: adapter,
         )
         monkeypatch.setattr(
@@ -1386,7 +1386,7 @@ def test_broken_worker_pool_reported_at_startup(
         def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
 
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor.ProcessPoolExecutor",
+        "ropt._components.executors._process_executor.ProcessPoolExecutor",
         _BrokenPool,
     )
     with pytest.raises(ExecutionError, match="guard the program entry point"):
@@ -1419,7 +1419,7 @@ def test_worker_pool_broken_before_an_item_is_sent_is_a_failed_work_item(
     # A pool that broke under a caller is a failure of the work, not the
     # interpreter shutting down, even though BrokenProcessPool is a RuntimeError.
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor.ProcessPoolExecutor",
+        "ropt._components.executors._process_executor.ProcessPoolExecutor",
         _BreaksAfterStartup,
     )
     result = ProcessExecutor(workers=1).run([WorkItem(function=_function, args=(0,))])
@@ -1434,7 +1434,7 @@ def test_worker_pool_broken_mid_batch_keeps_the_results_already_collected(
     # still has items to send once the pool is already gone.
     monkeypatch.setattr(_BreaksAfterStartup, "accepted", 1)
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor.ProcessPoolExecutor",
+        "ropt._components.executors._process_executor.ProcessPoolExecutor",
         _BreaksAfterStartup,
     )
     results = ProcessExecutor(workers=1).run(
@@ -1735,7 +1735,7 @@ def test_unconfigured_hpc_executor_rejected(
     # No template and no usable pysqa configuration: there is nothing to submit
     # jobs with, so this must fail at construction rather than at submit time.
     monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor._get_config_path",
+        "ropt._components.executors._hpc_executor._get_config_path",
         lambda config_path: None,
     )
     with pytest.raises(ExecutionError, match="not configured"):
@@ -2119,7 +2119,7 @@ def test_wrong_evaluation_result_type_rejected() -> None:
 def test_multiprocessing_unguarded_main_reports_startup_error(tmp_path: Path) -> None:
     script = tmp_path / "unguarded.py"
     script.write_text(
-        "from ropt.components.executors import ProcessExecutor\n\n"
+        "from ropt._components.executors import ProcessExecutor\n\n"
         "ProcessExecutor(workers=1)\n"
     )
     proc = subprocess.run(
@@ -2178,7 +2178,7 @@ def test_multiprocessing_without_cloudpickle_rejects_lambda(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor.dumps", pickle.dumps
+        "ropt._components.executors._process_executor.dumps", pickle.dumps
     )
     executor = ProcessExecutor(workers=1)
     with pytest.raises(ExecutionError, match="could not be sent"):
@@ -2193,7 +2193,7 @@ def test_multiprocessing_without_cloudpickle_rejects_an_unpicklable_argument(
     # ParallelEvaluator submits a picklable module-level function and passes the
     # user callback as an argument, so the arguments must be checked too.
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor.dumps", pickle.dumps
+        "ropt._components.executors._process_executor.dumps", pickle.dumps
     )
     executor = ProcessExecutor(workers=1)
     with pytest.raises(ExecutionError, match="could not be sent"):
@@ -2714,7 +2714,7 @@ def test_job_executor_failed_query_spends_one_retry_per_interval(
         state._query_failures = 1
         state._last_query = 100.0
     monkeypatch.setattr(
-        "ropt.components.executors._job_executor.time.monotonic", lambda: 100.0
+        "ropt._components.executors._job_executor.time.monotonic", lambda: 100.0
     )
     executor._launch_and_collect(caller)
     assert waits == [10.0]
@@ -2732,7 +2732,7 @@ def test_job_executor_launch_only_claim_spends_no_retry(
     executor.release_pass.set()
     clock = 100.0
     monkeypatch.setattr(
-        "ropt.components.executors._job_executor.time.monotonic", lambda: clock
+        "ropt._components.executors._job_executor.time.monotonic", lambda: clock
     )
     with state._lock:
         state._query_failures = 1

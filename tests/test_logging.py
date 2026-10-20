@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt import optimize
-from ropt.components.evaluators import (
+from ropt._components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )

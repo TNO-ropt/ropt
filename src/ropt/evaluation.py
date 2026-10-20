@@ -6,8 +6,8 @@ which rows must be evaluated, an
 objective and constraint values back, and
 [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] is the
 protocol such a callable must follow. The
-[`Evaluator`][ropt.components.evaluators.Evaluator] classes that wrap them are
-in `ropt.components.evaluators`.
+[`Evaluator`][ropt._components.evaluators.Evaluator] classes that wrap them are
+in `ropt._components.evaluators`.
 """
 
 from dataclasses import dataclass, field

@@ -9,7 +9,7 @@ import pytest
 from pydantic import ValidationError
 
 from ropt import optimize
-from ropt.components.event_handlers import CallbackHandler
+from ropt._handlers import CallbackHandler
 from ropt.config import LinearConstraintsConfig
 from ropt.config.constants import DEFAULT_SEED
 from ropt.context import EnOptContext

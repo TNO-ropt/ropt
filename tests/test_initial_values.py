@@ -15,7 +15,7 @@ from ropt.results import FunctionResults, GradientResults
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.components.evaluators import EvaluationFunctionContext
+    from ropt._components.evaluators import EvaluationFunctionContext
 
 _INITIAL = np.array([0.0, 0.0, 0.1])
 _REALIZATIONS = 2

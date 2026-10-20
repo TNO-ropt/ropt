@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from ropt.components.executors._hpc_executor import _select_cluster
+from ropt._components.executors._hpc_executor import _select_cluster
 from ropt.exceptions import ExecutionError
 
 

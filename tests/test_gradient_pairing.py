@@ -9,7 +9,7 @@ import pytest
 
 from ropt import optimize
 from ropt._core import EnsembleEvaluator
-from ropt.components.event_handlers import ResultsHandler
+from ropt._handlers import ResultsHandler
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent

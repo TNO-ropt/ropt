@@ -1,0 +1,247 @@
+"""Defines a class for running evaluations as local processes.
+
+A local job is what [`JobExecutorBase`][] calls a job: this module supplies the
+three answers it needs — how to start one, how to tell which are still running,
+and how to cancel one — for the case where the machine running `ropt` is also
+the machine running the work.
+
+It sits between the process pool and the cluster: like a cluster job, each
+evaluation gets an interpreter of its own that can be killed outright and whose
+output is captured to a file; unlike one, there is no queueing system, no shared
+filesystem and nothing to install.
+"""
+
+from __future__ import annotations
+
+import contextlib
+import queue
+import shutil
+import subprocess  # ruff: ignore[suspicious-subprocess-import]
+import tempfile
+import threading
+from pathlib import Path
+from typing import TYPE_CHECKING, override
+
+from ropt._components.concurrency._program import Program
+from ropt._logging import get_logger
+
+from ._job_executor import JobExecutorBase
+
+if TYPE_CHECKING:
+    from uuid import UUID
+
+_logger = get_logger(__name__)
+
+
+def _run_teardown(jobs: queue.Queue[Program | Path | None]) -> None:
+    # Finishes tearing a `LocalJobExecutor` down, off the thread that dropped
+    # it: cancelling a job may not wait there, but a killed job that is never
+    # waited for lingers as a zombie, and its directory may not go until it is
+    # truly gone. Nothing is read from the executor, so that it can be collected
+    # while this thread is still finishing.
+    while True:
+        item = jobs.get()
+        if not isinstance(item, Program):
+            workdir = item
+            break
+        with contextlib.suppress(OSError, ValueError):
+            item.wait()
+    if workdir is not None:
+        shutil.rmtree(workdir, ignore_errors=True)
+        _logger.debug("Removed the local working directory %s", workdir)
+
+
+def _remove_unused_workdir(workdir: Path) -> None:
+    # For a constructor that raised: nothing else would remove its directory.
+    # `rmdir` refuses a directory with anything in it, which is what limits this
+    # to the unused case.
+    with contextlib.suppress(OSError):
+        workdir.rmdir()
+
+
+class LocalJobExecutor(JobExecutorBase):
+    """An executor that runs each work item as a separate local process.
+
+    Needs no extras and no configuration. See
+    [The local queue](../running/parallel.md#local-jobs)
+    for details.
+
+    Cancelling a job terminates it and whatever it started, and kills them if
+    they are still running five seconds later. Outside POSIX only the job
+    itself is terminated, and what it started may outlive it.
+    """
+
+    _kind = "local"
+    _backend_name = "local job backend"
+
+    def __init__(
+        self,
+        *,
+        workdir: Path | str | None = None,
+        workers: int = 1,
+        interval: float = 0.1,
+        extra_polls: int = 0,
+        cleanup: bool = True,
+    ) -> None:
+        """Initialize the local job executor.
+
+        The default `workdir` is a private temporary directory that this
+        executor creates and removes again when it is dropped, unless there is
+        something in it to read: if a work item failed, or `cleanup` is off, the
+        directory is kept and its path logged. A work item that failed keeps its
+        captured output, which is the only record of why.
+
+        A local process is finished the moment it exits, and writes and renames
+        its result before it does, so the small `interval` is dead time rather
+        than restraint towards a scheduler, and `extra_polls=0` is enough.
+
+        Args:
+            workdir:     Directory for each work item's files and captured output.
+            workers:     Maximum number of jobs running at once.
+            interval:    Polling interval in seconds.
+            extra_polls: Extra polls to wait for a work item's result.
+            cleanup:     Whether to remove a work item's files once it settles.
+
+        Raises:
+            ValueError: If `workdir` is missing or an argument is out of range.
+        """
+        self._own_workdir = workdir is None
+        if workdir is None:
+            resolved = Path(tempfile.mkdtemp(prefix="ropt-local-"))
+        else:
+            resolved = Path(workdir).resolve()
+            if not resolved.is_dir():
+                msg = f"The local working directory does not exist: {resolved}"
+                raise ValueError(msg)
+        # The base validates the remaining arguments, so this is the last call
+        # that can raise, and by now there may be a temporary directory that
+        # nothing else would remove.
+        try:
+            super().__init__(
+                workdir=resolved,
+                workers=workers,
+                interval=interval,
+                extra_polls=extra_polls,
+                cleanup=cleanup,
+            )
+        except ValueError:
+            if self._own_workdir:
+                _remove_unused_workdir(resolved)
+            raise
+        self._next_job_id = 0
+        # The running jobs are reached by whichever caller has claimed the
+        # backend (`_start_job` and `_live_job_ids`) and by a departing caller
+        # (`_cancel_job`), which may overlap, so they need a lock of their own,
+        # as the module docstring of the base says.
+        self._processes: dict[int, Program] = {}
+        self._processes_lock = threading.Lock()
+        # Started last, with nothing left that can raise: a constructor that
+        # fails must not leave a thread behind for `__del__` to find.
+        self._teardown_queue: queue.Queue[Program | Path | None] = queue.Queue()
+        self._teardown_thread = threading.Thread(
+            target=_run_teardown,
+            args=(self._teardown_queue,),
+            name="ropt-local-teardown",
+            daemon=True,
+        )
+        self._teardown_thread.start()
+
+    def __del__(self) -> None:
+        """Cancel whatever is left and remove a temporary working directory."""
+        # Also runs on an object whose `__init__` raised before reaching the
+        # thread, which has nothing to tear down. Everything `_release` touches
+        # is assigned before the thread starts, so the two go together.
+        if getattr(self, "_teardown_thread", None) is None:
+            return
+        # Nothing here may escape: an exception in `__del__` is printed and
+        # swallowed, and at interpreter shutdown the modules it needs may
+        # already be gone.
+        with contextlib.suppress(Exception):
+            self._release()
+
+    @property
+    def workdir(self) -> Path:
+        """The directory the jobs read and write.
+
+        When no directory was passed, this is a temporary one, and this property
+        is the only way to locate it while the executor is open.
+
+        Returns:
+            The working directory.
+        """
+        return self._workdir
+
+    @override
+    def _start_job(self, bundle_id: UUID, command: list[str]) -> int:
+        output_file = self._workdir / f"{bundle_id}.txt"
+        # Started and registered under one acquisition, so that a poll never
+        # sees a job whose id has been handed out but is not yet in the
+        # register.
+        with self._processes_lock:
+            with output_file.open("wb") as fp:
+                # The working directory is inherited rather than set to the one
+                # the files live in: a job has to be able to import whatever the
+                # caller could, and for a script that means its own directory.
+                process = Program(command, stdout=fp, stderr=subprocess.STDOUT)
+            self._next_job_id += 1
+            job_id = self._next_job_id
+            self._processes[job_id] = process
+        return job_id
+
+    @override
+    def _live_job_ids(self) -> set[int]:
+        with self._processes_lock:
+            entries = list(self._processes.items())
+        live = {job_id for job_id, process in entries if not process.poll()}
+        if len(live) < len(entries):
+            # `poll` collected their exit status on the way past, so this thread
+            # is where a job that ended on its own stops being a child.
+            with self._processes_lock:
+                for job_id, _ in entries:
+                    if job_id not in live:
+                        self._processes.pop(job_id, None)
+        return live
+
+    @override
+    def _cancel_job(self, job_id: int) -> None:
+        with self._processes_lock:
+            process = self._processes.pop(job_id, None)
+        if process is None or process.poll():
+            return
+        process.abort()
+        # This runs on a departing caller's thread, which must never wait for a
+        # process to die: a Ctrl-C that waits is the thing this design is here
+        # to avoid. The teardown thread waits instead, and it is the only thing
+        # that does.
+        self._teardown_queue.put(process)
+
+    def _release(self) -> None:
+        # Cancels the jobs first, which is what fills the teardown queue; the
+        # sentinel goes in behind them, so every one of them is waited for.
+        self._cancel_all_jobs()
+        # Anything a batch did not know to cancel: giving up on polling drops
+        # its jobs, and a dropped local job is a process of ours that would
+        # otherwise outlive the executor.
+        with self._processes_lock:
+            leftover = list(self._processes)
+        for job_id in leftover:
+            self._cancel_job(job_id)
+        # Decided here rather than in the teardown thread because by now the
+        # jobs are cancelled and no further work item can fail, so the answer is
+        # final.
+        output_kept = self._state.output_kept
+        keep_workdir = self._own_workdir and (not self._remove_files or output_kept)
+        if keep_workdir:
+            # The name is random, so without this the directory is kept and
+            # unfindable, which is the same as not keeping it.
+            _logger.warning(
+                "Keeping the local working directory %s: %s.",
+                self._workdir,
+                "a work item failed"
+                if output_kept
+                else "cleanup is off, so nothing here is removed",
+            )
+        # Doubles as the sentinel: a directory to remove, or nothing to do.
+        self._teardown_queue.put(
+            self._workdir if self._own_workdir and not keep_workdir else None
+        )

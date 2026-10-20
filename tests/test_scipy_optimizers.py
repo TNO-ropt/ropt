@@ -8,6 +8,8 @@ from numpy.typing import NDArray
 from pydantic import ValidationError
 
 from ropt import optimize
+from ropt._components.evaluators import EvaluationFunctionContext
+from ropt._handlers import CallbackHandler
 from ropt.backend.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
@@ -17,8 +19,6 @@ from ropt.backend.scipy import (
     _CONSTRAINT_SUPPORT_NONLINEAR_INEQ,
     SUPPORTED_SCIPY_METHODS,
 )
-from ropt.components.evaluators import EvaluationFunctionContext
-from ropt.components.event_handlers import CallbackHandler
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.exceptions import UnsupportedError
