@@ -39,15 +39,17 @@ realization that sets how much each contributes to the combined objective:
 --8<-- "examples/ensemble.py:config"
 ```
 
-The weights need not sum to one; `ropt` normalizes them. Equal weights, as here,
-give a plain average. See [Configuration Sections](../optimizer_setup/configuration_sections.md#realizations)
-for the other realization settings. `INITIAL_VALUES` is the point the
-optimization starts from.
+The lenght of the `weights` entry is equal to the number of realizations in
+the ensemble. The weights need not sum to one; `ropt` normalizes them. Equal
+weights, as here, give a plain average.  See [Configuration
+Sections](../optimizer_setup/configuration_sections.md#realizations) for the
+other realization settings. `INITIAL_VALUES` is the point the optimization
+starts from, it must be a `numpy` vector of length equal to `variable_count`.
 
 ## 2. Draw the uncertain parameters
 
 Each realization is one draw of the uncertain parameters. Here the two Rosenbrock
-coefficients are sampled once per realization, so that `a[r]` and `b[r]` are the
+coefficients are sampled from a normal distribution, so that `a[r]` and `b[r]` are the
 coefficients for realization `r`:
 
 ```python
@@ -56,8 +58,8 @@ coefficients for realization `r`:
 
 ## 3. Write the evaluation function
 
-`ropt` calls the evaluation function once for every realization at each point it
-evaluates, so it must return the value for *its own* realization. The second
+`ropt` calls the evaluation function for every realization at each point it
+evaluates, so it must return the value for a given realization. The second
 argument identifies which one: `context.realization` is the realization number,
 which we use to index the parameter arrays:
 
@@ -65,14 +67,13 @@ which we use to index the parameter arrays:
 --8<-- "examples/ensemble.py:objective"
 ```
 
-The [Quickstart](quickstart.md) ignored this second argument; an ensemble
-objective uses `context.realization` to select the parameters for the
-realization it is computing. `ropt` combines the per-realization values into the
-robust objective.
+An ensemble objective uses `context.realization` to select the parameters for
+the realization it is computing. `ropt` combines the per-realization values into
+the robust objective.
 
-Returning a single number, as here, is the simplest case. A function with
-multiple objectives, or with constraints, returns a sequence instead — the
-objectives first, then the constraints; see
+Returning a single number is the simplest case. A function with multiple
+objectives, or with constraints, returns a sequence instead — the objectives
+first, then the constraints; see
 [Constraints](../optimizer_setup/constraints.md).
 
 ## 4. Follow the progress (optional)
@@ -125,11 +126,6 @@ robust objective, which is what it optimizes.
 That evaluation carries much more than those two values — the per-realization
 objectives, the aggregates, the ensemble weights; see
 [Working with Results](../results/results.md).
-
-Because the coefficients are centered on the values used in the
-[Quickstart](quickstart.md), the robust optimum still lies close to where all
-variables equal 1 — but it minimizes the *average* over the uncertain
-coefficients rather than any single realization.
 
 ## See also
 

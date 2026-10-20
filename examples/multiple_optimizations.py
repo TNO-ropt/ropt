@@ -1,4 +1,4 @@
-"""Run several optimizations concurrently with `Session.run`.
+"""Run multiple optimizations concurrently with `Session.run`.
 
 `run` starts each optimization on a thread of its own, at most `limit` at a
 time, and every optimization evaluates on the same pool. Each one is tagged with

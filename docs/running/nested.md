@@ -111,7 +111,7 @@ that realization:
 try:
     result = pool.optimize(inner_config, start, inner_function)
 except RuntimeError:
-    return float("nan")
+    return numpy.nan
 ```
 
 An exception that the outer evaluation function does not catch ends the outer

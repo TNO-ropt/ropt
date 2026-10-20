@@ -30,9 +30,9 @@ def test_example_parallel_threads(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("parallel").main(multiprocessing=False)
 
 
-def test_example_several_optimizations(tmp_path: Path, monkeypatch: Any) -> None:
+def test_example_multiple_optimizations(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    _load_from_file("several_optimizations").main()
+    _load_from_file("multiple_optimizations").main()
 
 
 def test_example_metadata(tmp_path: Path, monkeypatch: Any) -> None:

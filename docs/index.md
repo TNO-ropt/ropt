@@ -75,7 +75,7 @@ optimization. It is covered in the
 [Running Optimizations](running/running.md), which describes the functions the
 `ropt` package exports. They start an optimization with a single function call
 and cover [parallel evaluation](running/parallel.md),
-[several optimizations at once](running/many_runs.md),
+[running multiple optimizations](running/many_runs.md),
 [nested optimization](running/nested.md), and custom result handling.
 
 ## Related packages

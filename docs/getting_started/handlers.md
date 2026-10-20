@@ -1,15 +1,14 @@
 # Collecting Results with Handlers
 
-So far, [`optimize`][ropt.optimize] returned only the single best result.
-In many cases you want
-to see every result to watch progress over the optimization. A **handler** does
-this: an object you attach with a `handlers=` argument that observes every
-result an optimization produces.
+So far, [`optimize`][ropt.optimize] returned only the single best result. In
+many cases you want to see every result to watch progress over the optimization
+using a **handler**: an object that observes every result an optimization
+produces.
 
-It collects the full result objects —
-[`FunctionResults`][ropt.results.FunctionResults] and
-[`GradientResults`][ropt.results.GradientResults] — rather than the summary `optimize` returns; see
-[Working with Results](../results/results.md).
+Multiple handlers can be passed via the `handlers` argument, each receving the
+full result objects, [`FunctionResults`][ropt.results.FunctionResults] and
+[`GradientResults`][ropt.results.GradientResults]. rather than the summary
+`optimize` returns; see [Working with Results](../results/results.md).
 
 For instance, the [`HistoryHandler`][ropt.HistoryHandler] collects all results:
 

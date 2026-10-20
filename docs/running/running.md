@@ -29,10 +29,8 @@ from ropt import optimize
 
 config = {"variables": {"variable_count": 3, "perturbation_magnitudes": 1e-6}}
 
-
 def objective(variables, context):
     return float(np.sum((variables - 1.0) ** 2))
-
 
 result = optimize(config, np.zeros(3), objective)
 if result.results is not None:
@@ -60,9 +58,9 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
   [`EvaluationFunctionContext`][ropt.EvaluationFunctionContext]
   that identifies *which* evaluation this is:
     - `context.realization` — the realization number, for a problem with an
-      ensemble of realizations; `optimize` then minimizes the weighted average
-      objective over all of them. See
-      [Ensemble-Based Optimization](../getting_started/ensemble.md).
+      ensemble of realizations; `optimize` then minimizes a robust objective
+      over all of them. See [Ensemble-Based
+      Optimization](../getting_started/ensemble.md).
     - `context.perturbation` — the perturbation number, counted from 0, for an
       evaluation at a perturbed point; `-1` for a function evaluation. `ropt`
       evaluates perturbed points to estimate a
@@ -80,26 +78,26 @@ The function returns the objective value(s), followed by any constraint values.
 There are three ways to return them:
 
 - a **single number** when there is one objective and no nonlinear constraints;
-- a **list** of numbers when there are several objectives or nonlinear
-  constraints — put the objectives first, then the constraints;
+- a **numpy vector** or a **sequence** of numbers when there are several
+  objectives or nonlinear constraints — put the objectives first, then the
+  constraints;
 - an [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
   when you also want to attach `metadata`; it holds `objectives`, `constraints`
   and `metadata` in separate fields.
 
-If a realization fails to compute, return `float("nan")` for it. `ropt` treats
-`NaN` as a failed realization and keeps going, as long as enough realizations
-succeed. How many is enough is set by
+If a realization fails to compute, return `float("nan")` or `numpy.nan` for it.
+`ropt` treats `NaN` as a failed realization and keeps going, as long as enough
+realizations succeed. How many is enough is set by
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations),
 which defaults to *all* of them — so a single `NaN` ends the optimization with
 `TOO_FEW_REALIZATIONS` unless you lower it.
 
 ### Running an external program
 
-When the evaluation function runs a simulator or another external program,
-start it with [`run_program`][ropt.run_program]. It is the supported way to
-run external programs from `ropt`. It takes the program and its arguments as a
-list, like `subprocess.run`, waits for the program to exit, and returns its exit
-status:
+When the evaluation function runs a an external program, start it with
+[`run_program`][ropt.run_program]. This is the supported way to run external
+programs from `ropt`. It takes the program and its arguments as a list, waits
+for the program to exit, and returns its exit status:
 
 ```python
 from ropt import run_program
@@ -112,13 +110,12 @@ def objective(variables, context):
     return read_objective(workdir)
 ```
 
-Unlike `subprocess.run`, `run_program` terminates the program, together with
-every program it started, when the optimization is stopped. This matters most
-when evaluations run in parallel or several optimizations run at once: an abort
-or a failure then stops every program that is still running. A program started
-with `subprocess.run` keeps running after an abort, and on a thread pool your
-script cannot exit before it does. See
-[Running External Programs](programs.md).
+`run_program` terminates the program, together with every program it started,
+when the optimization is stopped. This matters most when evaluations run in
+parallel or several optimizations run at once: an abort or a failure then stops
+every program that is still running. A program started with the `subprocess.run`
+function from the Python standard library keeps running after an abort, so its
+use is not recommended. See [Running External Programs](programs.md).
 
 ## The result
 
@@ -132,10 +129,9 @@ result.exit_code  # why the optimization stopped (an ExitCode)
 result.results    # the best evaluation, or None if none was valid
 ```
 
-`results` is a [`FunctionResults`][ropt.results.FunctionResults] — the same
-object a [handler](../results/handlers.md) receives — so the best point and its
-values are read from it at the paths described in
-[Working with Results](../results/results.md):
+`results` is a [`FunctionResults`][ropt.results.FunctionResults], so the best
+point and its values are read from it at the paths described in [Working with
+Results](../results/results.md):
 
 ```python
 if result.results is not None:
@@ -153,10 +149,9 @@ covers every field.
 
 ## Reporting progress
 
-Pass a `report` callback to watch the optimization as it runs. It is called once
+Pass a `report` callback to track the optimization as it runs. It is called once
 for every function evaluation, with the
-[`FunctionResults`][ropt.results.FunctionResults] of that evaluation — the same
-object a handler is given:
+[`FunctionResults`][ropt.results.FunctionResults] of that evaluation:
 
 ```python
 def report(result):
@@ -218,24 +213,17 @@ result = optimize(config, x0, objective, report=report)
 assert result.exit_code is ExitCode.STOPPED
 ```
 
-With [several optimizations at once](many_runs.md), this stops only the
-optimization whose callback returned `True`; the others continue.
+When [running multiple optimizations at once](many_runs.md), this stops only the
+optimization whose callback returned `True`; the others continue. To abort all
+running optimizations in a session, call [`Session.abort`][ropt.Session.abort].
+For its effect when several optimizations run together, see [Aborting from
+outside](many_runs.md#stopping-from-outside).
 
 The runnable script is
 [examples/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py),
 which stops an optimization after a fixed number of results and then reads the
-best point
-it had reached.
+best point it had reached.
 
-!!! note "Nothing to stop on an evaluation"
-    [`evaluate`][ropt.evaluate] and
-    [`evaluate_batch`][ropt.evaluate_batch] take `report=` as well, but
-    there the return value is **ignored**. An evaluation is a single batch with
-    no optimizer loop to interrupt, so the callback reports and nothing more.
-
-To abort an optimization from another thread, call
-[`Session.abort`][ropt.Session.abort]. For its effect when several optimizations
-run together, see [Aborting from outside](many_runs.md#stopping-from-outside).
 
 ## Attaching metadata
 
@@ -292,11 +280,11 @@ sources:
 
 Neither kind is interpreted by `ropt`. Constant metadata ends up on
 `result.results.metadata`; per-evaluation metadata on
-`result.results.evaluations.metadata` (one entry per realization). Both kinds can
-be tabulated as columns by the
-[`DataFrameHandler`](../results/handlers.md#dataframehandler). See
-[Working with Results](../results/results.md#metadata) for how
-each appears in the pandas export. The full runnable script is
+`result.results.evaluations.metadata` (one entry per realization). Both kinds
+can be tabulated as columns by the
+[`DataFrameHandler`](../results/handlers.md#dataframehandler). See [Working with
+Results](../results/results.md#metadata) for how each appears. The full runnable
+script is
 [examples/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py).
 
 ## Evaluating without optimizing
@@ -333,13 +321,13 @@ still returns normally, and indicates why in `result.exit_code` —
 instance. An optimization that is aborted, for instance because another task
 raised, raises [`AbortedError`][ropt.exceptions.AbortedError] instead (see
 [Failures and Aborts](failures.md)).
-[Exit Codes](../results/exit_codes.md) lists them all, and explains why a
+
+[Exit Codes](../results/exit_codes.md) lists all exit codes, and explains why a
 reason and a result are independent: `result.results` is `None` when no feasible
 result was ever recorded, whatever the reason the optimization ended, and an
 optimization that stops part-way still returns the best result it had reached
-before that. The
-evaluations it did make reach the [handlers](../results/handlers.md) attached to
-it either way.
+before that. The evaluations it did make reach the
+[handlers](../results/handlers.md) attached to it either way.
 
 What *is* raised falls into three groups:
 
@@ -362,12 +350,13 @@ What *is* raised falls into three groups:
     - [`ExecutionError`][ropt.exceptions.ExecutionError] when `ropt` cannot
       start or complete work needed for the optimization.
     - [`AbortedError`][ropt.exceptions.AbortedError] when the optimization or
-      work it started is stopped before it finishes.
+      work it started is forcefully stopped before it finishes.
 
 - **Exceptions from your own evaluation function** are not caught. They travel
-  back from wherever the evaluation ran — including a worker thread or process
-  — and are re-raised from the `optimize` call. Return `float("nan")` instead
-  if a failed realization should be tolerated rather than fatal.
+  back from wherever the evaluation ran — including a worker thread or process —
+  and are re-raised from the `optimize` call. Return `float("nan")` or
+  `numpy.nan` instead if a failed realization should be tolerated rather than
+  fatal.
 
 The [`RoptError`][ropt.exceptions.RoptError] types above are imported from
 `ropt` itself, and catching the base class catches all of them at once:
@@ -378,11 +367,9 @@ from ropt import RoptError
 
 It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
-function stay whatever you raised. The control-flow signals that `ropt` raises
-and catches itself are excluded as well, and stay in
-[`ropt.exceptions`][ropt.exceptions].
+function stay whatever you raised.
 
-[Several Optimizations at Once](many_runs.md) shows how several optimization
+[Running Multiple Optimizations](many_runs.md) shows how several optimization
 tasks can run in parallel. If a task raises an exception, every task started
 from inside it is aborted, and the exception is raised in the code that started
 the task. If that code is your script, every other task on the session is

@@ -52,7 +52,7 @@ def objective(
         The objective, or `NaN` for the realization that fails.
     """
     if context.realization == FAILING:
-        return float("nan")
+        return np.nan
     return float(np.sum((variables - 1.0) ** 2))
 
 

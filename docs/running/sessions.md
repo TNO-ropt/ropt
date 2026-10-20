@@ -1,11 +1,9 @@
 # Sessions
 
 The module-level [`optimize`][ropt.optimize] and [`evaluate`][ropt.evaluate]
-evaluate one point at a time and return when they have finished. For anything
-more, open a **session** with [`session`][ropt.session] and start the work on
-it. A session gives access to pools of workers, runs several optimizations at
-once, aborts everything it runs when one part fails or when you ask it to, and
-cleans up when its block ends:
+evaluate one point at a time and return when they have finished. To access the
+concurrency features of `ropt`, open a [`session`][ropt.session] and use its
+methods to run optimizations that evaluate functions in parallel:
 
 ```python
 from ropt import session
@@ -16,22 +14,44 @@ with session() as s:
 ```
 
 `pool.optimize` takes the same arguments as the module-level `optimize` and
-returns the same result. The session also has `optimize`, `evaluate` and
-`evaluate_batch` methods of its own, which evaluate one point at a time, as
-the module-level functions do.
+returns the same result, but evaluates multiple functions in parallel.
 
-## What belongs to a session
+## Why use a session
+
+The module-level functions are enough for a single optimization that evaluates
+one point at a time. A session adds the following:
+
+- **Parallel evaluation.** Pools are built by a session; see [Pools](#pools).
+- **Concurrent work.** [`Session.run`][ropt.Session.run] runs optimizations, or
+  functions of your own, on threads at the same time, and returns their
+  results. See [Running Multiple Optimizations](many_runs.md).
+- **One abort for all work.** [`Session.abort`][ropt.Session.abort], called from
+  another thread, stops everything the session runs.
+- **Failure handling.** When one part fails, the session aborts the other parts
+  and raises the exception in your script.
+- **Cleanup.** When the `with` block ends, the session stops its work and
+  releases its workers.
+
+Concurrency alone does not require a session: module-level `optimize` calls
+made from threads of your own run at the same time. They are then independent:
+an abort or a failure in one does not reach the others.
+
+### Session methods and module-level functions
+
+A session also has [`optimize`][ropt.Session.optimize],
+[`evaluate`][ropt.Session.evaluate] and
+[`evaluate_batch`][ropt.Session.evaluate_batch]. Like the module-level
+functions, they evaluate one point at a time on the calling thread. The
+difference is that the optimization becomes part of the session:
+`Session.abort` stops it, and a failure in it aborts the other work of the
+session. A module-level `optimize` called from your script opens a session of
+its own, so an abort of the enclosing session does not reach it.
 
 Each call of `optimize`, `evaluate`, `evaluate_batch` or `run` on a session or
-on one of its pools starts a **task** that belongs to that session. What a
-session does to its work, it does to these tasks, and to everything started
-from inside them: an evaluation function, an event handler, a report callback,
-or a function given to `run`.
-
-Code that no task runs does not belong to the session, even inside its `with`
-block. That includes the code of your script itself, and a module-level
-function such as `optimize`, which opens a session of its own. An abort of the
-outer session does not reach either.
+on one of its pools starts a **task**. Everything started from inside a task
+belongs to the same session: evaluation functions, event handlers, report
+callbacks, and functions given to `run`. This includes a module-level
+`optimize` called from inside a task.
 
 ## Pools
 
@@ -42,12 +62,6 @@ jobs on an HPC cluster. Pools are built by a session, with
 [`hpc_pool`][ropt.Session.hpc_pool], and the session releases their workers
 when its block ends. Several pools can be open at once. See
 [Evaluating in Parallel](parallel.md).
-
-## Several optimizations at once
-
-[`Session.run`][ropt.Session.run] runs functions on threads of their own and
-returns their results. Pass it several `optimize` calls and they run at the
-same time. See [Several Optimizations at Once](many_runs.md).
 
 ## Failures and aborts
 

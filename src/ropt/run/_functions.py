@@ -104,8 +104,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         metadata:  Optional dictionary attached to the results.
 
     Returns:
-        An [`EvaluationResult`][ropt.EvaluationResult] whose `results` is
-        the [`FunctionResults`][ropt.results.FunctionResults] for the vector.
+        An evaluation result.
 
     Raises:
         AbortedError: If the evaluation was aborted.
@@ -145,8 +144,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         metadata:  Optional dictionary attached to every result.
 
     Returns:
-        An [`EvaluationResult`][ropt.EvaluationResult] whose `results`
-        holds one [`FunctionResults`][ropt.results.FunctionResults] per vector.
+        An evaluation result.
 
     Raises:
         AbortedError: If the evaluation was aborted.

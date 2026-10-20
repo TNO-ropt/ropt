@@ -1,4 +1,4 @@
-# Several Optimizations at Once
+# Running Multiple Optimizations
 
 Several optimizations can run together rather than one after another. Wrap each
 `optimize` call in a zero-argument callable and pass the callables to
@@ -58,12 +58,12 @@ the optimizations that use the pool, not ten per optimization. Batch IDs stay
 distinct whatever you pass, since every optimization in the program draws them
 from one counter.
 
-[examples/several_optimizations.py](https://github.com/TNO-ropt/ropt/blob/main/examples/several_optimizations.py)
+[examples/multiple_optimizations.py](https://github.com/TNO-ropt/ropt/blob/main/examples/multiple_optimizations.py)
 runs one optimization per start vector, at most two at a time, and tags each with
 its own metadata:
 
 ```python
---8<-- "examples/several_optimizations.py:run"
+--8<-- "examples/multiple_optimizations.py:run"
 ```
 
 ## Watching optimizations that overlap

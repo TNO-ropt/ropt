@@ -63,8 +63,8 @@ Every `ropt` optimization needs three things:
    [Running Optimizations](../running/running.md#the-evaluation-function).
 3. **A start point** — the variable values to start from.
 
-[`optimize`][ropt.optimize] combines these three, runs the optimization,
-and returns an [`OptimizationResult`][ropt.OptimizationResult]. Its
-`results` field holds the best evaluation of the optimization, as a
-[`FunctionResults`][ropt.results.FunctionResults] — the same object a handler
-receives — and is `None` if the optimization found nothing valid.
+[`optimize`][ropt.optimize] combines these three, runs the optimization, and
+returns an [`OptimizationResult`][ropt.OptimizationResult]. Its `results` field
+holds the best evaluation of the optimization, as a
+[`FunctionResults`][ropt.results.FunctionResults] and is `None` if the
+optimization found nothing valid.

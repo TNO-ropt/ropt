@@ -85,7 +85,7 @@ Optimizations started together with [`Session.run`][ropt.Session.run]
 run concurrently. Given a pool, their evaluations go there; given none, each
 optimization evaluates on the thread that `run` started for it, so your
 evaluation function is called from several threads at once and has to tolerate
-that. See [Several Optimizations at Once](../running/many_runs.md).
+that. See [Running Multiple Optimizations](../running/many_runs.md).
 
 **Metadata is copied with `copy.deepcopy`.** Every result gets its own copy of
 the `metadata` you passed, so keep it to plain data — numbers, strings, lists,
@@ -95,9 +95,9 @@ raises a `TypeError` in the middle of the optimization.
 **An exception from your objective is not turned into a failed realization.** It
 is re-raised from the `optimize` call, whichever pool the evaluation ran on, so
 a bug surfaces as the exception you wrote rather than as a missing value. Return
-`float("nan")` where a realization that could not produce a value should be
-tolerated; see
-[When an evaluation fails](../running/parallel.md#when-an-evaluation-fails).
+`float("nan")` or `numpy.nan` where a realization that could not produce a value
+should be tolerated; see [When an evaluation
+fails](../running/parallel.md#when-an-evaluation-fails).
 
 | What you see | Most likely cause |
 | --- | --- |
@@ -173,7 +173,7 @@ a time.
 | Results from a shared `report=` callback are jumbled or lost | The callback is called from the thread of every optimization at once. Collect the results in a [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) instead, or use one callback per optimization. |
 | An optimization started from a handler raises `WorkflowError` about the call stack, or hangs | Its handler list reaches a handler that is already running; see [Result Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs). |
 | Several optimizations are slower than expected while the workers sit idle | A shared handler is serializing them. Make it cheaper. |
-| A second concurrent optimization raises `WorkflowError` about output capture | Only one optimization at a time may set `stdout` or `stderr`; see [Several Optimizations at Once](../running/many_runs.md). |
+| A second concurrent optimization raises `WorkflowError` about output capture | Only one optimization at a time may set `stdout` or `stderr`; see [Running Multiple Optimizations](../running/many_runs.md). |
 
 ## Configuration
 

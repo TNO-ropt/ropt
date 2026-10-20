@@ -238,8 +238,7 @@ class Program:
         """The exit status of a program that ended without being aborted.
 
         Returns:
-            The exit status, negative for a signal as in `subprocess`, or `None`
-            while it runs, and for an aborted program on POSIX.
+            The exit status, negative for a signal as in `subprocess`, or `None`.
         """
         return self._returncode
 

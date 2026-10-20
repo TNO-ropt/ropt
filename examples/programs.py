@@ -81,7 +81,7 @@ def objective(
             stderr=subprocess.STDOUT,
         )
         if status != 0:
-            return float("nan")
+            return np.nan
         output = json.loads((cwd / "output.json").read_text(encoding="utf-8"))
         return float(output["objective"])
 

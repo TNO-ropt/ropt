@@ -125,8 +125,7 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         memo:      Objectives already computed, keyed by outer point.
 
     Returns:
-        The best inner objective found at this outer point, or `NaN` if the
-        inner optimization ended with too few successful realizations.
+        The best inner objective found at this outer point, or `NaN`.
     """
     # --8<-- [start:inner]
     key = (context.realization, *variables.tolist())
@@ -143,7 +142,7 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         metadata={"outer_batch": context.batch_id, "outer_eval": context.row_idx},
     )
     if result.exit_code is ExitCode.TOO_FEW_REALIZATIONS:
-        memo[key] = float("nan")
+        memo[key] = np.nan
     else:
         assert result.results is not None
         assert result.results.target_objective is not None

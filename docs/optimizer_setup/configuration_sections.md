@@ -478,9 +478,7 @@ to the terminal as usual.
 
 !!! warning "Capture is for one optimization at a time"
     Capturing rewires process-global state, so only one optimization at a time
-    can do it. A second optimization that tries while another holds it — one of
-    [several optimizations at once](../running/many_runs.md), or
-    an optimization started from inside an evaluation callback — raises
+    can do it. A second optimization that tries while another holds it raises
     [`WorkflowError`][ropt.exceptions.WorkflowError]. Leave `stdout` and
     `stderr` unset on optimizations that overlap.
 

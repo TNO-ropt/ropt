@@ -11,10 +11,7 @@ from ropt.exceptions import AbortedError
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
-from .base import (
-    EvaluationFunctionCallback,
-    Evaluator,
-)
+from .base import EvaluationFunctionCallback, Evaluator
 
 if TYPE_CHECKING:
     from collections.abc import Callable

@@ -38,8 +38,7 @@ class EvaluationFunction(Protocol):
             context:   The context identifying the evaluation.
 
         Returns:
-            An [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult],
-            a scalar, or objectives followed by constraints.
+            An evaluation result, a scalar, or a sequence of values.
         """
 
 

@@ -1,33 +1,36 @@
 # Running in Parallel
 
-An optimization calls your evaluation function many times. By default these calls
-happen one after another, on the same thread that called
-[`optimize`][ropt.optimize]. If each evaluation is slow, you can run several at
-the same time by evaluating on a **pool**.
+An optimization calls your evaluation function many times. By default these
+calls happen one after another. If each evaluation is slow, you can run several
+at the same time using an evaluation **pool**. Pools must part of a
+[`session`][ropt.session] context manager object that handles any cleanup
+actions that must be taken after the optimization finishes.
 
-Open a [`session`][ropt.session], build a pool on it, and start the optimization
-on that pool:
+Open a session using a `with` statement, build a pool with it, and start the
+optimization using the `optimize` method of that pool. It employs four threads to
+evaluate the functions in parallel:
 
 ```python
 from ropt import session
 
 with session() as s:
-    result = s.thread_pool(workers=4).optimize(config, x0, objective)
+    pool = s.thread_pool(workers=4)
+    result = pool.optimize(config, x0, objective)
 ```
 
-The session owns the pool and releases its workers when the block ends, so
-there is nothing to close. The runnable script is
-[examples/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py),
-which evaluates one optimization on a thread pool, or on a process pool
-when it is passed `--multiprocessing`.
+The session owns the pool and releases its workers when the block ends. The
+runnable example script is
+[examples/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py).
 
-A thread pool is one of three kinds. The others run each evaluation in a separate
-process, or as a job on an HPC cluster.
-[Evaluating in Parallel](../running/parallel.md) covers all three: which one
-suits a given evaluation function, how many workers to ask for, what stopping an
-optimization does to each, and the one property of your objective that rules
-some of them out.
+A `thread_pool` is one kind of evaluation pool, others run each evaluation in a
+separate process, or as a job on an HPC cluster. [Evaluating in
+Parallel](../running/parallel.md) covers all three: which one suits a given
+evaluation function, how many workers to ask for, what stopping an optimization
+does to each, and the one property of your objective that rules some of them
+out.
 
-To run several optimizations at the same time, rather than parallelizing within
-one, see [Several Optimizations at Once](../running/many_runs.md). What a
-session provides besides pools is described in [Sessions](../running/sessions.md).
+## See also
+
+- To run several optimizations in parallel, see [Running Multiple
+  Optimizations](../running/many_runs.md).
+- Sessions are described in [Sessions](../running/sessions.md).

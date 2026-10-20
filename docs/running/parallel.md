@@ -405,8 +405,8 @@ same way, and a new pool is needed.
 **An exception from your evaluation function** is re-raised unchanged, from the
 `optimize` call, whichever pool it ran on. A bug in the objective therefore
 surfaces as the exception you wrote, with the pool left usable. Return
-`float("nan")` instead when a realization that could not produce a value should
-be tolerated; see
+`float("nan")` or `numpy.nan` instead when a realization that could not produce
+a value should be tolerated; see
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
 for how many a batch may contain before the optimization ends with
 `TOO_FEW_REALIZATIONS`.
@@ -501,7 +501,7 @@ cancelled.
       handlers cannot be moved between processes, so the return value is all
       that comes back. Callables that stay in your process, on the session or on
       a thread pool, can feed one handler that they share, as
-      [Several Optimizations at Once](many_runs.md) shows.
+      [Running Multiple Optimizations](many_runs.md) shows.
     - **Worker budgets multiply, with no way around it.** A pool cannot be
       carried into a worker process, so a callable that needs one builds its
       own. Four callables that each build a ten-worker pool put **forty**
