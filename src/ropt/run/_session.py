@@ -4,12 +4,12 @@ A **session** is what a pool belongs to. Its factories are the only way to build
 a pool with workers, and closing the session releases every pool it built, so
 most code needs no further cleanup. It is also what an abort reaches: the
 session has an abort scope of its own, which is the current scope in its
-`with` block and in which every task started on it is nested, and `abort()`
+`with` block and in which every call made on it is nested, and `abort()`
 aborts it.
 
-A task started on one of its pools, or with its `run`, belongs to the session.
-A task started with a module-level function is nested in the current scope
-where it starts, which in the `with` block is the scope of the session. Any
+A call made on one of its pools, or its own `run`, is nested in the session's
+scope. A call to a module-level function is nested in the current scope where
+it is made, which in the `with` block is the scope of the session. Any
 number of pools — and any number of sessions — can be open at once.
 """
 
@@ -71,17 +71,17 @@ class Session:
 
     An optimization or evaluation started on a pool of the session evaluates on
     that pool's workers and belongs to this session. One started with a
-    module-level function in the session's `with` block, or inside one of its
-    tasks, evaluates in-process and is aborted with the session.
+    module-level function in the session's `with` block, or inside a call made
+    there, evaluates in-process and is aborted with the session.
 
     A session may be opened inside another, and pools from different sessions
     never interact; a session opened inside another session's `with` block, or
-    inside a task, is aborted with it. A session is single use — once closed it
+    inside a call made there, is aborted with it. A session is single use — once closed it
     cannot be reopened.
 
-    [`abort`][ropt.Session.abort] aborts the tasks that belong to it,
-    which is what a caller on another thread — a signal handler, a user
-    interface — calls to bring them down.
+    [`abort`][ropt.Session.abort] aborts the calls made on it or in its
+    `with` block, which is what a caller on another thread — a signal handler,
+    a user interface — calls to bring them down.
     """
 
     def __init__(self) -> None:
@@ -115,7 +115,7 @@ class Session:
         return self
 
     def __exit__(self, *_exc: object) -> None:
-        """Close the session, aborting its tasks and releasing every pool.
+        """Close the session, aborting its calls and releasing every pool.
 
         Work still running is waited for, five seconds at most in total, which
         gives the programs it started with [`run_program`][ropt.run_program]
@@ -125,7 +125,7 @@ class Session:
         self._exit_stack.close()
         with self._lock:
             pools, self._pools = self._pools, None
-        # The scope stays aborted, so a task that passed the check for an open
+        # The scope stays aborted, so a call that passed the check for an open
         # session just before the close is aborted as soon as it starts.
         self._abort_scope.abort()
         deadline = time.monotonic() + _grace.GRACE_PERIOD
@@ -138,16 +138,16 @@ class Session:
         self._run_threads.wait(deadline)
 
     def abort(self) -> None:
-        """Abort the tasks that belong to this session.
+        """Abort the calls made on this session or in its `with` block.
 
         Each optimization, evaluation and `run` call under way raises
         [`AbortedError`][ropt.exceptions.AbortedError] with
-        `ExitCode.USER_ABORT`. The session stays aborted: a task started on it
+        `ExitCode.USER_ABORT`. The session stays aborted: a call made on it
         afterwards, or from its `with` block, is aborted as soon as it starts.
 
-        Calling it is thread-safe, and safe on a session with no tasks. See
-        [Aborting from outside](../running/many_runs.md#stopping-from-outside)
-        for which tasks are reached and when.
+        Calling it is thread-safe, and safe on a session with nothing running.
+        See [Aborting from outside](../running/many_runs.md#stopping-from-outside)
+        for which calls are reached and when.
         """
         self._abort_scope.abort(ExitCode.USER_ABORT)
         with self._lock:
@@ -418,11 +418,10 @@ def session() -> Session:
     evaluates in-process and needs no session. See
     [Sessions](../running/sessions.md) for an overview.
 
-    A task that fails aborts the work it started, and its exception is raised
-    where the task was started. Not caught, it ends the `with` block, and closing
+    A call that fails aborts the work it started, and its exception is raised
+    where the call was made. Not caught, it ends the `with` block, and closing
     the session aborts whatever is still running.
-    [Failures and Aborts](../running/failures.md) defines tasks and describes
-    each case.
+    [Failures and Aborts](../running/failures.md) describes each case.
 
     Returns:
         A context manager binding the [`Session`][ropt.Session].

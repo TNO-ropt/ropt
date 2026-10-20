@@ -115,7 +115,7 @@ concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concur
 ## Failure in one optimization { #failure-in-one-run }
 
 The optimizations started from the callables of one `run` call are
-[nested](failures.md#nested-tasks) in it. When one of them raises, `run`
+[nested](failures.md#nested-calls) in it. When one of them raises, `run`
 aborts the others and raises that exception at once.
 [Failures and Aborts](failures.md) gives the rules for every case. An aborted
 optimization raises `AbortedError` with `ABORTED_ON_ERROR` — at once on a pool,
@@ -152,7 +152,7 @@ code means.
 
 The `report` callback runs inside the optimization it stops, which is no use to
 a signal handler or a user interface. [`Session.abort`][ropt.Session.abort] is
-the one that is called from another thread: it aborts every task started on
+the one that is called from another thread: it aborts every call made on
 the session or in its `with` block, and each raises
 [`AbortedError`][ropt.exceptions.AbortedError] with `USER_ABORT`.
 
@@ -173,22 +173,22 @@ applies no criterion, and the optimization returns no result. To keep what an
 aborted optimization had reached, collect its results as they arrive, with a
 `report` callback or a [handler](../results/handlers.md).
 
-An aborted task does not wait for the evaluations that are running. With no
-pool, the task calls the evaluation function itself, so the call in progress
-returns first. On a thread or process pool, the evaluations already running
-continue after the task has ended, and their workers are free only once they
+An aborted optimization does not wait for the evaluations that are running.
+With no pool, the optimization runs the evaluation function itself, so the
+evaluation in progress returns first. On a thread or process pool, the
+evaluations already running continue after the optimization has ended, and their workers are free only once they
 return. On an HPC pool they are cancelled.
 
-An abort is permanent: the session stays aborted. A task started on it
+An abort is permanent: the session stays aborted. A call made on it
 afterwards, or in its `with` block, raises `AbortedError` with `USER_ABORT` at
 once. Code that catches the `AbortedError` inside the block can record what
 happened, but cannot start more work on the session; catching it outside the
 `with` block works as well. To try again, open a new session. A
-[`run`][ropt.Session.run] call counts as one task here: a callable it has
+[`run`][ropt.Session.run] call is aborted as a whole: a callable it has
 queued behind its `limit` is not started. Leaving the session's `with` block
-aborts its tasks as well, and then releases its pools, which is what refuses a
-task started after that. Releasing an HPC pool cancels the jobs it still
-has, so none are left running when the block has ended. A task aborted that way
+aborts its calls as well, and then releases its pools, which is what refuses a
+call made after that. Releasing an HPC pool cancels the jobs it still
+has, so none are left running when the block has ended. A call aborted that way
 raises with `ABORTED` rather than `USER_ABORT`, since it was the block ending
 rather than a request to abort.
 

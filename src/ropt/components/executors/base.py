@@ -227,7 +227,7 @@ class ExecutorBase(Executor):
     that context. Workers in another interpreter cannot reach the executor, so
     it is never set there. Such a subclass also runs the work item inside the
     [`as_current`][ropt.components.concurrency.AbortScope.as_current] block of
-    the `abort_scope` that `run` was given, so that a task started from the
+    the `abort_scope` that `run` was given, so that a call made from the
     work item takes the one that sent it as its parent.
     """
 

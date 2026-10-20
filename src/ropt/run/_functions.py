@@ -1,7 +1,7 @@
-"""The entry points for a task that is started on no session.
+"""The entry points for a call that is made on no session.
 
-Such a task is nested in the current abort scope where it starts: the scope
-of a session in its `with` block, or that of the task whose code starts it.
+Such a call is nested in the current abort scope where it is made: the scope
+of a session in its `with` block, or that of the call whose code makes it.
 """
 
 from __future__ import annotations

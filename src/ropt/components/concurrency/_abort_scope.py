@@ -1,4 +1,4 @@
-"""The abort scope of a task, and of the tasks nested in it."""
+"""The abort scope of a call, and of the calls nested in it."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ def _run_callback(callback: Callable[[], None]) -> None:
 
 
 class AbortScope:
-    """An abort request for a task and the tasks nested in it.
+    """An abort request for a call and the calls nested in it.
 
     A step is given one at construction and polls it at the same points it
     polls its own [`stop`][ropt.components.compute_steps.ComputeStep.stop]
@@ -42,7 +42,7 @@ class AbortScope:
     than left waiting for work that will not run.
 
     A scope can be nested in a parent scope, so that it aborts with it, and can
-    be the current scope of the code that a task runs: see `nested_in` and
+    be the current scope of the code that a call runs: see `nested_in` and
     `as_current`.
 
     Aborting a scope is thread-safe, and an aborted scope cannot be reset.
@@ -180,31 +180,31 @@ _current: ContextVar[AbortScope | None] = ContextVar(
 def current_abort_scope() -> AbortScope | None:
     """Return the abort scope of the calling code.
 
-    That is the scope of the task whose code is running: its evaluation
+    That is the scope of the call whose code is running: its evaluation
     function, an event handler, or a function given to `run`. In the `with`
-    block of a session, outside any task, it is the scope of that session. A
-    task started from the calling code is nested in this scope.
+    block of a session, outside any call, it is the scope of that session. A
+    call made from the calling code is nested in this scope.
 
     Returns:
-        The current scope, or `None` outside any task and session block.
+        The current scope, or `None` outside any call and session block.
     """
     return _current.get()
 
 
 def aborting() -> bool:
-    """Return whether the task that runs the calling code is being aborted.
+    """Return whether the call that runs the calling code is being aborted.
 
-    Code that a task runs — an evaluation function, an event handler, a report
+    Code that a call runs — an evaluation function, an event handler, a report
     callback, or a function given to [`run`][ropt.Session.run] — can call this
-    to stop early once its task is aborted. In the `with` block of a session it
-    returns whether the session is aborted. It returns `False` outside any task
+    to stop early once that call is aborted. In the `with` block of a session it
+    returns whether the session is aborted. It returns `False` outside any call
     and session block, which includes the jobs of an HPC pool. In the worker
     processes of a process pool it turns `True` within a fraction of a second
     of the abort. See
     [Failures and Aborts](../running/failures.md#stopping-early-when-aborted).
 
     Returns:
-        Whether the task that runs the calling code is being aborted.
+        Whether the call that runs the calling code is being aborted.
     """
     scope = _current.get()
     return scope is not None and scope.aborting

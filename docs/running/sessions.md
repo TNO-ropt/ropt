@@ -40,7 +40,7 @@ must stay independent.
 Inside a session, start concurrent work with [`Session.run`][ropt.Session.run]
 rather than with threads of your own. An exception raised in a thread of your
 own stays in that thread: it does not leave the `with` block, so the session
-does not abort its other tasks. A module-level function called in such a thread
+does not abort its other work. A module-level function called in such a thread
 is not aborted with the session either. With `Session.run`, the failure of one
 function aborts the others, and the exception is raised in your script.
 
@@ -49,14 +49,8 @@ function aborts the others, and the exception is raised in your script.
 An optimization or evaluation that needs no pool uses the module-level
 [`optimize`][ropt.optimize], [`evaluate`][ropt.evaluate] and
 [`evaluate_batch`][ropt.evaluate_batch] in a session as well. Called in the
-session's `with` block, or from inside one of its tasks, they are aborted with
-the session.
-
-Each call of `optimize`, `evaluate`, `evaluate_batch` or `run` starts a
-**task**. A task started on one of the session's pools, with `Session.run`, or
-in the session's `with` block belongs to the session. Everything started from
-inside a task belongs to the same session: evaluation functions, event
-handlers, report callbacks, and functions given to `run`.
+session's `with` block, or from inside a call made on the session or in its
+`with` block, they are aborted with the session.
 
 ## Pools
 
@@ -70,25 +64,25 @@ when its block ends. Several pools can be open at once. See
 
 ## Failures and aborts
 
-When a task raises an exception, the tasks started from inside it are aborted,
-and the exception is raised in your script. If your script does not catch it,
-the exception leaves the `with` block, and the session aborts every task that is
-still running.
+When a call to `optimize`, `evaluate`, `evaluate_batch` or `run` raises an
+exception, the calls made from inside it are aborted, and the exception is
+raised in your script. If your script does not catch it, the exception leaves
+the `with` block, and the session aborts everything that is still running.
 [`Session.abort`][ropt.Session.abort], called from another thread, aborts every
-task started on the session or in its `with` block, and the session stays
-aborted. Ctrl-C aborts them when the `KeyboardInterrupt` leaves the `with`
-block. An aborted task raises
+call made on the session or in its `with` block, and the session stays aborted.
+Ctrl-C aborts them when the `KeyboardInterrupt` leaves the `with` block. An
+aborted call raises
 [`AbortedError`][ropt.exceptions.AbortedError]. See
 [Failures and Aborts](failures.md) and
 [Aborting from outside](many_runs.md#stopping-from-outside).
 
-An abort stops a program that a task started with
-[`run_program`][ropt.run_program], together with every program it started. See
+An abort stops the programs that the aborted calls started with
+[`run_program`][ropt.run_program], and every program those programs started. See
 [Running External Programs](programs.md).
 
 ## Closing the session
 
-When the `with` block ends, the session aborts the tasks that are still under
+When the `with` block ends, the session aborts the calls that are still under
 way and releases its pools. It then waits up to five seconds in total for
 running work to end. Worker processes still busy after that are killed, and
 threads are no longer waited for; see
@@ -98,5 +92,5 @@ A session cannot be opened again once it has closed. Calling a method of a
 closed session or of one of its pools raises
 [`WorkflowError`][ropt.exceptions.WorkflowError]. A session may be opened
 inside another, and the pools of different sessions are independent. A session
-opened in the `with` block of another, or in one of its tasks, is aborted with
-it.
+opened in the `with` block of another, or in a call made there, is aborted
+with it.

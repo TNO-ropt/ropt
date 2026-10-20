@@ -519,27 +519,28 @@ optimization emits are:
 | `FINISHED_EVALUATION` | After that batch completes; carries its results.            |
 
 An [`evaluate`][ropt.evaluate] or
-[`evaluate_batch`][ropt.evaluate_batch] task has no optimizer, and emits
+[`evaluate_batch`][ropt.evaluate_batch] call has no optimizer, and emits
 `START_ENSEMBLE_EVALUATOR` and `FINISHED_ENSEMBLE_EVALUATOR` around its single
 batch instead of the optimizer pair.
 
 Handlers are called on the thread that emits the event, in the order the
-`handlers` argument lists them, and the task waits until every handler for that
-event has returned. A handler that blocks therefore holds up the task that fed
-it, and any task waiting on the same handler's lock. Keep a handler shared by
+`handlers` argument lists them, and the optimization or evaluation waits until
+every handler for that event has returned. A handler that blocks therefore holds
+up the optimization or evaluation that fed it, and any other one waiting on the
+same handler's lock. Keep a handler shared by
 concurrent optimizations cheap; if one must do heavy I/O, buffer in memory and
 write once the optimizations have finished.
 
-!!! note "A handler failure ends the task"
-    An exception raised by a handler is fatal. It is raised on the task's own
-    stack, so it propagates as a single exception, and the handlers listed after
+!!! note "A handler failure ends the optimization"
+    An exception raised by a handler is fatal. It is raised on the stack of the
+    optimization or evaluation that emitted the event, so it propagates as a single exception, and the handlers listed after
     it do not see that event.
 
-!!! note "Read a handler's state after the tasks feeding it have finished"
+!!! note "Read a handler's state after the calls feeding it have finished"
     State kept on a handler, or stored with `handler[key]`, is deliberately not
-    bound to a thread, so it can be read from anywhere once the tasks feeding it
-    have returned. That return is what makes the latest values visible. Reading
-    it while a task is still feeding the handler on another thread gives a valid
+    bound to a thread, so it can be read from anywhere once the optimizations
+    and evaluations feeding it have returned. That return is what makes the latest values visible. Reading
+    it while one is still feeding the handler on another thread gives a valid
     but possibly stale value. To follow an optimization as it goes, use the
     handler's own `_handle_event`, or a `report` callback, rather than polling
     another handler's state.

@@ -102,7 +102,7 @@ to it.
 ## When an inner optimization fails { #when-an-inner-run-fails }
 
 The inner optimization is started from the outer evaluation function, so it is
-[nested](failures.md#nested-tasks) in the outer optimization. An exception it
+[nested](failures.md#nested-calls) in the outer optimization. An exception it
 raises is raised in the outer evaluation function and aborts nothing outside the
 inner optimization. The evaluation function can catch it and return `NaN` for
 that realization:
@@ -117,7 +117,7 @@ except RuntimeError:
 An exception that the outer evaluation function does not catch ends the outer
 optimization, as any exception from an evaluation function does. When the outer
 optimization is aborted, the inner optimizations are aborted with it. See
-[Failures and Aborts](failures.md) for the rules that apply to every task.
+[Failures and Aborts](failures.md) for the rules that apply to every call.
 
 ## Two pools, not one { #two-pools-not-one }
 

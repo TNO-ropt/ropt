@@ -134,7 +134,7 @@ generally comes from the optimizer.
     | --- | --- |
     | `ropt.components.compute_steps` | the start and finish of an optimization or evaluation, and the configuration it started from |
     | `ropt.core` | per-batch realization counts, stopping conditions, optimizer callbacks, and reuse of cached results |
-    | `ropt.components.executors` | executor start-up, job submission and cancellation, retained working directories, and exceptions raised by work that an aborted task no longer waits for |
+    | `ropt.components.executors` | executor start-up, job submission and cancellation, retained working directories, and exceptions raised by work that an aborted call no longer waits for |
     | `ropt.components.evaluators` | work-item dispatch |
     | `ropt.components.event_handlers` | each new best objective, and any handler that raised |
     | `ropt.backend.scipy`, `ropt.backend.external` | the method in use, and the external subprocess lifecycle |

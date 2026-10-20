@@ -230,8 +230,8 @@ best point it had reached.
 You can attach arbitrary **metadata** to an optimization or evaluation, from two
 sources:
 
-- **Constant, per task** — pass a `metadata` dict to `optimize`, `evaluate`, or
-  `evaluate_batch`. `ropt` copies it onto every result the task produces, which
+- **Constant, per call** — pass a `metadata` dict to `optimize`, `evaluate`, or
+  `evaluate_batch`. `ropt` copies it onto every result the call produces, which
   is one way to tag an optimization:
 
   ```python
@@ -318,8 +318,9 @@ which evaluates a single vector and then a matrix of them.
 Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in `result.exit_code` —
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value, for
-instance. An optimization that is aborted, for instance because another task
-raised, raises [`AbortedError`][ropt.exceptions.AbortedError] instead (see
+instance. An optimization that is aborted, for instance because another
+function given to the same `run` call raised, raises
+[`AbortedError`][ropt.exceptions.AbortedError] instead (see
 [Failures and Aborts](failures.md)).
 
 [Exit Codes](../results/exit_codes.md) lists all exit codes, and explains why a
@@ -369,10 +370,11 @@ It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
 function stay whatever you raised.
 
-[Running Multiple Optimizations](many_runs.md) shows how several optimization
-tasks can run in parallel. If a task raises an exception, every task started
-from inside it is aborted, and the exception is raised in the code that started
-the task. [Failures and Aborts](failures.md) describes each case.
+[Running Multiple Optimizations](many_runs.md) shows how several optimizations
+can run in parallel. If a call to `optimize`, `evaluate`, `evaluate_batch` or
+`run` raises an exception, every call made from inside it is aborted, and the
+exception is raised in the code that made the call.
+[Failures and Aborts](failures.md) describes each case.
 
 ## A note on enums
 

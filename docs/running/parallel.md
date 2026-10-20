@@ -1,7 +1,7 @@
 # Evaluating in Parallel
 
-Evaluations within one optimization can run in parallel, and you can launch your
-own tasks in parallel using an evaluation **pool**.
+Evaluations within one optimization can run in parallel, and you can run your
+own functions in parallel using an evaluation **pool**.
 
 ## Running in parallel
 
@@ -97,8 +97,8 @@ batches where a gradient is estimated. The second factor is `1` unless you run
 [several optimizations at once](many_runs.md), where it is the `limit` argument
 of `run` (or the number of optimizations, if you set no limit).
 
-Each evaluation in a batch is sent to a worker as a separate task. Up to
-`workers` tasks can run at once on a pool; the rest wait until a worker is
+Each evaluation in a batch is sent to a worker as a separate job. Up to
+`workers` jobs can run at once on a pool; the rest wait until a worker is
 available. An optimization started without a pool calls the evaluation
 function itself, one evaluation at a time.
 
@@ -475,11 +475,9 @@ these threads. They are daemon threads: a callable still running when your
 program exits is stopped without completing, and does not keep the program from
 exiting.
 
-`run` starts one task per callable, on the session it is called on or on its
-pool's session;
-[Failures and Aborts](failures.md) describes tasks and how a failure or an abort
-reaches them. When a callable raises, `run` aborts the other callables and
-raises the exception at once. When an abort arrives before all of its callables
+[Failures and Aborts](failures.md) describes how a failure or an abort reaches
+a `run` call and the calls nested in it. When a callable raises, `run` aborts
+the other callables and raises the exception at once. When an abort arrives before all of its callables
 have finished, `run` raises [`AbortedError`][ropt.exceptions.AbortedError] at
 once, as an aborted optimization does. Its `exit_code` distinguishes an abort
 that was asked for from one that a failure caused, and is `EXECUTOR_SHUT_DOWN`

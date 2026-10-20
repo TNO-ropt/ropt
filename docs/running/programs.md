@@ -91,13 +91,13 @@ file and read the file. Standard input is empty.
 `run_program` never stops the program on its own account. It stops the program
 only when its caller is stopped, in one of three ways:
 
-- **The task that runs the caller is aborted**, for example by Ctrl-C, by
+- **The caller is aborted**, for example by Ctrl-C, by
   [`Session.abort`][ropt.Session.abort], or by a failure elsewhere in the
   session. `run_program` then raises
   [`AbortedError`][ropt.exceptions.AbortedError]; see
   [Failures and Aborts](failures.md) for how that reaches the caller. Called
-  when the task is already being aborted, `run_program` raises at once and does
-  not start the program.
+  when the caller is already being aborted, `run_program` raises at once and
+  does not start the program.
 - **An exception interrupts the call**, for example `KeyboardInterrupt` in the
   main thread. The exception is re-raised.
 - **The process that called `run_program` ends**, for example when a process
@@ -111,12 +111,12 @@ those still running five seconds later receive `SIGKILL`.
 an event handler, a report callback, a function given to
 [`run`][ropt.Session.run], on every pool, or in your own code outside any
 optimization. Only the ways in which the caller can be stopped differ.
-[`Session.abort`][ropt.Session.abort] reaches only the tasks of its session.
-It does not reach code that no task runs, such as the main thread of your
-script inside a `with session()` block or an evaluation function that you call
-directly. Nor does it reach an optimization started with the module-level
-[`optimize`][ropt.optimize], which is not part of the session. In the main
-thread these calls still end on Ctrl-C, through the `KeyboardInterrupt`. In an
+[`Session.abort`][ropt.Session.abort] reaches code in the session's `with`
+block and the calls made there or on the session. It does not reach code after
+the block, such as an evaluation function that you call directly, nor code in a
+thread that your own code starts without
+[copying its context](failures.md#nested-calls). In the main thread such calls
+still end on Ctrl-C, through the `KeyboardInterrupt`. In an
 HPC job no abort reaches the program, but cancelling the job ends the process
 that called `run_program`.
 

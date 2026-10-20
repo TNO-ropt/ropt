@@ -49,11 +49,11 @@ except AbortedError as error:
 | `MAX_BATCHES_REACHED`   | The configured maximum number of evaluation batches was reached.                                     |
 | `STOPPED`               | A `report` callback returned `True`, ending the optimization at the next evaluation boundary.        |
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
-| `ABORTED`               | The task was aborted from outside, as closing a session, or a `KeyboardInterrupt`, does to a task still under way. |
-| `ABORTED_ON_ERROR`      | Another [task](../running/failures.md) raised, and this one was aborted with it.                    |
-| `USER_ABORT`            | [`Session.abort`](../running/many_runs.md#stopping-from-outside) aborted the task.                   |
-| `EXECUTOR_SHUT_DOWN`    | The pool the task was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
-| `UNKNOWN`               | The zero value of the enumeration. No task reports it.                                               |
+| `ABORTED`               | The call was aborted from outside, as closing a session, or a `KeyboardInterrupt`, does to a call still under way. |
+| `ABORTED_ON_ERROR`      | A [failure](../running/failures.md) of the call it is nested in aborted it.                         |
+| `USER_ABORT`            | [`Session.abort`](../running/many_runs.md#stopping-from-outside) aborted the call.                   |
+| `EXECUTOR_SHUT_DOWN`    | The pool the call was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
+| `UNKNOWN`               | The zero value of the enumeration. No call reports it.                                               |
 
 The first five are stops, returned on the result, and the next four are aborts,
 raised with `AbortedError`; `UNKNOWN` is neither. `TOO_FEW_REALIZATIONS` ends an
@@ -62,7 +62,7 @@ follows from a failure: one failed realization is enough to trigger it unless
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
 is lowered.
 
-## What each kind of task reports { #what-each-kind-of-run-reports }
+## What each kind of call reports { #what-each-kind-of-run-reports }
 
 An **optimization** returns any of the stop codes above, and raises with any of
 the abort codes.

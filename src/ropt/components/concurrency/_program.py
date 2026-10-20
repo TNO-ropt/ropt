@@ -260,11 +260,12 @@ def run_program(
     """Run an external program, and stop it when its caller is stopped.
 
     Blocks until the program exits. The program, and everything it started, is
-    terminated when the task that runs the caller is aborted, when an exception
-    such as `KeyboardInterrupt` interrupts the call, or when the calling process
-    ends. An abort of the task raises
-    [`AbortedError`][ropt.exceptions.AbortedError]. Code that no task runs is
-    not reached by an abort.
+    terminated when the optimization, evaluation or `run` call that runs the
+    caller is aborted, or the session in whose `with` block it is called; when
+    an exception such as `KeyboardInterrupt` interrupts the call; or when the
+    calling process ends. An abort raises
+    [`AbortedError`][ropt.exceptions.AbortedError]. Code outside any such call
+    and session block is not reached by an abort.
 
     `stdout` and `stderr` take `None` to inherit the caller's, a path to write
     to, an open file, a file descriptor, or `subprocess.DEVNULL`; `stderr` also
@@ -282,7 +283,7 @@ def run_program(
         The exit status of the program, negative for a signal as in `subprocess`.
 
     Raises:
-        AbortedError: If the calling task was aborted.
+        AbortedError: If the caller was aborted.
         OSError:      If the program could not be started.
         TypeError:    If `cmd` is a single string.
         ValueError:   If `stdout` or `stderr` is `subprocess.PIPE`.
