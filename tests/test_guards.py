@@ -16,7 +16,6 @@ import numpy as np
 import pytest
 
 from ropt import HistoryHandler, session
-from ropt.components.concurrency import AbortSignal
 from ropt.exceptions import ExecutionError, WorkflowError
 
 if TYPE_CHECKING:
@@ -138,7 +137,6 @@ def test_run_starting_while_a_session_closes_refused() -> None:
     # which a run could slip past both the refusal and the abort.
     outcomes: list[str] = []
     closing = session()
-    signal = AbortSignal()
 
     def _start_a_run() -> None:
         try:
@@ -148,9 +146,8 @@ def test_run_starting_while_a_session_closes_refused() -> None:
         else:
             outcomes.append("ran")
 
-    signal.add_callback(_start_a_run)
     with closing:
-        closing._register(signal)  # ruff: ignore[private-member-access]
+        closing._abort_scope.add_callback(_start_a_run)  # ruff: ignore[private-member-access]
     assert outcomes == ["refused"]
 
 

@@ -13,14 +13,12 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from ropt.components.compute_steps import EvaluationStep
-from ropt.components.concurrency import AbortSignal, parent_signal
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
-from ropt.enums import ExitCode
-from ropt.exceptions import AbortedError, ExecutorStopped
 
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
+from ._linked_abort_scope import linked_abort_scope
 from ._result import EvaluationResult
 
 if TYPE_CHECKING:
@@ -29,6 +27,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike, NDArray
 
+    from ropt.components.concurrency import AbortScope
     from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
     from ropt.results import FunctionResults
@@ -60,7 +59,7 @@ def _as_matrix(variables: ArrayLike) -> NDArray[np.float64]:
 
 
 def _evaluate(  # ruff: ignore[too-many-arguments]
-    session: Session,
+    session: Session | None,
     executor: Executor | None,
     config: dict[str, Any],
     variables: ArrayLike,
@@ -70,14 +69,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[FunctionResults]:
-    try:
-        array = _as_vector(variables)
-    except Exception:
-        # Arguments that do not fit fail the evaluation before it starts.
-        failure_aborts_session = parent_signal() is None
-        if failure_aborts_session:
-            session._fail()  # ruff: ignore[private-member-access]
-        raise
+    array = _as_vector(variables)
     outcome = _run_evaluation(
         session,
         executor,
@@ -92,7 +84,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
 
 
 def _evaluate_batch(  # ruff: ignore[too-many-arguments]
-    session: Session,
+    session: Session | None,
     executor: Executor | None,
     config: dict[str, Any],
     variables: ArrayLike,
@@ -102,14 +94,7 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
-    try:
-        array = _as_matrix(variables)
-    except Exception:
-        # Arguments that do not fit fail the evaluation before it starts.
-        failure_aborts_session = parent_signal() is None
-        if failure_aborts_session:
-            session._fail()  # ruff: ignore[private-member-access]
-        raise
+    array = _as_matrix(variables)
     return _run_evaluation(
         session,
         executor,
@@ -129,21 +114,21 @@ def _build_evaluation(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
-    signal: AbortSignal,
+    scope: AbortScope,
 ) -> tuple[EnOptContext, EvaluationStep, HistoryHandler]:
     context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(context, function, executor, signal)
+    evaluator = make_evaluator(context, function, executor, scope)
     # The results are collected by this run's own handler, in the order the
     # vectors were given, which is the order they are returned in.
     history = HistoryHandler()
-    step = EvaluationStep(evaluator=evaluator, abort_signal=signal)
+    step = EvaluationStep(evaluator=evaluator, abort_scope=scope)
     step.add_event_handler(history)
     attach_handlers(step, handlers, report)
     return context, step, history
 
 
 def _run_evaluation(  # ruff: ignore[too-many-arguments]
-    session: Session,
+    session: Session | None,
     executor: Executor | None,
     config: dict[str, Any],
     variables: ArrayLike,
@@ -153,49 +138,19 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
-    parent = parent_signal()
-    failure_aborts_session = parent is None
-    signal = AbortSignal()
-    try:
+    with linked_abort_scope(session) as scope:
         context, step, history = _build_evaluation(
             executor,
             config,
             function,
             handlers=handlers,
             report=report,
-            signal=signal,
+            scope=scope,
         )
-    except Exception:
-        # No abort can reach a run being built, so this needs no exemption.
-        if failure_aborts_session:
-            session._fail()  # ruff: ignore[private-member-access]
-        raise
-    # Left outside the guard above: registration raises because the session is
-    # closed, which is not this run failing.
-    session._register(signal)  # ruff: ignore[private-member-access]
-    try:
-        with signal.aborts_with(parent), signal.as_parent():
+        with scope.as_current():
             step.run(
                 context=context,
                 variables=np.asarray(variables, dtype=np.float64),
                 metadata=metadata,
             )
-    except ExecutorStopped:
-        # Not a failure of this evaluation, so it is reported the way an abort
-        # is rather than escaping.
-        raise AbortedError(ExitCode.EXECUTOR_SHUT_DOWN) from None
-    except Exception:
-        # `signal.aborting` means this run was aborted rather than failing.
-        if not signal.aborting:
-            # Aborts the tasks started from this evaluation's code.
-            signal.abort(ExitCode.ABORTED_ON_ERROR)
-            if failure_aborts_session:
-                session._fail()  # ruff: ignore[private-member-access]
-        raise
-    except BaseException:
-        # Not a failure, but the work started from this run must not outlive it.
-        signal.abort(ExitCode.ABORTED)
-        raise
-    finally:
-        session._deregister(signal)  # ruff: ignore[private-member-access]
     return EvaluationResult(results=tuple(history["results"] or ()))

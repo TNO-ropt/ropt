@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.components.concurrency import AbortSignal
+    from ropt.components.concurrency import AbortScope
 
 
 class FunctionEvaluator(Evaluator):
@@ -37,21 +37,21 @@ class FunctionEvaluator(Evaluator):
         *,
         function: EvaluationFunctionCallback,
         batch_id_callback: Callable[[], int] | None = None,
-        abort_signal: AbortSignal | None = None,
+        abort_scope: AbortScope | None = None,
     ) -> None:
         """Initialize the FunctionEvaluator.
 
         Args:
             function:          The function used for objectives and constraints.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
-            abort_signal:      An optional signal that aborts a running batch.
+            abort_scope:       An optional scope that aborts a running batch.
         """
         super().__init__()
         self._function = function
         self._batch_id_callback = (
             batch_id_callback if batch_id_callback is not None else BatchIdCounter()
         )
-        self._abort_signal = abort_signal
+        self._abort_scope = abort_scope
 
     @override
     def _eval(
@@ -67,7 +67,7 @@ class FunctionEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            AbortedError: If the abort signal aborted the batch.
+            AbortedError: If the abort scope aborted the batch.
         """
         batch_id = self._batch_id_callback()
         no = evaluator_context.context.objectives.weights.size
@@ -84,8 +84,8 @@ class FunctionEvaluator(Evaluator):
         ):
             # The rows run on this thread, so this is the only place the batch
             # can be aborted part way.
-            if self._abort_signal is not None and self._abort_signal.aborting:
-                raise AbortedError(self._abort_signal.exit_code)
+            if self._abort_scope is not None and self._abort_scope.aborting:
+                raise AbortedError(self._abort_scope.exit_code)
             _scatter_result(
                 row_idx,
                 self._function(variables[row_idx, :], function_context),

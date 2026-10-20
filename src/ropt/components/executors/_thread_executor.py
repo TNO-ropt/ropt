@@ -26,7 +26,7 @@ from .base import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from ropt.components.concurrency import AbortSignal
+    from ropt.components.concurrency import AbortScope
 
 _logger = get_logger(__name__)
 
@@ -69,7 +69,7 @@ class ThreadExecutor(ExecutorBase):
         self,
         items: list[WorkItem],
         store: Callable[[int, Any], None],
-        abort_signal: AbortSignal | None,
+        abort_scope: AbortScope | None,
     ) -> None:
         # Finished items arrive here rather than through
         # `concurrent.futures.wait`, which would block forever on a future
@@ -78,13 +78,13 @@ class ThreadExecutor(ExecutorBase):
         futures: dict[Future[Any], int] = {}
         # The sentinel is what releases `done.get()` below; nothing else can.
         wake = partial(done.put, None)
-        if abort_signal is not None:
-            abort_signal.add_callback(wake)
+        if abort_scope is not None:
+            abort_scope.add_callback(wake)
         try:
             for index, work_item in enumerate(items):
-                if abort_signal is not None and abort_signal.aborting:
+                if abort_scope is not None and abort_scope.aborting:
                     break
-                future = self._submit(work_item, abort_signal)
+                future = self._submit(work_item, abort_scope)
                 futures[future] = index
                 future.add_done_callback(done.put)
             while futures:
@@ -95,8 +95,8 @@ class ThreadExecutor(ExecutorBase):
                 if not item.cancelled():
                     store(index, item.result())
         finally:
-            if abort_signal is not None:
-                abort_signal.remove_callback(wake)
+            if abort_scope is not None:
+                abort_scope.remove_callback(wake)
             for future in futures:
                 # An item already on a worker cannot be interrupted, so it is
                 # left to finish.
@@ -111,25 +111,25 @@ class ThreadExecutor(ExecutorBase):
     def _close(self, deadline: float) -> None:
         _wait_for(self._idle, lambda: self._running == 0, deadline)
 
-    def _submit(self, item: WorkItem, abort_signal: AbortSignal | None) -> Future[Any]:
+    def _submit(self, item: WorkItem, abort_scope: AbortScope | None) -> Future[Any]:
         try:
-            return self._pool.submit(partial(self._run_tracked, item, abort_signal))
+            return self._pool.submit(partial(self._run_tracked, item, abort_scope))
         except RuntimeError:
             # The pool is gone, which at interpreter shutdown is how a caller
             # that outlived its program is released rather than left waiting.
             raise _stopped() from None
 
-    def _run_tracked(self, item: WorkItem, abort_signal: AbortSignal | None) -> Any:  # ruff: ignore[any-type]
+    def _run_tracked(self, item: WorkItem, abort_scope: AbortScope | None) -> Any:  # ruff: ignore[any-type]
         # A worker can take the next task before `_run_items` cancels it, so
         # whether an item starts is decided here rather than there.
-        if abort_signal is not None and abort_signal.aborting:
+        if abort_scope is not None and abort_scope.aborting:
             return WorkNotRun(_NOT_RUN)
         with self._idle:
             self._running += 1
         # Runs on the pool thread, so it marks that thread's context, not the caller's.
         token = _running_on.set(self)
         try:
-            with nullcontext() if abort_signal is None else abort_signal.as_parent():
+            with nullcontext() if abort_scope is None else abort_scope.as_current():
                 return _run_item(item.function, item.args, item.kwargs)
         finally:
             _running_on.reset(token)

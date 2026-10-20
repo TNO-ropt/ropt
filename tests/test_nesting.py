@@ -17,7 +17,7 @@ import numpy as np
 import pytest
 
 from ropt import session
-from ropt.components.concurrency import parent_signal
+from ropt.components.concurrency import current_abort_scope
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
 
@@ -237,17 +237,17 @@ def _records_its_abort(
     def objective(
         variables: NDArray[np.float64], context: EvaluationFunctionContext
     ) -> float:
-        # Evaluated in-process, so the parent signal here is the signal of this
+        # Evaluated in-process, so the current scope here is the scope of this
         # optimization.
-        signal = parent_signal()
-        assert signal is not None
+        scope = current_abort_scope()
+        assert scope is not None
         if not recorded.is_set():
             started.wait()
         aborted = threading.Event()
-        signal.add_callback(aborted.set)
+        scope.add_callback(aborted.set)
         assert aborted.wait(timeout=30)
         if not recorded.is_set():
-            exit_codes.append(signal.exit_code)
+            exit_codes.append(scope.exit_code)
             recorded.set()
         return _sphere(variables, context)
 
@@ -335,15 +335,15 @@ def _start_in_a_copied_context(target: Callable[[], None]) -> threading.Thread:
 
 
 @pytest.mark.parametrize(
-    ("start", "exit_code"),
+    "start",
     [
-        pytest.param(_start_plain, ExitCode.ABORTED_ON_ERROR, id="plain"),
-        pytest.param(_start_in_a_copied_context, ExitCode.FINISHED, id="copied"),
+        pytest.param(_start_plain, id="plain"),
+        pytest.param(_start_in_a_copied_context, id="copied"),
     ],
 )
 @pytest.mark.timeout(60)
-def test_pool_run_from_a_thread_of_the_objective_is_nested_only_in_its_context(
-    start: Callable[[Callable[[], None]], threading.Thread], exit_code: ExitCode
+def test_caught_failure_of_a_pool_run_on_a_thread_of_the_objective_does_not_abort_it(
+    start: Callable[[Callable[[], None]], threading.Thread],
 ) -> None:
     with session() as opened:
         outer = opened.thread_pool(workers=2)
@@ -366,4 +366,4 @@ def test_pool_run_from_a_thread_of_the_objective_is_nested_only_in_its_context(
         except AbortedError as exc:
             ended_with = exc.exit_code
 
-    assert ended_with == exit_code
+    assert ended_with == ExitCode.FINISHED

@@ -19,7 +19,7 @@ from .base import ComputeStep
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-    from ropt.components.concurrency import AbortSignal
+    from ropt.components.concurrency import AbortScope
     from ropt.components.evaluators import Evaluator
     from ropt.context import EnOptContext
     from ropt.results import FunctionResults, GradientResults, Results
@@ -42,7 +42,7 @@ class OptimizationStep(ComputeStep[ExitCode]):
         self,
         *,
         evaluator: Evaluator,
-        abort_signal: AbortSignal | None = None,
+        abort_scope: AbortScope | None = None,
         f0: FunctionResults | None = None,
         g0: GradientResults | None = None,
     ) -> None:
@@ -53,12 +53,12 @@ class OptimizationStep(ComputeStep[ExitCode]):
         everything derived from them is recomputed.
 
         Args:
-            evaluator:    The evaluator object to run function evaluations.
-            abort_signal: An optional signal that cuts this step off.
-            f0:           Optional function results at the initial variables.
-            g0:           Optional gradient results at the initial variables.
+            evaluator:   The evaluator object to run function evaluations.
+            abort_scope: An optional scope that cuts this step off.
+            f0:          Optional function results at the initial variables.
+            g0:          Optional gradient results at the initial variables.
         """
-        super().__init__(abort_signal=abort_signal)
+        super().__init__(abort_scope=abort_scope)
         self._evaluator = evaluator
         self._f0 = f0
         self._g0 = g0
@@ -158,5 +158,5 @@ class OptimizationStep(ComputeStep[ExitCode]):
         if self._stop_requested:
             raise OptimizerStop(ExitCode.STOPPED)
         if self._aborting:
-            assert self._abort_signal is not None
-            raise AbortedError(self._abort_signal.exit_code)
+            assert self._abort_scope is not None
+            raise AbortedError(self._abort_scope.exit_code)

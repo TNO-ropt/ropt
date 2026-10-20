@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 
 from ropt.components.compute_steps import EvaluationStep, OptimizationStep
-from ropt.components.concurrency import AbortSignal, parent_signal
+from ropt.components.concurrency import AbortScope, current_abort_scope
 from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
@@ -807,14 +807,14 @@ def test_stop_request_cleared_between_runs(config: Any, evaluator: Any) -> None:
     assert second != ExitCode.STOPPED
 
 
-def test_abort_signal_aborts_every_step_that_observes_it(
+def test_abort_scope_aborts_every_step_that_observes_it(
     config: Any, evaluator: Any
 ) -> None:
-    signal = AbortSignal()
+    scope = AbortScope()
     steps = [
-        OptimizationStep(evaluator=evaluator(), abort_signal=signal) for _ in range(2)
+        OptimizationStep(evaluator=evaluator(), abort_scope=scope) for _ in range(2)
     ]
-    signal.abort()
+    scope.abort()
     for step in steps:
         with pytest.raises(AbortedError) as raised:
             step.run(
@@ -823,13 +823,13 @@ def test_abort_signal_aborts_every_step_that_observes_it(
         assert raised.value.exit_code is ExitCode.ABORTED
 
 
-def test_abort_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -> None:
-    signal = AbortSignal()
-    step = OptimizationStep(evaluator=evaluator(), abort_signal=signal)
+def test_abort_scope_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -> None:
+    scope = AbortScope()
+    step = OptimizationStep(evaluator=evaluator(), abort_scope=scope)
     first = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    signal.abort()
+    scope.abort()
     for _ in range(2):
         with pytest.raises(AbortedError):
             step.run(
@@ -838,50 +838,50 @@ def test_abort_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -
     assert first != ExitCode.ABORTED
 
 
-def test_abort_signal_carries_the_exit_code_its_steps_raise_with(
+def test_abort_scope_carries_the_exit_code_its_steps_raise_with(
     config: Any, evaluator: Any
 ) -> None:
-    signal = AbortSignal()
-    step = OptimizationStep(evaluator=evaluator(), abort_signal=signal)
-    signal.abort(ExitCode.ABORTED_ON_ERROR)
+    scope = AbortScope()
+    step = OptimizationStep(evaluator=evaluator(), abort_scope=scope)
+    scope.abort(ExitCode.ABORTED_ON_ERROR)
     with pytest.raises(AbortedError) as raised:
         step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert raised.value.exit_code is ExitCode.ABORTED_ON_ERROR
 
 
-def test_abort_signal_keeps_the_exit_code_of_the_first_abort() -> None:
+def test_abort_scope_keeps_the_exit_code_of_the_first_abort() -> None:
     # The code a run is already ending with is not overwritten by a later
     # abort for another reason.
-    signal = AbortSignal()
-    signal.abort(ExitCode.ABORTED_ON_ERROR)
-    signal.abort(ExitCode.ABORTED)
-    assert signal.exit_code == ExitCode.ABORTED_ON_ERROR
+    scope = AbortScope()
+    scope.abort(ExitCode.ABORTED_ON_ERROR)
+    scope.abort(ExitCode.ABORTED)
+    assert scope.exit_code == ExitCode.ABORTED_ON_ERROR
 
 
-def test_abort_signal_runs_a_late_callback_at_once() -> None:
+def test_abort_scope_runs_a_late_callback_at_once() -> None:
     # A caller that registers after the abort must not be left waiting for a
     # notification that has already been sent.
-    signal = AbortSignal()
-    signal.abort()
+    scope = AbortScope()
+    scope.abort()
     calls: list[int] = []
-    signal.add_callback(partial(calls.append, 1))
+    scope.add_callback(partial(calls.append, 1))
     assert calls == [1]
 
 
-def test_abort_signal_does_not_run_a_removed_callback() -> None:
-    signal = AbortSignal()
+def test_abort_scope_does_not_run_a_removed_callback() -> None:
+    scope = AbortScope()
     calls: list[int] = []
     callback = partial(calls.append, 1)
-    signal.add_callback(callback)
-    signal.remove_callback(callback)
-    signal.abort()
+    scope.add_callback(callback)
+    scope.remove_callback(callback)
+    scope.abort()
     assert calls == []
 
 
-def test_abort_signal_runs_the_callbacks_after_one_that_raises(
+def test_abort_scope_runs_the_callbacks_after_one_that_raises(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    signal = AbortSignal()
+    scope = AbortScope()
     calls: list[int] = []
 
     def _raises() -> None:
@@ -889,79 +889,79 @@ def test_abort_signal_runs_the_callbacks_after_one_that_raises(
         msg = "boom"
         raise ValueError(msg)
 
-    signal.add_callback(_raises)
-    signal.add_callback(partial(calls.append, 2))
+    scope.add_callback(_raises)
+    scope.add_callback(partial(calls.append, 2))
     with caplog.at_level(logging.ERROR):
-        signal.abort()
+        scope.abort()
     assert calls == [1, 2]
     assert "boom" in caplog.text
 
 
-def test_abort_signal_does_not_raise_a_late_callback_that_raises(
+def test_abort_scope_does_not_raise_a_late_callback_that_raises(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
-    signal = AbortSignal()
-    signal.abort()
+    scope = AbortScope()
+    scope.abort()
 
     def _raises() -> None:
         msg = "boom"
         raise ValueError(msg)
 
     with caplog.at_level(logging.ERROR):
-        signal.add_callback(_raises)
+        scope.add_callback(_raises)
     assert "boom" in caplog.text
 
 
-def test_abort_signal_aborts_with_its_parent_inside_the_block() -> None:
-    parent = AbortSignal()
-    signal = AbortSignal()
-    with signal.aborts_with(parent):
+def test_abort_scope_aborts_with_its_parent_inside_the_block() -> None:
+    parent = AbortScope()
+    scope = AbortScope()
+    with scope.nested_in(parent):
         parent.abort(ExitCode.USER_ABORT)
-    assert signal.exit_code == ExitCode.USER_ABORT
+    assert scope.exit_code == ExitCode.USER_ABORT
 
 
-def test_abort_signal_does_not_abort_with_its_parent_after_the_block() -> None:
-    parent = AbortSignal()
-    signal = AbortSignal()
-    with signal.aborts_with(parent):
+def test_abort_scope_does_not_abort_with_its_parent_after_the_block() -> None:
+    parent = AbortScope()
+    scope = AbortScope()
+    with scope.nested_in(parent):
         pass
     parent.abort()
-    assert not signal.aborting
+    assert not scope.aborting
 
 
-def test_abort_signal_aborts_at_once_with_a_parent_that_is_aborting() -> None:
-    parent = AbortSignal()
+def test_abort_scope_aborts_at_once_with_a_parent_that_is_aborting() -> None:
+    parent = AbortScope()
     parent.abort(ExitCode.ABORTED_ON_ERROR)
-    signal = AbortSignal()
-    with signal.aborts_with(parent):
-        assert signal.exit_code == ExitCode.ABORTED_ON_ERROR
+    scope = AbortScope()
+    with scope.nested_in(parent):
+        assert scope.exit_code == ExitCode.ABORTED_ON_ERROR
 
 
-def test_abort_signal_accepts_no_parent_to_abort_with() -> None:
-    signal = AbortSignal()
-    with signal.aborts_with(None):
+def test_abort_scope_accepts_no_parent_to_abort_with() -> None:
+    scope = AbortScope()
+    with scope.nested_in(None):
         pass
-    assert not signal.aborting
+    assert not scope.aborting
 
 
-def test_parent_signal_is_none_outside_every_block() -> None:
-    assert parent_signal() is None
+def test_current_abort_scope_is_none_outside_every_block() -> None:
+    assert current_abort_scope() is None
 
 
-def test_abort_signal_is_the_parent_signal_inside_its_block() -> None:
-    signal = AbortSignal()
-    with signal.as_parent():
-        assert parent_signal() is signal
-    assert parent_signal() is None
+def test_abort_scope_is_current_inside_its_as_current_block() -> None:
+    scope = AbortScope()
+    with scope.as_current():
+        assert current_abort_scope() is scope
+    assert current_abort_scope() is None
 
 
-def test_abort_signal_as_parent_restores_the_outer_parent_signal() -> None:
-    outer = AbortSignal()
-    inner = AbortSignal()
-    with outer.as_parent():
-        with inner.as_parent():
-            assert parent_signal() is inner
-        assert parent_signal() is outer
+def test_abort_scope_as_current_restores_the_outer_current_scope() -> None:
+    outer = AbortScope()
+    inner = AbortScope()
+    with outer.as_current():
+        with inner.as_current():
+            assert current_abort_scope() is inner
+        assert current_abort_scope() is outer
 
 
 _EVALUATION_EVENTS = {

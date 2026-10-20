@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.components.concurrency import AbortSignal
+    from ropt.components.concurrency import AbortScope
     from ropt.components.executors import Executor
 
 _logger = get_logger(__name__)
@@ -41,7 +41,7 @@ class ParallelEvaluator(Evaluator):
         function: EvaluationFunctionCallback,
         executor: Executor,
         batch_id_callback: Callable[[], int] | None = None,
-        abort_signal: AbortSignal | None = None,
+        abort_scope: AbortScope | None = None,
     ) -> None:
         """Initialize the ParallelEvaluator.
 
@@ -49,12 +49,12 @@ class ParallelEvaluator(Evaluator):
             function:          The function used for objectives and constraints.
             executor:          The executor to dispatch evaluations to.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
-            abort_signal:      An optional signal that aborts a running batch.
+            abort_scope:       An optional scope that aborts a running batch.
         """
         super().__init__()
         self._function = function
         self._executor = executor
-        self._abort_signal = abort_signal
+        self._abort_scope = abort_scope
         self._batch_id_callback = (
             batch_id_callback if batch_id_callback is not None else BatchIdCounter()
         )
@@ -81,7 +81,7 @@ class ParallelEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            AbortedError: If the abort signal aborted the batch.
+            AbortedError: If the abort scope aborted the batch.
         """
         batch_id = self._batch_id_callback()
 
@@ -105,14 +105,14 @@ class ParallelEvaluator(Evaluator):
                 )
                 for row_idx, run_context in active
             ],
-            abort_signal=self._abort_signal,
+            abort_scope=self._abort_scope,
         )
-        # A `WorkNotRun` only appears when the signal aborted the batch, so the
+        # A `WorkNotRun` only appears when the scope aborted the batch, so the
         # rows that did come back describe a batch nobody is waiting for.
-        if self._abort_signal is not None and any(
+        if self._abort_scope is not None and any(
             isinstance(value, WorkNotRun) for value in values
         ):
-            raise AbortedError(self._abort_signal.exit_code)
+            raise AbortedError(self._abort_scope.exit_code)
         for (row_idx, _), value in zip(active, values, strict=True):
             _handle_result(row_idx, value, results, metadata, no)
 

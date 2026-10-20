@@ -2,8 +2,10 @@
 
 A **session** is what a pool belongs to. Its factories are the only way to build
 a pool with workers, and closing the session releases every pool it built, so
-most code needs no further cleanup. It is also what an abort reaches: each task
-registers a signal while it lasts, and `abort()` aborts them all.
+most code needs no further cleanup. It is also what an abort reaches: the
+session has an abort scope of its own, which is the current scope in its
+`with` block and in which every task started on it is nested, and `abort()`
+aborts it.
 
 A task is started on the session or on one of its pools, so what it belongs to
 is stated at the call site and never discovered from the surroundings. Any
@@ -12,12 +14,13 @@ number of pools — and any number of sessions — can be open at once.
 
 from __future__ import annotations
 
+import contextlib
 import threading
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Self, overload
 
-from ropt.components.concurrency import _grace, parent_signal
+from ropt.components.concurrency import AbortScope, _grace, current_abort_scope
 from ropt.components.executors import (
     HPCExecutor,
     LocalJobExecutor,
@@ -42,7 +45,6 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike
 
-    from ropt.components.concurrency import AbortSignal
     from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
     from ropt.results import FunctionResults, GradientResults
@@ -80,7 +82,9 @@ class Session:
     evaluates on that pool's workers. Either way it belongs to this session.
 
     A session may be opened inside another, and pools from different sessions
-    never interact. A session is single use — once closed it cannot be reopened.
+    never interact; a session opened inside another session's `with` block, or
+    inside a task, is aborted with it. A session is single use — once closed it
+    cannot be reopened.
 
     [`abort`][ropt.Session.abort] aborts the tasks that belong to it,
     which is what a caller on another thread — a signal handler, a user
@@ -93,7 +97,8 @@ class Session:
         self._lock = threading.Lock()
         self._pools: list[WorkerPool] | None = None
         self._entered = False
-        self._signals: set[AbortSignal] = set()
+        self._abort_scope = AbortScope()
+        self._exit_stack = contextlib.ExitStack()
         self._run_threads = ThreadGroup()
 
     def __enter__(self) -> Self:
@@ -110,6 +115,10 @@ class Session:
                 raise WorkflowError(_REOPENED)
             self._entered = True
             self._pools = []
+        self._exit_stack.enter_context(
+            self._abort_scope.nested_in(current_abort_scope())
+        )
+        self._exit_stack.enter_context(self._abort_scope.as_current())
         return self
 
     def __exit__(self, *_exc: object) -> None:
@@ -120,14 +129,12 @@ class Session:
         the time to end. Worker processes still busy after that are killed;
         threads are no longer waited for.
         """
-        # Closing and taking the snapshot are one step: a task that registers
-        # between them would be neither refused as late nor reached by the
-        # abort, and would outlive the session.
+        self._exit_stack.close()
         with self._lock:
             pools, self._pools = self._pools, None
-            signals = list(self._signals)
-        for signal in signals:
-            signal.abort()
+        # The scope stays aborted, so a task that passed the check for an open
+        # session just before the close is aborted as soon as it starts.
+        self._abort_scope.abort()
         deadline = time.monotonic() + _grace.GRACE_PERIOD
         # Every pool is stopped before any is waited for, so that they all
         # share the one grace period.
@@ -142,38 +149,22 @@ class Session:
 
         Each optimization, evaluation and `run` call under way raises
         [`AbortedError`][ropt.exceptions.AbortedError] with
-        `ExitCode.USER_ABORT`.
+        `ExitCode.USER_ABORT`. The session stays aborted: a task started on it
+        afterwards, or from its `with` block, is aborted as soon as it starts.
 
-        This reaches every task under way. Calling it is thread-safe, and safe
-        on a session with no tasks. See
+        Calling it is thread-safe, and safe on a session with no tasks. See
         [Aborting from outside](../running/many_runs.md#stopping-from-outside)
         for which tasks are reached and when.
         """
-        self._abort_all(ExitCode.USER_ABORT)
-
-    def _fail(self) -> None:
-        # A task that failed brings down the rest, which is what makes a script
-        # stop at the first problem.
-        self._abort_all(ExitCode.ABORTED_ON_ERROR)
-
-    def _abort_all(self, exit_code: ExitCode) -> None:
+        self._abort_scope.abort(ExitCode.USER_ABORT)
         with self._lock:
-            signals = list(self._signals)
             pools = list(self._pools or ())
-        for signal in signals:
-            signal.abort(exit_code)
         for pool in pools:
             pool._retire()  # ruff: ignore[private-member-access]
 
-    def _register(self, signal: AbortSignal) -> None:
-        with self._lock:
-            if self._pools is None:
-                raise WorkflowError(_CLOSED)
-            self._signals.add(signal)
-
-    def _deregister(self, signal: AbortSignal) -> None:
-        with self._lock:
-            self._signals.discard(signal)
+    def _open_abort_scope(self) -> AbortScope:
+        self._require_open()
+        return self._abort_scope
 
     def optimize(  # ruff: ignore[too-many-arguments]
         self,
@@ -350,13 +341,7 @@ class Session:
             ValueError:    If `limit` is less than one.
             WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
-        try:
-            executor = DaemonThreadExecutor(limit=limit, threads=self._run_threads)
-        except ValueError:
-            # Arguments that do not fit fail the call before it starts.
-            if parent_signal() is None:
-                self._fail()
-            raise
+        executor = DaemonThreadExecutor(limit=limit, threads=self._run_threads)
         return _run_work(self, executor, work)
 
     def thread_pool(self, *, workers: int = 1) -> WorkerPool:
@@ -578,11 +563,11 @@ def session() -> Session:
     evaluates in-process and needs no session. See
     [Sessions](../running/sessions.md) for an overview.
 
-    A task that fails aborts the other tasks on the session, which is what makes
-    a script stop at the first problem, and its exception is raised where the
-    task was started. A task started from inside another task does not abort the
-    rest of the session. [Failures and Aborts](../running/failures.md) defines
-    tasks and describes each case.
+    A task that fails aborts the work it started, and its exception is raised
+    where the task was started. Not caught, it ends the `with` block, and closing
+    the session aborts whatever is still running.
+    [Failures and Aborts](../running/failures.md) defines tasks and describes
+    each case.
 
     Returns:
         A context manager binding the [`Session`][ropt.Session].

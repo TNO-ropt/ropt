@@ -59,7 +59,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from uuid import UUID
 
-    from ropt.components.concurrency import AbortSignal
+    from ropt.components.concurrency import AbortScope
 
 _logger = get_logger(__name__)
 
@@ -415,17 +415,17 @@ class JobExecutorBase(ExecutorBase):
         self,
         items: list[WorkItem],
         store: Callable[[int, Any], None],
-        abort_signal: AbortSignal | None,
+        abort_scope: AbortScope | None,
     ) -> None:
         results: _Results = []
         wake = self._state.wake
-        if abort_signal is not None:
-            abort_signal.add_callback(wake)
+        if abort_scope is not None:
+            abort_scope.add_callback(wake)
         try:
             self._state.queue(results, items)
             remaining = len(items)
             while remaining > 0:
-                if abort_signal is not None and abort_signal.aborting:
+                if abort_scope is not None and abort_scope.aborting:
                     break
                 ready = self._state.pop_results(results)
                 if ready:
@@ -437,8 +437,8 @@ class JobExecutorBase(ExecutorBase):
                 else:
                     self._launch_and_collect(results)
         finally:
-            if abort_signal is not None:
-                abort_signal.remove_callback(wake)
+            if abort_scope is not None:
+                abort_scope.remove_callback(wake)
             self._cancel_jobs(self._state.drop(results))
 
     def _launch_and_collect(self, results: _Results) -> None:

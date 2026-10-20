@@ -7,8 +7,9 @@ at the same time: side by side on one session, or started from inside one
 another, as when an evaluation function calls `run`. When a task raises an
 exception, every task started from inside it is aborted, and so are the other
 tasks started by the same `run` call. The exception is then raised in the code
-that started the task. If the task was started from your script rather than from
-inside another task, every other task on the session is aborted as well.
+that started the task. If that code does not catch it, the exception leaves the
+`with` block, and the session aborts every task that is still running. Code that
+catches the exception keeps the other tasks running.
 
 !!! note
 
@@ -47,9 +48,10 @@ realizations a batch may contain is set by
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations).
 
 Without the `try`, the exception leaves `objective`, and the optimization fails
-with it. The optimization was started from your script, so `optimize` aborts
-every other task on the session, including the simulations that the other
-evaluations had started, and then raises the `SimulationError` in your script.
+with it. `optimize` aborts the tasks nested in it, including the simulations
+that the other evaluations had started, and then raises the `SimulationError`
+in your script. The exception then leaves the `with` block, and the session
+aborts the rest of its work.
 
 ## Nested tasks { #nested-tasks }
 
@@ -69,8 +71,8 @@ an HPC job is not nested. Neither is a task started from your script.
 
 !!! note "Threads that your code starts"
     A task started from a thread that your own code starts is not nested, even
-    when the thread is started from an evaluation function, so its failure aborts
-    every other task on the session. Start the thread through
+    when the thread is started from an evaluation function, so it is not aborted
+    with the task that started the thread. Start the thread through
     `contextvars.copy_context().run` to make it nested:
 
     ```python
@@ -103,13 +105,12 @@ other, and no task is aborted.
 When a task raises an exception, these tasks are aborted:
 
 - every task nested in it, at any depth;
-- the other tasks started by the same `run` call;
-- every other task on its session, unless the failing task is nested.
+- the other tasks started by the same `run` call.
 
-The same holds when an optimization or evaluation cannot be built because its
-configuration is invalid, and when arguments are rejected before any task
-starts, such as a vector of the wrong shape. A method called on a session that
-has closed, or on one of its pools, raises
+An optimization or evaluation that cannot be built because its configuration is
+invalid, or that is given arguments it rejects, such as a vector of the wrong
+shape, raises the exception before it has started anything to abort. A method
+called on a session that has closed, or on one of its pools, raises
 [`WorkflowError`][ropt.exceptions.WorkflowError] and aborts nothing. An
 exception raised by a task that is being aborted is still raised, but aborts
 nothing further.
@@ -119,9 +120,9 @@ a task, the tasks nested in it and the other tasks of the same `run` call are
 aborted with `ABORTED`, and the exception is raised. Other tasks on the session
 are not aborted until the exception leaves the session's `with` block.
 
-A failure does not abort the tasks of another session, unless they are nested in
-one that it aborts. A module-level function such as [`optimize`][ropt.optimize]
-opens a session of its own, which holds only the tasks started by that function.
+An exception that leaves the `with` block of a session, whether a failure or a
+`KeyboardInterrupt`, ends the session, which aborts the tasks that are still
+running with `ABORTED`.
 
 ## What an abort does
 
@@ -129,9 +130,14 @@ A nested task is aborted when its parent is, with the same exit code:
 `USER_ABORT` after [`Session.abort`](many_runs.md#stopping-from-outside), `ABORTED`
 when the session's `with` block ends or a `KeyboardInterrupt` or `SystemExit`
 passes through the parent, and `ABORTED_ON_ERROR` after a failure.
-This also holds when the nested task belongs to another session, as one started
-with the module-level `optimize` does. A nested task that starts after its
-parent was aborted is aborted at once.
+This also holds when the nested task is started on another session, or with a
+module-level function such as [`optimize`][ropt.optimize]. A nested task that
+starts after its parent was aborted is aborted at once.
+
+When a session is aborted, so are the tasks started on it, the tasks started in
+its `with` block, and the sessions opened there. An aborted session stays
+aborted: every task started on it, or in its `with` block, after the abort is
+aborted at once. See [Aborting from outside](many_runs.md#stopping-from-outside).
 
 An aborted task raises [`AbortedError`][ropt.exceptions.AbortedError], whose
 `exit_code` is the exit code of the abort; see
@@ -182,6 +188,7 @@ nested task raises `AbortedError` at once. An external program started with
 `run_program` then raises `AbortedError`; see
 [Running External Programs](programs.md).
 
-`aborting` returns `False` in code that no task runs, which includes the jobs of
-an HPC pool. In the worker processes of a process pool it turns `True` within a
+In the `with` block of a session, outside any task, `aborting` returns whether
+the session is aborted. It returns `False` outside any task and session block,
+which includes the jobs of an HPC pool. In the worker processes of a process pool it turns `True` within a
 fraction of a second of the abort.

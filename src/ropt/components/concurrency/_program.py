@@ -16,7 +16,7 @@ from typing import IO, TYPE_CHECKING, Any
 from ropt.exceptions import AbortedError, ExecutionError
 
 from . import _grace
-from ._abort_signal import parent_signal
+from ._abort_scope import current_abort_scope
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -291,15 +291,15 @@ def run_program(
         msg = "cmd must be a sequence of arguments, not a single string"
         raise TypeError(msg)
     args = [os.fspath(arg) for arg in cmd]
-    signal = parent_signal()
-    if signal is not None and signal.aborting:
-        raise AbortedError(signal.exit_code)
+    scope = current_abort_scope()
+    if scope is not None and scope.aborting:
+        raise AbortedError(scope.exit_code)
     with ExitStack() as stack:
         out = _output(stdout, cwd, stack, name="stdout")
         err = _output(stderr, cwd, stack, name="stderr")
         program = Program(args, cwd=cwd, env=env, stdout=out, stderr=err)
-    if signal is not None:
-        signal.add_callback(program.abort)
+    if scope is not None:
+        scope.add_callback(program.abort)
     try:
         program.wait()
     except BaseException:
@@ -307,11 +307,11 @@ def run_program(
         program.detach()
         raise
     finally:
-        if signal is not None:
-            signal.remove_callback(program.abort)
+        if scope is not None:
+            scope.remove_callback(program.abort)
     if program.aborted:
-        assert signal is not None
-        raise AbortedError(signal.exit_code)
+        assert scope is not None
+        raise AbortedError(scope.exit_code)
     assert program.returncode is not None
     return program.returncode
 

@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from concurrent.futures import Future
 
-    from ropt.components.concurrency import AbortSignal
+    from ropt.components.concurrency import AbortScope
 
 _logger = get_logger(__name__)
 
@@ -162,11 +162,11 @@ class Executor(ABC):
         calls: Sequence[WorkItem],
         *,
         collect_errors: bool = False,
-        abort_signal: AbortSignal | None = None,
+        abort_scope: AbortScope | None = None,
     ) -> list[Any]:
         """Run the calls and return their results, in the order they were given.
 
-        Blocks until every call has a result, or until `abort_signal` fires. A
+        Blocks until every call has a result, or until `abort_scope` aborts. A
         call the machinery could not run gets an
         [`ExecutorFailure`][ropt.components.executors.ExecutorFailure] in its
         position, and a call left without a result by an abort gets a
@@ -176,7 +176,7 @@ class Executor(ABC):
         waiting for the rest of the batch. With `collect_errors` it is placed in
         the call's position instead, and every call keeps its place.
 
-        An `abort_signal` that fires aborts the batch: queued calls are never
+        When `abort_scope` aborts, the batch is aborted: queued calls are never
         started, started ones are cancelled where the mechanism allows it, and
         `run` returns without waiting for the rest. Each call that did not
         finish gets a `WorkNotRun`. A call already running on a worker thread
@@ -184,7 +184,7 @@ class Executor(ABC):
         has handed to a worker but can no longer withdraw: both keep running
         after `run` has returned, and an exception they raise is logged as a
         warning. An executor that runs work items in this process, or in its
-        own worker processes, runs each inside an abort signal that `abort_signal`
+        own worker processes, runs each inside an abort scope that `abort_scope`
         aborts, so such a call can end early. See
         [Stopping a run](../running/parallel.md#stopping-a-run).
 
@@ -199,7 +199,7 @@ class Executor(ABC):
         Args:
             calls:          The work items to run.
             collect_errors: Whether an exception is returned instead of raised.
-            abort_signal:   An optional signal that aborts the batch.
+            abort_scope:    An optional scope that aborts the batch.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -226,8 +226,8 @@ class ExecutorBase(Executor):
     caller whose context has it set, including a thread started with a copy of
     that context. Workers in another interpreter cannot reach the executor, so
     it is never set there. Such a subclass also runs the work item inside the
-    [`as_parent`][ropt.components.concurrency.AbortSignal.as_parent] block of
-    the `abort_signal` that `run` was given, so that a task started from the
+    [`as_current`][ropt.components.concurrency.AbortScope.as_current] block of
+    the `abort_scope` that `run` was given, so that a task started from the
     work item takes the one that sent it as its parent.
     """
 
@@ -255,14 +255,14 @@ class ExecutorBase(Executor):
         calls: Sequence[WorkItem],
         *,
         collect_errors: bool = False,
-        abort_signal: AbortSignal | None = None,
+        abort_scope: AbortScope | None = None,
     ) -> list[Any]:
         """Run the calls and return their results, in the order they were given.
 
         Args:
             calls:          The work items to run.
             collect_errors: Whether an exception is returned instead of raised.
-            abort_signal:   An optional signal that aborts the batch.
+            abort_scope:    An optional scope that aborts the batch.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -286,7 +286,7 @@ class ExecutorBase(Executor):
                 result = result.error
             results[index] = result
 
-        self._run_items(items, store, abort_signal)
+        self._run_items(items, store, abort_scope)
         # An aborted batch leaves the slots of the calls that did not run empty,
         # and an empty slot is indistinguishable from a call that returned None.
         for index in range(len(items)):
@@ -299,7 +299,7 @@ class ExecutorBase(Executor):
         self,
         items: list[WorkItem],
         store: Callable[[int, Any], None],
-        abort_signal: AbortSignal | None,
+        abort_scope: AbortScope | None,
     ) -> None:
         """Run the items, passing each result to `store` as it arrives.
 
@@ -309,13 +309,13 @@ class ExecutorBase(Executor):
         the caller: whatever this batch started must be released before that
         exception leaves.
 
-        An `abort_signal` that fires must bring this call back promptly, leaving
+        An `abort_scope` that aborts must bring this call back promptly, leaving
         the items it did not store for the caller to mark as not run.
 
         Args:
-            items:        The work items to run.
-            store:        Callback taking an item index and its result.
-            abort_signal: An optional signal that aborts the batch.
+            items:       The work items to run.
+            store:       Callback taking an item index and its result.
+            abort_scope: An optional scope that aborts the batch.
         """
 
 

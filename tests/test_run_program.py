@@ -19,7 +19,7 @@ import numpy as np
 import pytest
 
 from ropt import AbortedError, run_program, session
-from ropt.components.concurrency import AbortSignal, _grace, _program
+from ropt.components.concurrency import AbortScope, _grace, _program
 from ropt.enums import ExitCode
 
 if TYPE_CHECKING:
@@ -72,12 +72,12 @@ def _assert_all_exited(read_fd: int, write_fd: int) -> None:
 
 
 def _run_in_thread(
-    signal_: AbortSignal, target: Callable[[], object]
+    scope: AbortScope, target: Callable[[], object]
 ) -> tuple[threading.Thread, list[BaseException]]:
     raised: list[BaseException] = []
 
     def run() -> None:
-        with signal_.as_parent():
+        with scope.as_current():
             try:
                 target()
             except Exception as exc:  # ruff: ignore[blind-except]
@@ -147,13 +147,13 @@ def test_run_program_abort_kills_the_program_and_its_children(
     pipe: tuple[int, int],
 ) -> None:
     read_fd, write_fd = pipe
-    abort_signal = AbortSignal()
+    abort_scope = AbortScope()
     thread, raised = _run_in_thread(
-        abort_signal,
+        abort_scope,
         lambda: run_program(["sh", "-c", "sleep 60 & echo $!; wait"], stdout=write_fd),
     )
     _read_line(read_fd)
-    abort_signal.abort(ExitCode.USER_ABORT)
+    abort_scope.abort(ExitCode.USER_ABORT)
     thread.join(timeout=30)
 
     assert not thread.is_alive()
@@ -170,13 +170,13 @@ def test_run_program_abort_ends_the_grace_period_when_the_program_exits(
 ) -> None:
     monkeypatch.setattr(_grace, "GRACE_PERIOD", 45.0)
     read_fd, write_fd = pipe
-    abort_signal = AbortSignal()
+    abort_scope = AbortScope()
     thread, raised = _run_in_thread(
-        abort_signal,
+        abort_scope,
         lambda: run_program(["sh", "-c", "echo ready; exec sleep 60"], stdout=write_fd),
     )
     _read_line(read_fd)
-    abort_signal.abort()
+    abort_scope.abort()
     thread.join(timeout=15)
 
     assert not thread.is_alive()
@@ -192,12 +192,12 @@ def test_run_program_kills_a_program_that_ignores_sigterm(
     pipe: tuple[int, int],
 ) -> None:
     read_fd, write_fd = pipe
-    abort_signal = AbortSignal()
+    abort_scope = AbortScope()
     thread, raised = _run_in_thread(
-        abort_signal, lambda: run_program(["sh", "-c", _STUBBORN], stdout=write_fd)
+        abort_scope, lambda: run_program(["sh", "-c", _STUBBORN], stdout=write_fd)
     )
     _read_line(read_fd)
-    abort_signal.abort()
+    abort_scope.abort()
     thread.join(timeout=30)
 
     assert not thread.is_alive()
@@ -208,9 +208,9 @@ def test_run_program_kills_a_program_that_ignores_sigterm(
 
 def test_run_program_does_not_start_once_aborted(tmp_path: Path) -> None:
     marker = tmp_path / "started"
-    abort_signal = AbortSignal()
-    abort_signal.abort()
-    with abort_signal.as_parent(), pytest.raises(AbortedError):
+    abort_scope = AbortScope()
+    abort_scope.abort()
+    with abort_scope.as_current(), pytest.raises(AbortedError):
         run_program([sys.executable, "-c", f"open({str(marker)!r}, 'w')"])
     assert not marker.exists()
 
@@ -266,12 +266,12 @@ def test_run_program_without_the_wrapper_terminates_the_program(
     assert run_program([sys.executable, "-c", "raise SystemExit(4)"]) == 4
 
     code = "import time; print('ready', flush=True); time.sleep(60)"
-    abort_signal = AbortSignal()
+    abort_scope = AbortScope()
     thread, raised = _run_in_thread(
-        abort_signal, lambda: run_program([sys.executable, "-c", code], stdout=write_fd)
+        abort_scope, lambda: run_program([sys.executable, "-c", code], stdout=write_fd)
     )
     _read_line(read_fd)
-    abort_signal.abort()
+    abort_scope.abort()
     thread.join(timeout=30)
 
     assert not thread.is_alive()

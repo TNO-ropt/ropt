@@ -1,4 +1,4 @@
-"""An abort request shared by whatever observes it."""
+"""The abort scope of a task, and of the tasks nested in it."""
 
 from __future__ import annotations
 
@@ -26,44 +26,44 @@ def _run_callback(callback: Callable[[], None]) -> None:
         _logger.exception("An abort callback raised")
 
 
-class AbortSignal:
-    """An abort request that compute steps can be told to observe.
+class AbortScope:
+    """An abort request for a task and the tasks nested in it.
 
     A step is given one at construction and polls it at the same points it
     polls its own [`stop`][ropt.components.compute_steps.ComputeStep.stop]
-    request, so one signal reaches any number of steps at once. The two differ
-    in kind: `stop` ends a run on a criterion it was given, while a signal aborts
+    request, so one scope reaches any number of steps at once. The two differ
+    in kind: `stop` ends a run on a criterion it was given, while a scope aborts
     it without consulting it. They also differ in lifetime, since `stop` is
-    cleared by the next `run` and a signal is not: a step that starts while the
-    signal is aborting is aborted from the outset.
+    cleared by the next `run` and a scope is not: a step that starts while the
+    scope is aborting is aborted from the outset.
 
     Code that cannot poll registers a callback instead, which is how a blocked
     [`Executor.run`][ropt.components.executors.Executor.run] is woken rather
     than left waiting for work that will not run.
 
-    A signal can abort with a parent signal, and can be the parent signal of the
-    tasks started while it is marked as one: see `aborts_with` and
-    `as_parent`.
+    A scope can be nested in a parent scope, so that it aborts with it, and can
+    be the current scope of the code that a task runs: see `nested_in` and
+    `as_current`.
 
-    Setting the signal is thread-safe, and it cannot be reset.
+    Aborting a scope is thread-safe, and an aborted scope cannot be reset.
     """
 
     def __init__(self) -> None:
-        """Initialize a signal that is not aborting."""
+        """Initialize a scope that is not aborting."""
         self._lock = threading.Lock()
         self._aborting = False
         self._callbacks: list[Callable[[], None]] = []
         self._exit_code = ExitCode.ABORTED
 
     def abort(self, exit_code: ExitCode = ExitCode.ABORTED) -> None:
-        """Abort everything observing this signal.
+        """Abort everything observing this scope.
 
         Calling this more than once has no further effect: the first call
         decides the exit code, so a later abort for another reason cannot
         overwrite the code a run is already ending with.
 
         Args:
-            exit_code: The exit code the steps on this signal end with.
+            exit_code: The exit code the steps on this scope end with.
         """
         with self._lock:
             if self._aborting:
@@ -76,7 +76,7 @@ class AbortSignal:
 
     @property
     def exit_code(self) -> ExitCode:
-        """The exit code a step on this signal ends with.
+        """The exit code a step on this scope ends with.
 
         Returns:
             The exit code passed to the first `abort` call.
@@ -95,13 +95,13 @@ class AbortSignal:
             return self._aborting
 
     def add_callback(self, callback: Callable[[], None]) -> None:
-        """Register a callback to run when this signal aborts.
+        """Register a callback to run when this scope aborts.
 
-        A signal that is already aborting runs the callback immediately, so a
+        A scope that is already aborting runs the callback immediately, so a
         caller that registers late is not left waiting.
 
-        The callback runs on the thread that aborts the signal, or on this one
-        when the signal is already aborting, so it must return promptly. One
+        The callback runs on the thread that aborts the scope, or on this one
+        when the scope is already aborting, so it must return promptly. One
         that raises is logged instead of raised, and the callbacks after it
         still run.
 
@@ -126,17 +126,17 @@ class AbortSignal:
             self._callbacks.remove(callback)
 
     @contextlib.contextmanager
-    def aborts_with(self, parent: AbortSignal | None) -> Generator[None]:
-        """Abort this signal when `parent` aborts, for as long as the block runs.
+    def nested_in(self, parent: AbortScope | None) -> Generator[None]:
+        """Abort this scope when `parent` aborts, for as long as the block runs.
 
-        This signal takes the exit code of `parent`. A `parent` that is already
+        This scope takes the exit code of `parent`. A `parent` that is already
         aborting aborts it at once.
 
         Args:
-            parent: The signal to abort with, or `None` for none.
+            parent: The scope to abort with, or `None` for none.
 
         Yields:
-            Nothing; `parent` no longer reaches this signal once the block ends.
+            Nothing; `parent` no longer reaches this scope once the block ends.
         """
         if parent is None:
             yield
@@ -148,42 +148,47 @@ class AbortSignal:
         finally:
             parent.remove_callback(abort)
 
-    def _abort_with(self, parent: AbortSignal) -> None:
+    def _abort_with(self, parent: AbortScope) -> None:
         # Registered before `parent` aborts, so its exit code is read when it fires.
         self.abort(parent.exit_code)
 
     @contextlib.contextmanager
-    def as_parent(self) -> Generator[None]:
-        """Make this the parent signal of tasks started in the block.
+    def as_current(self) -> Generator[None]:
+        """Make this the current abort scope inside the block.
 
-        Inside the block, [`parent_signal`][ropt.components.concurrency.parent_signal]
-        returns this signal.
+        Inside the block,
+        [`current_abort_scope`][ropt.components.concurrency.current_abort_scope]
+        returns this scope.
 
         Yields:
-            Nothing; the previous parent signal returns when the block ends.
+            Nothing; the previous current scope returns when the block ends.
         """
-        token = _parent.set(self)
+        token = _current.set(self)
         try:
             yield
         finally:
-            _parent.reset(token)
+            _current.reset(token)
 
 
 # A context variable rather than a thread-local, so that a thread started with
 # `contextvars.copy_context().run` inherits it.
-_parent: ContextVar[AbortSignal | None] = ContextVar("parent_signal", default=None)
+_current: ContextVar[AbortScope | None] = ContextVar(
+    "current_abort_scope", default=None
+)
 
 
-def parent_signal() -> AbortSignal | None:
-    """Return the parent signal of a task started from the calling code.
+def current_abort_scope() -> AbortScope | None:
+    """Return the abort scope of the calling code.
 
-    That is the signal of the task whose code is running: its evaluation
-    function, an event handler, or a function given to `run`.
+    That is the scope of the task whose code is running: its evaluation
+    function, an event handler, or a function given to `run`. In the `with`
+    block of a session, outside any task, it is the scope of that session. A
+    task started from the calling code is nested in this scope.
 
     Returns:
-        The parent signal, or `None` for code that no task is running.
+        The current scope, or `None` outside any task and session block.
     """
-    return _parent.get()
+    return _current.get()
 
 
 def aborting() -> bool:
@@ -191,14 +196,15 @@ def aborting() -> bool:
 
     Code that a task runs — an evaluation function, an event handler, a report
     callback, or a function given to [`run`][ropt.Session.run] — can call this
-    to stop early once its task is aborted. It returns `False` in code that no
-    task runs, which includes the jobs of an HPC pool. In the worker processes
-    of a process pool it turns `True` within a fraction of a second of the
-    abort. See
+    to stop early once its task is aborted. In the `with` block of a session it
+    returns whether the session is aborted. It returns `False` outside any task
+    and session block, which includes the jobs of an HPC pool. In the worker
+    processes of a process pool it turns `True` within a fraction of a second
+    of the abort. See
     [Failures and Aborts](../running/failures.md#stopping-early-when-aborted).
 
     Returns:
         Whether the task that runs the calling code is being aborted.
     """
-    signal = _parent.get()
-    return signal is not None and signal.aborting
+    scope = _current.get()
+    return scope is not None and scope.aborting

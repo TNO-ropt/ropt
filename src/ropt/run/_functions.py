@@ -1,20 +1,15 @@
-"""The entry points for a task that belongs to no session.
+"""The entry points for a task that is started on no session.
 
-Each opens a session of its own for the length of the call, so a task always has
-one. Nothing else can reach that session, which is exactly what "outside a
-session" means: no `Session.abort` reaches the task directly, and its failure
-aborts only what it started. Started from inside another task, it is still
-nested there and is aborted with it.
-
-Give a task a [`session`][ropt.session], or one of its pools, when it
-should be part of something larger.
+Such a task is nested in the current abort scope where it starts: the scope
+of a session in its `with` block, or that of the task whose code starts it.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ._session import session
+from ._evaluate import _evaluate, _evaluate_batch
+from ._optimize import _optimize
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -67,19 +62,20 @@ def optimize(  # ruff: ignore[too-many-arguments]
     Raises:
         AbortedError: If the optimization was aborted.
     """  # ruff: ignore[docstring-extraneous-exception]
-    with session() as opened:
-        return opened.optimize(
-            config,
-            x0,
-            function,
-            handlers=handlers,
-            report=report,
-            constraint_tolerance=constraint_tolerance,
-            metadata=metadata,
-            f0=f0,
-            g0=g0,
-            report_gradients=report_gradients,
-        )
+    return _optimize(
+        None,
+        None,
+        config,
+        x0,
+        function,
+        handlers=handlers,
+        report=report,
+        constraint_tolerance=constraint_tolerance,
+        metadata=metadata,
+        f0=f0,
+        g0=g0,
+        report_gradients=report_gradients,
+    )
 
 
 def evaluate(  # ruff: ignore[too-many-arguments]
@@ -110,15 +106,16 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         AbortedError: If the evaluation was aborted.
         ValueError:   If `variables` is not a single vector.
     """  # ruff: ignore[docstring-extraneous-exception]
-    with session() as opened:
-        return opened.evaluate(
-            config,
-            variables,
-            function,
-            handlers=handlers,
-            report=report,
-            metadata=metadata,
-        )
+    return _evaluate(
+        None,
+        None,
+        config,
+        variables,
+        function,
+        handlers=handlers,
+        report=report,
+        metadata=metadata,
+    )
 
 
 def evaluate_batch(  # ruff: ignore[too-many-arguments]
@@ -150,12 +147,13 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         AbortedError: If the evaluation was aborted.
         ValueError:   If `variables` is not a 2-D matrix.
     """  # ruff: ignore[docstring-extraneous-exception]
-    with session() as opened:
-        return opened.evaluate_batch(
-            config,
-            variables,
-            function,
-            handlers=handlers,
-            report=report,
-            metadata=metadata,
-        )
+    return _evaluate_batch(
+        None,
+        None,
+        config,
+        variables,
+        function,
+        handlers=handlers,
+        report=report,
+        metadata=metadata,
+    )

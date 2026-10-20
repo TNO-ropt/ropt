@@ -15,7 +15,7 @@ import numpy as np
 import pytest
 
 from ropt import session
-from ropt.components.concurrency import AbortSignal, parent_signal
+from ropt.components.concurrency import AbortScope, current_abort_scope
 from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
 from ropt.enums import EnOptEventType, ExitCode
@@ -195,14 +195,14 @@ def test_pool_run_base_exception_reaches_caller(
 def test_a_pool_run_ended_by_a_base_exception_aborts_the_work_it_started(
     pools: Callable[..., WorkerPool], error: type[BaseException]
 ) -> None:
-    # Work started from the function takes this signal as its parent,
+    # Work started from the function takes this scope as its parent,
     # so whether it aborts is what reaches that work.
-    seen: list[AbortSignal] = []
+    seen: list[AbortScope] = []
 
     def _record_then_raise() -> int:
-        signal = parent_signal()
-        assert signal is not None
-        seen.append(signal)
+        scope = current_abort_scope()
+        assert scope is not None
+        seen.append(scope)
         raise error
 
     with pytest.raises(error):
@@ -269,14 +269,14 @@ def test_a_pool_run_aborted_while_its_function_runs_raises() -> None:
 def test_an_aborted_pool_run_reports_why_it_was_aborted(
     exit_code: ExitCode,
 ) -> None:
-    # A signal that is already aborting keeps every call from starting, which is
+    # A scope that is already aborting keeps every call from starting, which is
     # what an abort arriving mid-batch leaves behind. Driving `_run`
     # directly is what makes the ordering certain: through `run` the worker
     # may drain the queue before the collecting thread is scheduled to drop it.
-    signal = AbortSignal()
-    signal.abort(exit_code)
+    scope = AbortScope()
+    scope.abort(exit_code)
     with pytest.raises(AbortedError) as exc_info:
-        _run(ThreadExecutor(workers=1), [partial(_square, 2)], signal)
+        _run(ThreadExecutor(workers=1), [partial(_square, 2)], scope)
     assert exc_info.value.exit_code == exit_code
 
 
@@ -349,7 +349,7 @@ def test_session_run_gives_callables_the_context_of_the_caller() -> None:
 
 def test_session_run_runs_callables_as_nested_tasks() -> None:
     with session() as opened:
-        assert opened.run(lambda: parent_signal() is not None)
+        assert opened.run(lambda: current_abort_scope() is not None)
 
 
 @pytest.mark.timeout(60)
@@ -412,12 +412,12 @@ def test_session_run_starts_no_queued_callable_after_an_abort() -> None:
 def test_session_run_ended_by_a_base_exception_aborts_the_work_it_started(
     error: type[BaseException],
 ) -> None:
-    seen: list[AbortSignal] = []
+    seen: list[AbortScope] = []
 
     def _record_then_raise() -> int:
-        signal = parent_signal()
-        assert signal is not None
-        seen.append(signal)
+        scope = current_abort_scope()
+        assert scope is not None
+        seen.append(scope)
         raise error
 
     with session() as opened:

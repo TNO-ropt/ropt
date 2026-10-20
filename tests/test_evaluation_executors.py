@@ -33,7 +33,7 @@ import pytest
 from ropt import session
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.components.compute_steps import OptimizationStep
-from ropt.components.concurrency import AbortSignal, _program, parent_signal
+from ropt.components.concurrency import AbortScope, _program, current_abort_scope
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -289,15 +289,15 @@ def test_submitting_from_a_worker_thread_is_refused() -> None:
     assert "already running on it" in message
 
 
-@pytest.mark.parametrize(
-    "abort_signal", [AbortSignal(), None], ids=["signal", "no_signal"]
-)
-def test_thread_executor_runs_work_with_its_abort_signal_as_parent(
-    abort_signal: AbortSignal | None,
+@pytest.mark.parametrize("abort_scope", [AbortScope(), None], ids=["scope", "no_scope"])
+def test_thread_executor_runs_work_with_its_abort_scope_as_current(
+    abort_scope: AbortScope | None,
 ) -> None:
     executor = ThreadExecutor(workers=1)
-    values = executor.run([WorkItem(function=parent_signal)], abort_signal=abort_signal)
-    assert values == [abort_signal]
+    values = executor.run(
+        [WorkItem(function=current_abort_scope)], abort_scope=abort_scope
+    )
+    assert values == [abort_scope]
 
 
 def _teardown_threads() -> set[threading.Thread]:
@@ -1316,10 +1316,10 @@ class _RecordingExecutor(ThreadExecutor):
     def _submit(
         self,
         item: WorkItem,
-        abort_signal: AbortSignal | None,
+        abort_scope: AbortScope | None,
     ) -> Future[Any]:
         self.submitted.append(item)
-        return super()._submit(item, abort_signal)
+        return super()._submit(item, abort_scope)
 
 
 def test_executor_dispatches_work_items_individually() -> None:
@@ -1464,7 +1464,7 @@ def test_an_abort_does_not_wait_for_work_already_running(
     # The first call holds the only worker, so the other two are still queued
     # when the abort arrives and must not start. A thread cannot be interrupted,
     # so `run` has to return while the first one is still blocked.
-    signal = AbortSignal()
+    scope = AbortScope()
     started = threading.Event()
     release = threading.Event()
     ran: list[int] = []
@@ -1482,13 +1482,13 @@ def test_an_abort_does_not_wait_for_work_already_running(
     results: list[Any] = []
 
     def _drive() -> None:
-        results.extend(executor.run(items, abort_signal=signal))
+        results.extend(executor.run(items, abort_scope=scope))
 
     driver = threading.Thread(target=_drive)
     try:
         driver.start()
         assert started.wait(timeout=4.0)
-        signal.abort()
+        scope.abort()
         driver.join(timeout=4.0)
         assert not driver.is_alive()
         assert not release.is_set()
@@ -1528,7 +1528,7 @@ def _waiting_for_log(text: str) -> Generator[threading.Event]:
 def test_an_error_raised_by_work_left_running_is_logged(
     make_executor: Callable[[], Executor],
 ) -> None:
-    signal = AbortSignal()
+    scope = AbortScope()
     started = threading.Event()
     release = threading.Event()
 
@@ -1540,13 +1540,13 @@ def test_an_error_raised_by_work_left_running_is_logged(
 
     def _abort_once_started() -> None:
         assert started.wait(timeout=5.0)
-        signal.abort()
+        scope.abort()
 
     aborter = threading.Thread(target=_abort_once_started)
     with _waiting_for_log("left running") as logged:
         aborter.start()
         results = make_executor().run(
-            [WorkItem(function=_fail_once_released)], abort_signal=signal
+            [WorkItem(function=_fail_once_released)], abort_scope=scope
         )
         aborter.join(timeout=5.0)
         release.set()
@@ -1562,20 +1562,20 @@ def test_an_abort_does_not_wait_for_work_running_in_a_process(tmp_path: Path) ->
     # then makes the work item raise, which is logged.
     listener = Listener(str(tmp_path / "worker"))
     executor = ProcessExecutor(workers=1)
-    signal = AbortSignal()
+    scope = AbortScope()
     results: list[Any] = []
     connection = None
 
     def _drive() -> None:
         item = WorkItem(function=_block_until_disconnected, args=(listener.address,))
-        results.extend(executor.run([item], abort_signal=signal))
+        results.extend(executor.run([item], abort_scope=scope))
 
     driver = threading.Thread(target=_drive, daemon=True)
     with _waiting_for_log("EOFError") as logged:
         try:
             driver.start()
             connection = listener.accept()
-            signal.abort()
+            scope.abort()
             driver.join(timeout=10.0)
             assert not driver.is_alive()
             assert isinstance(results[0], WorkNotRun)
@@ -1595,7 +1595,7 @@ def test_an_abort_wakes_a_run_waiting_for_a_payload_slot(tmp_path: Path) -> None
     # abort can bring it back.
     listener = Listener(str(tmp_path / "worker"))
     executor = ProcessExecutor(workers=1)
-    signal = AbortSignal()
+    scope = AbortScope()
     results: list[Any] = []
     connection = None
 
@@ -1607,7 +1607,7 @@ def test_an_abort_wakes_a_run_waiting_for_a_payload_slot(tmp_path: Path) -> None
 
     def _wait_for_a_slot() -> None:
         results.extend(
-            executor.run([WorkItem(function=_function, args=(0,))], abort_signal=signal)
+            executor.run([WorkItem(function=_function, args=(0,))], abort_scope=scope)
         )
 
     holder = threading.Thread(target=_hold_both_slots, daemon=True)
@@ -1616,7 +1616,7 @@ def test_an_abort_wakes_a_run_waiting_for_a_payload_slot(tmp_path: Path) -> None
         holder.start()
         connection = listener.accept()
         waiter.start()
-        signal.abort()
+        scope.abort()
         waiter.join(timeout=30.0)
         assert not waiter.is_alive()
         assert isinstance(results[0], WorkNotRun)
@@ -1627,8 +1627,8 @@ def test_an_abort_wakes_a_run_waiting_for_a_payload_slot(tmp_path: Path) -> None
         holder.join(timeout=30.0)
 
 
-def test_the_payload_gate_refuses_a_waiter_once_the_signal_aborts() -> None:
-    signal = AbortSignal()
+def test_the_payload_gate_refuses_a_waiter_once_the_scope_aborts() -> None:
+    scope = AbortScope()
     gate = _PayloadGate(RawArray("i", 1), 1)
     slot = gate.acquire(blocking=True)
     assert slot is not None
@@ -1637,12 +1637,12 @@ def test_the_payload_gate_refuses_a_waiter_once_the_signal_aborts() -> None:
 
     def _wait_for_the_slot() -> None:
         waiting.set()
-        acquired.append(gate.acquire(blocking=True, abort_signal=signal))
+        acquired.append(gate.acquire(blocking=True, abort_scope=scope))
 
     waiter = threading.Thread(target=_wait_for_the_slot)
     waiter.start()
     assert waiting.wait(timeout=4.0)
-    signal.abort()
+    scope.abort()
     gate.wake()
     waiter.join(timeout=4.0)
     assert not waiter.is_alive()
@@ -1650,7 +1650,7 @@ def test_the_payload_gate_refuses_a_waiter_once_the_signal_aborts() -> None:
 
 
 def test_the_payload_gate_refuses_a_waiter_when_a_slot_frees_after_the_abort() -> None:
-    signal = AbortSignal()
+    scope = AbortScope()
     gate = _PayloadGate(RawArray("i", 1), 1)
     slot = gate.acquire(blocking=True)
     assert slot is not None
@@ -1659,14 +1659,14 @@ def test_the_payload_gate_refuses_a_waiter_when_a_slot_frees_after_the_abort() -
 
     def _wait_for_the_slot() -> None:
         waiting.set()
-        acquired.append(gate.acquire(blocking=True, abort_signal=signal))
+        acquired.append(gate.acquire(blocking=True, abort_scope=scope))
 
     waiter = threading.Thread(target=_wait_for_the_slot)
     waiter.start()
     assert waiting.wait(timeout=4.0)
     # Released rather than woken, so the waiter finds a free slot and leaves the
     # loop without the abort ever being tested for it.
-    signal.abort()
+    scope.abort()
     gate.release(slot)
     waiter.join(timeout=4.0)
     assert not waiter.is_alive()
@@ -1682,14 +1682,12 @@ def test_the_payload_gate_refuses_a_waiter_when_a_slot_frees_after_the_abort() -
         ),
     ],
 )
-def test_a_batch_given_an_aborted_signal_does_not_run(
+def test_a_batch_given_an_aborted_scope_does_not_run(
     build: Callable[[], ExecutorBase],
 ) -> None:
-    signal = AbortSignal()
-    signal.abort()
-    results = build().run(
-        [WorkItem(function=_function, args=(0,))], abort_signal=signal
-    )
+    scope = AbortScope()
+    scope.abort()
+    results = build().run([WorkItem(function=_function, args=(0,))], abort_scope=scope)
     assert isinstance(results[0], WorkNotRun)
 
 

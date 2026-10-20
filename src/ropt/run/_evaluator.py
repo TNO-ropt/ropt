@@ -10,7 +10,7 @@ from ._batch_ids import next_batch_id
 from ._function import adapt_function
 
 if TYPE_CHECKING:
-    from ropt.components.concurrency import AbortSignal
+    from ropt.components.concurrency import AbortScope
     from ropt.components.evaluators import Evaluator
     from ropt.components.executors import Executor
     from ropt.context import EnOptContext
@@ -22,7 +22,7 @@ def make_evaluator(
     context: EnOptContext,
     function: EvaluationFunction,
     executor: Executor | None,
-    abort_signal: AbortSignal | None = None,
+    abort_scope: AbortScope | None = None,
 ) -> Evaluator:
     n_obj = context.objectives.weights.size
     n_con = (
@@ -35,11 +35,11 @@ def make_evaluator(
         return FunctionEvaluator(
             function=callback,
             batch_id_callback=next_batch_id,
-            abort_signal=abort_signal,
+            abort_scope=abort_scope,
         )
     return ParallelEvaluator(
         function=callback,
         executor=executor,
         batch_id_callback=next_batch_id,
-        abort_signal=abort_signal,
+        abort_scope=abort_scope,
     )

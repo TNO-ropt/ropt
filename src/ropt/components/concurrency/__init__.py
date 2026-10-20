@@ -1,23 +1,23 @@
 """Concurrency primitives for workflow coordinators.
 
-[`AbortSignal`][ropt.components.concurrency.AbortSignal] aborts every compute
+[`AbortScope`][ropt.components.concurrency.AbortScope] aborts every compute
 step that was given it. For the helpers meant for scripts and applications, see
 [`ropt.utils`][ropt.utils].
 
-[`AbortSignal.as_parent`][ropt.components.concurrency.AbortSignal.as_parent]
-marks the code that a task is running, and
-[`parent_signal`][ropt.components.concurrency.parent_signal] returns the signal
-it was marked with: the parent signal of a task started from that code.
+[`AbortScope.as_current`][ropt.components.concurrency.AbortScope.as_current]
+makes a scope current for the code that a task is running, and
+[`current_abort_scope`][ropt.components.concurrency.current_abort_scope]
+returns it. A task started from that code is nested in the current scope.
 """
 
 from __future__ import annotations
 
-from ._abort_signal import AbortSignal, aborting, parent_signal
+from ._abort_scope import AbortScope, aborting, current_abort_scope
 from ._program import run_program
 
 __all__ = [
-    "AbortSignal",
+    "AbortScope",
     "aborting",
-    "parent_signal",
+    "current_abort_scope",
     "run_program",
 ]

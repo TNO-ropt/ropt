@@ -372,8 +372,7 @@ function stay whatever you raised.
 [Running Multiple Optimizations](many_runs.md) shows how several optimization
 tasks can run in parallel. If a task raises an exception, every task started
 from inside it is aborted, and the exception is raised in the code that started
-the task. If that code is your script, every other task on the session is
-aborted as well. [Failures and Aborts](failures.md) describes each case.
+the task. [Failures and Aborts](failures.md) describes each case.
 
 ## A note on enums
 

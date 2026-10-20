@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Any, override
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
-from ropt.components.concurrency import AbortSignal, _grace
+from ropt.components.concurrency import AbortScope, _grace
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError
 
@@ -194,7 +194,7 @@ class ProcessExecutor(ExecutorBase):
         self,
         items: list[WorkItem],
         store: Callable[[int, Any], None],
-        abort_signal: AbortSignal | None,
+        abort_scope: AbortScope | None,
     ) -> None:
         pending = deque(enumerate(items))
         # Finished items arrive here rather than through
@@ -205,14 +205,14 @@ class ProcessExecutor(ExecutorBase):
         # The waits this call can be parked on are the result queue and the
         # payload gate; an abort has to break both.
         wake = partial(done.put, None)
-        if abort_signal is not None:
-            abort_signal.add_callback(wake)
-            abort_signal.add_callback(self._payload_gate.wake)
+        if abort_scope is not None:
+            abort_scope.add_callback(wake)
+            abort_scope.add_callback(self._payload_gate.wake)
         try:
             while pending or futures:
-                if abort_signal is not None and abort_signal.aborting:
+                if abort_scope is not None and abort_scope.aborting:
                     break
-                unsent = self._submit_pending(pending, futures, done, abort_signal)
+                unsent = self._submit_pending(pending, futures, done, abort_scope)
                 _store_unsent(unsent, store)
                 if not futures:
                     continue
@@ -224,37 +224,37 @@ class ProcessExecutor(ExecutorBase):
                 if not item.cancelled():
                     store(index, _item_result(item))
         finally:
-            if abort_signal is not None:
-                abort_signal.remove_callback(wake)
-                abort_signal.remove_callback(self._payload_gate.wake)
+            if abort_scope is not None:
+                abort_scope.remove_callback(wake)
+                abort_scope.remove_callback(self._payload_gate.wake)
             for future, (_, slot) in futures.items():
                 if future.cancel():
                     self._payload_gate.release(slot)
                 else:
-                    self._leave_running(future, slot, abort_signal)
+                    self._leave_running(future, slot, abort_scope)
 
     def _leave_running(
-        self, future: _Result, slot: _Slot, abort_signal: AbortSignal | None
+        self, future: _Result, slot: _Slot, abort_scope: AbortScope | None
     ) -> None:
-        # The item keeps its parent: an abort of the signal that sent it, now
+        # The item keeps its parent: an abort of the scope that sent it, now
         # or later, still reaches it, as it would on a thread.
         forward = None
-        if abort_signal is not None:
-            forward = partial(self._payload_gate.abort, slot, abort_signal)
-            abort_signal.add_callback(forward)
+        if abort_scope is not None:
+            forward = partial(self._payload_gate.abort, slot, abort_scope)
+            abort_scope.add_callback(forward)
         future.add_done_callback(
-            partial(self._end_left_running, slot, abort_signal, forward)
+            partial(self._end_left_running, slot, abort_scope, forward)
         )
 
     def _end_left_running(
         self,
         slot: _Slot,
-        abort_signal: AbortSignal | None,
+        abort_scope: AbortScope | None,
         forward: Callable[[], None] | None,
         future: _Result,
     ) -> None:
-        if abort_signal is not None and forward is not None:
-            abort_signal.remove_callback(forward)
+        if abort_scope is not None and forward is not None:
+            abort_scope.remove_callback(forward)
         # A payload holds its slot until its work ends, waited for or not.
         self._payload_gate.release(slot)
         if future.cancelled() or isinstance(future.exception(), BrokenProcessPool):
@@ -267,13 +267,13 @@ class ProcessExecutor(ExecutorBase):
         pending: deque[tuple[int, WorkItem]],
         futures: dict[_Result, tuple[int, _Slot]],
         done: queue.SimpleQueue[_Result | None],
-        abort_signal: AbortSignal | None,
+        abort_scope: AbortScope | None,
     ) -> list[int]:
         # Waiting for a slot is safe only with nothing in flight: the slots this
         # batch holds are given back by the loop that calls this.
         while pending:
             slot = self._payload_gate.acquire(
-                blocking=not futures, abort_signal=abort_signal
+                blocking=not futures, abort_scope=abort_scope
             )
             if slot is None:
                 break
@@ -387,12 +387,12 @@ def _init_worker(flags: _Flags, grace: float) -> None:
 
 
 def _watch_flag(
-    flags: _Flags, index: int, abort_signal: AbortSignal, finished: threading.Event
+    flags: _Flags, index: int, abort_scope: AbortScope, finished: threading.Event
 ) -> None:
     while not finished.wait(_FLAG_INTERVAL):
         code = flags[index]
         if code:
-            abort_signal.abort(ExitCode(code))
+            abort_scope.abort(ExitCode(code))
             return
 
 
@@ -402,13 +402,13 @@ def _run_payload(payload: bytes, index: int) -> tuple[bool, bytes]:
         return _run_unpacked(payload)
     if flags[index]:
         return True, dumps(WorkNotRun(_NOT_RUN))
-    abort_signal = AbortSignal()
+    abort_scope = AbortScope()
     finished = threading.Event()
     threading.Thread(
-        target=_watch_flag, args=(flags, index, abort_signal, finished), daemon=True
+        target=_watch_flag, args=(flags, index, abort_scope, finished), daemon=True
     ).start()
     try:
-        with abort_signal.as_parent():
+        with abort_scope.as_current():
             return _run_unpacked(payload)
     finally:
         finished.set()
@@ -483,13 +483,13 @@ class _PayloadGate:
         self._owners: list[_Slot | None] = [None] * slots
 
     def acquire(
-        self, *, blocking: bool, abort_signal: AbortSignal | None = None
+        self, *, blocking: bool, abort_scope: AbortScope | None = None
     ) -> _Slot | None:
         with self._condition:
             while True:
                 # Tested before the slot, so a waiter woken by a freed slot
                 # rather than by the abort does not take it.
-                if abort_signal is not None and abort_signal.aborting:
+                if abort_scope is not None and abort_scope.aborting:
                     return None
                 if self._free:
                     slot = _Slot(self._free.pop())
@@ -508,10 +508,10 @@ class _PayloadGate:
             self._free.append(slot.index)
             self._condition.notify()
 
-    def abort(self, slot: _Slot, abort_signal: AbortSignal) -> None:
+    def abort(self, slot: _Slot, abort_scope: AbortScope) -> None:
         with self._condition:
             if self._owners[slot.index] is slot:
-                self._flags[slot.index] = int(abort_signal.exit_code)
+                self._flags[slot.index] = int(abort_scope.exit_code)
 
     def wake(self) -> None:
         with self._condition:

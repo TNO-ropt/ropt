@@ -12,7 +12,7 @@ from ropt.exceptions import WorkflowError
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-    from ropt.components.concurrency import AbortSignal
+    from ropt.components.concurrency import AbortScope
     from ropt.context import EnOptContext
     from ropt.events import EnOptEvent
 
@@ -28,18 +28,18 @@ class ComputeStep[ResultT](ABC):
     The type parameter is what `run` returns.
     """
 
-    def __init__(self, *, abort_signal: AbortSignal | None = None) -> None:
+    def __init__(self, *, abort_scope: AbortScope | None = None) -> None:
         """Initialize the ComputeStep.
 
         Args:
-            abort_signal: An optional signal that cuts this step off.
+            abort_scope: An optional scope that cuts this step off.
         """
         self._event_handlers: list[EventHandler] = []
         self._running = False
         self._run_lock = threading.Lock()
         # Set once and read; assignment is atomic, so no lock of its own.
         self._stop_requested = False
-        self._abort_signal = abort_signal
+        self._abort_scope = abort_scope
 
     def add_event_handler(self, handler: EventHandler) -> None:
         """Attach an event handler to receive this step's events.
@@ -85,7 +85,7 @@ class ComputeStep[ResultT](ABC):
 
     @property
     def _aborting(self) -> bool:
-        return self._abort_signal is not None and self._abort_signal.aborting
+        return self._abort_scope is not None and self._abort_scope.aborting
 
     @abstractmethod
     def _run(
@@ -135,7 +135,7 @@ class ComputeStep[ResultT](ABC):
                 raise WorkflowError(msg)
             self._running = True
         # A step reused after a stopped run must not start out stopped. Only
-        # this step's own request is cleared: a signal is shared, and is not
+        # this step's own request is cleared: a scope is shared, and is not
         # this step's to reset.
         self._stop_requested = False
         try:

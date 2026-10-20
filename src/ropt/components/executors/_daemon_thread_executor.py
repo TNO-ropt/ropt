@@ -16,7 +16,7 @@ from .base import ExecutorBase, WorkItem, _log_left_running, _run_item, _wait_fo
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from ropt.components.concurrency import AbortSignal
+    from ropt.components.concurrency import AbortScope
 
 type _Job = tuple[Future[Any], Callable[[], Any]]
 
@@ -58,17 +58,17 @@ class DaemonThreadExecutor(ExecutorBase):
         self,
         items: list[WorkItem],
         store: Callable[[int, Any], None],
-        abort_signal: AbortSignal | None,
+        abort_scope: AbortScope | None,
     ) -> None:
         done: queue.SimpleQueue[Future[Any] | None] = queue.SimpleQueue()
-        futures, jobs = _prepare_jobs(items, done, abort_signal)
+        futures, jobs = _prepare_jobs(items, done, abort_scope)
         wake = partial(done.put, None)
-        if abort_signal is not None:
-            abort_signal.add_callback(wake)
+        if abort_scope is not None:
+            abort_scope.add_callback(wake)
         try:
             threads = len(jobs) if self._limit is None else min(self._limit, len(jobs))
             for _ in range(threads):
-                self._threads.start(partial(_take_jobs, jobs, abort_signal))
+                self._threads.start(partial(_take_jobs, jobs, abort_scope))
             while futures:
                 item = done.get()
                 if item is None:
@@ -77,8 +77,8 @@ class DaemonThreadExecutor(ExecutorBase):
                 if not item.cancelled():
                     store(index, item.result())
         finally:
-            if abort_signal is not None:
-                abort_signal.remove_callback(wake)
+            if abort_scope is not None:
+                abort_scope.remove_callback(wake)
             for future in futures:
                 if not future.cancel():
                     future.add_done_callback(partial(_log_left_running, Future.result))
@@ -138,7 +138,7 @@ class ThreadGroup:
 def _prepare_jobs(
     items: list[WorkItem],
     done: queue.SimpleQueue[Future[Any] | None],
-    abort_signal: AbortSignal | None,
+    abort_scope: AbortScope | None,
 ) -> tuple[dict[Future[Any], int], deque[_Job]]:
     futures: dict[Future[Any], int] = {}
     jobs: deque[_Job] = deque()
@@ -149,18 +149,18 @@ def _prepare_jobs(
         # Copied here, on the calling thread, and once per job: a context can
         # be entered by one thread at a time.
         context = contextvars.copy_context()
-        job = partial(context.run, _run_as_child, item, abort_signal)
+        job = partial(context.run, _run_as_child, item, abort_scope)
         jobs.append((future, job))
     return futures, jobs
 
 
-def _take_jobs(jobs: deque[_Job], abort_signal: AbortSignal | None) -> None:
+def _take_jobs(jobs: deque[_Job], abort_scope: AbortScope | None) -> None:
     while True:
         try:
             future, job = jobs.popleft()
         except IndexError:
             return
-        if abort_signal is not None and abort_signal.aborting:
+        if abort_scope is not None and abort_scope.aborting:
             future.cancel()
             continue
         if not future.set_running_or_notify_cancel():
@@ -175,7 +175,7 @@ def _take_jobs(jobs: deque[_Job], abort_signal: AbortSignal | None) -> None:
 
 def _run_as_child(
     item: WorkItem,
-    abort_signal: AbortSignal | None,
+    abort_scope: AbortScope | None,
 ) -> Any:  # ruff: ignore[any-type]
-    with nullcontext() if abort_signal is None else abort_signal.as_parent():
+    with nullcontext() if abort_scope is None else abort_scope.as_current():
         return _run_item(item.function, item.args, item.kwargs)
