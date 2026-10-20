@@ -506,9 +506,9 @@ print(counter.count)
 An [`EnOptEvent`][ropt.events.EnOptEvent] carries the `event_type` that
 triggered it and a `results` tuple, which holds the
 [`Results`][ropt.results.Results] objects of a `FINISHED_EVALUATION` and is
-empty for the other types. Its `source` is the compute step of the optimization
-that emitted the event, and calling `event.source.stop()` ends that optimization
-at the next evaluation boundary, with exit code `STOPPED`. The types an
+empty for the other types. Calling `event.stop()` ends the optimization that
+emitted the event at the next evaluation boundary, with exit code `STOPPED`.
+The types an
 optimization emits are:
 
 | Event type            | When it is emitted                                          |

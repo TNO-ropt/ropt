@@ -67,7 +67,7 @@ class ComputeStep[ResultT](ABC):
     def _emit_event(self, event: EnOptEvent) -> None:
         # Handlers run inline, on this run's own stack, so one that raises
         # unwinds this run and the handlers after it never see the event.
-        event.source = self
+        event.stop = self.stop
         for handler in self.event_handlers:
             if event.event_type in handler.event_types:
                 handler.handle_event(event)

@@ -38,10 +38,10 @@ def make_report_handler(report: ReportCallback, *, gradients: bool) -> EventHand
                 continue
             # `gradients` widens what is passed beyond what the alias describes,
             # which no single signature can express.
-            if report(cast("FunctionResults", item)) and event.source is not None:
+            if report(cast("FunctionResults", item)) and event.stop is not None:
                 # A truthy return asks the emitting run to stop; the break is
                 # what makes reporting end there rather than run out the batch.
-                event.source.stop()
+                event.stop()
                 break
 
     return CallbackHandler(

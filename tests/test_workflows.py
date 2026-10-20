@@ -729,8 +729,8 @@ def test_handler_stop_ends_with_stopped(config: Any, evaluator: Any) -> None:
         nonlocal evaluations
         evaluations += 1
         if evaluations == 1:
-            assert event.source is not None
-            event.source.stop()
+            assert event.stop is not None
+            event.stop()
 
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(ResultsHandler())
@@ -754,8 +754,8 @@ def test_handler_stop_runs_remaining_handlers(config: Any, evaluator: Any) -> No
         nonlocal stops
         stops += 1
         if stops == 1:
-            assert event.source is not None
-            event.source.stop()
+            assert event.stop is not None
+            event.stop()
 
     def _later(_: EnOptEvent) -> None:
         nonlocal later_ran
@@ -787,8 +787,8 @@ def test_stop_request_cleared_between_runs(config: Any, evaluator: Any) -> None:
         nonlocal calls
         calls += 1
         if calls == 1:
-            assert event.source is not None
-            event.source.stop()
+            assert event.stop is not None
+            event.stop()
 
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(ResultsHandler())

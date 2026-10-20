@@ -10,10 +10,11 @@ to track progress, store results, or stop the optimization. See
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ropt.components.compute_steps.base import ComputeStep
+    from collections.abc import Callable
+
     from ropt.context import EnOptContext
     from ropt.enums import EnOptEventType
     from ropt.results import Results
@@ -27,10 +28,7 @@ class EnOptEvent:
         event_type: Type of event that occurred.
         context:    The validated configuration in use.
         results:    Tuple of result objects associated with the event.
-        source:     The compute step that emitted the event.
-
-    A handler may call `source.stop()` to stop the optimization that emitted the
-    event.
+        stop:       Stops the optimization that emitted the event.
 
     See [Handling Results](../results/handlers.md#writing-your-own-handler) for
     when each event fires and what it carries.
@@ -39,4 +37,4 @@ class EnOptEvent:
     event_type: EnOptEventType
     context: EnOptContext
     results: tuple[Results, ...] = field(default_factory=tuple)
-    source: ComputeStep[Any] | None = None
+    stop: Callable[[], None] | None = None
