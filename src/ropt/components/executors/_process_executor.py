@@ -107,8 +107,7 @@ class ProcessExecutor(ExecutorBase):
         # callback: the pool runs those holding a lock of its own, which
         # `submit` and `shutdown` take while this one is held.
         self._state = threading.Lock()
-        self._closed = False
-        self._retiring: _Workers | None = None
+        self._retiring = False
         self._current: _Workers | None = self._start_workers()
         _logger.debug("Started process executor with %d worker(s)", workers)
 
@@ -132,27 +131,18 @@ class ProcessExecutor(ExecutorBase):
         return _Workers(pool)
 
     def _live_workers(self) -> _Workers:
-        # Called with `_state` held.
-        if self._closed:
-            raise _stopped()
-        retiring, self._retiring = self._retiring, None
-        if retiring is not None and retiring.busy():
-            # Work after an abort does not wait for the workers that the abort
-            # left busy: they are killed now rather than at their deadline.
-            _stop_workers(retiring.pool, kill=True)
-            if self._current is retiring:
-                self._current = None
+        # Called with `_state` held. `_current` is `None` only once closed.
         if self._current is None:
-            self._current = self._start_workers()
+            raise _stopped()
         return self._current
 
     @override
     def _retire(self) -> None:
         with self._state:
             workers = self._current
-            if workers is None or not workers.busy():
+            if self._retiring or workers is None or not workers.busy():
                 return
-            self._retiring = workers
+            self._retiring = True
         deadline = time.monotonic() + _grace.GRACE_PERIOD
         threading.Thread(
             target=self._kill_when_due, args=(workers, deadline), daemon=True
@@ -161,20 +151,12 @@ class ProcessExecutor(ExecutorBase):
     def _kill_when_due(self, workers: _Workers, deadline: float) -> None:
         workers.wait_idle(deadline)
         with self._state:
-            if self._retiring is not workers:
-                return
-            self._retiring = None
-            if not workers.busy():
-                return
-            _stop_workers(workers.pool, kill=True)
-            if self._current is workers:
-                self._current = None
+            if self._current is workers and workers.busy():
+                _stop_workers(workers.pool, kill=True)
 
     @override
     def _close(self, deadline: float) -> None:
         with self._state:
-            self._closed = True
-            self._retiring = None
             workers, self._current = self._current, None
         if workers is None:
             return
@@ -281,11 +263,13 @@ class ProcessExecutor(ExecutorBase):
                 future = self._submit(item, slot)
             except BrokenProcessPool:
                 self._payload_gate.release(slot)
-                # A pool broken by anything other than an abort is not
-                # replaced, so the rest of the batch is lost too and building
-                # its payloads would run nothing.
+                # A broken pool is not replaced, so the rest of the batch is
+                # lost too and building its payloads would run nothing. Killed
+                # by an abort, the items are left unstored: they were not run.
                 unsent = [index, *(other for other, _ in pending)]
                 pending.clear()
+                if abort_scope is not None and abort_scope.aborting:
+                    return []
                 return unsent
             except BaseException:
                 self._payload_gate.release(slot)

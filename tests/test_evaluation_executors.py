@@ -66,6 +66,7 @@ from ropt.components.executors._process_executor import (
     _stop_workers,
 )
 from ropt.context import EnOptContext
+from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 
 if TYPE_CHECKING:
@@ -996,6 +997,37 @@ def test_dying_worker_reported_as_infrastructure_failure(
         result = executor.run([WorkItem(function=_kill_own_process)])[0]
     assert isinstance(result, ExecutorFailure)
     assert "Worker process pool broken" in caplog.text
+
+
+class _AbortsWhenSent:
+    def __init__(self, scope: AbortScope) -> None:
+        self._scope = scope
+
+    def __call__(self) -> int:
+        return 0
+
+    @override
+    def __reduce__(self) -> tuple[Any, ...]:
+        self._scope.abort(ExitCode.USER_ABORT)
+        return (_one, ())
+
+
+def _one() -> int:
+    return 1
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+def test_process_executor_item_aborted_on_its_way_to_a_broken_pool_is_not_run() -> None:
+    # The abort lands after the item took its slot but before it reached a pool
+    # that an abort may have killed meanwhile: it was not run, rather than lost.
+    executor = ProcessExecutor(workers=1)
+    executor.run([WorkItem(function=_kill_own_process)])
+    scope = AbortScope()
+    result = executor.run(
+        [WorkItem(function=_AbortsWhenSent(scope))], abort_scope=scope
+    )[0]
+    assert isinstance(result, WorkNotRun)
 
 
 @pytest.mark.parametrize(
