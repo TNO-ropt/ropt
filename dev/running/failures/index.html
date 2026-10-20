@@ -2565,8 +2565,9 @@ at the same time: side by side on one session, or started from inside one
 another, as when an evaluation function calls <code>run</code>. When a task raises an
 exception, every task started from inside it is aborted, and so are the other
 tasks started by the same <code>run</code> call. The exception is then raised in the code
-that started the task. If the task was started from your script rather than from
-inside another task, every other task on the session is aborted as well.</p>
+that started the task. If that code does not catch it, the exception leaves the
+<code>with</code> block, and the session aborts every task that is still running. Code that
+catches the exception keeps the other tasks running.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This page describes what a failure does to other tasks. What a single
@@ -2600,9 +2601,10 @@ does any <code>NaN</code>, and the other evaluations are not affected. How many 
 realizations a batch may contain is set by
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>.</p>
 <p>Without the <code>try</code>, the exception leaves <code>objective</code>, and the optimization fails
-with it. The optimization was started from your script, so <code>optimize</code> aborts
-every other task on the session, including the simulations that the other
-evaluations had started, and then raises the <code>SimulationError</code> in your script.</p>
+with it. <code>optimize</code> aborts the tasks nested in it, including the simulations
+that the other evaluations had started, and then raises the <code>SimulationError</code>
+in your script. The exception then leaves the <code>with</code> block, and the session
+aborts the rest of its work.</p>
 <h2 id="nested-tasks">Nested tasks</h2>
 <p>A task started from inside another task is <strong>nested</strong> in it, and the outer task
 is its <strong>parent</strong>. A task is started from inside another when <code>optimize</code>,
@@ -2619,8 +2621,8 @@ an HPC job is not nested. Neither is a task started from your script.</p>
 <div class="admonition note">
 <p class="admonition-title">Threads that your code starts</p>
 <p>A task started from a thread that your own code starts is not nested, even
-when the thread is started from an evaluation function, so its failure aborts
-every other task on the session. Start the thread through
+when the thread is started from an evaluation function, so it is not aborted
+with the task that started the thread. Start the thread through
 <code>contextvars.copy_context().run</code> to make it nested:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">contextvars</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
@@ -2646,13 +2648,12 @@ other, and no task is aborted.</p>
 <p>When a task raises an exception, these tasks are aborted:</p>
 <ul>
 <li>every task nested in it, at any depth;</li>
-<li>the other tasks started by the same <code>run</code> call;</li>
-<li>every other task on its session, unless the failing task is nested.</li>
+<li>the other tasks started by the same <code>run</code> call.</li>
 </ul>
-<p>The same holds when an optimization or evaluation cannot be built because its
-configuration is invalid, and when arguments are rejected before any task
-starts, such as a vector of the wrong shape. A method called on a session that
-has closed, or on one of its pools, raises
+<p>An optimization or evaluation that cannot be built because its configuration is
+invalid, or that is given arguments it rejects, such as a vector of the wrong
+shape, raises the exception before it has started anything to abort. A method
+called on a session that has closed, or on one of its pools, raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> and aborts nothing. An
 exception raised by a task that is being aborted is still raised, but aborts
 nothing further.</p>
@@ -2660,17 +2661,21 @@ nothing further.</p>
 a task, the tasks nested in it and the other tasks of the same <code>run</code> call are
 aborted with <code>ABORTED</code>, and the exception is raised. Other tasks on the session
 are not aborted until the exception leaves the session's <code>with</code> block.</p>
-<p>A failure does not abort the tasks of another session, unless they are nested in
-one that it aborts. A module-level function such as <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>
-opens a session of its own, which holds only the tasks started by that function.</p>
+<p>An exception that leaves the <code>with</code> block of a session, whether a failure or a
+<code>KeyboardInterrupt</code>, ends the session, which aborts the tasks that are still
+running with <code>ABORTED</code>.</p>
 <h2 id="what-an-abort-does">What an abort does</h2>
 <p>A nested task is aborted when its parent is, with the same exit code:
 <code>USER_ABORT</code> after <a href="../many_runs/#stopping-from-outside"><code>Session.abort</code></a>, <code>ABORTED</code>
 when the session's <code>with</code> block ends or a <code>KeyboardInterrupt</code> or <code>SystemExit</code>
 passes through the parent, and <code>ABORTED_ON_ERROR</code> after a failure.
-This also holds when the nested task belongs to another session, as one started
-with the module-level <code>optimize</code> does. A nested task that starts after its
-parent was aborted is aborted at once.</p>
+This also holds when the nested task is started on another session, or with a
+module-level function such as <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>. A nested task that
+starts after its parent was aborted is aborted at once.</p>
+<p>When a session is aborted, so are the tasks started on it, the tasks started in
+its <code>with</code> block, and the sessions opened there. An aborted session stays
+aborted: every task started on it, or in its <code>with</code> block, after the abort is
+aborted at once. See <a href="../many_runs/#stopping-from-outside">Aborting from outside</a>.</p>
 <p>An aborted task raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
 <code>exit_code</code> is the exit code of the abort; see
 <a href="../../results/exit_codes/">Exit Codes</a>. It raises without waiting for the work it
@@ -2731,8 +2736,9 @@ nested task raises <code>AbortedError</code> at once. An external program starte
 <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> is terminated when the task is aborted, and
 <code>run_program</code> then raises <code>AbortedError</code>; see
 <a href="../programs/">Running External Programs</a>.</p>
-<p><code>aborting</code> returns <code>False</code> in code that no task runs, which includes the jobs of
-an HPC pool. In the worker processes of a process pool it turns <code>True</code> within a
+<p>In the <code>with</code> block of a session, outside any task, <code>aborting</code> returns whether
+the session is aborted. It returns <code>False</code> outside any task and session block,
+which includes the jobs of an HPC pool. In the worker processes of a process pool it turns <code>True</code> within a
 fraction of a second of the abort.</p>
 
 

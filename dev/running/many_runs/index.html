@@ -2623,7 +2623,7 @@ a file, talking to a database — holds up every optimization feeding it.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Without a pool, the threads of <code>run</code> do the evaluating</p>
-<p>An optimization started with <a class="autorefs autorefs-internal" title="            optimize" href="../../reference/api/#ropt.Session.optimize"><code>Session.optimize</code></a>
+<p>An optimization started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>
 evaluates in your own program, on the thread that <code>run</code> started for it.
 When several of them run at once, your evaluation function is called by
 several threads at once and must tolerate that. Start them on a pool when it
@@ -2648,8 +2648,7 @@ unless you want the optimizers' reports interleaved on the terminal.</p>
 <h2 id="failure-in-one-run">Failure in one optimization</h2>
 <p>The optimizations started from the callables of one <code>run</code> call are
 <a href="../failures/#nested-tasks">nested</a> in it. When one of them raises, <code>run</code>
-aborts the others and raises that exception at once; when <code>run</code> was called
-from your script, every other task on the session is aborted as well.
+aborts the others and raises that exception at once.
 <a href="../failures/">Failures and Aborts</a> gives the rules for every case. An aborted
 optimization raises <code>AbortedError</code> with <code>ABORTED_ON_ERROR</code> — at once on a pool,
 or at its next evaluation boundary without one — but <code>run</code> does not wait for
@@ -2670,7 +2669,7 @@ something that marks the failure:</p>
 <p><a href="#stopping-from-outside"><code>Session.abort</code></a> reaches every optimization on
 the session, and <code>run</code> then raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with <code>USER_ABORT</code>. When a failure
-elsewhere aborted it, the exit code is <code>ABORTED_ON_ERROR</code>, so the exit code
+aborted it, the exit code is <code>ABORTED_ON_ERROR</code>, so the exit code
 distinguishes an abort that was asked for from one that a failure caused. A
 <code>KeyboardInterrupt</code> aborts the optimizations of the <code>run</code> call it passes through,
 and is raised at once. See <a href="../../results/exit_codes/">Exit Codes</a> for what each
@@ -2678,9 +2677,9 @@ code means.</p>
 <h2 id="stopping-from-outside">Aborting from outside</h2>
 <p>The <code>report</code> callback runs inside the optimization it stops, which is no use to
 a signal handler or a user interface. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> is
-the one that is called from another thread: it aborts every task that belongs
-to the session, and each raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>
-with <code>USER_ABORT</code>.</p>
+the one that is called from another thread: it aborts every task started on
+the session or in its <code>with</code> block, and each raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with <code>USER_ABORT</code>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">abort</span><span class="p">())</span>
@@ -2700,9 +2699,11 @@ pool, the task calls the evaluation function itself, so the call in progress
 returns first. On a thread or process pool, the evaluations already running
 continue after the task has ended, and their workers are free only once they
 return. On an HPC pool they are cancelled.</p>
-<p><code>abort()</code> reaches the tasks that are under way at the moment it is called, and
-nothing more. A task started afterwards is unaffected, so a
-loop that abandons one attempt and starts another keeps working. A
+<p>An abort is permanent: the session stays aborted. A task started on it
+afterwards, or in its <code>with</code> block, raises <code>AbortedError</code> with <code>USER_ABORT</code> at
+once. Code that catches the <code>AbortedError</code> inside the block can record what
+happened, but cannot start more work on the session; catching it outside the
+<code>with</code> block works as well. To try again, open a new session. A
 <a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>run</code></a> call counts as one task here: a callable it has
 queued behind its <code>limit</code> is not started. Leaving the session's <code>with</code> block
 aborts its tasks as well, and then releases its pools, which is what refuses a
@@ -2710,9 +2711,9 @@ task started after that. Releasing an HPC pool cancels the jobs it still
 has, so none are left running when the block has ended. A task aborted that way
 raises with <code>ABORTED</code> rather than <code>USER_ABORT</code>, since it was the block ending
 rather than a request to abort.</p>
-<p>An optimization started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> belongs
-to no session you hold and cannot be aborted this way. Start it on a session
-or one of its pools to make it abortable.</p>
+<p>A module-level function such as <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, called in the
+<code>with</code> block of a session, is aborted with the session. Called outside any
+session block, it cannot be aborted this way.</p>
 
 
 
