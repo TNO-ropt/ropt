@@ -2560,9 +2560,9 @@
 <h1 id="running-external-programs">Running External Programs</h1>
 <p>An evaluation function often runs a simulator or a solver as a separate program.
 Start it with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>, and the program stops when the
-optimization is aborted, on any pool, together with every program it started.
+optimization is aborted, with any pool, together with every program it started.
 A program started with <code>subprocess.run</code> or <code>os.system</code> keeps running after an
-abort, and on a thread pool the evaluation waits for it.</p>
+abort, and with a thread pool the evaluation waits for it.</p>
 <p>The example script
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/programs.py"><code>examples/programs.py</code></a>
 runs a simulator from the objective function. The simulator is
@@ -2619,7 +2619,7 @@ program was ended by signal <code>N</code>, as in <code>subprocess</code>. The o
 for a failed simulation, which marks the evaluation as failed; see
 <a href="../failures/">Failures and Aborts</a>.</p>
 <h2 id="running-the-optimization">Running the optimization</h2>
-<p>The optimization runs the four realizations on a thread pool, so up to four
+<p>The optimization runs the four realizations with a thread pool, so up to four
 simulators run at the same time:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span>
@@ -2712,7 +2712,7 @@ only when its caller is stopped, in one of three ways:</p>
 those still running five seconds later receive <code>SIGKILL</code>.</p>
 <p><code>run_program</code> behaves the same wherever it is called: in an evaluation function,
 an event handler, a report callback, a function given to
-<a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, on every pool, or in your own code outside any
+<a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, with every pool, or in your own code outside any
 optimization. Only the ways in which the caller can be stopped differ.
 <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> reaches code in the session's <code>with</code>
 block and the calls made there or given the session's pools. It does not reach code after

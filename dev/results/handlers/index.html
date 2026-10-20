@@ -2794,7 +2794,7 @@ handler starts, not on the call that is feeding the handler. A nested
 <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> emits on the thread that called it — the
 one already inside the handler — so this raises a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A nested optimization
-started with <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> on a pool emits on a worker of that pool,
+started with <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> and a pool emits on a worker of that pool,
 which waits for a lock the first thread will
 not release until the optimization ends, and both stop. The same holds for
 two handlers that each start an optimization reaching the other. Give the
@@ -3522,7 +3522,7 @@ handler's own <code>_handle_event</code>, or a <code>report</code> callback, rat
 another handler's state.</p>
 </div>
 <h2 id="handlers-and-separate-processes">Handlers and separate processes</h2>
-<p>On a thread pool (or with no pool) your objective and your handlers run
+<p>With a thread pool (or with no pool) your objective and your handlers run
 in the <strong>same process</strong> and share memory: a handler can see anything the
 objective left behind — a global it set, a list it appended to, an object it
 mutated.</p>
@@ -3553,7 +3553,7 @@ an objective defined at module level works as is; a lambda, a closure, or a
 notebook-defined objective needs the optional <code>cloudpickle</code> extra. Most
 functions and data serialize fine, but things like open files, locks, or
 database connections may not.</p>
-<p>On a process pool the bytes travel over an in-machine channel. On an
+<p>With a process pool the bytes travel over an in-machine channel. With an
 HPC pool they are written as <strong>files on a shared filesystem</strong> that the
 cluster nodes read, so it needs such a filesystem (its <code>workdir</code>).</p>
 <p>Serialization is only the mechanism <code>ropt</code> uses today; the essential
@@ -3568,8 +3568,8 @@ handlers and your main program never see it.</p>
 <div class="admonition note">
 <p class="admonition-title">Pools stay in the main process</p>
 <p>A pool is tied to the process that opened its session, so it is not usable
-in a worker. An objective that closes over one — to run work on it, or to
-start an inner optimization on it — is stopped in the worker, which reports the
+in a worker. An objective that closes over one — to run work with it, or to
+start an inner optimization with it — is stopped in the worker, which reports the
 object by name. Do that work in the objective itself, or return what you
 need and act on it in the main process.</p>
 </div>

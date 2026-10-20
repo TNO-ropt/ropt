@@ -2576,7 +2576,7 @@ optimization raises or reports is described in
 happens when a worker breaks down in
 <a href="../parallel/#when-an-evaluation-fails">When an evaluation fails</a>.</p>
 </div>
-<p>Here an evaluation function runs a simulation on a process pool:</p>
+<p>Here an evaluation function runs a simulation with a process pool:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">session</span>
@@ -2613,7 +2613,7 @@ or from a function given to it if it is a <code>run</code> call. The outer call 
 <strong>parent</strong>. This holds with or without a pool.</p>
 <p>An evaluation function runs in your process when its optimization or evaluation
 has no pool or a thread pool, and so does a function given to <code>run</code> without a
-pool or on a thread pool. On a process or HPC pool they run in another process.
+pool or with a thread pool. With a process or HPC pool they run in another process.
 A call they make in the worker of a process pool is aborted when the call that
 runs them is; a call they make in an HPC job is not nested. Neither is a call
 made from your script.</p>
@@ -2649,14 +2649,14 @@ depth. When one function given to <code>run</code> raises, the <code>run</code> 
 other functions are aborted, together with the calls nested in them.</p>
 <p>An optimization or evaluation that cannot be built because its configuration is
 invalid, or that is given arguments it rejects, such as a vector of the wrong
-shape, raises the exception before it has started anything to abort. A method
-called on a session that has closed, or on one of its pools, raises
+shape, raises the exception before it has started anything to abort. Building a pool
+with a session that has closed, or passing one of its pools to a call, raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> and aborts nothing. An
 exception raised by a call that is being aborted is still raised, but aborts
 nothing further.</p>
 <p>A <code>KeyboardInterrupt</code> or <code>SystemExit</code> is not a failure. When one passes through
 a call, the calls nested in it, and for <code>run</code> its other functions, are aborted
-with <code>ABORTED</code>, and the exception is raised. Other calls on the session are not
+with <code>ABORTED</code>, and the exception is raised. Other calls in the session are not
 aborted until the exception leaves the session's <code>with</code> block.</p>
 <p>An exception that leaves the <code>with</code> block of a session, whether a failure or a
 <code>KeyboardInterrupt</code>, ends the session, which aborts the calls that are still
@@ -2678,7 +2678,7 @@ is aborted at once. See
 <code>exit_code</code> is the exit code of the abort; see
 <a href="../../results/exit_codes/">Exit Codes</a>. It raises without waiting for the work it
 has running, and returns no result. A function given to <code>run</code> that has not
-started never starts, and if it is running on a pool, <code>run</code> does not wait for
+started never starts, and if it is running with a pool, <code>run</code> does not wait for
 it. What
 happens to work that is already running depends on the pool:</p>
 <table>
@@ -2699,7 +2699,7 @@ happens to work that is already running depends on the pool:</p>
 </tr>
 <tr>
 <td><code>process_pool</code></td>
-<td>as on a thread pool, and its worker is killed if it is still running five seconds later</td>
+<td>as with a thread pool, and its worker is killed if it is still running five seconds later</td>
 </tr>
 <tr>
 <td><code>hpc_pool</code></td>
@@ -2718,7 +2718,7 @@ their pool can no longer run the work. In an evaluation function, returning
 that your own code raises, as the example above does.</p>
 <h2 id="stopping-early-when-aborted">Stopping early when aborted</h2>
 <p>Work that is left running after its call was aborted runs to its end, unless it
-stops by itself or, on a process pool, its worker is killed five seconds later.
+stops by itself or, with a process pool, its worker is killed five seconds later.
 Call <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> in long-running code — an
 evaluation function, an event handler, a report callback, or a function given to
 <code>run</code> — to find out whether the call that runs it is being aborted:</p>

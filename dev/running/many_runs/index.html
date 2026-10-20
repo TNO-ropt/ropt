@@ -2555,8 +2555,8 @@ pool and returns the results in the order the callables were given:</p>
 <p>Each callable is an ordinary <code>optimize</code> call, so every optimization can have its
 own configuration, initial values, objective, <code>metadata</code> and <code>report</code> callback.</p>
 <p>The optimizations need a pool of their own, <code>runner</code> here, separate from the
-pool they evaluate on. A call made from work running on a pool cannot use that
-same pool: it raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Without
+pool they evaluate with. A call made from work running with a pool cannot use
+that same pool: it raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Without
 a pool, <code>run</code> calls the functions one after another on the calling thread.</p>
 <div class="admonition tip">
 <p class="admonition-title">Give each optimization an ID</p>
@@ -2584,7 +2584,7 @@ attached to its results (and shows up in a
 <li><strong>The optimizations</strong> run concurrently, each on a worker of the pool given
   to <code>run</code>. The number of workers of that pool caps how many of them are under
   way at the same time; the others wait for a free worker.</li>
-<li><strong>The function evaluations</strong> inside those optimizations happen on the pool
+<li><strong>The function evaluations</strong> inside those optimizations use the pool
   passed to each <code>optimize</code> call, and the pool determines how they are
   parallelized. With <code>thread_pool(workers=1)</code> the optimizations still progress
   together, but their evaluations are executed one at a time. A larger pool —
@@ -2635,7 +2635,7 @@ a file, talking to a database — holds up every optimization feeding it.</p>
 <p>An optimization started with <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> without a pool
 evaluates in your own program, on the worker of <code>run</code> that runs it.
 When several of them run at once, your evaluation function is called by
-several threads at once and must tolerate that. Start them on a pool when it
+several threads at once and must tolerate that. Give them a pool when it
 must not be.</p>
 </div>
 <div class="admonition warning">
@@ -2659,7 +2659,7 @@ unless you want the optimizers' reports interleaved on the terminal.</p>
 <a href="../failures/#nested-calls">nested</a> in it. When one of them raises, <code>run</code>
 aborts the others and raises that exception at once.
 <a href="../failures/">Failures and Aborts</a> gives the rules for every case. An aborted
-optimization raises <code>AbortedError</code> with <code>ABORTED_ON_ERROR</code> — at once on a pool,
+optimization raises <code>AbortedError</code> with <code>ABORTED_ON_ERROR</code> — at once with a pool,
 or at its next evaluation boundary without one — but <code>run</code> does not wait for
 it, and its result is lost. Optimizations still waiting for a worker are not
 started after the abort.</p>
@@ -2707,11 +2707,11 @@ aborted optimization had reached, collect its results as they arrive, with a
 With no pool, the optimization runs the evaluation function itself, so the
 evaluation in progress returns first. On a thread or process pool, the
 evaluations already running continue after the optimization has ended, and their workers are free only once they
-return. On an HPC pool they are cancelled.</p>
+return. With an HPC pool they are cancelled.</p>
 <p>An abort is permanent: the session stays aborted. A call given one of its
 pools afterwards, or in its <code>with</code> block, raises <code>AbortedError</code> with <code>USER_ABORT</code> at
 once. Code that catches the <code>AbortedError</code> inside the block can record what
-happened, but cannot start more work on the session; catching it outside the
+happened, but cannot start more work in the session; catching it outside the
 <code>with</code> block works as well. To try again, open a new session. A
 <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> call is aborted as a whole: a callable still waiting for a
 worker is not started. Leaving the session's <code>with</code> block

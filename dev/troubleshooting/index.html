@@ -2647,7 +2647,7 @@ it writes there — a global, a cache, a list it appends to — is thrown away w
 the worker finishes. Return what you need instead; see
 <a href="../results/handlers/#handlers-and-separate-processes">Handlers and separate processes</a>.</p>
 <p><strong>Several optimizations may call your objective at the same time.</strong>
-Optimizations started together with <a class="autorefs autorefs-internal" title="            ropt.run" href="../reference/api/#ropt.run"><code>run</code></a> on a pool
+Optimizations started together with <a class="autorefs autorefs-internal" title="            ropt.run" href="../reference/api/#ropt.run"><code>run</code></a> and a pool
 run concurrently. Given a pool, their evaluations go there; given none, each
 optimization evaluates on the worker of <code>run</code> that runs it, so your
 evaluation function is called from several threads at once and has to tolerate
@@ -2683,17 +2683,17 @@ fails</a>.</p>
 <td>Something in <code>metadata</code> cannot be deep-copied.</td>
 </tr>
 <tr>
-<td><code>ExecutionError</code> part-way through an optimization on a pool</td>
+<td><code>ExecutionError</code> part-way through an optimization with a pool</td>
 <td>A worker or job broke, rather than your objective; see <a href="../running/parallel/#when-an-evaluation-fails">When an evaluation fails</a>.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="pools-stopping-and-processes">Pools, stopping and processes</h2>
-<p><strong>An optimization evaluates on the pool it was given, and no other.</strong>
+<p><strong>An optimization evaluates with the pool it was given, and no other.</strong>
 Nothing is picked up from the surrounding code. An optimization started with
 <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../reference/api/#ropt.optimize"><code>optimize</code></a> without a pool evaluates inside your own program, on
 the thread that called it — even if a pool exists next to it.</p>
-<p><strong>Threads cannot be interrupted.</strong> Evaluations on a thread pool run to
+<p><strong>Threads cannot be interrupted.</strong> Evaluations with a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
 outside. An evaluation that checks <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../reference/api/#ropt.aborting"><code>aborting</code></a>, or runs its
 external programs with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../reference/api/#ropt.run_program"><code>run_program</code></a>, stops early; any other
@@ -2722,7 +2722,7 @@ the loop or function that uses it rather than around the whole program; see
 </tr>
 <tr>
 <td>The program will not exit after Ctrl-C</td>
-<td>Evaluations on a thread pool are still running and cannot be interrupted. Check <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../reference/api/#ropt.aborting"><code>aborting</code></a> in them, or start their programs with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../reference/api/#ropt.run_program"><code>run_program</code></a>.</td>
+<td>Evaluations with a thread pool are still running and cannot be interrupted. Check <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../reference/api/#ropt.aborting"><code>aborting</code></a> in them, or start their programs with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../reference/api/#ropt.run_program"><code>run_program</code></a>.</td>
 </tr>
 <tr>
 <td>Pages of <code>multiprocessing</code> tracebacks, ending in <code>ExecutionError: Could not start worker processes</code></td>
@@ -2762,7 +2762,7 @@ waits for the lock. Keep a shared handler cheap.</p>
 <p><strong>A handler must not start an optimization that reaches it again.</strong> The handler
 holds its own lock while it runs. A nested <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../reference/api/#ropt.optimize"><code>optimize</code></a> emits on
 that same thread and raises; a nested optimization started with
-<a class="autorefs autorefs-internal" title="            ropt.run" href="../reference/api/#ropt.run"><code>run</code></a> on a pool emits on a worker of that pool, and blocks. See <a href="../results/handlers/#sharing-a-handler-across-concurrent-runs">Result
+<a class="autorefs autorefs-internal" title="            ropt.run" href="../reference/api/#ropt.run"><code>run</code></a> and a pool emits on a worker of that pool, and blocks. See <a href="../results/handlers/#sharing-a-handler-across-concurrent-runs">Result
 Handlers</a>.</p>
 <p><strong>Not every optimizer can run beside another.</strong> A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its

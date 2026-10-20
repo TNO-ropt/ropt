@@ -4707,7 +4707,7 @@ a walkthrough.</p>
         <p>Run one or more arbitrary callables.</p>
 <p>Pass a single zero-argument callable to run one call and get its result,
 or a sequence to get a tuple of results in the order of <code>work</code>. Bind
-arguments with <code>functools.partial</code>. On a pool the callables run
+arguments with <code>functools.partial</code>. With a pool the callables run
 concurrently on its workers, and must be picklable for a process or HPC
 pool. Without a pool they run one after another on the calling thread. See
 <a href="../../running/parallel/#offloading-your-own-work">Running your own work</a>
@@ -5060,7 +5060,7 @@ for a walkthrough.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Open a session that owns the pools built on it.</p>
+        <p>Open a session that owns the pools it builds.</p>
 <p>Build pools with the session's factories, and pass a pool to the
 optimizations and evaluations that should use its workers. Closing the
 session releases every pool it built, so most code needs no further cleanup:</p>
@@ -5119,7 +5119,7 @@ the session aborts whatever is still running.
 
 
 
-        <p>An open session, and the factories that build on it.</p>
+        <p>An open session, and the factories that build its pools.</p>
 <p>A pool needs an owner that releases its workers, which is why pools are
 built here rather than constructed on their own. Everything a session
 creates is returned to the caller and passed on explicitly; nothing is
@@ -5266,8 +5266,8 @@ a user interface — calls to bring them down.</p>
     <div class="doc doc-contents ">
 
         <p>Close the session, aborting its calls and releasing every pool.</p>
-<p>Work still running on its pools is waited for, five seconds at most in
-total, which gives the programs it started with
+<p>Work still running with its pools is waited for, five seconds at most
+in total, which gives the programs it started with
 <a class="autorefs autorefs-internal" title="            ropt.run_program" href="#ropt.run_program"><code>run_program</code></a> the time to end. Worker processes
 still busy after that are killed; threads are no longer waited for.</p>
 
@@ -5299,7 +5299,7 @@ still busy after that are killed; threads are no longer waited for.</p>
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with
 <code>ExitCode.USER_ABORT</code>. The session stays aborted: a call given one of
 its pools afterwards, or made in its <code>with</code> block, is aborted as soon as it starts.</p>
-<p>Calling it is thread-safe, and safe on a session with nothing running.
+<p>Calling it is thread-safe, and safe when nothing is running.
 See <a href="../../running/many_runs/#stopping-from-outside">Aborting from outside</a>
 for which calls are reached and when.</p>
 

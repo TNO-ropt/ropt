@@ -2875,7 +2875,7 @@ own functions in parallel using an evaluation <strong>pool</strong>.</p>
 <h2 id="running-in-parallel">Running in parallel</h2>
 <p>By default <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> calls the evaluation function itself,
 one evaluation at a time. To run the evaluations in parallel, open a
-<a href="../sessions/"><code>session</code></a>, build a <strong>pool</strong> on it and pass the pool to
+<a href="../sessions/"><code>session</code></a>, build a <strong>pool</strong> with it and pass the pool to
 <code>optimize</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">session</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -2949,7 +2949,7 @@ batches where a gradient is estimated. The second factor is <code>1</code> unles
 <a href="../many_runs/">several optimizations at once</a>, where it is the number of workers
 of the pool given to <code>run</code>.</p>
 <p>Each evaluation in a batch is sent to a worker as a separate job. Up to
-<code>workers</code> jobs can run at once on a pool; the rest wait until a worker is
+<code>workers</code> jobs can run at once with a pool; the rest wait until a worker is
 available. An optimization started without a pool calls the evaluation
 function itself, one evaluation at a time.</p>
 <p>You can keep several pools open at once and choose per optimization:</p>
@@ -3017,7 +3017,7 @@ only come <strong>back</strong> through the return value; see
 <a href="../../results/handlers/#handlers-and-separate-processes">Handlers and separate processes</a>.</p>
 <p>An evaluation still running when the optimization is aborted can test for it
 with <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a>, and an external program it started with
-<a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> is terminated, as on a thread pool. Workers
+<a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> is terminated, as with a thread pool. Workers
 still busy five seconds after the abort are killed. A program started in another way, for
 example with <code>subprocess.run</code>, keeps running after its worker is killed; see
 <a href="../programs/">Running External Programs</a>.</p>
@@ -3171,10 +3171,10 @@ busy, which is the normal case, since an optimization fills its pool with one
 work item per realization. Rather than hang, the pool refuses work submitted by
 the evaluation itself with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
 A thread that the evaluation starts is not recognized as a worker, so work submitted from it is not refused and can still
-deadlock on the pool. Give the inner optimization its own pool, or none at all,
+deadlock the pool. Give the inner optimization its own pool, or none at all,
 so that it calls the evaluation function itself.</p>
-<p>The evaluation must stay <strong>in your process</strong>, so on a thread pool or with no
-pool. On a process or HPC pool the evaluation function is copied
+<p>The evaluation must stay <strong>in your process</strong>, so with a thread pool or with no
+pool. With a process or HPC pool the evaluation function is copied
 into a worker, and a pool cannot be copied with it: open a session and build
 the inner pool inside the worker, or run the inner optimization without one. An
 evaluation function that carries a pool along anyway is refused when the
@@ -3201,7 +3201,7 @@ to them differs:</p>
 </tr>
 <tr>
 <td><code>process_pool</code></td>
-<td>as on a thread pool, and workers still busy five seconds later are <strong>killed</strong></td>
+<td>as with a thread pool, and workers still busy five seconds later are <strong>killed</strong></td>
 </tr>
 <tr>
 <td><code>hpc_pool</code></td>
@@ -3212,7 +3212,7 @@ to them differs:</p>
 <p>The optimization raises at once and does not wait for them. When the session
 closes, it waits up to five seconds for its pools to become idle.</p>
 <p><strong>A thread cannot be killed.</strong> Python provides no way to stop a running thread
-from outside. An evaluation on a thread pool stops early only if it checks
+from outside. An evaluation with a thread pool stops early only if it checks
 <code>aborting</code>, or if the program it waits for was started with <code>run_program</code>.
 Otherwise it ends when it ends, and your program cannot exit before it does.</p>
 <p><strong>A process pool kills its workers after five seconds.</strong> A worker that is still
@@ -3263,12 +3263,12 @@ a value should be tolerated; see
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 for how many a batch may contain before the optimization ends with
 <code>TOO_FEW_REALIZATIONS</code>.</p>
-<p>On an HPC pool the exception crosses a process boundary, and no serialization
+<p>With an HPC pool the exception crosses a process boundary, and no serialization
 format carries a traceback. The job therefore attaches the formatted traceback
 to the exception as a note, so it travels with it. An exception that cannot be
 serialized at all arrives as a <code>RuntimeError</code> carrying its <code>repr</code> and notes.</p>
 <p>A job that died before writing a result leaves its only trace in the file
-holding its captured output. On an HPC pool that file is kept
+holding its captured output. With an HPC pool that file is kept
 when an evaluation fails, even when the pool removes the rest, and its last
 lines are added to the error message. The message names the file whether or not
 it could be read: a shared filesystem need not show its contents yet, and a
@@ -3279,7 +3279,7 @@ submission script that does not redirect the job's output — with
 useful when code
 you control — a custom handler, a custom component, or a helper you call between
 optimizations — has an expensive, self-contained piece of work you want to run
-on a pool instead of in your own code.</p>
+with a pool instead of in your own code.</p>
 <p>Pass a single callable to run it once and get its result back:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
@@ -3299,12 +3299,12 @@ different functions:</p>
 <p>As with the evaluation function on a process or HPC pool, the
 callables and their arguments are <strong>copied to the workers</strong>, since they run in
 separate processes.</p>
-<p>On a thread pool the callables run <strong>in your process</strong>, on the pool's
+<p>With a thread pool the callables run <strong>in your process</strong>, on the pool's
 workers, at most <code>workers</code> of them at once. They are not copied, so they need
 not be picklable. The workers do not see the context variables of the code that
 called <code>run</code>. Without a pool, <code>run</code> calls the callables one after another on
 the calling thread, and returns when the last one has finished.</p>
-<p>A callable given to <code>run</code> on a pool cannot itself call <code>run</code>, <code>optimize</code>,
+<p>A callable given to <code>run</code> with a pool cannot itself call <code>run</code>, <code>optimize</code>,
 <code>evaluate</code> or <code>evaluate_batch</code> with that same pool: the call raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Give the inner call another
 pool, or none.</p>
@@ -3315,12 +3315,12 @@ before all of its callables have finished, <code>run</code> raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. Its <code>exit_code</code> distinguishes an
 abort that was asked for from one that a failure caused, and is
 <code>EXECUTOR_SHUT_DOWN</code> when the pool could no longer run the work.</p>
-<p>On a pool, <code>run</code> raises at once and does not wait for a callable that is still
-running. On a thread or process pool, that callable runs to its end unless it
+<p>With a pool, <code>run</code> raises at once and does not wait for a callable that is still
+running. With a thread or process pool, that callable runs to its end unless it
 checks <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> or its program was started with
 <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>, and an exception it raises is logged as a
-warning. On a process pool its worker is killed if it is still running five
-seconds later. On an HPC pool it is cancelled. Without a pool, <code>run</code> raises
+warning. With a process pool its worker is killed if it is still running five
+seconds later. With an HPC pool it is cancelled. Without a pool, <code>run</code> raises
 when the running callable returns, and starts none of the remaining ones; it
 also raises if the last callable returns after the abort, since its value may
 come from an early return after checking <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a>.</p>
@@ -3354,12 +3354,12 @@ budget — keep them in your own process instead.</p>
 <div class="admonition warning">
 <p class="admonition-title">Calling <code>run</code> from a handler holds up the optimizations feeding it</p>
 <p>A handler runs on the thread driving the optimization, so it can call <code>run</code>
-on a pool. While it waits, it holds its own lock, so every other optimization
+with a pool. While it waits, it holds its own lock, so every other optimization
 waiting on that handler waits too.</p>
 <p>A callable given to <code>run</code> that reaches back into the same handler — by
 starting an optimization that carries it in <code>handlers=</code> — fails differently
-per pool. On a thread pool it blocks: the handler waits for the call, and the
-call waits for the lock the handler holds. On a process pool it
+per pool. With a thread pool it blocks: the handler waits for the call, and the
+call waits for the lock the handler holds. With a process pool it
 raises an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>, since a
 handler holds a lock and cannot be serialized. See
 <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent optimizations</a>.</p>

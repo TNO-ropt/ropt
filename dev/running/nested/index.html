@@ -2728,7 +2728,7 @@ optimization, as any exception from an evaluation function does. When the outer
 optimization is aborted, the inner optimizations are aborted with it. See
 <a href="../failures/">Failures and Aborts</a> for the rules that apply to every call.</p>
 <h2 id="two-pools-not-one">Two pools, not one</h2>
-<p>Each layer evaluates on its own pool, and that is a requirement rather than
+<p>Each layer evaluates with its own pool, and that is a requirement rather than
 a preference:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># A plain dict reaches the outer evaluations because they run on threads, in</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># this process; on a process pool each worker would get an empty copy.</span>
@@ -2749,7 +2749,7 @@ a preference:</p>
 </span></code></pre></div>
 <p>The outer pool is a <strong>thread</strong> pool. Outer evaluations therefore stay
 inside this process, where the inner pool and the shared handler are live
-objects; on a process pool they would arrive as copies, which <code>ropt</code>
+objects; with a process pool they would arrive as copies, which <code>ropt</code>
 refuses. The inner pool is a <strong>process</strong> pool, which is where the real
 work goes.</p>
 <p>That is also where a cluster belongs. Swapping the inner pool for an
@@ -2785,7 +2785,7 @@ re-proposed unchanged, so a repeated vector is identical bit for bit. The
 realization index is part of the key because a memo keyed on the variables alone
 gives the wrong value for a problem with more than one realization.</p>
 <p>The dictionary is reachable only because the outer evaluations run on threads,
-in this process. On a process pool or an HPC pool the function is
+in this process. With a process pool or an HPC pool the function is
 copied into a worker, which starts from an empty dictionary and discards it when
 it finishes, without raising. See
 <a href="../parallel/#which-pool">Which pool should I use?</a>.</p>
