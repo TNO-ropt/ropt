@@ -184,8 +184,7 @@ only come **back** through the return value; see
 An evaluation still running when the optimization is aborted can test for it
 with [`aborting`][ropt.aborting], and an external program it started with
 [`run_program`][ropt.run_program] is terminated, as on a thread pool. Workers
-still busy five seconds after the abort are killed, and the pool starts new
-workers for the work that follows. A program started in another way, for
+still busy five seconds after the abort are killed. A program started in another way, for
 example with `subprocess.run`, keeps running after its worker is killed; see
 [Running External Programs](programs.md).
 
@@ -358,8 +357,7 @@ from outside. An evaluation on a thread pool stops early only if it checks
 Otherwise it ends when it ends, and your program cannot exit before it does.
 
 **A process pool kills its workers after five seconds.** A worker that is still
-busy then is killed, and the pool starts new workers for the work that follows.
-A program the evaluation started with `run_program` is terminated with it; a
+busy then is killed. A program the evaluation started with `run_program` is terminated with it; a
 program started in another way keeps running.
 
 **A terminated program gets five seconds to exit.** A program started with
@@ -397,9 +395,9 @@ produce a result indistinguishable from one computed over the whole ensemble.
 
 Whether the pool can run further work afterwards depends on which pool it is. An
 HPC pool starts fresh jobs for the next batch. A process
-pool that killed its own workers after an abort starts new workers for the work
-that follows. A process pool that lost a worker in any other way, for example
-to the out-of-memory killer, cannot be restarted: every later batch fails the
+pool kills its own workers only after an abort, which leaves no further work to
+run. A process pool that lost a worker in any other way, for example to the
+out-of-memory killer, cannot be restarted: every later batch fails the
 same way, and a new pool is needed.
 
 **An exception from your evaluation function** is re-raised unchanged, from the

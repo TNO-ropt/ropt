@@ -60,8 +60,7 @@ class ProcessExecutor(ExecutorBase):
     calls [`aborting`][ropt.aborting], or runs a program with
     [`run_program`][ropt.run_program], sees it. When this executor belongs to a
     [`Session`][ropt.Session], an abort of the session also kills the worker
-    processes still busy five seconds later, and the next work item starts a new
-    set of them.
+    processes still busy five seconds later.
 
     Note:
         An abort also leaves one item running that was submitted but not yet

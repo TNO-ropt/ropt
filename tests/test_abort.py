@@ -607,10 +607,6 @@ def _run_into_fifo(fifo: str) -> int:
     return run_program(["sh", "-c", "echo started; exec sleep 60"], stdout=fifo)
 
 
-def _one_in_a_process() -> int:
-    return 1
-
-
 @pytest.mark.slow
 @pytest.mark.timeout(60)
 def test_session_abort_reaches_work_running_in_a_process_pool(tmp_path: Path) -> None:
@@ -636,8 +632,7 @@ def test_session_abort_reaches_work_running_in_a_process_pool(tmp_path: Path) ->
 def test_session_abort_kills_busy_process_workers_after_the_grace_period(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    # The work ignores the abort, so only killing its worker ends it. The pool
-    # starts new workers for the work that follows.
+    # The work ignores the abort, so only killing its worker ends it.
     monkeypatch.setattr(_grace, "GRACE_PERIOD", 0.2)
     codes: list[ExitCode] = []
     with Listener(str(tmp_path / "socket")) as listener, session() as opened:
@@ -655,7 +650,6 @@ def test_session_abort_kills_busy_process_workers_after_the_grace_period(
                 connection.recv()
         driver.join(timeout=30)
         assert codes == [ExitCode.USER_ABORT]
-        assert pool.run(_one_in_a_process) == 1
 
 
 @pytest.mark.slow

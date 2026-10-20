@@ -232,7 +232,7 @@ class Session:
         thread pool: [`aborting`][ropt.aborting] turns `True`, and a program
         started with [`run_program`][ropt.run_program] is terminated. Workers
         still busy five seconds after an abort, or after the session closes,
-        are killed, and the pool starts new ones for the work that follows.
+        are killed.
 
         Args:
             workers:             The number of worker processes.
