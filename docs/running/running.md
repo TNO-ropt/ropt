@@ -1,10 +1,11 @@
 # Running Optimizations
 
 !!! note
-    This page uses the module-level functions [`optimize`][ropt.optimize] and
-    [`evaluate`][ropt.evaluate], which evaluate one point at a time and return
-    when they have finished. Parallel evaluation, several optimizations at once and
-    aborting from outside need a [session](sessions.md). Everything this page
+    This page calls [`optimize`][ropt.optimize] and
+    [`evaluate`][ropt.evaluate] without a pool, so they evaluate one point at a
+    time and return when they have finished. Parallel evaluation, several
+    optimizations at once and aborting from outside need a pool from a
+    [session](sessions.md). Everything this page
     explains applies there unchanged.
 
 Everything needed to run an optimization is imported from the `ropt` package

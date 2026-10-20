@@ -47,8 +47,7 @@ Handlers that store results expose them through `handler["results"]` (and, for
 
 The same handler may also be given to optimizations that execute
 **concurrently** — those started together with
-[`Session.run`](../running/many_runs.md), or ones you start on threads of
-your own. A handler's
+[`run`](../running/many_runs.md), or ones you start on threads of your own. A handler's
 [`handle_event`][ropt.EventHandler.handle_event]
 takes a lock around each call, so a second optimization waits for the first to
 finish rather than interleaving with it:
@@ -56,16 +55,17 @@ finish rather than interleaving with it:
 ```python
 from functools import partial
 
-from ropt import HistoryHandler, session
+from ropt import HistoryHandler, optimize, run, session
 
 history = HistoryHandler()
 with session() as s:
     pool = s.thread_pool(workers=4)
-    s.run(
+    run(
         [
-            partial(pool.optimize, config, x0, objective, handlers=[history])
+            partial(optimize, config, x0, objective, pool=pool, handlers=[history])
             for x0 in start_points
-        ]
+        ],
+        pool=s.thread_pool(workers=len(start_points)),
     )
 
 print(history.results)
@@ -91,8 +91,8 @@ feeds two handlers from the same set of concurrent optimizations:
     [`optimize`][ropt.optimize] emits on the thread that called it — the
     one already inside the handler — so this raises a
     [`WorkflowError`][ropt.exceptions.WorkflowError]. A nested optimization
-    started with [`Session.run`][ropt.Session.run] emits on a thread
-    that `run` started for it, which waits for a lock the first thread will
+    started with [`run`][ropt.run] and a pool emits on a worker of that pool,
+    which waits for a lock the first thread will
     not release until the optimization ends, and both stop. The same holds for
     two handlers that each start an optimization reaching the other. Give the
     inner optimization handlers of its own.
@@ -547,7 +547,7 @@ write once the optimizations have finished.
 
 ## Handlers and separate processes
 
-On a thread pool (or with no pool) your objective and your handlers run
+With a thread pool (or with no pool) your objective and your handlers run
 in the **same process** and share memory: a handler can see anything the
 objective left behind — a global it set, a list it appended to, an object it
 mutated.
@@ -583,7 +583,7 @@ flowchart LR
     functions and data serialize fine, but things like open files, locks, or
     database connections may not.
 
-    On a process pool the bytes travel over an in-machine channel. On an
+    With a process pool the bytes travel over an in-machine channel. With an
     HPC pool they are written as **files on a shared filesystem** that the
     cluster nodes read, so it needs such a filesystem (its `workdir`).
 
@@ -599,8 +599,8 @@ handlers and your main program never see it.
 
 !!! note "Pools stay in the main process"
     A pool is tied to the process that opened its session, so it is not usable
-    in a worker. An objective that closes over one — to run work on it, or to
-    start an inner optimization on it — is stopped in the worker, which reports the
+    in a worker. An objective that closes over one — to run work with it, or to
+    start an inner optimization with it — is stopped in the worker, which reports the
     object by name. Do that work in the objective itself, or return what you
     need and act on it in the main process.
 

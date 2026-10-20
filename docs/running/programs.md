@@ -2,9 +2,9 @@
 
 An evaluation function often runs a simulator or a solver as a separate program.
 Start it with [`run_program`][ropt.run_program], and the program stops when the
-optimization is aborted, on any pool, together with every program it started.
+optimization is aborted, with any pool, together with every program it started.
 A program started with `subprocess.run` or `os.system` keeps running after an
-abort, and on a thread pool the evaluation waits for it.
+abort, and with a thread pool the evaluation waits for it.
 
 The example script
 [`examples/programs.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/programs.py)
@@ -37,7 +37,7 @@ for a failed simulation, which marks the evaluation as failed; see
 
 ## Running the optimization
 
-The optimization runs the four realizations on a thread pool, so up to four
+The optimization runs the four realizations with a thread pool, so up to four
 simulators run at the same time:
 
 ```python
@@ -109,10 +109,10 @@ those still running five seconds later receive `SIGKILL`.
 
 `run_program` behaves the same wherever it is called: in an evaluation function,
 an event handler, a report callback, a function given to
-[`run`][ropt.Session.run], on every pool, or in your own code outside any
+[`run`][ropt.run], with every pool, or in your own code outside any
 optimization. Only the ways in which the caller can be stopped differ.
 [`Session.abort`][ropt.Session.abort] reaches code in the session's `with`
-block and the calls made there or on the session. It does not reach code after
+block and the calls made there or given the session's pools. It does not reach code after
 the block, such as an evaluation function that you call directly, nor code in a
 thread that your own code starts without
 [copying its context](failures.md#nested-calls). In the main thread such calls

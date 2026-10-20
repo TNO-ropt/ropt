@@ -7,14 +7,14 @@ own functions in parallel using an evaluation **pool**.
 
 By default [`optimize`][ropt.optimize] calls the evaluation function itself,
 one evaluation at a time. To run the evaluations in parallel, open a
-[`session`](sessions.md), build a **pool** on it and start the optimization
-using the `optimize` method of that pool:
+[`session`](sessions.md), build a **pool** with it and pass the pool to
+`optimize`:
 
 ```python
-from ropt import session
+from ropt import optimize, session
 
 with session() as s:
-    result = s.thread_pool(workers=8).optimize(config, x0, objective)
+    result = optimize(config, x0, objective, pool=s.thread_pool(workers=8))
 ```
 
 The runnable script for this section is
@@ -22,9 +22,9 @@ The runnable script for this section is
 
 The session that created the pool releases their workers when its block ends, so
 most code needs no further cleanup. Nothing is implicit: an optimization
-evaluates its functions using the pool it was started on. An optimization
-started with the module-level [`optimize`][ropt.optimize] has no session, and
-executes its function evaluations serially.
+evaluates its functions using the pool it was given. An optimization started
+with [`optimize`][ropt.optimize] without a pool has no session, and executes
+its function evaluations serially.
 
 The available pools are:
 
@@ -94,11 +94,11 @@ Batch size follows from the problem, not from a setting: it is how many
 evaluations the optimizer requests at once. For a gradient-based optimization
 over an ensemble that is one per realization, plus their perturbations on the
 batches where a gradient is estimated. The second factor is `1` unless you run
-[several optimizations at once](many_runs.md), where it is the `limit` argument
-of `run` (or the number of optimizations, if you set no limit).
+[several optimizations at once](many_runs.md), where it is the number of workers
+of the pool given to `run`.
 
 Each evaluation in a batch is sent to a worker as a separate job. Up to
-`workers` jobs can run at once on a pool; the rest wait until a worker is
+`workers` jobs can run at once with a pool; the rest wait until a worker is
 available. An optimization started without a pool calls the evaluation
 function itself, one evaluation at a time.
 
@@ -108,8 +108,8 @@ You can keep several pools open at once and choose per optimization:
 with session() as s:
     fast = s.thread_pool(workers=8)
     heavy = s.process_pool(workers=4)
-    cheap = fast.optimize(config, x0, objective)
-    costly = heavy.optimize(config, x0, expensive_objective)
+    cheap = optimize(config, x0, objective, pool=fast)
+    costly = optimize(config, x0, expensive_objective, pool=heavy)
 ```
 
 !!! note "Pools inside an evaluation"
@@ -129,7 +129,7 @@ with session() as s:
     ```python
     for case in cases:
         with session() as s:
-            s.process_pool(workers=4).optimize(config, case, objective)
+            optimize(config, case, objective, pool=s.process_pool(workers=4))
     ```
 
     A pool used after its session has closed raises a
@@ -144,7 +144,7 @@ function works as the objective and it can freely use the data around it:
 
 ```python
 with session() as s:
-    result = s.thread_pool(workers=4).optimize(config, x0, objective)
+    result = optimize(config, x0, objective, pool=s.thread_pool(workers=4))
 ```
 
 Use it when each evaluation spends most of its time **waiting** — starting an
@@ -165,7 +165,7 @@ interpreter, so this is where heavy Python code actually runs faster:
 
 ```python
 with session() as s:
-    result = s.process_pool(workers=4).optimize(config, x0, objective)
+    result = optimize(config, x0, objective, pool=s.process_pool(workers=4))
 ```
 
 This pool applies when the evaluation is **Python code**, or when each
@@ -183,7 +183,7 @@ only come **back** through the return value; see
 
 An evaluation still running when the optimization is aborted can test for it
 with [`aborting`][ropt.aborting], and an external program it started with
-[`run_program`][ropt.run_program] is terminated, as on a thread pool. Workers
+[`run_program`][ropt.run_program] is terminated, as with a thread pool. Workers
 still busy five seconds after the abort are killed. A program started in another way, for
 example with `subprocess.run`, keeps running after its worker is killed; see
 [Running External Programs](programs.md).
@@ -202,7 +202,7 @@ configuration of your `ropt` installation:
 ```python
 with session() as s:
     pool = s.hpc_pool(workers=10, workdir="/scratch/my-run")
-    result = pool.optimize(config, x0, objective)
+    result = optimize(config, x0, objective, pool=pool)
 ```
 
 The runnable script is
@@ -322,14 +322,12 @@ wait for the workers it is itself occupying — a deadlock as soon as they are a
 busy, which is the normal case, since an optimization fills its pool with one
 work item per realization. Rather than hang, the pool refuses work submitted by
 the evaluation itself with a [`WorkflowError`][ropt.exceptions.WorkflowError].
-The same holds for work submitted from a thread that the evaluation starts with
-[`Session.run`][ropt.Session.run]. A thread started in any other way is not
-recognized as a worker, so work submitted from it is not refused and can still
-deadlock on the pool. Give the inner optimization its own pool, or none at all,
+A thread that the evaluation starts is not recognized as a worker, so work submitted from it is not refused and can still
+deadlock the pool. Give the inner optimization its own pool, or none at all,
 so that it calls the evaluation function itself.
 
-The evaluation must stay **in your process**, so on a thread pool or with no
-pool. On a process or HPC pool the evaluation function is copied
+The evaluation must stay **in your process**, so with a thread pool or with no
+pool. With a process or HPC pool the evaluation function is copied
 into a worker, and a pool cannot be copied with it: open a session and build
 the inner pool inside the worker, or run the inner optimization without one. An
 evaluation function that carries a pool along anyway is refused when the
@@ -345,14 +343,14 @@ to them differs:
 | --- | --- |
 | none | the current one finishes |
 | `thread_pool` | [`aborting`][ropt.aborting] turns `True` and programs started with [`run_program`][ropt.run_program] are terminated; otherwise they **run to completion** |
-| `process_pool` | as on a thread pool, and workers still busy five seconds later are **killed** |
+| `process_pool` | as with a thread pool, and workers still busy five seconds later are **killed** |
 | `hpc_pool` | the jobs are **deleted from the queue**; on the local queue, each job **and every program it started** is terminated, and killed five seconds later if still running |
 
 The optimization raises at once and does not wait for them. When the session
 closes, it waits up to five seconds for its pools to become idle.
 
 **A thread cannot be killed.** Python provides no way to stop a running thread
-from outside. An evaluation on a thread pool stops early only if it checks
+from outside. An evaluation with a thread pool stops early only if it checks
 `aborting`, or if the program it waits for was started with `run_program`.
 Otherwise it ends when it ends, and your program cannot exit before it does.
 
@@ -409,13 +407,13 @@ a value should be tolerated; see
 for how many a batch may contain before the optimization ends with
 `TOO_FEW_REALIZATIONS`.
 
-On an HPC pool the exception crosses a process boundary, and no serialization
+With an HPC pool the exception crosses a process boundary, and no serialization
 format carries a traceback. The job therefore attaches the formatted traceback
 to the exception as a note, so it travels with it. An exception that cannot be
 serialized at all arrives as a `RuntimeError` carrying its `repr` and notes.
 
 A job that died before writing a result leaves its only trace in the file
-holding its captured output. On an HPC pool that file is kept
+holding its captured output. With an HPC pool that file is kept
 when an evaluation fails, even when the pool removes the rest, and its last
 lines are added to the error message. The message names the file whether or not
 it could be read: a shared filesystem need not show its contents yet, and a
@@ -424,22 +422,21 @@ submission script that does not redirect the job's output — with
 
 ## Running your own work { #offloading-your-own-work }
 
-You can hand **your own** functions to a pool with
-[`WorkerPool.run`][ropt.WorkerPool.run], or run them on threads of their
-own with [`Session.run`][ropt.Session.run]. It is useful when code
+You can hand **your own** functions to a pool with [`run`][ropt.run]. It is
+useful when code
 you control — a custom handler, a custom component, or a helper you call between
 optimizations — has an expensive, self-contained piece of work you want to run
-on a pool instead of in your own code.
+with a pool instead of in your own code.
 
 Pass a single callable to run it once and get its result back:
 
 ```python
 from functools import partial
 
-from ropt import session
+from ropt import run, session
 
 with session() as s:
-    result = s.process_pool(workers=4).run(partial(expensive, data))
+    result = run(partial(expensive, data), pool=s.process_pool(workers=4))
 ```
 
 `run` takes **zero-argument** callables — bind arguments with
@@ -450,42 +447,41 @@ different functions:
 ```python
 with session() as s:
     pool = s.process_pool(workers=4)
-    first, second = pool.run([partial(expensive, x), partial(other, y)])
+    first, second = run([partial(expensive, x), partial(other, y)], pool=pool)
 ```
 
 As with the evaluation function on a process or HPC pool, the
 callables and their arguments are **copied to the workers**, since they run in
 separate processes.
 
-Called on the session instead of on a pool, `run` starts the callables **in
-your process, on threads of their own**: one thread per callable, started by that
-call, with at most `limit` of them running at once:
+With a thread pool the callables run **in your process**, on the pool's
+workers, at most `workers` of them at once. They are not copied, so they need
+not be picklable. The workers do not see the context variables of the code that
+called `run`. Without a pool, `run` calls the callables one after another on
+the calling thread, and returns when the last one has finished.
 
-```python
-with session() as s:
-    first, second = s.run([partial(expensive, x), partial(other, y)], limit=2)
-```
-
-Without `limit`, all callables start at once. They are not copied, so they need
-not be picklable, and each one sees a copy of the context variables of the code
-that called `run`. When the session closes, it waits up to five seconds for
-these threads. They are daemon threads: a callable still running when your
-program exits is stopped without completing, and does not keep the program from
-exiting.
+A callable given to `run` with a pool cannot itself call `run`, `optimize`,
+`evaluate` or `evaluate_batch` with that same pool: the call raises
+[`WorkflowError`][ropt.exceptions.WorkflowError]. Give the inner call another
+pool, or none.
 
 [Failures and Aborts](failures.md) describes how a failure or an abort reaches
 a `run` call and the calls nested in it. When a callable raises, `run` aborts
-the other callables and raises the exception at once. When an abort arrives before all of its callables
-have finished, `run` raises [`AbortedError`][ropt.exceptions.AbortedError] at
-once, as an aborted optimization does. Its `exit_code` distinguishes an abort
-that was asked for from one that a failure caused, and is `EXECUTOR_SHUT_DOWN`
-when the pool could no longer run the work. `run` does not wait for a
-callable that is still running. On a thread of its own, or on a thread or
-process pool, it runs to its end unless it checks [`aborting`][ropt.aborting] or
-its program was started with [`run_program`][ropt.run_program], and an
-exception it raises is logged as a warning. On a process pool its worker is
-killed if it is still running five seconds later. On an HPC pool it is
-cancelled.
+the other callables and raises the exception at once. When an abort arrives
+before all of its callables have finished, `run` raises
+[`AbortedError`][ropt.exceptions.AbortedError]. Its `exit_code` distinguishes an
+abort that was asked for from one that a failure caused, and is
+`EXECUTOR_SHUT_DOWN` when the pool could no longer run the work.
+
+With a pool, `run` raises at once and does not wait for a callable that is still
+running. With a thread or process pool, that callable runs to its end unless it
+checks [`aborting`][ropt.aborting] or its program was started with
+[`run_program`][ropt.run_program], and an exception it raises is logged as a
+warning. With a process pool its worker is killed if it is still running five
+seconds later. With an HPC pool it is cancelled. Without a pool, `run` raises
+when the running callable returns, and starts none of the remaining ones; it
+also raises if the last callable returns after the abort, since its value may
+come from an early return after checking [`aborting`][ropt.aborting].
 
 !!! warning "Work given to `run` coordinates with nothing"
     A callable given to `run` goes wherever its pool puts it, and on a process
@@ -495,7 +491,7 @@ cancelled.
     - **Results cannot be tracked across the callables.** A handler
       created inside one sees only that callable's results and cannot be brought back:
       handlers cannot be moved between processes, so the return value is all
-      that comes back. Callables that stay in your process, on the session or on
+      that comes back. Callables that stay in your process, without a pool or on
       a thread pool, can feed one handler that they share, as
       [Running Multiple Optimizations](many_runs.md) shows.
     - **Worker budgets multiply, with no way around it.** A pool cannot be
@@ -515,13 +511,13 @@ cancelled.
 
 !!! warning "Calling `run` from a handler holds up the optimizations feeding it"
     A handler runs on the thread driving the optimization, so it can call `run`
-    on a pool. While it waits, it holds its own lock, so every other optimization
+    with a pool. While it waits, it holds its own lock, so every other optimization
     waiting on that handler waits too.
 
     A callable given to `run` that reaches back into the same handler — by
     starting an optimization that carries it in `handlers=` — fails differently
-    per pool. On a thread pool it blocks: the handler waits for the call, and the
-    call waits for the lock the handler holds. On a process pool it
+    per pool. With a thread pool it blocks: the handler waits for the call, and the
+    call waits for the lock the handler holds. With a process pool it
     raises an [`ExecutionError`][ropt.exceptions.ExecutionError], since a
     handler holds a lock and cannot be serialized. See
     [Sharing a handler across concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concurrent-runs).

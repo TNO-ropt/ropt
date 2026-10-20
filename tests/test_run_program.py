@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 import pytest
 
-from ropt import AbortedError, run_program, session
+from ropt import AbortedError, evaluate_batch, run_program, session
 from ropt.components.concurrency import AbortScope, _grace, _program
 from ropt.enums import ExitCode
 
@@ -306,7 +306,7 @@ def test_run_program_in_a_thread_pool_is_killed_by_session_abort(
         aborter = threading.Thread(target=abort_when_running)
         aborter.start()
         with pytest.raises(AbortedError) as raised:
-            pool.evaluate_batch(config, np.zeros((1, 1)), objective)
+            evaluate_batch(config, np.zeros((1, 1)), objective, pool=pool)
         aborter.join(timeout=30)
 
     assert raised.value.exit_code is ExitCode.USER_ABORT

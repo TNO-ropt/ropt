@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt import HistoryHandler, session
+from ropt import HistoryHandler, evaluate, evaluate_batch, optimize, run, session
 from ropt.exceptions import ExecutionError, WorkflowError
 
 if TYPE_CHECKING:
@@ -45,19 +45,19 @@ def _sphere(variables: NDArray[np.float64], _: EvaluationFunctionContext) -> flo
 
 
 def _optimize(pool: WorkerPool) -> None:
-    pool.optimize(_CONFIG, _INITIAL, _sphere)
+    optimize(_CONFIG, _INITIAL, _sphere, pool=pool)
 
 
 def _evaluate(pool: WorkerPool) -> None:
-    pool.evaluate(_CONFIG, _INITIAL, _sphere)
+    evaluate(_CONFIG, _INITIAL, _sphere, pool=pool)
 
 
 def _evaluate_batch(pool: WorkerPool) -> None:
-    pool.evaluate_batch(_CONFIG, _MATRIX, _sphere)
+    evaluate_batch(_CONFIG, _MATRIX, _sphere, pool=pool)
 
 
 def _pool_run(pool: WorkerPool) -> None:
-    pool.run(partial(pow, 2, 3))
+    run(partial(pow, 2, 3), pool=pool)
 
 
 _TAKES_A_POOL = pytest.mark.parametrize(
@@ -88,17 +88,6 @@ def test_pool_from_a_closed_session_refused(
         entry_point(pool)
 
 
-def test_run_on_an_open_session_accepted(opened: Session) -> None:
-    assert opened.run(partial(pow, 2, 3)) == 8
-
-
-def test_run_on_a_closed_session_refused() -> None:
-    with session() as closing:
-        pass
-    with pytest.raises(WorkflowError, match="not open"):
-        closing.run(partial(pow, 2, 3))
-
-
 def test_run_starting_while_a_session_closes_refused() -> None:
     # The callback fires from inside the close, which is the one instant at
     # which a run could slip past both the refusal and the abort.
@@ -107,29 +96,26 @@ def test_run_starting_while_a_session_closes_refused() -> None:
 
     def _start_a_run() -> None:
         try:
-            closing.run(partial(pow, 2, 3))
+            run(partial(pow, 2, 3), pool=pool)
         except WorkflowError:
             outcomes.append("refused")
         else:
             outcomes.append("ran")
 
     with closing:
+        pool = closing.thread_pool(workers=1)
         closing._abort_scope.add_callback(_start_a_run)  # ruff: ignore[private-member-access]
     assert outcomes == ["refused"]
 
 
 def _run_again(pool: WorkerPool) -> int:
-    return pool.run(partial(pow, 2, 3))
-
-
-def _run_again_on_a_session_thread(opened: Session, pool: WorkerPool) -> int:
-    return opened.run(partial(_run_again, pool))
+    return run(partial(pow, 2, 3), pool=pool)
 
 
 def _optimize_again(
     pool: WorkerPool, variables: NDArray[np.float64], _: EvaluationFunctionContext
 ) -> float:
-    pool.optimize(_CONFIG, _INITIAL, _sphere)
+    optimize(_CONFIG, _INITIAL, _sphere, pool=pool)
     return float(np.sum(variables**2))
 
 
@@ -141,23 +127,14 @@ def _optimize_again(
 def test_pool_run_on_the_pool_it_runs_on_refused(opened: Session) -> None:
     pool = opened.thread_pool(workers=1)
     with pytest.raises(WorkflowError, match="already running on it"):
-        pool.run(partial(_run_again, pool))
-
-
-@pytest.mark.timeout(30)
-def test_pool_run_on_the_pool_it_runs_on_refused_from_a_session_thread(
-    opened: Session,
-) -> None:
-    pool = opened.thread_pool(workers=1)
-    with pytest.raises(WorkflowError, match="already running on it"):
-        pool.run(partial(_run_again_on_a_session_thread, opened, pool))
+        run(partial(_run_again, pool), pool=pool)
 
 
 @pytest.mark.timeout(30)
 def test_nested_run_on_the_pool_it_runs_on_refused(opened: Session) -> None:
     pool = opened.thread_pool(workers=1)
     with pytest.raises(WorkflowError, match="already running on it"):
-        pool.optimize(_CONFIG, _INITIAL, partial(_optimize_again, pool))
+        optimize(_CONFIG, _INITIAL, partial(_optimize_again, pool), pool=pool)
 
 
 @pytest.mark.timeout(30)
@@ -166,7 +143,7 @@ def test_nested_run_on_a_second_pool_allowed(opened: Session) -> None:
     # than about nesting, which is supported.
     inner = opened.thread_pool(workers=1)
     outer = opened.thread_pool(workers=1)
-    outer.optimize(_CONFIG, _INITIAL, partial(_optimize_again, inner))
+    optimize(_CONFIG, _INITIAL, partial(_optimize_again, inner), pool=outer)
 
 
 def _evaluate_with(carried: Any, variables: NDArray[np.float64], _: Any) -> float:
@@ -197,4 +174,4 @@ def test_carrying_a_workflow_object_into_a_worker(
     # the object holds a lock, so serializing the work item fails.
     function = partial(_evaluate_with, carry(opened))
     with pytest.raises(ExecutionError, match="could not be sent to a worker"):
-        opened.process_pool(workers=2).optimize(_CONFIG, _INITIAL, function)
+        optimize(_CONFIG, _INITIAL, function, pool=opened.process_pool(workers=2))

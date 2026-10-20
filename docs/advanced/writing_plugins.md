@@ -184,8 +184,8 @@ documentation table for them. The built-in SciPy backend uses it; see
 
 A backend runs in the caller's process, alongside whatever else is in it —
 including other optimizations, since
-[`Session.run`][ropt.Session.run] can start several at once, each on its
-own thread with its own configuration. Anything a backend changes *per process*
+[`run`][ropt.run] can start several at once, each on a worker thread of a
+pool, with its own configuration. Anything a backend changes *per process*
 is therefore shared with unrelated optimizations, and cannot carry
 per-optimization settings.
 

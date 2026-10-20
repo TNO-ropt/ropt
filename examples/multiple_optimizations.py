@@ -1,7 +1,7 @@
-"""Run multiple optimizations concurrently with `Session.run`.
+"""Run multiple optimizations concurrently with `run`.
 
-`run` starts each optimization on a thread of its own, at most `limit` at a
-time, and every optimization evaluates on the same pool. Each one is tagged with
+`run` starts each optimization on a worker of one thread pool, two at a time,
+and every optimization evaluates on a second pool. Each one is tagged with
 a `metadata` dictionary (`label`) that is attached to its results, so the
 optimizations can be told apart afterwards.
 """
@@ -12,10 +12,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt import (
-    EvaluationFunctionContext,
-    session,
-)
+from ropt import EvaluationFunctionContext, optimize, run, session
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -50,13 +47,13 @@ def main() -> None:
     """Run one optimization per start vector, concurrently, tagging each one."""
     # --8<-- [start:run]
     with session() as s:
-        optimize = partial(s.thread_pool(workers=3).optimize, CONFIG)
-        results = s.run(
+        job = partial(optimize, CONFIG, pool=s.thread_pool(workers=3))
+        results = run(
             [
-                partial(optimize, start, rosenbrock, metadata={"label": label})
+                partial(job, start, rosenbrock, metadata={"label": label})
                 for label, start in enumerate(STARTS)
             ],
-            limit=2,
+            pool=s.thread_pool(workers=2),
         )
     # --8<-- [end:run]
     for result in results:

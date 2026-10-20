@@ -24,7 +24,7 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt import EvaluationFunctionContext, FunctionResults, session
+from ropt import EvaluationFunctionContext, FunctionResults, optimize, session
 
 DIM = 2
 REALIZATIONS = 5
@@ -99,10 +99,11 @@ def main(*, queue: str | None = None, workdir: Path | None = None) -> None:
             queue=queue,
             workdir=Path.cwd() if workdir is None else workdir.resolve(),
         )
-        result = pool.optimize(
+        result = optimize(
             CONFIG,
             INITIAL_VALUES,
             rosenbrock,
+            pool=pool,
             report=report,
         )
     assert result.results is not None

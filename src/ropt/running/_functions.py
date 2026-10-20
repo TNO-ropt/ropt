@@ -1,18 +1,21 @@
-"""The entry points for a call that is made on no session.
+"""The entry points: optimize, evaluate and run, with a pool or in-process.
 
-Such a call is nested in the current abort scope where it is made: the scope
-of a session in its `with` block, or that of the call whose code makes it.
+A call is nested in the current abort scope where it is made: the scope of a
+session in its `with` block, or that of the call whose code makes it. A call
+given a pool is also nested in the scope of the pool's session.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, overload
 
 from ._evaluate import _evaluate, _evaluate_batch
 from ._optimize import _optimize
+from ._pool import pool_parts
+from ._work import _run_work
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Callable, Sequence
 
     from numpy.typing import ArrayLike
 
@@ -20,6 +23,7 @@ if TYPE_CHECKING:
     from ropt.results import FunctionResults, GradientResults
 
     from ._function import EvaluationFunction
+    from ._pool import WorkerPool
     from ._report import ReportCallback
     from ._result import EvaluationResult, OptimizationResult
 
@@ -29,6 +33,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     x0: ArrayLike,
     function: EvaluationFunction,
     *,
+    pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     constraint_tolerance: float = 1e-10,
@@ -37,17 +42,18 @@ def optimize(  # ruff: ignore[too-many-arguments]
     g0: GradientResults | None = None,
     report_gradients: bool = False,
 ) -> OptimizationResult:
-    """Run a single optimization in-process.
+    """Run a single optimization.
 
-    The evaluations run on the calling thread. See
-    [Running Optimizations](../running/running.md) for a walkthrough, and
-    [`WorkerPool.optimize`][ropt.WorkerPool.optimize] for the same optimization
-    on a pool.
+    The evaluations run on the workers of `pool`, or on the calling thread
+    without one. See [Running Optimizations](../running/running.md) for a
+    walkthrough.
 
     Args:
         config:               The optimization configuration.
         x0:                   The initial variable vector.
         function:             The per-realization evaluation function.
+        pool:                 The pool to evaluate on, or `None` to evaluate
+                              in-process.
         handlers:             Optional handlers, called in the order listed.
         report:               Optional callback invoked per evaluation.
         constraint_tolerance: The tolerance within which a constraint holds.
@@ -60,11 +66,13 @@ def optimize(  # ruff: ignore[too-many-arguments]
         An [`OptimizationResult`][ropt.OptimizationResult].
 
     Raises:
-        AbortedError: If the optimization was aborted.
+        AbortedError:  If the optimization was aborted.
+        WorkflowError: If the session of `pool` has closed.
     """  # ruff: ignore[docstring-extraneous-exception]
+    session, executor = pool_parts(pool)
     return _optimize(
-        None,
-        None,
+        session,
+        executor,
         config,
         x0,
         function,
@@ -83,18 +91,22 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
+    pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> EvaluationResult[FunctionResults]:
-    """Evaluate a single variable vector in-process, without optimizing.
+    """Evaluate a single variable vector, without optimizing.
 
-    See [Running Optimizations](../running/running.md) for a walkthrough.
+    The evaluations run on the workers of `pool`, or on the calling thread
+    without one. See [Running Optimizations](../running/running.md) for a
+    walkthrough.
 
     Args:
         config:    The optimization configuration.
         variables: The variable vector to evaluate.
         function:  The per-realization evaluation function.
+        pool:      The pool to evaluate on, or `None` to evaluate in-process.
         handlers:  Optional handlers, called in the order listed.
         report:    Optional callback invoked with the results.
         metadata:  Optional dictionary attached to the results.
@@ -103,12 +115,14 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         An evaluation result.
 
     Raises:
-        AbortedError: If the evaluation was aborted.
-        ValueError:   If `variables` is not a single vector.
+        AbortedError:  If the evaluation was aborted.
+        ValueError:    If `variables` is not a single vector.
+        WorkflowError: If the session of `pool` has closed.
     """  # ruff: ignore[docstring-extraneous-exception]
+    session, executor = pool_parts(pool)
     return _evaluate(
-        None,
-        None,
+        session,
+        executor,
         config,
         variables,
         function,
@@ -123,19 +137,23 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
+    pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
-    """Evaluate a batch of variable vectors in-process, without optimizing.
+    """Evaluate a batch of variable vectors, without optimizing.
 
     Each row of `variables` is one vector, and the results come back in the same
-    order. See [Running Optimizations](../running/running.md) for a walkthrough.
+    order. The evaluations run on the workers of `pool`, or on the calling
+    thread without one. See [Running Optimizations](../running/running.md) for
+    a walkthrough.
 
     Args:
         config:    The optimization configuration.
         variables: The variable vectors to evaluate, one per row.
         function:  The per-realization evaluation function.
+        pool:      The pool to evaluate on, or `None` to evaluate in-process.
         handlers:  Optional handlers, called in the order listed.
         report:    Optional callback invoked with each evaluation.
         metadata:  Optional dictionary attached to every result.
@@ -144,12 +162,14 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         An evaluation result.
 
     Raises:
-        AbortedError: If the evaluation was aborted.
-        ValueError:   If `variables` is not a 2-D matrix.
+        AbortedError:  If the evaluation was aborted.
+        ValueError:    If `variables` is not a 2-D matrix.
+        WorkflowError: If the session of `pool` has closed.
     """  # ruff: ignore[docstring-extraneous-exception]
+    session, executor = pool_parts(pool)
     return _evaluate_batch(
-        None,
-        None,
+        session,
+        executor,
         config,
         variables,
         function,
@@ -157,3 +177,44 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         report=report,
         metadata=metadata,
     )
+
+
+@overload
+def run[T](work: Callable[[], T], *, pool: WorkerPool | None = None) -> T: ...
+
+
+@overload
+def run[T](
+    work: Sequence[Callable[[], T]], *, pool: WorkerPool | None = None
+) -> tuple[T, ...]: ...
+
+
+def run[T](
+    work: Callable[[], T] | Sequence[Callable[[], T]],
+    *,
+    pool: WorkerPool | None = None,
+) -> T | tuple[T, ...]:
+    """Run one or more arbitrary callables.
+
+    Pass a single zero-argument callable to run one call and get its result,
+    or a sequence to get a tuple of results in the order of `work`. Bind
+    arguments with `functools.partial`. With a pool the callables run
+    concurrently on its workers, and must be picklable for a process or HPC
+    pool. Without a pool they run one after another on the calling thread. See
+    [Running your own work](../running/parallel.md#offloading-your-own-work)
+    for a walkthrough.
+
+    Args:
+        work: A single zero-argument callable, or a sequence of them.
+        pool: The pool to run on, or `None` to run in-process.
+
+    Returns:
+        The single result, or a tuple of results in the order of `work`.
+
+    Raises:
+        AbortedError:   If an abort arrived before every callable finished.
+        ExecutionError: If the machinery could not run a call.
+        WorkflowError:  If the session of `pool` has closed.
+    """  # ruff: ignore[docstring-extraneous-exception]
+    session, executor = pool_parts(pool)
+    return _run_work(session, executor, work)

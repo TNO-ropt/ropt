@@ -1,7 +1,7 @@
 """Aggregate results from concurrent optimizations with one shared handler.
 
 The same handler may be given to optimizations that run concurrently -- here
-the optimizations that `Session.run` starts together. Its `handle_event`
+the optimizations that `run` starts together. Its `handle_event`
 serializes its own calls, so a second optimization waits for the first instead
 of interleaving with it. An optimization may feed several handlers at once, for
 different purposes.
@@ -13,11 +13,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt import (
-    EvaluationFunctionContext,
-    HistoryHandler,
-    session,
-)
+from ropt import EvaluationFunctionContext, HistoryHandler, optimize, run, session
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -54,12 +50,16 @@ def main() -> None:
     per_run = HistoryHandler()
     # --8<-- [start:shared]
     with session() as s:
-        optimize = partial(
-            s.thread_pool(workers=len(STARTS)).optimize,
+        job = partial(
+            optimize,
             CONFIG,
+            pool=s.thread_pool(workers=len(STARTS)),
             handlers=[history, per_run],
         )
-        s.run([partial(optimize, start, rosenbrock) for start in STARTS])
+        run(
+            [partial(job, start, rosenbrock) for start in STARTS],
+            pool=s.thread_pool(workers=len(STARTS)),
+        )
     # --8<-- [end:shared]
     print(
         f"collected results across {len(STARTS)} concurrent optimizations: "

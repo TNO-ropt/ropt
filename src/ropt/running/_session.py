@@ -1,16 +1,15 @@
-"""The session: the owner of the pools built on it.
+"""The session: the owner of the pools it builds.
 
 A **session** is what a pool belongs to. Its factories are the only way to build
 a pool with workers, and closing the session releases every pool it built, so
 most code needs no further cleanup. It is also what an abort reaches: the
 session has an abort scope of its own, which is the current scope in its
-`with` block and in which every call made on it is nested, and `abort()`
-aborts it.
+`with` block and in which every call given one of its pools is nested, and
+`abort()` aborts it.
 
-A call made on one of its pools, or its own `run`, is nested in the session's
-scope. A call to a module-level function is nested in the current scope where
-it is made, which in the `with` block is the scope of the session. Any
-number of pools — and any number of sessions — can be open at once.
+A call without a pool is nested in the current scope where it is made, which in
+the `with` block is the scope of the session. Any number of pools — and any
+number of sessions — can be open at once.
 """
 
 from __future__ import annotations
@@ -19,7 +18,7 @@ import contextlib
 import threading
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Self, overload
+from typing import TYPE_CHECKING, Any, Self
 
 from ropt.components.concurrency import AbortScope, _grace, current_abort_scope
 from ropt.components.executors import (
@@ -28,19 +27,14 @@ from ropt.components.executors import (
     ProcessExecutor,
     ThreadExecutor,
 )
-from ropt.components.executors._daemon_thread_executor import (
-    DaemonThreadExecutor,
-    ThreadGroup,
-)
 from ropt.components.executors._hpc_executor import clusters_with_queue
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, WorkflowError
 
 from ._pool import WorkerPool
-from ._work import _run_work
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable
 
     from ropt.components.executors import Executor
 
@@ -59,7 +53,7 @@ _REOPENED = (
 
 
 class Session:
-    """An open session, and the factories that build on it.
+    """An open session, and the factories that build its pools.
 
     A pool needs an owner that releases its workers, which is why pools are
     built here rather than constructed on their own. Everything a session
@@ -69,18 +63,18 @@ class Session:
     Bind the session with `as` and call its factories inside the block. See
     [Sessions](../running/sessions.md) for an overview.
 
-    An optimization or evaluation started on a pool of the session evaluates on
-    that pool's workers and belongs to this session. One started with a
-    module-level function in the session's `with` block, or inside a call made
-    there, evaluates in-process and is aborted with the session.
+    An optimization, evaluation or `run` call given a pool of the session
+    runs on that pool's workers and belongs to this session. One without a pool
+    in the session's `with` block, or inside a call made there, runs in-process
+    and is aborted with the session.
 
     A session may be opened inside another, and pools from different sessions
     never interact; a session opened inside another session's `with` block, or
-    inside a call made there, is aborted with it. A session is single use — once closed it
-    cannot be reopened.
+    inside a call made there, is aborted with it. A session is single use —
+    once closed it cannot be reopened.
 
-    [`abort`][ropt.Session.abort] aborts the calls made on it or in its
-    `with` block, which is what a caller on another thread — a signal handler,
+    [`abort`][ropt.Session.abort] aborts the calls given its pools or made in
+    its `with` block, which is what a caller on another thread — a signal handler,
     a user interface — calls to bring them down.
     """
 
@@ -92,7 +86,6 @@ class Session:
         self._entered = False
         self._abort_scope = AbortScope()
         self._exit_stack = contextlib.ExitStack()
-        self._run_threads = ThreadGroup()
 
     def __enter__(self) -> Self:
         """Open the session.
@@ -117,10 +110,10 @@ class Session:
     def __exit__(self, *_exc: object) -> None:
         """Close the session, aborting its calls and releasing every pool.
 
-        Work still running is waited for, five seconds at most in total, which
-        gives the programs it started with [`run_program`][ropt.run_program]
-        the time to end. Worker processes still busy after that are killed;
-        threads are no longer waited for.
+        Work still running with its pools is waited for, five seconds at most
+        in total, which gives the programs it started with
+        [`run_program`][ropt.run_program] the time to end. Worker processes
+        still busy after that are killed; threads are no longer waited for.
         """
         self._exit_stack.close()
         with self._lock:
@@ -135,17 +128,16 @@ class Session:
         for executor in executors:
             if executor is not None:
                 executor._close(deadline)  # ruff: ignore[private-member-access]
-        self._run_threads.wait(deadline)
 
     def abort(self) -> None:
-        """Abort the calls made on this session or in its `with` block.
+        """Abort the calls given its pools or made in its `with` block.
 
         Each optimization, evaluation and `run` call under way raises
         [`AbortedError`][ropt.exceptions.AbortedError] with
-        `ExitCode.USER_ABORT`. The session stays aborted: a call made on it
-        afterwards, or from its `with` block, is aborted as soon as it starts.
+        `ExitCode.USER_ABORT`. The session stays aborted: a call given one of
+        its pools afterwards, or made in its `with` block, is aborted as soon as it starts.
 
-        Calling it is thread-safe, and safe on a session with nothing running.
+        Calling it is thread-safe, and safe when nothing is running.
         See [Aborting from outside](../running/many_runs.md#stopping-from-outside)
         for which calls are reached and when.
         """
@@ -158,46 +150,6 @@ class Session:
     def _open_abort_scope(self) -> AbortScope:
         self._require_open()
         return self._abort_scope
-
-    @overload
-    def run[T](self, work: Callable[[], T], *, limit: int | None = None) -> T: ...
-
-    @overload
-    def run[T](
-        self, work: Sequence[Callable[[], T]], *, limit: int | None = None
-    ) -> tuple[T, ...]: ...
-
-    def run[T](
-        self,
-        work: Callable[[], T] | Sequence[Callable[[], T]],
-        *,
-        limit: int | None = None,
-    ) -> T | tuple[T, ...]:
-        """Run one or more arbitrary callables in-process, on threads of their own.
-
-        Pass a single zero-argument callable to run one call and get its result,
-        or a sequence to run them concurrently and get a tuple of results in the
-        order of `work`. Bind arguments with `functools.partial`. Each call runs
-        on a daemon thread started for it, with a copy of the caller's context
-        variables. See
-        [Running your own work](../running/parallel.md#offloading-your-own-work)
-        for a walkthrough.
-
-        Args:
-            work:  A single zero-argument callable, or a sequence of them.
-            limit: The maximum number of calls running at once, or `None` for
-                   no limit.
-
-        Returns:
-            The single result, or a tuple of results in the order of `work`.
-
-        Raises:
-            AbortedError:  If an abort arrived before every callable finished.
-            ValueError:    If `limit` is less than one.
-            WorkflowError: If this session has closed.
-        """  # ruff: ignore[docstring-extraneous-exception]
-        executor = DaemonThreadExecutor(limit=limit, threads=self._run_threads)
-        return _run_work(self, executor, work)
 
     def thread_pool(self, *, workers: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker threads.
@@ -402,19 +354,19 @@ def _local_queue_executor(  # ruff: ignore[too-many-arguments]
 
 
 def session() -> Session:
-    """Open a session that owns the pools built on it.
+    """Open a session that owns the pools it builds.
 
-    Build pools with the session's factories, and start on each pool the
+    Build pools with the session's factories, and pass a pool to the
     optimizations and evaluations that should use its workers. Closing the
     session releases every pool it built, so most code needs no further cleanup:
 
     ```python
     with session() as s:
         pool = s.thread_pool(workers=4)
-        result = pool.optimize(config, x0, objective)
+        result = optimize(config, x0, objective, pool=pool)
     ```
 
-    An optimization started with the module-level [`optimize`][ropt.optimize]
+    An optimization started with [`optimize`][ropt.optimize] without a pool
     evaluates in-process and needs no session. See
     [Sessions](../running/sessions.md) for an overview.
 

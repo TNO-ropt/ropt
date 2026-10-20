@@ -26,6 +26,10 @@ and [`RoptError`][ropt.exceptions.RoptError] with
 ::: ropt.evaluate
 ::: ropt.evaluate_batch
 
+## Running your own work
+
+::: ropt.run
+
 ## Evaluation functions
 
 ::: ropt.EvaluationFunctionContext

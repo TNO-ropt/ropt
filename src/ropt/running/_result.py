@@ -33,7 +33,7 @@ class OptimizationResult:
 class EvaluationResult[T]:
     """The outcome of a single evaluation.
 
-    What `results` holds depends on which method produced it: one
+    What `results` holds depends on which function produced it: one
     [`FunctionResults`][ropt.results.FunctionResults] from
     [`evaluate`][ropt.evaluate], or one per vector from
     [`evaluate_batch`][ropt.evaluate_batch]. An evaluation is a single batch:

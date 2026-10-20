@@ -109,7 +109,7 @@ that realization:
 
 ```python
 try:
-    result = pool.optimize(inner_config, start, inner_function)
+    result = optimize(inner_config, start, inner_function, pool=pool)
 except RuntimeError:
     return numpy.nan
 ```
@@ -121,7 +121,7 @@ optimization is aborted, the inner optimizations are aborted with it. See
 
 ## Two pools, not one { #two-pools-not-one }
 
-Each layer evaluates on its own pool, and that is a requirement rather than
+Each layer evaluates with its own pool, and that is a requirement rather than
 a preference:
 
 ```python
@@ -130,7 +130,7 @@ a preference:
 
 The outer pool is a **thread** pool. Outer evaluations therefore stay
 inside this process, where the inner pool and the shared handler are live
-objects; on a process pool they would arrive as copies, which `ropt`
+objects; with a process pool they would arrive as copies, which `ropt`
 refuses. The inner pool is a **process** pool, which is where the real
 work goes.
 
@@ -176,7 +176,7 @@ realization index is part of the key because a memo keyed on the variables alone
 gives the wrong value for a problem with more than one realization.
 
 The dictionary is reachable only because the outer evaluations run on threads,
-in this process. On a process pool or an HPC pool the function is
+in this process. With a process pool or an HPC pool the function is
 copied into a worker, which starts from an empty dictionary and discards it when
 it finishes, without raising. See
 [Which pool should I use?](parallel.md#which-pool).

@@ -19,11 +19,12 @@ control-flow signals that `ropt` raises and catches itself stay in
 [`ropt.exceptions`][ropt.exceptions].
 
 Nothing about an optimization or evaluation depends on where it is called from.
-What it is started on says where its evaluations happen and which session it
-belongs to: a module function runs in-process and belongs to nothing, a
-[`Session`][ropt.Session] method runs in-process on that session, and a
-[`WorkerPool`][ropt.WorkerPool] method runs on that pool's workers. This holds
-wherever it is started from, including a thread you spawn yourself.
+The functions [`optimize`][ropt.optimize], [`evaluate`][ropt.evaluate],
+[`evaluate_batch`][ropt.evaluate_batch] and [`run`][ropt.run] take an optional
+`pool` argument that says where the work happens: without one it runs
+in-process on the calling thread, with a [`WorkerPool`][ropt.WorkerPool] it runs
+on that pool's workers and belongs to the pool's session. This holds wherever
+the call is made from, including a thread you spawn yourself.
 
 Pools come from a [`session`][ropt.session], which releases them when it closes.
 """
@@ -59,7 +60,7 @@ from ropt.results import (
     results_to_pandas,
     results_to_polars,
 )
-from ropt.run import (
+from ropt.running import (
     EvaluationFunction,
     EvaluationResult,
     OptimizationResult,
@@ -69,6 +70,7 @@ from ropt.run import (
     evaluate,
     evaluate_batch,
     optimize,
+    run,
     session,
 )
 
@@ -102,6 +104,7 @@ __all__ = [
     "optimize",
     "results_to_pandas",
     "results_to_polars",
+    "run",
     "run_program",
     "session",
 ]

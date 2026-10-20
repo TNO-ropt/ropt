@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt import session
+from ropt import optimize, session
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -55,7 +55,7 @@ def main(*, multiprocessing: bool = False) -> None:
     """
     with session() as s:
         build = s.process_pool if multiprocessing else s.thread_pool
-        result = build(workers=4).optimize(CONFIG, INITIAL_VALUES, rosenbrock)
+        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, pool=build(workers=4))
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     assert np.allclose(result.results.variables, 1.0, atol=1e-2)

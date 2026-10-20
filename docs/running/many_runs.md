@@ -2,23 +2,30 @@
 
 Several optimizations can run together rather than one after another. Wrap each
 `optimize` call in a zero-argument callable and pass the callables to
-[`Session.run`][ropt.Session.run], which starts each one on a thread of its
-own and returns the results in the order the callables were given:
+[`run`][ropt.run] with a thread pool. `run` starts each one on a worker of that
+pool and returns the results in the order the callables were given:
 
 ```python
 from functools import partial
 
-from ropt import session
+from ropt import optimize, run, session
 
 with session() as s:
     pool = s.thread_pool(workers=4)
-    results = s.run(
-        [partial(pool.optimize, config, x0, objective) for x0 in start_points]
+    runner = s.thread_pool(workers=len(start_points))
+    results = run(
+        [partial(optimize, config, x0, objective, pool=pool) for x0 in start_points],
+        pool=runner,
     )
 ```
 
 Each callable is an ordinary `optimize` call, so every optimization can have its
 own configuration, initial values, objective, `metadata` and `report` callback.
+
+The optimizations need a pool of their own, `runner` here, separate from the
+pool they evaluate with. A call made from work running with a pool cannot use
+that same pool: it raises [`WorkflowError`][ropt.exceptions.WorkflowError]. Without
+a pool, `run` calls the functions one after another on the calling thread.
 
 !!! tip "Give each optimization an ID"
     Pass `metadata` to tag each optimization with an identifier that is
@@ -27,11 +34,14 @@ own configuration, initial values, objective, `metadata` and `report` callback.
 
     ```python
     labels = ["low", "mid", "high"]
-    results = s.run(
+    results = run(
         [
-            partial(pool.optimize, config, x0, objective, metadata={"label": label})
+            partial(
+                optimize, config, x0, objective, pool=pool, metadata={"label": label}
+            )
             for x0, label in zip(start_points, labels)
-        ]
+        ],
+        pool=runner,
     )
     for result in results:
         print(result.results.metadata["label"])
@@ -43,11 +53,11 @@ own configuration, initial values, objective, `metadata` and `report` callback.
 
 There are two independent levels of concurrency here:
 
-- **The optimizations** run concurrently, each on a thread that `run` starts
-  for it. The `limit` argument of `run` caps how many of them are under way at
-  the same time; without it, all of them start at once.
-- **The function evaluations** inside those optimizations happen on the pool
-  that each `optimize` call is made on, and the pool determines how they are
+- **The optimizations** run concurrently, each on a worker of the pool given
+  to `run`. The number of workers of that pool caps how many of them are under
+  way at the same time; the others wait for a free worker.
+- **The function evaluations** inside those optimizations use the pool
+  passed to each `optimize` call, and the pool determines how they are
   parallelized. With `thread_pool(workers=1)` the optimizations still progress
   together, but their evaluations are executed one at a time. A larger pool —
   `thread_pool(workers=n)`, or a process or HPC pool — runs several
@@ -89,11 +99,11 @@ concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concur
     So keep a shared handler cheap. A handler that must do slow work — writing
     a file, talking to a database — holds up every optimization feeding it.
 
-!!! warning "Without a pool, the threads of `run` do the evaluating"
-    An optimization started with the module-level [`optimize`][ropt.optimize]
-    evaluates in your own program, on the thread that `run` started for it.
+!!! warning "Without a pool, the workers of `run` do the evaluating"
+    An optimization started with [`optimize`][ropt.optimize] without a pool
+    evaluates in your own program, on the worker of `run` that runs it.
     When several of them run at once, your evaluation function is called by
-    several threads at once and must tolerate that. Start them on a pool when it
+    several threads at once and must tolerate that. Give them a pool when it
     must not be.
 
 !!! warning "Not every backend can take part"
@@ -118,9 +128,9 @@ The optimizations started from the callables of one `run` call are
 [nested](failures.md#nested-calls) in it. When one of them raises, `run`
 aborts the others and raises that exception at once.
 [Failures and Aborts](failures.md) gives the rules for every case. An aborted
-optimization raises `AbortedError` with `ABORTED_ON_ERROR` — at once on a pool,
+optimization raises `AbortedError` with `ABORTED_ON_ERROR` — at once with a pool,
 or at its next evaluation boundary without one — but `run` does not wait for
-it, and its result is lost. Optimizations still queued behind `limit` are not
+it, and its result is lost. Optimizations still waiting for a worker are not
 started after the abort.
 
 A callable that catches the exception of its optimization does not fail, so the
@@ -130,17 +140,17 @@ something that marks the failure:
 ```python
 def optimize_or_none(x0):
     try:
-        return pool.optimize(config, x0, objective)
+        return optimize(config, x0, objective, pool=pool)
     except SimulationError:
         return None
 
-results = s.run([partial(optimize_or_none, x0) for x0 in start_points])
+results = run([partial(optimize_or_none, x0) for x0 in start_points], pool=runner)
 ```
 
 `SimulationError` stands for an exception that your own objective raises.
 
 [`Session.abort`](#stopping-from-outside) reaches every optimization on
-the session, and `run` then raises
+the session's pools, and `run` then raises
 [`AbortedError`][ropt.exceptions.AbortedError] with `USER_ABORT`. When a failure
 aborted it, the exit code is `ABORTED_ON_ERROR`, so the exit code
 distinguishes an abort that was asked for from one that a failure caused. A
@@ -152,8 +162,8 @@ code means.
 
 The `report` callback runs inside the optimization it stops, which is no use to
 a signal handler or a user interface. [`Session.abort`][ropt.Session.abort] is
-the one that is called from another thread: it aborts every call made on
-the session or in its `with` block, and each raises
+the one that is called from another thread: it aborts every call given one of
+the session's pools or made in its `with` block, and each raises
 [`AbortedError`][ropt.exceptions.AbortedError] with `USER_ABORT`.
 
 ```python
@@ -161,7 +171,7 @@ with session() as s:
     pool = s.thread_pool(workers=4)
     signal.signal(signal.SIGINT, lambda *_: s.abort())
     try:
-        result = pool.optimize(config, x0, objective)
+        result = optimize(config, x0, objective, pool=pool)
     except AbortedError as error:
         print("aborted:", error.exit_code.message)
 ```
@@ -177,21 +187,21 @@ An aborted optimization does not wait for the evaluations that are running.
 With no pool, the optimization runs the evaluation function itself, so the
 evaluation in progress returns first. On a thread or process pool, the
 evaluations already running continue after the optimization has ended, and their workers are free only once they
-return. On an HPC pool they are cancelled.
+return. With an HPC pool they are cancelled.
 
-An abort is permanent: the session stays aborted. A call made on it
-afterwards, or in its `with` block, raises `AbortedError` with `USER_ABORT` at
+An abort is permanent: the session stays aborted. A call given one of its
+pools afterwards, or in its `with` block, raises `AbortedError` with `USER_ABORT` at
 once. Code that catches the `AbortedError` inside the block can record what
-happened, but cannot start more work on the session; catching it outside the
+happened, but cannot start more work in the session; catching it outside the
 `with` block works as well. To try again, open a new session. A
-[`run`][ropt.Session.run] call is aborted as a whole: a callable it has
-queued behind its `limit` is not started. Leaving the session's `with` block
+[`run`][ropt.run] call is aborted as a whole: a callable still waiting for a
+worker is not started. Leaving the session's `with` block
 aborts its calls as well, and then releases its pools, which is what refuses a
 call made after that. Releasing an HPC pool cancels the jobs it still
 has, so none are left running when the block has ended. A call aborted that way
 raises with `ABORTED` rather than `USER_ABORT`, since it was the block ending
 rather than a request to abort.
 
-A module-level function such as [`optimize`][ropt.optimize], called in the
-`with` block of a session, is aborted with the session. Called outside any
+A call without a pool, such as [`optimize`][ropt.optimize], made in the
+`with` block of a session, is aborted with the session. Made outside any
 session block, it cannot be aborted this way.

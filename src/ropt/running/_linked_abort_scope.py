@@ -1,8 +1,8 @@
 """The abort scope of one optimization, evaluation or `run` call.
 
 Aborts travel down and failures travel up. The scope of a call is nested in
-the current scope where the call is made, and in the scope of the session the
-call is started on. A call that fails aborts the work it started, and its
+the current scope where the call is made, and in the scope of the session of
+the pool it is given. A call that fails aborts the work it started, and its
 exception is raised to its caller; the calls beside it are not aborted.
 """
 

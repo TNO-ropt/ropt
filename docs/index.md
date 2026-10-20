@@ -27,8 +27,8 @@ statistic, such as the mean, over the ensemble.
   variables as part of a black-box function.
 - Evaluation of the functions in parallel: on background threads, in worker
   processes, as separate processes on the local machine, or as jobs on an HPC
-  cluster. One set of workers serves every optimization started on it, and work
-  of your own can be sent to it as well.
+  cluster. One pool serves every optimization that uses it, and work of your own
+  can be sent to it as well.
 - Stopping an optimization on a criterion of your own, which returns the best
   result reached so far, or aborting it from another thread.
 - Restarting an optimization from the point an earlier optimization reached,

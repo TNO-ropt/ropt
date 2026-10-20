@@ -138,10 +138,11 @@ share one `f0` and `g0`, which is the case when the same point is optimized unde
 several configurations:
 
 ```python
-s.run(
+run(
     [
         partial(optimize, config, x0, function, f0=f0, g0=g0)
         for config in (config_a, config_b)
-    ]
+    ],
+    pool=s.thread_pool(workers=2),
 )
 ```

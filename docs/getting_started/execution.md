@@ -6,16 +6,16 @@ at the same time using an evaluation **pool**. Pools must part of a
 [`session`][ropt.session] context manager object that handles any cleanup
 actions that must be taken after the optimization finishes.
 
-Open a session using a `with` statement, build a pool with it, and start the
-optimization using the `optimize` method of that pool. It employs four threads to
-evaluate the functions in parallel:
+Open a session using a `with` statement, build a pool with it, and pass the pool
+to `optimize`. The pool employs four threads to evaluate the functions in
+parallel:
 
 ```python
-from ropt import session
+from ropt import optimize, session
 
 with session() as s:
     pool = s.thread_pool(workers=4)
-    result = pool.optimize(config, x0, objective)
+    result = optimize(config, x0, objective, pool=pool)
 ```
 
 The session owns the pool and releases its workers when the block ends. The

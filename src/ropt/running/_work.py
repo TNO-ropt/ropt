@@ -1,13 +1,9 @@
-"""Run arbitrary callables on a pool, or on threads of their own.
+"""Run arbitrary callables with a pool, or one after another in-process.
 
-The work is a single callable, or a sequence of callables that run concurrently
-and may be entirely different functions. They must be picklable for a process or
-job pool.
-
-Which pool the work lands on is decided entirely by the pool it is called on:
-calling `run` from inside an evaluation function dispatches to the pool that call
-names, not to the one running the evaluation. Calling `run` on a session runs the
-work on threads started for that call.
+The work is a single callable, or a sequence of callables that may be entirely
+different functions. With a pool they run concurrently on its workers, and must be
+picklable for a process or job pool. Without a pool they run in turn on the
+calling thread.
 """
 
 from __future__ import annotations
@@ -29,8 +25,8 @@ if TYPE_CHECKING:
 
 
 def _run_work[T](
-    session: Session,
-    executor: Executor,
+    session: Session | None,
+    executor: Executor | None,
     work: Callable[[], T] | Sequence[Callable[[], T]],
 ) -> T | tuple[T, ...]:
     with linked_abort_scope(session) as scope:
@@ -43,8 +39,10 @@ def _run_work[T](
 
 
 def _run(
-    executor: Executor, functions: list[Callable[[], Any]], scope: AbortScope
+    executor: Executor | None, functions: list[Callable[[], Any]], scope: AbortScope
 ) -> list[Any]:
+    if executor is None:
+        return _run_in_turn(functions, scope)
     values = executor.run(
         [WorkItem(function=function) for function in functions],
         abort_scope=scope,
@@ -59,3 +57,20 @@ def _run(
             msg = f"A callable given to `run` could not be run: {value.message}"
             raise ExecutionError(msg)
     return values
+
+
+def _run_in_turn(functions: list[Callable[[], Any]], scope: AbortScope) -> list[Any]:
+    values: list[Any] = []
+    with scope.as_current():
+        for function in functions:
+            _raise_if_aborting(scope)
+            values.append(function())
+    # A callable that saw the abort may have returned early, with a value that
+    # does not stand for its result.
+    _raise_if_aborting(scope)
+    return values
+
+
+def _raise_if_aborting(scope: AbortScope) -> None:
+    if scope.aborting:
+        raise AbortedError(scope.exit_code)

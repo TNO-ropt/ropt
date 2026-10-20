@@ -195,7 +195,7 @@ def aborting() -> bool:
     """Return whether the call that runs the calling code is being aborted.
 
     Code that a call runs — an evaluation function, an event handler, a report
-    callback, or a function given to [`run`][ropt.Session.run] — can call this
+    callback, or a function given to [`run`][ropt.run] — can call this
     to stop early once that call is aborted. In the `with` block of a session it
     returns whether the session is aborted. It returns `False` outside any call
     and session block, which includes the jobs of an HPC pool. In the worker

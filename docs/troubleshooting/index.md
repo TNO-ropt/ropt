@@ -81,9 +81,9 @@ the worker finishes. Return what you need instead; see
 [Handlers and separate processes](../results/handlers.md#handlers-and-separate-processes).
 
 **Several optimizations may call your objective at the same time.**
-Optimizations started together with [`Session.run`][ropt.Session.run]
+Optimizations started together with [`run`][ropt.run] and a pool
 run concurrently. Given a pool, their evaluations go there; given none, each
-optimization evaluates on the thread that `run` started for it, so your
+optimization evaluates on the worker of `run` that runs it, so your
 evaluation function is called from several threads at once and has to tolerate
 that. See [Running Multiple Optimizations](../running/many_runs.md).
 
@@ -104,16 +104,16 @@ fails](../running/parallel.md#when-an-evaluation-fails).
 | A global or a cache your objective writes to is never updated | The objective ran in a worker process, on a copy. Return the value as [metadata](../running/running.md#attaching-metadata) instead. |
 | An objective that works alone misbehaves when several optimizations run at once | It is being called from several threads at once. Remove the shared mutable state, or guard it with a lock of its own. |
 | `TypeError: cannot pickle ...` part-way through an optimization | Something in `metadata` cannot be deep-copied. |
-| `ExecutionError` part-way through an optimization on a pool | A worker or job broke, rather than your objective; see [When an evaluation fails](../running/parallel.md#when-an-evaluation-fails). |
+| `ExecutionError` part-way through an optimization with a pool | A worker or job broke, rather than your objective; see [When an evaluation fails](../running/parallel.md#when-an-evaluation-fails). |
 
 ## Pools, stopping and processes
 
-**An optimization evaluates on the pool it was started on, and no other.**
-Nothing is picked up from the surrounding code. An optimization started with the
-module-level [`optimize`][ropt.optimize] evaluates inside your own program, on
+**An optimization evaluates with the pool it was given, and no other.**
+Nothing is picked up from the surrounding code. An optimization started with
+[`optimize`][ropt.optimize] without a pool evaluates inside your own program, on
 the thread that called it — even if a pool exists next to it.
 
-**Threads cannot be interrupted.** Evaluations on a thread pool run to
+**Threads cannot be interrupted.** Evaluations with a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
 outside. An evaluation that checks [`aborting`][ropt.aborting], or runs its
 external programs with [`run_program`][ropt.run_program], stops early; any other
@@ -134,7 +134,7 @@ the loop or function that uses it rather than around the whole program; see
 | What you see | Most likely cause |
 | --- | --- |
 | Ctrl-C appears to do nothing | A process-wide signal setting, changed by `polars` when `ropt` imports it. Call [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt]; see [Keyboard Interrupts](keyboard_interrupt.md). |
-| The program will not exit after Ctrl-C | Evaluations on a thread pool are still running and cannot be interrupted. Check [`aborting`][ropt.aborting] in them, or start their programs with [`run_program`][ropt.run_program]. |
+| The program will not exit after Ctrl-C | Evaluations with a thread pool are still running and cannot be interrupted. Check [`aborting`][ropt.aborting] in them, or start their programs with [`run_program`][ropt.run_program]. |
 | Pages of `multiprocessing` tracebacks, ending in `ExecutionError: Could not start worker processes` | The script has no `if __name__ == "__main__":` guard, so every worker re-ran it from the top. |
 | A process pool keeps hundreds of megabytes resident | Each worker is a separate interpreter. Close the session that built the pool when the optimizations that use it are done. |
 | `WorkflowError` about a pool released when its session closed | The pool outlived its `with session()` block. Build a new one inside an open session. |
@@ -157,8 +157,7 @@ waits for the lock. Keep a shared handler cheap.
 **A handler must not start an optimization that reaches it again.** The handler
 holds its own lock while it runs. A nested [`optimize`][ropt.optimize] emits on
 that same thread and raises; a nested optimization started with
-[`Session.run`][ropt.Session.run] emits on the thread that `run`
-started for it, and blocks. See [Result
+[`run`][ropt.run] and a pool emits on a worker of that pool, and blocks. See [Result
 Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 **Not every optimizer can run beside another.** A backend that needs its own

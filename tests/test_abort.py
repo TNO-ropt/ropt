@@ -24,6 +24,7 @@ from ropt import (
     evaluate,
     evaluate_batch,
     optimize,
+    run,
     run_program,
     session,
 )
@@ -158,8 +159,6 @@ def test_aborting_turns_true_in_an_evaluation_function_once_its_run_is_aborted()
 def test_aborting_turns_true_in_a_function_given_to_run_once_the_call_is_aborted() -> (
     None
 ):
-    # The `run` call does not wait for the function, so the function signals
-    # when it has looked.
     seen: list[tuple[bool, bool]] = []
     looked = threading.Event()
 
@@ -173,7 +172,7 @@ def test_aborting_turns_true_in_a_function_given_to_run_once_the_call_is_aborted
             return 0
 
         with pytest.raises(AbortedError):
-            opened.run(_work)
+            run(_work)
         assert looked.wait(timeout=30)
 
     assert seen == [(False, True)]
@@ -214,7 +213,9 @@ def test_session_abort_between_batches_raises() -> None:
             opened.abort()
 
         with pytest.raises(AbortedError) as raised:
-            pool.optimize(_CONFIG, _INITIAL, _sphere, report=_abort_on_first_result)
+            optimize(
+                _CONFIG, _INITIAL, _sphere, pool=pool, report=_abort_on_first_result
+            )
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
 
@@ -240,7 +241,7 @@ def test_session_abort_aborts_the_batch_in_flight() -> None:
             return _sphere(variables, context)
 
         with pytest.raises(AbortedError) as raised:
-            pool.optimize(_CONFIG, _INITIAL, objective)
+            optimize(_CONFIG, _INITIAL, objective, pool=pool)
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
     # A run that was let alone evaluates the vector and a perturbation per
@@ -266,7 +267,7 @@ def test_session_abort_of_an_evaluation_batch_raises() -> None:
             return _sphere(variables, context)
 
         with pytest.raises(AbortedError) as raised:
-            pool.evaluate_batch(_CONFIG, matrix, objective)
+            evaluate_batch(_CONFIG, matrix, objective, pool=pool)
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
 
@@ -309,7 +310,7 @@ def test_an_evaluation_aborted_while_its_vector_runs_raises() -> None:
             return _sphere(variables, context)
 
         with pytest.raises(AbortedError) as raised:
-            pool.evaluate(_CONFIG, _INITIAL, objective)
+            evaluate(_CONFIG, _INITIAL, objective, pool=pool)
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
 
@@ -331,11 +332,11 @@ def test_a_nested_run_that_fails_does_not_abort_the_run_that_started_it() -> Non
         def objective(
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
-            inner.optimize(_CONFIG, _INITIAL, _nested)
+            optimize(_CONFIG, _INITIAL, _nested, pool=inner)
             return _sphere(variables, context)
 
         with pytest.raises(ValueError, match="boom"):
-            outer.optimize(_CONFIG, _INITIAL, objective)
+            optimize(_CONFIG, _INITIAL, objective, pool=outer)
 
 
 @pytest.mark.timeout(60)
@@ -346,10 +347,11 @@ def test_session_abort_aborts_every_run_in_progress() -> None:
 
     with session() as opened:
         pool = opened.thread_pool(workers=runs)
-        run = partial(pool.optimize, _CONFIG, _INITIAL)
+        start = partial(optimize, _CONFIG, _INITIAL, pool=pool)
         drivers = [
             threading.Thread(
-                target=_records_abort, args=(partial(run, _waits_once(started)), codes)
+                target=_records_abort,
+                args=(partial(start, _waits_once(started)), codes),
             )
             for _ in range(runs)
         ]
@@ -372,8 +374,8 @@ def test_closing_a_session_aborts_a_run_on_another_thread() -> None:
 
     with session() as opened:
         pool = opened.thread_pool(workers=1)
-        run = partial(pool.optimize, _CONFIG, _INITIAL, _waits_once(started))
-        driver = threading.Thread(target=_records_abort, args=(run, codes))
+        start = partial(optimize, _CONFIG, _INITIAL, _waits_once(started), pool=pool)
+        driver = threading.Thread(target=_records_abort, args=(start, codes))
         driver.start()
         # The run is inside its first evaluation, so the block below closes on
         # a run that is genuinely in progress.
@@ -400,9 +402,10 @@ def test_session_abort_aborts_a_run_started_afterwards(where: str) -> None:
     with session() as opened:
         pool = opened.thread_pool(workers=1)
         opened.abort()
-        run = optimize if where == "module" else pool.optimize
         with pytest.raises(AbortedError) as raised:
-            run(_CONFIG, _INITIAL, objective)
+            optimize(
+                _CONFIG, _INITIAL, objective, pool=None if where == "module" else pool
+            )
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
     assert calls == []
@@ -434,7 +437,7 @@ def test_session_abort_reaches_a_session_opened_in_its_block() -> None:
     with session() as outer, session() as inner:
         outer.abort()
         with pytest.raises(AbortedError) as raised:
-            inner.thread_pool(workers=1).optimize(_CONFIG, _INITIAL, _sphere)
+            optimize(_CONFIG, _INITIAL, _sphere, pool=inner.thread_pool(workers=1))
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
 
@@ -462,14 +465,16 @@ def test_failing_run_does_not_abort_the_others_on_its_session() -> None:
 
         def _held_run() -> None:
             outcome.append(
-                pool.optimize(_CONFIG, _INITIAL, _waits_then_holds(started, release))
+                optimize(
+                    _CONFIG, _INITIAL, _waits_then_holds(started, release), pool=pool
+                )
             )
 
         driver = threading.Thread(target=_held_run)
         driver.start()
         try:
             with pytest.raises(ValueError, match="boom"):
-                pool.optimize(_CONFIG, _INITIAL, _fails_at(started))
+                optimize(_CONFIG, _INITIAL, _fails_at(started), pool=pool)
         finally:
             release.set()
             driver.join(timeout=30)
@@ -479,7 +484,7 @@ def test_failing_run_does_not_abort_the_others_on_its_session() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_session_abort_starts_none_of_the_runs_queued_behind_the_limit() -> None:
+def test_session_abort_starts_none_of_the_runs_queued_on_a_pool() -> None:
     # One at a time, so the four behind the first are still queued when the
     # abort arrives. Each run counts its own evaluations, which is what shows
     # that none of the four reached one.
@@ -501,12 +506,14 @@ def test_session_abort_starts_none_of_the_runs_queued_behind_the_limit() -> None
     with session() as opened:
         pool = opened.thread_pool(workers=1)
         with pytest.raises(AbortedError) as raised:
-            opened.run(
+            run(
                 [
-                    partial(pool.optimize, _CONFIG, _INITIAL, _counts(index, opened))
+                    partial(
+                        optimize, _CONFIG, _INITIAL, _counts(index, opened), pool=pool
+                    )
                     for index in range(5)
                 ],
-                limit=1,
+                pool=opened.thread_pool(workers=1),
             )
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
@@ -515,15 +522,8 @@ def test_session_abort_starts_none_of_the_runs_queued_behind_the_limit() -> None
         assert calls[1:] == [0, 0, 0, 0]
 
 
-def _start_on(opened: Session, where: str, work: Callable[[], object]) -> Any:
-    if where == "thread_pool":
-        return opened.thread_pool(workers=1).run(work)
-    return opened.run(work)
-
-
 @pytest.mark.timeout(60)
-@pytest.mark.parametrize("where", ["thread_pool", "session_run"])
-def test_session_close_waits_for_aborted_work_to_end(where: str) -> None:
+def test_session_close_waits_for_aborted_work_to_end() -> None:
     # The work ends only once it sees the abort, which closing the session
     # sends, so it can only have finished if closing waited for it.
     started = threading.Event()
@@ -540,7 +540,8 @@ def test_session_close_waits_for_aborted_work_to_end(where: str) -> None:
 
     with session() as opened:
         driver = threading.Thread(
-            target=_records_abort, args=(partial(_start_on, opened, where, work), [])
+            target=_records_abort,
+            args=(partial(run, work, pool=opened.thread_pool(workers=1)), []),
         )
         driver.start()
         assert started.wait(timeout=30)
@@ -551,9 +552,8 @@ def test_session_close_waits_for_aborted_work_to_end(where: str) -> None:
 
 @pytest.mark.slow
 @pytest.mark.timeout(60)
-@pytest.mark.parametrize("where", ["thread_pool", "session_run"])
 def test_session_close_stops_waiting_after_the_grace_period(
-    where: str, monkeypatch: pytest.MonkeyPatch
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     # Work that ignores the abort is waited for until the grace period ends,
     # and then left running.
@@ -569,7 +569,7 @@ def test_session_close_stops_waiting_after_the_grace_period(
         with session() as opened:
             driver = threading.Thread(
                 target=_records_abort,
-                args=(partial(_start_on, opened, where, work), []),
+                args=(partial(run, work, pool=opened.thread_pool(workers=1)), []),
             )
             driver.start()
             assert started.wait(timeout=30)
@@ -615,7 +615,10 @@ def test_session_abort_reaches_work_running_in_a_process_pool(tmp_path: Path) ->
         pool = opened.process_pool(workers=1)
         driver = threading.Thread(
             target=_records_abort,
-            args=(partial(pool.run, partial(_report_abort, listener.address)), codes),
+            args=(
+                partial(run, partial(_report_abort, listener.address), pool=pool),
+                codes,
+            ),
         )
         driver.start()
         with listener.accept() as connection:
@@ -639,7 +642,10 @@ def test_session_abort_kills_busy_process_workers_after_the_grace_period(
         pool = opened.process_pool(workers=1)
         driver = threading.Thread(
             target=_records_abort,
-            args=(partial(pool.run, partial(_ignore_abort, listener.address)), codes),
+            args=(
+                partial(run, partial(_ignore_abort, listener.address), pool=pool),
+                codes,
+            ),
         )
         driver.start()
         with listener.accept() as connection:
@@ -663,7 +669,10 @@ def test_session_close_kills_busy_process_workers_after_the_grace_period(
             pool = opened.process_pool(workers=1)
             driver = threading.Thread(
                 target=_records_abort,
-                args=(partial(pool.run, partial(_ignore_abort, listener.address)), []),
+                args=(
+                    partial(run, partial(_ignore_abort, listener.address), pool=pool),
+                    [],
+                ),
             )
             driver.start()
             connection = listener.accept()
@@ -688,7 +697,7 @@ def test_session_abort_kills_a_program_run_in_a_process_pool(tmp_path: Path) -> 
         pool = opened.process_pool(workers=1)
         driver = threading.Thread(
             target=_records_abort,
-            args=(partial(pool.run, partial(_run_into_fifo, str(fifo))), codes),
+            args=(partial(run, partial(_run_into_fifo, str(fifo)), pool=pool), codes),
         )
         driver.start()
         with fifo.open("rb") as stream:
@@ -701,14 +710,21 @@ def test_session_abort_kills_a_program_run_in_a_process_pool(tmp_path: Path) -> 
 
 @pytest.mark.skipif(os.name != "posix", reason="needs POSIX")
 @pytest.mark.timeout(60)
-def test_session_abort_kills_a_program_run_by_session_run(tmp_path: Path) -> None:
+def test_session_abort_kills_a_program_run_in_a_thread_pool(tmp_path: Path) -> None:
     fifo = tmp_path / "fifo"
     os.mkfifo(fifo)
     codes: list[ExitCode] = []
     with session() as opened:
         driver = threading.Thread(
             target=_records_abort,
-            args=(partial(opened.run, partial(_run_into_fifo, str(fifo))), codes),
+            args=(
+                partial(
+                    run,
+                    partial(_run_into_fifo, str(fifo)),
+                    pool=opened.thread_pool(workers=1),
+                ),
+                codes,
+            ),
         )
         driver.start()
         with fifo.open("rb") as stream:
@@ -732,7 +748,7 @@ def test_session_abort_kills_a_program_run_in_a_local_job(tmp_path: Path) -> Non
         pool = opened.hpc_pool(workdir=tmp_path, queue="local")
         driver = threading.Thread(
             target=_records_abort,
-            args=(partial(pool.run, partial(_run_into_fifo, str(fifo))), codes),
+            args=(partial(run, partial(_run_into_fifo, str(fifo)), pool=pool), codes),
         )
         driver.start()
         with fifo.open("rb") as stream:
@@ -755,4 +771,4 @@ def test_process_workers_ignore_keyboard_interrupt() -> None:
     # Ctrl-C at a terminal reaches every process in the foreground group, and
     # handling it is up to the main process.
     with session() as opened:
-        assert opened.process_pool(workers=1).run(_interrupt_own_process) == 1
+        assert run(_interrupt_own_process, pool=opened.process_pool(workers=1)) == 1

@@ -30,7 +30,7 @@ from uuid import UUID, uuid4
 import numpy as np
 import pytest
 
-from ropt import session
+from ropt import run, session
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.components.compute_steps import OptimizationStep
 from ropt.components.concurrency import AbortScope, _program, current_abort_scope
@@ -53,7 +53,6 @@ from ropt.components.executors import (
     _hpc_executor,
 )
 from ropt.components.executors.__main__ import run_task
-from ropt.components.executors._daemon_thread_executor import DaemonThreadExecutor
 from ropt.components.executors._job_executor import (
     JobExecutorBase,
     _StateUpdate,
@@ -707,15 +706,15 @@ def test_closing_a_session_cancels_the_hpc_jobs_of_a_task_still_running(
     _mock_scheduler(monkeypatch, adapter)
     outcome: list[AbortedError] = []
 
-    def _run_one(run: Callable[[Callable[[], int]], int]) -> None:
+    def _run_one(start: Callable[[Callable[[], int]], int]) -> None:
         try:
-            run(partial(_function, 0))
+            start(partial(_function, 0))
         except AbortedError as exc:
             outcome.append(exc)
 
     with session() as opened:
         pool = opened.hpc_pool(workdir=tmp_path, workers=1, interval=0, template="")
-        task = threading.Thread(target=_run_one, args=(pool.run,))
+        task = threading.Thread(target=_run_one, args=(partial(run, pool=pool),))
         task.start()
         assert held.wait(timeout=20)
     try:
@@ -1484,8 +1483,8 @@ def test_a_returned_exception_is_a_result_rather_than_a_failure() -> None:
 
 _ONE_WORKER_AT_A_TIME = pytest.mark.parametrize(
     "make_executor",
-    [partial(ThreadExecutor, workers=1), partial(DaemonThreadExecutor, limit=1)],
-    ids=["thread", "daemon-thread"],
+    [partial(ThreadExecutor, workers=1)],
+    ids=["thread"],
 )
 
 
@@ -2552,8 +2551,8 @@ def test_job_executor_cancels_on_a_thread_the_interpreter_waits_for(
 ) -> None:
     # Cancelling runs on a thread of its own, so that a second interrupt breaks
     # the join rather than the cancelling. A new thread inherits the daemon flag
-    # of the thread that creates it, and `Session.run` drives its work from
-    # daemon threads, which the interpreter would not wait for.
+    # of the thread that creates it, and work may be driven from a daemon
+    # thread, which the interpreter would not wait for.
     executor = _ControlledJobExecutor(tmp_path)
     executor.release_pass.set()
     cancelled = threading.Event()

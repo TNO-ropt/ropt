@@ -1,4 +1,4 @@
-"""The optimization runs behind the session and pool methods.
+"""The optimization runs behind the module functions.
 
 One call builds a whole workflow and throws it away again: a context from the
 configuration, an evaluator wired to the executor, an optimization step, and the

@@ -7,7 +7,7 @@ there.
 from __future__ import annotations
 
 from ._function import EvaluationFunction
-from ._functions import evaluate, evaluate_batch, optimize
+from ._functions import evaluate, evaluate_batch, optimize, run
 from ._pool import WorkerPool
 from ._report import ReportCallback
 from ._result import EvaluationResult, OptimizationResult
@@ -23,5 +23,6 @@ __all__ = [
     "evaluate",
     "evaluate_batch",
     "optimize",
+    "run",
     "session",
 ]

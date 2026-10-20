@@ -37,7 +37,7 @@ holds the code:
 from ropt import AbortedError
 
 try:
-    result = pool.optimize(config, x0, objective)
+    result = optimize(config, x0, objective, pool=pool)
 except AbortedError as error:
     print(error.exit_code.message)
 ```

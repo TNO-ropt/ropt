@@ -33,6 +33,7 @@ from ropt import (
     EvaluationFunctionContext,
     ExitCode,
     WorkerPool,
+    optimize,
     session,
 )
 
@@ -132,10 +133,11 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
     if key in memo:
         return memo[key]
 
-    result = pool.optimize(
+    result = optimize(
         INNER_CONFIG,
         np.where(MASK, INITIAL_VALUES, variables),
         function,
+        pool=pool,
         handlers=[tables],
         # Within a batch only (batch_id, row_idx) is unique: several rows share
         # a realization, so realization alone would not identify the caller.
@@ -177,7 +179,7 @@ def main() -> None:
     # this process; on a process pool each worker would get an empty copy.
     memo: dict[tuple[float, ...], float] = {}
     with session() as s:
-        s.thread_pool(workers=2).optimize(
+        optimize(
             OUTER_CONFIG,
             INITIAL_VALUES,
             partial(
@@ -187,6 +189,7 @@ def main() -> None:
                 function=partial(rosenbrock, a=a, b=b),
                 memo=memo,
             ),
+            pool=s.thread_pool(workers=2),
         )
     # --8<-- [end:run]
 

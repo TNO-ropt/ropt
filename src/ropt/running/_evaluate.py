@@ -1,4 +1,4 @@
-"""The evaluations behind the session and pool methods.
+"""The evaluations behind the module functions.
 
 The same shape as `_optimize`, with an evaluation step in place of the
 optimizer: one batch of variable vectors, evaluated once, with no loop around

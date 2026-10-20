@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt import evaluate, evaluate_batch, optimize, session
+from ropt import evaluate, evaluate_batch, optimize, run, session
 from ropt.components.concurrency import current_abort_scope
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
@@ -54,7 +54,7 @@ def _boom(*_args: object) -> float:
 
 
 def _pool_run(_opened: Session, inner: WorkerPool) -> None:
-    inner.run(_boom)
+    run(_boom, pool=inner)
 
 
 def _optimize(_opened: Session, _inner: WorkerPool) -> None:
@@ -85,8 +85,8 @@ def _evaluate_batch_wrong_shape(_opened: Session, _inner: WorkerPool) -> None:
     evaluate_batch(_CONFIG, _INITIAL, _sphere)
 
 
-def _session_run(opened: Session, _inner: WorkerPool) -> None:
-    opened.run([partial(optimize, _CONFIG, _INITIAL, _boom)] * 2)
+def _run(_opened: Session, _inner: WorkerPool) -> None:
+    run([partial(optimize, _CONFIG, _INITIAL, _boom)] * 2)
 
 
 @pytest.mark.parametrize(
@@ -100,7 +100,7 @@ def _session_run(opened: Session, _inner: WorkerPool) -> None:
         pytest.param(_evaluate_wrong_shape, id="evaluate_wrong_shape"),
         pytest.param(_evaluate_batch, id="evaluate_batch"),
         pytest.param(_evaluate_batch_wrong_shape, id="evaluate_batch_wrong_shape"),
-        pytest.param(_session_run, id="session_run"),
+        pytest.param(_run, id="run"),
     ],
 )
 @pytest.mark.timeout(60)
@@ -124,7 +124,7 @@ def test_caught_nested_failure_does_not_abort_the_run(
                     caught.append(type(exc))
             return _sphere(variables, context)
 
-        result = outer.optimize(_CONFIG, _INITIAL, objective)
+        result = optimize(_CONFIG, _INITIAL, objective, pool=outer)
 
     assert caught
     assert result.exit_code == ExitCode.FINISHED
@@ -147,7 +147,7 @@ def _run_from_a_report_callback(opened: Session, work: Callable[[], None]) -> Ex
         work()
 
     pool = opened.thread_pool(workers=1)
-    return pool.optimize(_CONFIG, _INITIAL, _sphere, report=report).exit_code
+    return optimize(_CONFIG, _INITIAL, _sphere, pool=pool, report=report).exit_code
 
 
 @pytest.mark.parametrize(
@@ -168,7 +168,7 @@ def test_caught_failure_of_a_pool_run_on_the_optimization_thread_does_not_abort_
 
         def work() -> None:
             try:
-                inner.run(_boom)
+                run(_boom, pool=inner)
             except ValueError as exc:
                 caught.append(type(exc))
 
@@ -195,7 +195,7 @@ def test_failing_nested_pool_run_aborts_what_is_nested_in_it() -> None:
             try:
                 assert failed.wait(timeout=30)
                 try:
-                    outcomes.append(inner.run(partial(int, 1)))
+                    outcomes.append(run(partial(int, 1), pool=inner))
                 except AbortedError as exc:
                     outcomes.append(exc.exit_code)
             finally:
@@ -207,11 +207,11 @@ def test_failing_nested_pool_run_aborts_what_is_nested_in_it() -> None:
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
             with contextlib.suppress(ValueError):
-                middle.run(work)
+                run(work, pool=middle)
             failed.set()
             return _sphere(variables, context)
 
-        result = outer.evaluate(_CONFIG, _INITIAL, objective)
+        result = evaluate(_CONFIG, _INITIAL, objective, pool=outer)
         assert done.wait(timeout=30)
 
     assert result.results is not None
@@ -255,7 +255,7 @@ def _records_its_abort(
 
 
 @pytest.mark.timeout(60)
-def test_failing_optimization_in_a_nested_session_run_aborts_only_that_call() -> None:
+def test_failing_optimization_in_a_nested_run_aborts_only_that_call() -> None:
     # Both optimizations are inside their first evaluation when one fails. The
     # `run` call does not wait for the optimization it aborts, so that one
     # records the exit code it was aborted with.
@@ -274,14 +274,15 @@ def test_failing_optimization_in_a_nested_session_run_aborts_only_that_call() ->
             fails = _fails_once_both_evaluate(started)
             waits = _records_its_abort(started, exit_codes, recorded)
             try:
-                opened.run(
-                    [partial(optimize_with, fails), partial(optimize_with, waits)]
+                run(
+                    [partial(optimize_with, fails), partial(optimize_with, waits)],
+                    pool=opened.thread_pool(workers=2),
                 )
             except ValueError as exc:
                 caught.append(type(exc))
             return _sphere(variables, context)
 
-        result = outer.evaluate(_CONFIG, _INITIAL, objective)
+        result = evaluate(_CONFIG, _INITIAL, objective, pool=outer)
         assert recorded.wait(timeout=30)
 
     assert result.results is not None
@@ -290,7 +291,7 @@ def test_failing_optimization_in_a_nested_session_run_aborts_only_that_call() ->
 
 
 @pytest.mark.timeout(60)
-def test_nested_session_run_is_aborted_with_its_parent() -> None:
+def test_nested_run_is_aborted_with_its_parent() -> None:
     # The `run` call it is nested in has failed before the call starts, so it is
     # aborted at once instead of running.
     failed = threading.Event()
@@ -305,7 +306,7 @@ def test_nested_session_run_is_aborted_with_its_parent() -> None:
             try:
                 assert failed.wait(timeout=30)
                 optimization = partial(optimize, _CONFIG, _INITIAL, _sphere)
-                opened.run([optimization, optimization])
+                run([optimization, optimization])
             except AbortedError as exc:
                 exit_codes.append(exc.exit_code)
             finally:
@@ -317,11 +318,11 @@ def test_nested_session_run_is_aborted_with_its_parent() -> None:
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
             with contextlib.suppress(ValueError):
-                middle.run(work)
+                run(work, pool=middle)
             failed.set()
             return _sphere(variables, context)
 
-        result = outer.evaluate(_CONFIG, _INITIAL, objective)
+        result = evaluate(_CONFIG, _INITIAL, objective, pool=outer)
         assert done.wait(timeout=30)
 
     assert result.results is not None
@@ -353,7 +354,7 @@ def test_caught_failure_of_a_pool_run_on_a_thread_of_the_objective_does_not_abor
 
         def work() -> None:
             with contextlib.suppress(ValueError):
-                inner.run(_boom)
+                run(_boom, pool=inner)
 
         def objective(
             variables: NDArray[np.float64], context: EvaluationFunctionContext
@@ -364,7 +365,7 @@ def test_caught_failure_of_a_pool_run_on_a_thread_of_the_objective_does_not_abor
             return _sphere(variables, context)
 
         try:
-            ended_with = outer.optimize(_CONFIG, _INITIAL, objective).exit_code
+            ended_with = optimize(_CONFIG, _INITIAL, objective, pool=outer).exit_code
         except AbortedError as exc:
             ended_with = exc.exit_code
 

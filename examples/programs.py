@@ -29,7 +29,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt import EvaluationFunctionContext, ExitCode, run_program, session
+from ropt import EvaluationFunctionContext, ExitCode, optimize, run_program, session
 from ropt.exceptions import AbortedError
 from ropt.utils import restore_keyboard_interrupt
 
@@ -93,7 +93,9 @@ def main() -> None:
     """Run the optimization once to completion, and once with a hanging simulator."""
     # --8<-- [start:run]
     with session() as s:
-        result = s.thread_pool(workers=4).optimize(CONFIG, INITIAL_VALUES, objective)
+        result = optimize(
+            CONFIG, INITIAL_VALUES, objective, pool=s.thread_pool(workers=4)
+        )
     # --8<-- [end:run]
     assert result.exit_code == ExitCode.MAX_FUNCTIONS_REACHED
     assert result.results is not None
@@ -108,7 +110,7 @@ def main() -> None:
         timer = threading.Timer(TIME_LIMIT, s.abort)
         timer.start()
         try:
-            s.thread_pool(workers=4).optimize(CONFIG, INITIAL_VALUES, hanging)
+            optimize(CONFIG, INITIAL_VALUES, hanging, pool=s.thread_pool(workers=4))
         except AbortedError as error:
             print(f"aborted after {time.monotonic() - start:.1f} s: {error}")
             exit_code = error.exit_code
