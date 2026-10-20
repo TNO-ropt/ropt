@@ -2470,13 +2470,12 @@
 
 
 <h1 id="collecting-results-with-handlers">Collecting Results with Handlers</h1>
-<p>So far, <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> returned only the single best result.
-In many cases you want
-to see every result to watch progress over the optimization. A <strong>handler</strong> does
-this: an object you attach with a <code>handlers=</code> argument that observes every
-result an optimization produces.</p>
-<p>It collects the full result objects —
-<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+<p>So far, <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> returned only the single best result. In
+many cases you want to see every result to watch progress over the optimization
+using a <strong>handler</strong>: an object that observes every result an optimization
+produces.</p>
+<p>Multiple handlers can be passed via the <code>handlers</code> argument, each receving the
+full result objects, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -2487,8 +2486,8 @@ result an optimization produces.</p>
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> — rather than the summary <code>optimize</code> returns; see
-<a href="../../results/results/">Working with Results</a>.</p>
+  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a>. rather than the summary
+<code>optimize</code> returns; see <a href="../../results/results/">Working with Results</a>.</p>
 <p>For instance, the <a class="autorefs autorefs-internal" title="            ropt.HistoryHandler" href="../../reference/api/#ropt.HistoryHandler"><code>HistoryHandler</code></a> collects all results:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>

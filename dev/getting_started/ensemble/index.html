@@ -2641,21 +2641,23 @@ realization that sets how much each contributes to the combined objective:</p>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">}</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">INITIAL_VALUES</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">DIM</span><span class="p">)</span> <span class="o">/</span> <span class="n">DIM</span> <span class="o">+</span> <span class="mf">0.5</span>
 </span></code></pre></div>
-<p>The weights need not sum to one; <code>ropt</code> normalizes them. Equal weights, as here,
-give a plain average. See <a href="../../optimizer_setup/configuration_sections/#realizations">Configuration Sections</a>
-for the other realization settings. <code>INITIAL_VALUES</code> is the point the
-optimization starts from.</p>
+<p>The lenght of the <code>weights</code> entry is equal to the number of realizations in
+the ensemble. The weights need not sum to one; <code>ropt</code> normalizes them. Equal
+weights, as here, give a plain average.  See <a href="../../optimizer_setup/configuration_sections/#realizations">Configuration
+Sections</a> for the
+other realization settings. <code>INITIAL_VALUES</code> is the point the optimization
+starts from, it must be a <code>numpy</code> vector of length equal to <code>variable_count</code>.</p>
 <h2 id="2-draw-the-uncertain-parameters">2. Draw the uncertain parameters</h2>
 <p>Each realization is one draw of the uncertain parameters. Here the two Rosenbrock
-coefficients are sampled once per realization, so that <code>a[r]</code> and <code>b[r]</code> are the
+coefficients are sampled from a normal distribution, so that <code>a[r]</code> and <code>b[r]</code> are the
 coefficients for realization <code>r</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">rng</span> <span class="o">=</span> <span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">a</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">UNCERTAINTY</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">REALIZATIONS</span><span class="p">)</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">b</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">100</span> <span class="o">*</span> <span class="n">UNCERTAINTY</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">REALIZATIONS</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="3-write-the-evaluation-function">3. Write the evaluation function</h2>
-<p><code>ropt</code> calls the evaluation function once for every realization at each point it
-evaluates, so it must return the value for <em>its own</em> realization. The second
+<p><code>ropt</code> calls the evaluation function for every realization at each point it
+evaluates, so it must return the value for a given realization. The second
 argument identifies which one: <code>context.realization</code> is the realization number,
 which we use to index the parameter arrays:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">rosenbrock</span><span class="p">(</span>
@@ -2677,13 +2679,12 @@ which we use to index the parameter arrays:</p>
 </span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="n">objective</span> <span class="o">+=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
 </span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The <a href="../quickstart/">Quickstart</a> ignored this second argument; an ensemble
-objective uses <code>context.realization</code> to select the parameters for the
-realization it is computing. <code>ropt</code> combines the per-realization values into the
-robust objective.</p>
-<p>Returning a single number, as here, is the simplest case. A function with
-multiple objectives, or with constraints, returns a sequence instead — the
-objectives first, then the constraints; see
+<p>An ensemble objective uses <code>context.realization</code> to select the parameters for
+the realization it is computing. <code>ropt</code> combines the per-realization values into
+the robust objective.</p>
+<p>Returning a single number is the simplest case. A function with multiple
+objectives, or with constraints, returns a sequence instead — the objectives
+first, then the constraints; see
 <a href="../../optimizer_setup/constraints/">Constraints</a>.</p>
 <h2 id="4-follow-the-progress-optional">4. Follow the progress (optional)</h2>
 <p>To track a running optimization, pass a <code>report</code> callback: <code>ropt</code> calls it after
@@ -2747,10 +2748,6 @@ robust objective, which is what it optimizes.</p>
 <p>That evaluation carries much more than those two values — the per-realization
 objectives, the aggregates, the ensemble weights; see
 <a href="../../results/results/">Working with Results</a>.</p>
-<p>Because the coefficients are centered on the values used in the
-<a href="../quickstart/">Quickstart</a>, the robust optimum still lies close to where all
-variables equal 1 — but it minimizes the <em>average</em> over the uncertain
-coefficients rather than any single realization.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li>The ideas and terms behind ensembles:

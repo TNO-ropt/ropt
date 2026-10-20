@@ -2565,21 +2565,21 @@ easy to reach but slow to follow.</p>
    <a href="../../running/running/#the-evaluation-function">Running Optimizations</a>.</li>
 <li><strong>A start point</strong> — the variable values to start from.</li>
 </ol>
-<p><a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> combines these three, runs the optimization,
-and returns an <a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
+<p><a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> combines these three, runs the optimization, and
+returns an <a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
 
 
   
       dataclass
-  " href="../../reference/api/#ropt.OptimizationResult"><code>OptimizationResult</code></a>. Its
-<code>results</code> field holds the best evaluation of the optimization, as a
+  " href="../../reference/api/#ropt.OptimizationResult"><code>OptimizationResult</code></a>. Its <code>results</code> field
+holds the best evaluation of the optimization, as a
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> — the same object a handler
-receives — and is <code>None</code> if the optimization found nothing valid.</p>
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and is <code>None</code> if the
+optimization found nothing valid.</p>
 
 
 

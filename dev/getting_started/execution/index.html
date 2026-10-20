@@ -669,6 +669,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running in Parallel
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -685,6 +703,36 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -2384,6 +2432,25 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -2403,31 +2470,35 @@
 
 
 <h1 id="running-in-parallel">Running in Parallel</h1>
-<p>An optimization calls your evaluation function many times. By default these calls
-happen one after another, on the same thread that called
-<a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>. If each evaluation is slow, you can run several at
-the same time by evaluating on a <strong>pool</strong>.</p>
-<p>Open a <a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a>, build a pool on it, and start the optimization
-on that pool:</p>
+<p>An optimization calls your evaluation function many times. By default these
+calls happen one after another. If each evaluation is slow, you can run several
+at the same time using an evaluation <strong>pool</strong>. Pools must part of a
+<a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a> context manager object that handles any cleanup
+actions that must be taken after the optimization finishes.</p>
+<p>Open a session using a <code>with</code> statement, build a pool with it, and start the
+optimization using the <code>optimize</code> method of that pool. It employs four threads to
+evaluate the functions in parallel:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The session owns the pool and releases its workers when the block ends, so
-there is nothing to close. The runnable script is
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py">examples/parallel.py</a>,
-which evaluates one optimization on a thread pool, or on a process pool
-when it is passed <code>--multiprocessing</code>.</p>
-<p>A thread pool is one of three kinds. The others run each evaluation in a separate
-process, or as a job on an HPC cluster.
-<a href="../../running/parallel/">Evaluating in Parallel</a> covers all three: which one
-suits a given evaluation function, how many workers to ask for, what stopping an
-optimization does to each, and the one property of your objective that rules
-some of them out.</p>
-<p>To run several optimizations at the same time, rather than parallelizing within
-one, see <a href="../../running/many_runs/">Several Optimizations at Once</a>. What a
-session provides besides pools is described in <a href="../../running/sessions/">Sessions</a>.</p>
+<p>The session owns the pool and releases its workers when the block ends. The
+runnable example script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py">examples/parallel.py</a>.</p>
+<p>A <code>thread_pool</code> is one kind of evaluation pool, others run each evaluation in a
+separate process, or as a job on an HPC cluster. <a href="../../running/parallel/">Evaluating in
+Parallel</a> covers all three: which one suits a given
+evaluation function, how many workers to ask for, what stopping an optimization
+does to each, and the one property of your objective that rules some of them
+out.</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>To run several optimizations in parallel, see <a href="../../running/many_runs/">Several Optimizations at
+  Once</a>.</li>
+<li>Sessions are described in <a href="../../running/sessions/">Sessions</a>.</li>
+</ul>
 
 
 
