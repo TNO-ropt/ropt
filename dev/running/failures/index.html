@@ -2558,9 +2558,9 @@
 
 
 <h1 id="failures-and-aborts">Failures and Aborts</h1>
-<p>A call to <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or <code>run</code>, on a
-<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run">session</a> or a <a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.WorkerPool.run">pool</a>, can start further
-calls from inside its own work: from an evaluation function, an event handler, a
+<p>A call to <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>,
+<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> or <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, with or without a
+pool, can start further calls from inside its own work: from an evaluation function, an event handler, a
 report callback or a function given to <code>run</code>. Those calls are <strong>nested</strong> in it.
 When a call fails, every call nested in it is aborted, at any depth, and the
 exception is raised in the code that made the call. For <code>run</code>, a failure of one
@@ -2579,18 +2579,18 @@ happens when a worker breaks down in
 <p>Here an evaluation function runs a simulation on a process pool:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">session</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">simulators</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>            <span class="k">return</span> <span class="n">simulators</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">simulate</span><span class="p">,</span> <span class="n">variables</span><span class="p">))</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>            <span class="k">return</span> <span class="n">run</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">simulate</span><span class="p">,</span> <span class="n">variables</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">simulators</span><span class="p">)</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="k">except</span> <span class="n">SimulationError</span><span class="p">:</span>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </span></code></pre></div>
 <p><code>simulate</code> and <code>SimulationError</code> stand for your own function and an exception
 that it raises. <code>run</code> is called from the evaluation function, so it is
@@ -2610,14 +2610,13 @@ aborts the rest of its work.</p>
 another such call when it is made, in the same process, from the work of that
 other call: from its evaluation function, event handlers or report callback,
 or from a function given to it if it is a <code>run</code> call. The outer call is its
-<strong>parent</strong>. This holds for the module-level functions as well as for the
-methods of a session or a pool.</p>
+<strong>parent</strong>. This holds with or without a pool.</p>
 <p>An evaluation function runs in your process when its optimization or evaluation
-has no pool or a thread pool, and so does a function given to <code>run</code> on a thread
-pool or on a session.
-On a process or HPC pool they run in another process. A call they make in the
-worker of a process pool is aborted when the call that runs them is; a call they
-make in an HPC job is not nested. Neither is a call made from your script.</p>
+has no pool or a thread pool, and so does a function given to <code>run</code> without a
+pool or on a thread pool. On a process or HPC pool they run in another process.
+A call they make in the worker of a process pool is aborted when the call that
+runs them is; a call they make in an HPC job is not nested. Neither is a call
+made from your script.</p>
 <div class="admonition note">
 <p class="admonition-title">Threads that your code starts</p>
 <p>A call made from a thread that your own code starts is not nested, even
@@ -2667,18 +2666,20 @@ running with <code>ABORTED</code>.</p>
 <code>USER_ABORT</code> after <a href="../many_runs/#stopping-from-outside"><code>Session.abort</code></a>, <code>ABORTED</code>
 when the session's <code>with</code> block ends or a <code>KeyboardInterrupt</code> or <code>SystemExit</code>
 passes through the parent, and <code>ABORTED_ON_ERROR</code> after a failure.
-This also holds when the nested call is made on another session, or with a
-module-level function such as <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>. A nested call that
-is made after its parent was aborted is aborted at once.</p>
-<p>When a session is aborted, so are the calls made on it or in its <code>with</code> block,
-and the sessions opened there. An aborted session stays aborted: every call made
-on it, or in its <code>with</code> block, after the abort is aborted at once. See
+This also holds when the nested call is given a pool of another session, or no
+pool at all. A nested call that is made after its parent was aborted is aborted
+at once.</p>
+<p>When a session is aborted, so are the calls given its pools or made in its
+<code>with</code> block, and the sessions opened there. An aborted session stays aborted:
+every call given one of its pools, or made in its <code>with</code> block, after the abort
+is aborted at once. See
 <a href="../many_runs/#stopping-from-outside">Aborting from outside</a>.</p>
 <p>An aborted call raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
 <code>exit_code</code> is the exit code of the abort; see
 <a href="../../results/exit_codes/">Exit Codes</a>. It raises without waiting for the work it
 has running, and returns no result. A function given to <code>run</code> that has not
-started never starts, and if it is running, <code>run</code> does not wait for it. What
+started never starts, and if it is running on a pool, <code>run</code> does not wait for
+it. What
 happens to work that is already running depends on the pool:</p>
 <table>
 <thead>
@@ -2690,10 +2691,10 @@ happens to work that is already running depends on the pool:</p>
 <tbody>
 <tr>
 <td>none</td>
-<td>runs to its end, and the call ends after it</td>
+<td>runs to its end, and the call ends after it; <code>run</code> starts none of its remaining functions</td>
 </tr>
 <tr>
-<td><code>thread_pool</code>, or the threads of <code>Session.run</code></td>
+<td><code>thread_pool</code></td>
 <td>runs to its end unless it <a href="#stopping-early-when-aborted">stops early</a>, but the call does not wait for it</td>
 </tr>
 <tr>

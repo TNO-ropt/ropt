@@ -2020,6 +2020,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#running-your-own-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running your own work
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#evaluation-functions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2131,17 +2153,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.Session.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        run
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.Session.thread_pool" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2196,50 +2207,6 @@
     <span class="md-ellipsis">
       
         __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.WorkerPool.optimize" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        optimize
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.WorkerPool.evaluate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        evaluate
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.WorkerPool.evaluate_batch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        evaluate_batch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.WorkerPool.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        run
       
     </span>
   </a>
@@ -3202,6 +3169,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#running-your-own-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running your own work
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#evaluation-functions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3313,17 +3302,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.Session.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        run
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.Session.thread_pool" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3378,50 +3356,6 @@
     <span class="md-ellipsis">
       
         __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.WorkerPool.optimize" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        optimize
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.WorkerPool.evaluate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        evaluate
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.WorkerPool.evaluate_batch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        evaluate_batch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.WorkerPool.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        run
       
     </span>
   </a>
@@ -3894,11 +3828,12 @@ from <a class="autorefs autorefs-internal" title="            RoptError" href=".
 control-flow signals that <code>ropt</code> raises and catches itself stay in
 <a class="autorefs autorefs-internal" title="            ropt.exceptions" href="../exceptions/#ropt.exceptions"><code>ropt.exceptions</code></a>.</p>
 <p>Nothing about an optimization or evaluation depends on where it is called from.
-What it is started on says where its evaluations happen and which session it
-belongs to: a module function runs in-process and belongs to nothing, a
-<a class="autorefs autorefs-internal" title="            ropt.Session" href="#ropt.Session"><code>Session</code></a> method runs in-process on that session, and a
-<a class="autorefs autorefs-internal" title="            ropt.WorkerPool" href="#ropt.WorkerPool"><code>WorkerPool</code></a> method runs on that pool's workers. This holds
-wherever it is started from, including a thread you spawn yourself.</p>
+The functions <a class="autorefs autorefs-internal" title="            ropt.optimize" href="#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="#ropt.evaluate"><code>evaluate</code></a>,
+<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="#ropt.evaluate_batch"><code>evaluate_batch</code></a> and <a class="autorefs autorefs-internal" title="            ropt.run" href="#ropt.run"><code>run</code></a> take an optional
+<code>pool</code> argument that says where the work happens: without one it runs
+in-process on the calling thread, with a <a class="autorefs autorefs-internal" title="            ropt.WorkerPool" href="#ropt.WorkerPool"><code>WorkerPool</code></a> it runs
+on that pool's workers and belongs to the pool's session. This holds wherever
+the call is made from, including a thread you spawn yourself.</p>
 <p>Pools come from a <a class="autorefs autorefs-internal" title="            ropt.session" href="#ropt.session"><code>session</code></a>, which releases them when it closes.</p>
 
 
@@ -3963,23 +3898,23 @@ and <a class="autorefs autorefs-internal" title="            RoptError" href="..
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">x0</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">f0</span><span class="p">:</span> <span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">g0</span><span class="p">:</span> <span class="n">GradientResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">report_gradients</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationResult</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">f0</span><span class="p">:</span> <span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">g0</span><span class="p">:</span> <span class="n">GradientResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">report_gradients</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationResult</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
 
-        <p>Run a single optimization in-process.</p>
-<p>The evaluations run on the calling thread. See
-<a href="../../running/running/">Running Optimizations</a> for a walkthrough, and
-<a class="autorefs autorefs-internal" title="            optimize" href="#ropt.WorkerPool.optimize"><code>WorkerPool.optimize</code></a> for the same optimization
-on a pool.</p>
+        <p>Run a single optimization.</p>
+<p>The evaluations run on the workers of <code>pool</code>, or on the calling thread
+without one. See <a href="../../running/running/">Running Optimizations</a> for a
+walkthrough.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4030,7 +3965,7 @@ on a pool.</p>
                 <code>function</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationFunction (ropt.run._function.EvaluationFunction)" href="#ropt.EvaluationFunction">EvaluationFunction</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationFunction (ropt.running._function.EvaluationFunction)" href="#ropt.EvaluationFunction">EvaluationFunction</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4039,6 +3974,23 @@ on a pool.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>pool</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.running._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The pool to evaluate on, or <code>None</code> to evaluate
+                  in-process.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -4067,7 +4019,7 @@ on a pool.</p>
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.running._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4188,7 +4140,7 @@ on a pool.</p>
 
   
       dataclass
-   (ropt.run._result.OptimizationResult)" href="#ropt.OptimizationResult">OptimizationResult</a></code>
+   (ropt.running._result.OptimizationResult)" href="#ropt.OptimizationResult">OptimizationResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4224,6 +4176,16 @@ on a pool.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the session of <code>pool</code> has closed.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -4246,16 +4208,19 @@ on a pool.</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
 
-        <p>Evaluate a single variable vector in-process, without optimizing.</p>
-<p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+        <p>Evaluate a single variable vector, without optimizing.</p>
+<p>The evaluations run on the workers of <code>pool</code>, or on the calling thread
+without one. See <a href="../../running/running/">Running Optimizations</a> for a
+walkthrough.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4306,7 +4271,7 @@ on a pool.</p>
                 <code>function</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationFunction (ropt.run._function.EvaluationFunction)" href="#ropt.EvaluationFunction">EvaluationFunction</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationFunction (ropt.running._function.EvaluationFunction)" href="#ropt.EvaluationFunction">EvaluationFunction</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4315,6 +4280,22 @@ on a pool.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>pool</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.running._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The pool to evaluate on, or <code>None</code> to evaluate in-process.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -4343,7 +4324,7 @@ on a pool.</p>
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.running._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4390,7 +4371,7 @@ on a pool.</p>
 
   
       dataclass
-   (ropt.run._result.EvaluationResult)" href="#ropt.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+   (ropt.running._result.EvaluationResult)" href="#ropt.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -4436,6 +4417,16 @@ on a pool.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the session of <code>pool</code> has closed.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -4457,17 +4448,20 @@ on a pool.</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
 
-        <p>Evaluate a batch of variable vectors in-process, without optimizing.</p>
+        <p>Evaluate a batch of variable vectors, without optimizing.</p>
 <p>Each row of <code>variables</code> is one vector, and the results come back in the same
-order. See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+order. The evaluations run on the workers of <code>pool</code>, or on the calling
+thread without one. See <a href="../../running/running/">Running Optimizations</a> for
+a walkthrough.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4518,7 +4512,7 @@ order. See <a href="../../running/running/">Running Optimizations</a> for a walk
                 <code>function</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationFunction (ropt.run._function.EvaluationFunction)" href="#ropt.EvaluationFunction">EvaluationFunction</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationFunction (ropt.running._function.EvaluationFunction)" href="#ropt.EvaluationFunction">EvaluationFunction</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4527,6 +4521,22 @@ order. See <a href="../../running/running/">Running Optimizations</a> for a walk
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>pool</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.running._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The pool to evaluate on, or <code>None</code> to evaluate in-process.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -4555,7 +4565,7 @@ order. See <a href="../../running/running/">Running Optimizations</a> for a walk
 
   
       module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
+   (ropt.running._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4602,7 +4612,7 @@ order. See <a href="../../running/running/">Running Optimizations</a> for a walk
 
   
       dataclass
-   (ropt.run._result.EvaluationResult)" href="#ropt.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+   (ropt.running._result.EvaluationResult)" href="#ropt.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -4645,6 +4655,171 @@ order. See <a href="../../running/running/">Running Optimizations</a> for a walk
             <td>
               <div class="doc-md-description">
                 <p>If <code>variables</code> is not a 2-D matrix.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the session of <code>pool</code> has closed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div><h2 id="running-your-own-work">Running your own work</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ropt.run" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.run</span>
+
+
+</h2>
+          <div class="doc-overloads">
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span>
+</span></code></pre></div><div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">]],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span></code></pre></div>          </div>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">]],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Run one or more arbitrary callables.</p>
+<p>Pass a single zero-argument callable to run one call and get its result,
+or a sequence to get a tuple of results in the order of <code>work</code>. Bind
+arguments with <code>functools.partial</code>. On a pool the callables run
+concurrently on its workers, and must be picklable for a process or HPC
+pool. Without a pool they run one after another on the calling thread. See
+<a href="../../running/parallel/#offloading-your-own-work">Running your own work</a>
+for a walkthrough.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>work</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <span title="ropt.running._functions.run[T]">T</span>] | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <span title="ropt.running._functions.run[T]">T</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A single zero-argument callable, or a sequence of them.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>pool</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.running._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The pool to run on, or <code>None</code> to run in-process.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ropt.running._functions.run[T]">T</span> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<span title="ropt.running._functions.run[T]">T</span>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The single result, or a tuple of results in the order of <code>work</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            AbortedError (ropt.exceptions.AbortedError)" href="../exceptions/#ropt.exceptions.AbortedError">AbortedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If an abort arrived before every callable finished.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExecutionError (ropt.exceptions.ExecutionError)" href="../exceptions/#ropt.exceptions.ExecutionError">ExecutionError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the machinery could not run a call.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the session of <code>pool</code> has closed.</p>
               </div>
             </td>
           </tr>
@@ -4886,14 +5061,14 @@ order. See <a href="../../running/running/">Running Optimizations</a> for a walk
     <div class="doc doc-contents first">
 
         <p>Open a session that owns the pools built on it.</p>
-<p>Build pools with the session's factories, and start on each pool the
+<p>Build pools with the session's factories, and pass a pool to the
 optimizations and evaluations that should use its workers. Closing the
 session releases every pool it built, so most code needs no further cleanup:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
 </span></code></pre></div>
-<p>An optimization started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="#ropt.optimize"><code>optimize</code></a>
+<p>An optimization started with <a class="autorefs autorefs-internal" title="            ropt.optimize" href="#ropt.optimize"><code>optimize</code></a> without a pool
 evaluates in-process and needs no session. See
 <a href="../../running/sessions/">Sessions</a> for an overview.</p>
 <p>A call that fails aborts the work it started, and its exception is raised
@@ -4913,7 +5088,7 @@ the session aborts whatever is still running.
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.Session (ropt.run._session.Session)" href="#ropt.Session">Session</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.Session (ropt.running._session.Session)" href="#ropt.Session">Session</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4951,16 +5126,16 @@ creates is returned to the caller and passed on explicitly; nothing is
 discovered from the surroundings.</p>
 <p>Bind the session with <code>as</code> and call its factories inside the block. See
 <a href="../../running/sessions/">Sessions</a> for an overview.</p>
-<p>An optimization or evaluation started on a pool of the session evaluates on
-that pool's workers and belongs to this session. One started with a
-module-level function in the session's <code>with</code> block, or inside a call made
-there, evaluates in-process and is aborted with the session.</p>
+<p>An optimization, evaluation or <code>run</code> call given a pool of the session
+runs on that pool's workers and belongs to this session. One without a pool
+in the session's <code>with</code> block, or inside a call made there, runs in-process
+and is aborted with the session.</p>
 <p>A session may be opened inside another, and pools from different sessions
 never interact; a session opened inside another session's <code>with</code> block, or
-inside a call made there, is aborted with it. A session is single use — once closed it
-cannot be reopened.</p>
-<p><a class="autorefs autorefs-internal" title="            abort" href="#ropt.Session.abort"><code>abort</code></a> aborts the calls made on it or in its
-<code>with</code> block, which is what a caller on another thread — a signal handler,
+inside a call made there, is aborted with it. A session is single use —
+once closed it cannot be reopened.</p>
+<p><a class="autorefs autorefs-internal" title="            abort" href="#ropt.Session.abort"><code>abort</code></a> aborts the calls given its pools or made in
+its <code>with</code> block, which is what a caller on another thread — a signal handler,
 a user interface — calls to bring them down.</p>
 
 
@@ -5091,10 +5266,10 @@ a user interface — calls to bring them down.</p>
     <div class="doc doc-contents ">
 
         <p>Close the session, aborting its calls and releasing every pool.</p>
-<p>Work still running is waited for, five seconds at most in total, which
-gives the programs it started with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="#ropt.run_program"><code>run_program</code></a>
-the time to end. Worker processes still busy after that are killed;
-threads are no longer waited for.</p>
+<p>Work still running on its pools is waited for, five seconds at most in
+total, which gives the programs it started with
+<a class="autorefs autorefs-internal" title="            ropt.run_program" href="#ropt.run_program"><code>run_program</code></a> the time to end. Worker processes
+still busy after that are killed; threads are no longer waited for.</p>
 
 
     </div>
@@ -5119,174 +5294,14 @@ threads are no longer waited for.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Abort the calls made on this session or in its <code>with</code> block.</p>
+        <p>Abort the calls given its pools or made in its <code>with</code> block.</p>
 <p>Each optimization, evaluation and <code>run</code> call under way raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with
-<code>ExitCode.USER_ABORT</code>. The session stays aborted: a call made on it
-afterwards, or from its <code>with</code> block, is aborted as soon as it starts.</p>
+<code>ExitCode.USER_ABORT</code>. The session stays aborted: a call given one of
+its pools afterwards, or made in its <code>with</code> block, is aborted as soon as it starts.</p>
 <p>Calling it is thread-safe, and safe on a session with nothing running.
 See <a href="../../running/many_runs/#stopping-from-outside">Aborting from outside</a>
 for which calls are reached and when.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.Session.run" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
-
-
-</h3>
-          <div class="doc-overloads">
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span>
-</span></code></pre></div><div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">]],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-</span></code></pre></div>          </div>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">]],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Run one or more arbitrary callables in-process, on threads of their own.</p>
-<p>Pass a single zero-argument callable to run one call and get its result,
-or a sequence to run them concurrently and get a tuple of results in the
-order of <code>work</code>. Bind arguments with <code>functools.partial</code>. Each call runs
-on a daemon thread started for it, with a copy of the caller's context
-variables. See
-<a href="../../running/parallel/#offloading-your-own-work">Running your own work</a>
-for a walkthrough.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>work</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <span title="ropt.run._session.Session.run[T]">T</span>] | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <span title="ropt.run._session.Session.run[T]">T</span>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A single zero-argument callable, or a sequence of them.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>limit</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The maximum number of calls running at once, or <code>None</code> for
-   no limit.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ropt.run._session.Session.run[T]">T</span> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<span title="ropt.run._session.Session.run[T]">T</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The single result, or a tuple of results in the order of <code>work</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            AbortedError (ropt.exceptions.AbortedError)" href="../exceptions/#ropt.exceptions.AbortedError">AbortedError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If an abort arrived before every callable finished.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>limit</code> is less than one.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If this session has closed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
 
     </div>
@@ -5359,7 +5374,7 @@ that releases the GIL. See
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.run._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.running._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5488,7 +5503,7 @@ are killed.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.run._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.running._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5850,7 +5865,7 @@ configuration layout and Slurm examples.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.run._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.WorkerPool (ropt.running._pool.WorkerPool)" href="#ropt.WorkerPool">WorkerPool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5916,9 +5931,11 @@ configuration layout and Slurm examples.</p>
         <p>The workers that evaluations are given to.</p>
 <p>Built by a session factory such as
 <a class="autorefs autorefs-internal" title="            thread_pool" href="#ropt.Session.thread_pool"><code>thread_pool</code></a>, and released when that
-session closes. Starting an optimization or evaluation on a pool sets both
-where its evaluations happen and which session it belongs to. See
-<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+session closes. A pool has no methods of its own: pass it as the <code>pool</code>
+argument of <a class="autorefs autorefs-internal" title="            ropt.optimize" href="#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="#ropt.evaluate"><code>evaluate</code></a>,
+<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="#ropt.evaluate_batch"><code>evaluate_batch</code></a> or <a class="autorefs autorefs-internal" title="            ropt.run" href="#ropt.run"><code>run</code></a>, which then
+run their work on its workers, nested in its session. See
+<a href="../../running/parallel/">Evaluating in Parallel</a> for a walkthrough.</p>
 <p>This is the type to annotate with when your own code takes a pool.</p>
 
 
@@ -5971,7 +5988,7 @@ where its evaluations happen and which session it belongs to. See
                 <code>session</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.Session (ropt.run._session.Session)" href="#ropt.Session">Session</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.Session (ropt.running._session.Session)" href="#ropt.Session">Session</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6009,887 +6026,6 @@ where its evaluations happen and which session it belongs to. See
 
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.WorkerPool.optimize" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">optimize</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">optimize</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">x0</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">f0</span><span class="p">:</span> <span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">g0</span><span class="p">:</span> <span class="n">GradientResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">report_gradients</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationResult</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Run a single optimization, evaluating on this pool.</p>
-<p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>config</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimization configuration.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>x0</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The initial variable vector.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>function</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationFunction (ropt.run._function.EvaluationFunction)" href="#ropt.EvaluationFunction">EvaluationFunction</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The per-realization evaluation function.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>handlers</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.EventHandler (ropt.components.event_handlers.EventHandler)" href="#ropt.EventHandler">EventHandler</a>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional handlers, called in the order listed.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>report</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
-
-
-  
-      module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional callback invoked per evaluation.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>constraint_tolerance</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#float">float</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The tolerance within which a constraint holds.</p>
-              </div>
-            </td>
-            <td>
-                  <code>1e-10</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>metadata</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional dictionary attached to every result.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>f0</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional function results at <code>x0</code>.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>g0</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.GradientResults">GradientResults</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional gradient results at <code>x0</code>.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>report_gradients</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether <code>report</code> also receives gradient results.</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
-
-
-  
-      dataclass
-   (ropt.run._result.OptimizationResult)" href="#ropt.OptimizationResult">OptimizationResult</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An <a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
-
-
-  
-      dataclass
-  " href="#ropt.OptimizationResult"><code>OptimizationResult</code></a>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            AbortedError (ropt.exceptions.AbortedError)" href="../exceptions/#ropt.exceptions.AbortedError">AbortedError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the optimization was aborted.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If this pool's session has closed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.WorkerPool.evaluate" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">evaluate</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">evaluate</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Evaluate a single variable vector on this pool, without optimizing.</p>
-<p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>config</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimization configuration.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The variable vector to evaluate.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>function</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationFunction (ropt.run._function.EvaluationFunction)" href="#ropt.EvaluationFunction">EvaluationFunction</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The per-realization evaluation function.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>handlers</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.EventHandler (ropt.components.event_handlers.EventHandler)" href="#ropt.EventHandler">EventHandler</a>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional handlers, called in the order listed.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>report</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
-
-
-  
-      module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional callback invoked with the results.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>metadata</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional dictionary attached to the results.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationResult
-
-
-  
-      dataclass
-   (ropt.run._result.EvaluationResult)" href="#ropt.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An evaluation result.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            AbortedError (ropt.exceptions.AbortedError)" href="../exceptions/#ropt.exceptions.AbortedError">AbortedError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the evaluation was aborted.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>variables</code> is not a single vector.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If this pool's session has closed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.WorkerPool.evaluate_batch" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">evaluate_batch</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">evaluate_batch</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Evaluate a batch of variable vectors on this pool, without optimizing.</p>
-<p>Each row of <code>variables</code> is one vector, and the results come back in the
-same order. See <a href="../../running/running/">Running Optimizations</a> for a
-walkthrough.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>config</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimization configuration.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The variable vectors to evaluate, one per row.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>function</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationFunction (ropt.run._function.EvaluationFunction)" href="#ropt.EvaluationFunction">EvaluationFunction</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The per-realization evaluation function.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>handlers</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.EventHandler (ropt.components.event_handlers.EventHandler)" href="#ropt.EventHandler">EventHandler</a>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional handlers, called in the order listed.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>report</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
-
-
-  
-      module-attribute
-   (ropt.run._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional callback invoked with each evaluation.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>metadata</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional dictionary attached to every result.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.EvaluationResult
-
-
-  
-      dataclass
-   (ropt.run._result.EvaluationResult)" href="#ropt.EvaluationResult">EvaluationResult</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An evaluation result.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            AbortedError (ropt.exceptions.AbortedError)" href="../exceptions/#ropt.exceptions.AbortedError">AbortedError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the evaluation was aborted.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>variables</code> is not a 2-D matrix.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If this pool's session has closed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.WorkerPool.run" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
-
-
-</h3>
-          <div class="doc-overloads">
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">T</span>
-</span></code></pre></div><div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="n">work</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-</span></code></pre></div>          </div>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">]</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">T</span><span class="p">]],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Run one or more arbitrary callables on this pool's workers.</p>
-<p>Pass a single zero-argument callable to run one call and get its result,
-or a sequence to run them concurrently and get a tuple of results in the
-order of <code>work</code>. Bind arguments with <code>functools.partial</code>. The callables
-must be picklable for a process or job pool.</p>
-<p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>work</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <span title="ropt.run._pool.WorkerPool.run[T]">T</span>] | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <span title="ropt.run._pool.WorkerPool.run[T]">T</span>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A single zero-argument callable, or a sequence of them.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ropt.run._pool.WorkerPool.run[T]">T</span> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<span title="ropt.run._pool.WorkerPool.run[T]">T</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The single result, or a tuple of results in the order of <code>work</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            AbortedError (ropt.exceptions.AbortedError)" href="../exceptions/#ropt.exceptions.AbortedError">AbortedError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If an abort arrived before every callable finished.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExecutionError (ropt.exceptions.ExecutionError)" href="../exceptions/#ropt.exceptions.ExecutionError">ExecutionError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the machinery could not run a call.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If this pool's session has closed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
   </div>
 
     </div>
@@ -6911,7 +6047,7 @@ must be picklable for a process or job pool.</p>
 
         <p>Return whether the call that runs the calling code is being aborted.</p>
 <p>Code that a call runs — an evaluation function, an event handler, a report
-callback, or a function given to <a class="autorefs autorefs-internal" title="            run" href="#ropt.Session.run"><code>run</code></a> — can call this
+callback, or a function given to <a class="autorefs autorefs-internal" title="            ropt.run" href="#ropt.run"><code>run</code></a> — can call this
 to stop early once that call is aborted. In the <code>with</code> block of a session it
 returns whether the session is aborted. It returns <code>False</code> outside any call
 and session block, which includes the jobs of an HPC pool. In the worker
@@ -8815,7 +7951,7 @@ evaluation is carried unchanged on <code>results</code>. See
 
 
         <p>The outcome of a single evaluation.</p>
-<p>What <code>results</code> holds depends on which method produced it: one
+<p>What <code>results</code> holds depends on which function produced it: one
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -8841,7 +7977,7 @@ it produces every result, or raises
           <tr class="doc-section-item">
             <td><code><span title="ropt.EvaluationResult.results">results</span></code></td>
             <td>
-                  <code><span title="ropt.run._result.EvaluationResult[T]">T</span></code>
+                  <code><span title="ropt.running._result.EvaluationResult[T]">T</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8994,7 +8130,7 @@ it produces every result, or raises
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ropt.run._function.FunctionValue">FunctionValue</span></code>
+                  <code><span title="ropt.running._function.FunctionValue">FunctionValue</span></code>
             </td>
             <td>
               <div class="doc-md-description">

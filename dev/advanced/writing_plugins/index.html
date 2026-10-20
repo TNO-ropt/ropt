@@ -2812,8 +2812,8 @@ documentation table for them. The built-in SciPy backend uses it; see
 <h2 id="what-a-backend-may-not-change">What a backend may not change</h2>
 <p>A backend runs in the caller's process, alongside whatever else is in it —
 including other optimizations, since
-<a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>Session.run</code></a> can start several at once, each on its
-own thread with its own configuration. Anything a backend changes <em>per process</em>
+<a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> can start several at once, each on a worker thread of a
+pool, with its own configuration. Anything a backend changes <em>per process</em>
 is therefore shared with unrelated optimizations, and cannot carry
 per-optimization settings.</p>
 <p>So while an optimization is in progress a backend must not change the working

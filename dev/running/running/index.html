@@ -2694,10 +2694,11 @@
 <h1 id="running-optimizations">Running Optimizations</h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This page uses the module-level functions <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> and
-<a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>, which evaluate one point at a time and return
-when they have finished. Parallel evaluation, several optimizations at once and
-aborting from outside need a <a href="../sessions/">session</a>. Everything this page
+<p>This page calls <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> without a pool, so they evaluate one point at a
+time and return when they have finished. Parallel evaluation, several
+optimizations at once and aborting from outside need a pool from a
+<a href="../sessions/">session</a>. Everything this page
 explains applies there unchanged.</p>
 </div>
 <p>Everything needed to run an optimization is imported from the <code>ropt</code> package
