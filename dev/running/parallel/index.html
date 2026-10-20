@@ -2870,8 +2870,8 @@
 
 
 <h1 id="evaluating-in-parallel">Evaluating in Parallel</h1>
-<p>Evaluations within one optimization can run in parallel, and you can launch your
-own tasks in parallel using an evaluation <strong>pool</strong>.</p>
+<p>Evaluations within one optimization can run in parallel, and you can run your
+own functions in parallel using an evaluation <strong>pool</strong>.</p>
 <h2 id="running-in-parallel">Running in parallel</h2>
 <p>By default <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> calls the evaluation function itself,
 one evaluation at a time. To run the evaluations in parallel, open a
@@ -2948,8 +2948,8 @@ over an ensemble that is one per realization, plus their perturbations on the
 batches where a gradient is estimated. The second factor is <code>1</code> unless you run
 <a href="../many_runs/">several optimizations at once</a>, where it is the <code>limit</code> argument
 of <code>run</code> (or the number of optimizations, if you set no limit).</p>
-<p>Each evaluation in a batch is sent to a worker as a separate task. Up to
-<code>workers</code> tasks can run at once on a pool; the rest wait until a worker is
+<p>Each evaluation in a batch is sent to a worker as a separate job. Up to
+<code>workers</code> jobs can run at once on a pool; the rest wait until a worker is
 available. An optimization started without a pool calls the evaluation
 function itself, one evaluation at a time.</p>
 <p>You can keep several pools open at once and choose per optimization:</p>
@@ -3018,8 +3018,7 @@ only come <strong>back</strong> through the return value; see
 <p>An evaluation still running when the optimization is aborted can test for it
 with <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a>, and an external program it started with
 <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> is terminated, as on a thread pool. Workers
-still busy five seconds after the abort are killed, and the pool starts new
-workers for the work that follows. A program started in another way, for
+still busy five seconds after the abort are killed. A program started in another way, for
 example with <code>subprocess.run</code>, keeps running after its worker is killed; see
 <a href="../programs/">Running External Programs</a>.</p>
 <h3 id="running-on-an-hpc-cluster">Running on an HPC cluster</h3>
@@ -3219,8 +3218,7 @@ from outside. An evaluation on a thread pool stops early only if it checks
 <code>aborting</code>, or if the program it waits for was started with <code>run_program</code>.
 Otherwise it ends when it ends, and your program cannot exit before it does.</p>
 <p><strong>A process pool kills its workers after five seconds.</strong> A worker that is still
-busy then is killed, and the pool starts new workers for the work that follows.
-A program the evaluation started with <code>run_program</code> is terminated with it; a
+busy then is killed. A program the evaluation started with <code>run_program</code> is terminated with it; a
 program started in another way keeps running.</p>
 <p><strong>A terminated program gets five seconds to exit.</strong> A program started with
 <code>run_program</code>, and a job on the local queue, are first asked to exit, together
@@ -3255,9 +3253,9 @@ it would continue the optimization on whichever workers happened to survive and
 produce a result indistinguishable from one computed over the whole ensemble.</p>
 <p>Whether the pool can run further work afterwards depends on which pool it is. An
 HPC pool starts fresh jobs for the next batch. A process
-pool that killed its own workers after an abort starts new workers for the work
-that follows. A process pool that lost a worker in any other way, for example
-to the out-of-memory killer, cannot be restarted: every later batch fails the
+pool kills its own workers only after an abort, which leaves no further work to
+run. A process pool that lost a worker in any other way, for example to the
+out-of-memory killer, cannot be restarted: every later batch fails the
 same way, and a new pool is needed.</p>
 <p><strong>An exception from your evaluation function</strong> is re-raised unchanged, from the
 <code>optimize</code> call, whichever pool it ran on. A bug in the objective therefore
@@ -3316,11 +3314,9 @@ that called <code>run</code>. When the session closes, it waits up to five secon
 these threads. They are daemon threads: a callable still running when your
 program exits is stopped without completing, and does not keep the program from
 exiting.</p>
-<p><code>run</code> starts one task per callable, on the session it is called on or on its
-pool's session;
-<a href="../failures/">Failures and Aborts</a> describes tasks and how a failure or an abort
-reaches them. When a callable raises, <code>run</code> aborts the other callables and
-raises the exception at once. When an abort arrives before all of its callables
+<p><a href="../failures/">Failures and Aborts</a> describes how a failure or an abort reaches
+a <code>run</code> call and the calls nested in it. When a callable raises, <code>run</code> aborts
+the other callables and raises the exception at once. When an abort arrives before all of its callables
 have finished, <code>run</code> raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> at
 once, as an aborted optimization does. Its <code>exit_code</code> distinguishes an abort
 that was asked for from one that a failure caused, and is <code>EXECUTOR_SHUT_DOWN</code>

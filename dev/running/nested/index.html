@@ -2713,7 +2713,7 @@ optimization applies its own
 to it.</p>
 <h2 id="when-an-inner-run-fails">When an inner optimization fails</h2>
 <p>The inner optimization is started from the outer evaluation function, so it is
-<a href="../failures/#nested-tasks">nested</a> in the outer optimization. An exception it
+<a href="../failures/#nested-calls">nested</a> in the outer optimization. An exception it
 raises is raised in the outer evaluation function and aborts nothing outside the
 inner optimization. The evaluation function can catch it and return <code>NaN</code> for
 that realization:</p>
@@ -2725,7 +2725,7 @@ that realization:</p>
 <p>An exception that the outer evaluation function does not catch ends the outer
 optimization, as any exception from an evaluation function does. When the outer
 optimization is aborted, the inner optimizations are aborted with it. See
-<a href="../failures/">Failures and Aborts</a> for the rules that apply to every task.</p>
+<a href="../failures/">Failures and Aborts</a> for the rules that apply to every call.</p>
 <h2 id="two-pools-not-one">Two pools, not one</h2>
 <p>Each layer evaluates on its own pool, and that is a requirement rather than
 a preference:</p>

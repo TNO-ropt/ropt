@@ -2604,20 +2604,15 @@ must stay independent.</p>
 <p>Inside a session, start concurrent work with <a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>Session.run</code></a>
 rather than with threads of your own. An exception raised in a thread of your
 own stays in that thread: it does not leave the <code>with</code> block, so the session
-does not abort its other tasks. A module-level function called in such a thread
+does not abort its other work. A module-level function called in such a thread
 is not aborted with the session either. With <code>Session.run</code>, the failure of one
 function aborts the others, and the exception is raised in your script.</p>
 <h3 id="module-level-functions-in-a-session">Module-level functions in a session</h3>
 <p>An optimization or evaluation that needs no pool uses the module-level
 <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> and
 <a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> in a session as well. Called in the
-session's <code>with</code> block, or from inside one of its tasks, they are aborted with
-the session.</p>
-<p>Each call of <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or <code>run</code> starts a
-<strong>task</strong>. A task started on one of the session's pools, with <code>Session.run</code>, or
-in the session's <code>with</code> block belongs to the session. Everything started from
-inside a task belongs to the same session: evaluation functions, event
-handlers, report callbacks, and functions given to <code>run</code>.</p>
+session's <code>with</code> block, or from inside a call made on the session or in its
+<code>with</code> block, they are aborted with the session.</p>
 <h2 id="pools">Pools</h2>
 <p>A pool runs evaluations in parallel, on threads, in worker processes, or as
 jobs on an HPC cluster. Pools are built by a session, with
@@ -2627,22 +2622,22 @@ jobs on an HPC cluster. Pools are built by a session, with
 when its block ends. Several pools can be open at once. See
 <a href="../parallel/">Evaluating in Parallel</a>.</p>
 <h2 id="failures-and-aborts">Failures and aborts</h2>
-<p>When a task raises an exception, the tasks started from inside it are aborted,
-and the exception is raised in your script. If your script does not catch it,
-the exception leaves the <code>with</code> block, and the session aborts every task that is
-still running.
+<p>When a call to <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or <code>run</code> raises an
+exception, the calls made from inside it are aborted, and the exception is
+raised in your script. If your script does not catch it, the exception leaves
+the <code>with</code> block, and the session aborts everything that is still running.
 <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, called from another thread, aborts every
-task started on the session or in its <code>with</code> block, and the session stays
-aborted. Ctrl-C aborts them when the <code>KeyboardInterrupt</code> leaves the <code>with</code>
-block. An aborted task raises
+call made on the session or in its <code>with</code> block, and the session stays aborted.
+Ctrl-C aborts them when the <code>KeyboardInterrupt</code> leaves the <code>with</code> block. An
+aborted call raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. See
 <a href="../failures/">Failures and Aborts</a> and
 <a href="../many_runs/#stopping-from-outside">Aborting from outside</a>.</p>
-<p>An abort stops a program that a task started with
-<a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>, together with every program it started. See
+<p>An abort stops the programs that the aborted calls started with
+<a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>, and every program those programs started. See
 <a href="../programs/">Running External Programs</a>.</p>
 <h2 id="closing-the-session">Closing the session</h2>
-<p>When the <code>with</code> block ends, the session aborts the tasks that are still under
+<p>When the <code>with</code> block ends, the session aborts the calls that are still under
 way and releases its pools. It then waits up to five seconds in total for
 running work to end. Worker processes still busy after that are killed, and
 threads are no longer waited for; see
@@ -2651,8 +2646,8 @@ threads are no longer waited for; see
 closed session or of one of its pools raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A session may be opened
 inside another, and the pools of different sessions are independent. A session
-opened in the <code>with</code> block of another, or in one of its tasks, is aborted with
-it.</p>
+opened in the <code>with</code> block of another, or in a call made there, is aborted
+with it.</p>
 
 
 

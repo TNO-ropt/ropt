@@ -1237,7 +1237,7 @@
   <a href="#what-each-kind-of-run-reports" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What each kind of task reports
+        What each kind of call reports
       
     </span>
   </a>
@@ -2453,7 +2453,7 @@
   <a href="#what-each-kind-of-run-reports" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What each kind of task reports
+        What each kind of call reports
       
     </span>
   </a>
@@ -2560,23 +2560,23 @@ holds the code:</p>
 </tr>
 <tr>
 <td><code>ABORTED</code></td>
-<td>The task was aborted from outside, as closing a session, or a <code>KeyboardInterrupt</code>, does to a task still under way.</td>
+<td>The call was aborted from outside, as closing a session, or a <code>KeyboardInterrupt</code>, does to a call still under way.</td>
 </tr>
 <tr>
 <td><code>ABORTED_ON_ERROR</code></td>
-<td>Another <a href="../../running/failures/">task</a> raised, and this one was aborted with it.</td>
+<td>A <a href="../../running/failures/">failure</a> of the call it is nested in aborted it.</td>
 </tr>
 <tr>
 <td><code>USER_ABORT</code></td>
-<td><a href="../../running/many_runs/#stopping-from-outside"><code>Session.abort</code></a> aborted the task.</td>
+<td><a href="../../running/many_runs/#stopping-from-outside"><code>Session.abort</code></a> aborted the call.</td>
 </tr>
 <tr>
 <td><code>EXECUTOR_SHUT_DOWN</code></td>
-<td>The pool the task was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it.</td>
+<td>The pool the call was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it.</td>
 </tr>
 <tr>
 <td><code>UNKNOWN</code></td>
-<td>The zero value of the enumeration. No task reports it.</td>
+<td>The zero value of the enumeration. No call reports it.</td>
 </tr>
 </tbody>
 </table>
@@ -2586,7 +2586,7 @@ optimization at an evaluation boundary like the other stops, but unlike them it
 follows from a failure: one failed realization is enough to trigger it unless
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 is lowered.</p>
-<h2 id="what-each-kind-of-run-reports">What each kind of task reports</h2>
+<h2 id="what-each-kind-of-run-reports">What each kind of call reports</h2>
 <p>An <strong>optimization</strong> returns any of the stop codes above, and raises with any of
 the abort codes.</p>
 <p>An <strong>evaluation</strong> is a single batch with no optimizer loop around it, so it has

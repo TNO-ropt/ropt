@@ -4896,11 +4896,10 @@ session releases every pool it built, so most code needs no further cleanup:</p>
 <p>An optimization started with the module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="#ropt.optimize"><code>optimize</code></a>
 evaluates in-process and needs no session. See
 <a href="../../running/sessions/">Sessions</a> for an overview.</p>
-<p>A task that fails aborts the work it started, and its exception is raised
-where the task was started. Not caught, it ends the <code>with</code> block, and closing
+<p>A call that fails aborts the work it started, and its exception is raised
+where the call was made. Not caught, it ends the <code>with</code> block, and closing
 the session aborts whatever is still running.
-<a href="../../running/failures/">Failures and Aborts</a> defines tasks and describes
-each case.</p>
+<a href="../../running/failures/">Failures and Aborts</a> describes each case.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -4954,15 +4953,15 @@ discovered from the surroundings.</p>
 <a href="../../running/sessions/">Sessions</a> for an overview.</p>
 <p>An optimization or evaluation started on a pool of the session evaluates on
 that pool's workers and belongs to this session. One started with a
-module-level function in the session's <code>with</code> block, or inside one of its
-tasks, evaluates in-process and is aborted with the session.</p>
+module-level function in the session's <code>with</code> block, or inside a call made
+there, evaluates in-process and is aborted with the session.</p>
 <p>A session may be opened inside another, and pools from different sessions
 never interact; a session opened inside another session's <code>with</code> block, or
-inside a task, is aborted with it. A session is single use — once closed it
+inside a call made there, is aborted with it. A session is single use — once closed it
 cannot be reopened.</p>
-<p><a class="autorefs autorefs-internal" title="            abort" href="#ropt.Session.abort"><code>abort</code></a> aborts the tasks that belong to it,
-which is what a caller on another thread — a signal handler, a user
-interface — calls to bring them down.</p>
+<p><a class="autorefs autorefs-internal" title="            abort" href="#ropt.Session.abort"><code>abort</code></a> aborts the calls made on it or in its
+<code>with</code> block, which is what a caller on another thread — a signal handler,
+a user interface — calls to bring them down.</p>
 
 
 
@@ -5091,7 +5090,7 @@ interface — calls to bring them down.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Close the session, aborting its tasks and releasing every pool.</p>
+        <p>Close the session, aborting its calls and releasing every pool.</p>
 <p>Work still running is waited for, five seconds at most in total, which
 gives the programs it started with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="#ropt.run_program"><code>run_program</code></a>
 the time to end. Worker processes still busy after that are killed;
@@ -5120,14 +5119,14 @@ threads are no longer waited for.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Abort the tasks that belong to this session.</p>
+        <p>Abort the calls made on this session or in its <code>with</code> block.</p>
 <p>Each optimization, evaluation and <code>run</code> call under way raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with
-<code>ExitCode.USER_ABORT</code>. The session stays aborted: a task started on it
+<code>ExitCode.USER_ABORT</code>. The session stays aborted: a call made on it
 afterwards, or from its <code>with</code> block, is aborted as soon as it starts.</p>
-<p>Calling it is thread-safe, and safe on a session with no tasks. See
-<a href="../../running/many_runs/#stopping-from-outside">Aborting from outside</a>
-for which tasks are reached and when.</p>
+<p>Calling it is thread-safe, and safe on a session with nothing running.
+See <a href="../../running/many_runs/#stopping-from-outside">Aborting from outside</a>
+for which calls are reached and when.</p>
 
 
     </div>
@@ -5428,7 +5427,7 @@ that releases the GIL. See
 thread pool: <a class="autorefs autorefs-internal" title="            ropt.aborting" href="#ropt.aborting"><code>aborting</code></a> turns <code>True</code>, and a program
 started with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="#ropt.run_program"><code>run_program</code></a> is terminated. Workers
 still busy five seconds after an abort, or after the session closes,
-are killed, and the pool starts new ones for the work that follows.</p>
+are killed.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6910,11 +6909,11 @@ must be picklable for a process or job pool.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Return whether the task that runs the calling code is being aborted.</p>
-<p>Code that a task runs — an evaluation function, an event handler, a report
+        <p>Return whether the call that runs the calling code is being aborted.</p>
+<p>Code that a call runs — an evaluation function, an event handler, a report
 callback, or a function given to <a class="autorefs autorefs-internal" title="            run" href="#ropt.Session.run"><code>run</code></a> — can call this
-to stop early once its task is aborted. In the <code>with</code> block of a session it
-returns whether the session is aborted. It returns <code>False</code> outside any task
+to stop early once that call is aborted. In the <code>with</code> block of a session it
+returns whether the session is aborted. It returns <code>False</code> outside any call
 and session block, which includes the jobs of an HPC pool. In the worker
 processes of a process pool it turns <code>True</code> within a fraction of a second
 of the abort. See
@@ -6936,7 +6935,7 @@ of the abort. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether the task that runs the calling code is being aborted.</p>
+                <p>Whether the call that runs the calling code is being aborted.</p>
               </div>
             </td>
           </tr>
@@ -6970,11 +6969,12 @@ of the abort. See
 
         <p>Run an external program, and stop it when its caller is stopped.</p>
 <p>Blocks until the program exits. The program, and everything it started, is
-terminated when the task that runs the caller is aborted, when an exception
-such as <code>KeyboardInterrupt</code> interrupts the call, or when the calling process
-ends. An abort of the task raises
-<a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. Code that no task runs is
-not reached by an abort.</p>
+terminated when the optimization, evaluation or <code>run</code> call that runs the
+caller is aborted, or the session in whose <code>with</code> block it is called; when
+an exception such as <code>KeyboardInterrupt</code> interrupts the call; or when the
+calling process ends. An abort raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. Code outside any such call
+and session block is not reached by an abort.</p>
 <p><code>stdout</code> and <code>stderr</code> take <code>None</code> to inherit the caller's, a path to write
 to, an open file, a file descriptor, or <code>subprocess.DEVNULL</code>; <code>stderr</code> also
 takes <code>subprocess.STDOUT</code>. A relative path is relative to <code>cwd</code>. Standard
@@ -7114,7 +7114,7 @@ input is empty. See <a href="../../running/programs/">Running External Programs<
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the calling task was aborted.</p>
+                <p>If the caller was aborted.</p>
               </div>
             </td>
           </tr>

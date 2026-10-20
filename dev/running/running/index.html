@@ -2924,8 +2924,8 @@ best point it had reached.</p>
 <p>You can attach arbitrary <strong>metadata</strong> to an optimization or evaluation, from two
 sources:</p>
 <ul>
-<li><strong>Constant, per task</strong> — pass a <code>metadata</code> dict to <code>optimize</code>, <code>evaluate</code>, or
-  <code>evaluate_batch</code>. <code>ropt</code> copies it onto every result the task produces, which
+<li><strong>Constant, per call</strong> — pass a <code>metadata</code> dict to <code>optimize</code>, <code>evaluate</code>, or
+  <code>evaluate_batch</code>. <code>ropt</code> copies it onto every result the call produces, which
   is one way to tag an optimization:</li>
 </ul>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
@@ -3012,8 +3012,9 @@ which evaluates a single vector and then a matrix of them.</p>
 <p>Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in <code>result.exit_code</code> —
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value, for
-instance. An optimization that is aborted, for instance because another task
-raised, raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead (see
+instance. An optimization that is aborted, for instance because another
+function given to the same <code>run</code> call raised, raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead (see
 <a href="../failures/">Failures and Aborts</a>).</p>
 <p><a href="../../results/exit_codes/">Exit Codes</a> lists all exit codes, and explains why a
 reason and a result are independent: <code>result.results</code> is <code>None</code> when no feasible
@@ -3063,10 +3064,11 @@ before that. The evaluations it did make reach the
 <p>It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
 function stay whatever you raised.</p>
-<p><a href="../many_runs/">Running Multiple Optimizations</a> shows how several optimization
-tasks can run in parallel. If a task raises an exception, every task started
-from inside it is aborted, and the exception is raised in the code that started
-the task. <a href="../failures/">Failures and Aborts</a> describes each case.</p>
+<p><a href="../many_runs/">Running Multiple Optimizations</a> shows how several optimizations
+can run in parallel. If a call to <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or
+<code>run</code> raises an exception, every call made from inside it is aborted, and the
+exception is raised in the code that made the call.
+<a href="../failures/">Failures and Aborts</a> describes each case.</p>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations.
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, the type of <code>result.exit_code</code>, is imported

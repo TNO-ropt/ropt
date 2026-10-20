@@ -3491,27 +3491,28 @@ optimization emits are:</p>
 </tbody>
 </table>
 <p>An <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> or
-<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> task has no optimizer, and emits
+<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> call has no optimizer, and emits
 <code>START_ENSEMBLE_EVALUATOR</code> and <code>FINISHED_ENSEMBLE_EVALUATOR</code> around its single
 batch instead of the optimizer pair.</p>
 <p>Handlers are called on the thread that emits the event, in the order the
-<code>handlers</code> argument lists them, and the task waits until every handler for that
-event has returned. A handler that blocks therefore holds up the task that fed
-it, and any task waiting on the same handler's lock. Keep a handler shared by
+<code>handlers</code> argument lists them, and the optimization or evaluation waits until
+every handler for that event has returned. A handler that blocks therefore holds
+up the optimization or evaluation that fed it, and any other one waiting on the
+same handler's lock. Keep a handler shared by
 concurrent optimizations cheap; if one must do heavy I/O, buffer in memory and
 write once the optimizations have finished.</p>
 <div class="admonition note">
-<p class="admonition-title">A handler failure ends the task</p>
-<p>An exception raised by a handler is fatal. It is raised on the task's own
-stack, so it propagates as a single exception, and the handlers listed after
+<p class="admonition-title">A handler failure ends the optimization</p>
+<p>An exception raised by a handler is fatal. It is raised on the stack of the
+optimization or evaluation that emitted the event, so it propagates as a single exception, and the handlers listed after
 it do not see that event.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Read a handler's state after the tasks feeding it have finished</p>
+<p class="admonition-title">Read a handler's state after the calls feeding it have finished</p>
 <p>State kept on a handler, or stored with <code>handler[key]</code>, is deliberately not
-bound to a thread, so it can be read from anywhere once the tasks feeding it
-have returned. That return is what makes the latest values visible. Reading
-it while a task is still feeding the handler on another thread gives a valid
+bound to a thread, so it can be read from anywhere once the optimizations
+and evaluations feeding it have returned. That return is what makes the latest values visible. Reading
+it while one is still feeding the handler on another thread gives a valid
 but possibly stale value. To follow an optimization as it goes, use the
 handler's own <code>_handle_event</code>, or a <code>report</code> callback, rather than polling
 another handler's state.</p>
