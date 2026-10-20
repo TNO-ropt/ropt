@@ -1,10 +1,10 @@
 """The data exchanged between `ropt` and a user evaluation function.
 
-An [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext] describes
+An [`EvaluationBatchContext`][ropt._evaluation.EvaluationBatchContext] describes
 which rows must be evaluated, an
-[`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] carries the
+[`EvaluationBatchResult`][ropt._evaluation.EvaluationBatchResult] carries the
 objective and constraint values back, and
-[`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] is the
+[`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] is the
 protocol such a callable must follow. The
 [`Evaluator`][ropt._components.evaluators.Evaluator] classes that wrap them are
 in `ropt._components.evaluators`.

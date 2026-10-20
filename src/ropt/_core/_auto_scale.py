@@ -9,8 +9,8 @@ import numpy as np
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+    from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
     from ropt.context import EnOptContext
-    from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
 
 def set_auto_scales(

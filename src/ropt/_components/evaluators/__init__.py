@@ -1,7 +1,7 @@
 """Evaluators: the objects a compute step uses to evaluate the model.
 
 Each is an [`Evaluator`][ropt._components.evaluators.Evaluator] subclass. The
-plain callable protocols they wrap are in `ropt.evaluation`. See
+plain callable protocols they wrap are in `ropt._evaluation`. See
 [Evaluating in Parallel](../running/parallel.md) for usage.
 """
 

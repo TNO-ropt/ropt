@@ -6,9 +6,9 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from ropt._evaluation import EvaluationBatchCallback, EvaluationBatchContext
 from ropt._scaling import unscale_value
 from ropt.context import EnOptContext
-from ropt.evaluation import EvaluationBatchCallback, EvaluationBatchContext
 
 from ._auto_scale import set_auto_scales
 

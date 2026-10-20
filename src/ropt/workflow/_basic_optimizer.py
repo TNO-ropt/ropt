@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike
 
-    from ropt.evaluation import EvaluationBatchCallback
+    from ropt._evaluation import EvaluationBatchCallback
     from ropt.events import EnOptEvent
     from ropt.results import FunctionResults
 
@@ -37,7 +37,7 @@ class BasicOptimizer:
 
     1. validates `config` into an [`EnOptContext`][ropt.context.EnOptContext];
     2. wraps a plain
-       [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] in a
+       [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] in a
        [`BatchEvaluator`][ropt._components.evaluators.BatchEvaluator], or uses a
        supplied [`Evaluator`][ropt._components.evaluators.Evaluator] as given;
     3. creates an
@@ -89,7 +89,7 @@ class BasicOptimizer:
         Args:
             config:               The configuration for the optimization.
             evaluator:            An
-                [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback]
+                [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback]
                 callable that evaluates a batch of variable vectors, or an
                 [`Evaluator`][ropt._components.evaluators.Evaluator] instance for
                 advanced features such as caching, parallel, or HPC evaluation.

@@ -12,12 +12,12 @@ from ropt._scaling import scale, unscale_value
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.context import EnOptContext
-    from ropt.evaluation import (
+    from ropt._evaluation import (
         EvaluationBatchCallback,
         EvaluationBatchContext,
         EvaluationBatchResult,
     )
+    from ropt.context import EnOptContext
     from ropt.results import FunctionResults, GradientResults
 
 

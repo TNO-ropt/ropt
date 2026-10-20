@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, override
 
 import numpy as np
 
-from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
+from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import AbortedError
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result

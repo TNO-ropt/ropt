@@ -18,6 +18,7 @@ from ropt._components.evaluators import (
     Evaluator,
     FunctionEvaluator,
 )
+from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt._handlers import (
     CallbackHandler,
     EventHandler,
@@ -26,7 +27,6 @@ from ropt._handlers import (
 )
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import AbortedError, OptimizerStop, WorkflowError
 from ropt.results import FunctionResults
 

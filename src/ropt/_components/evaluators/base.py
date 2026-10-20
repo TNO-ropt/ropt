@@ -7,14 +7,14 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Protocol
 
-from ropt.evaluation import EvaluationBatchResult
+from ropt._evaluation import EvaluationBatchResult
 from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.evaluation import EvaluationBatchContext
+    from ropt._evaluation import EvaluationBatchContext
 
 
 class Evaluator(ABC):
@@ -22,9 +22,9 @@ class Evaluator(ABC):
 
     Subclasses must implement the abstract `_eval` method, which performs the
     actual evaluation of variables using an
-    [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext] and
+    [`EvaluationBatchContext`][ropt._evaluation.EvaluationBatchContext] and
     returns an
-    [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult]. Callers use
+    [`EvaluationBatchResult`][ropt._evaluation.EvaluationBatchResult]. Callers use
     [`eval`][ropt._components.evaluators.Evaluator.eval], which adds the
     concurrency guard.
 
@@ -68,7 +68,7 @@ class Evaluator(ABC):
     ) -> EvaluationBatchResult:
         """Evaluate objective and constraint functions for given variables.
 
-        This follows the [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] protocol.
+        This follows the [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] protocol.
 
         Args:
             variables: The matrix of variables to evaluate, one vector per row.

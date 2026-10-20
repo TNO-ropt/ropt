@@ -17,10 +17,10 @@ from numpy.typing import NDArray
 from ropt import optimize
 from ropt._components.evaluators import EvaluationFunctionContext
 from ropt._core._auto_scale import set_auto_scales
+from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt._handlers import CallbackHandler
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
-from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.events import EnOptEvent
 from ropt.results import (
     ConstraintInfo,

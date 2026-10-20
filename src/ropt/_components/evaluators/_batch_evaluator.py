@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.evaluation import (
+    from ropt._evaluation import (
         EvaluationBatchCallback,
         EvaluationBatchContext,
         EvaluationBatchResult,
@@ -30,7 +30,7 @@ class BatchEvaluator(Evaluator):
         """Initialize the BatchEvaluator.
 
         Forwards the evaluation to the provided callback, which should implement
-        the [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] protocol.
+        the [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] protocol.
 
         Args:
             callback: The callback to defer evaluation to.

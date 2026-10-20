@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Any, override
 import numpy as np
 
 from ropt._components.executors import ExecutorFailure, WorkItem, WorkNotRun
+from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt._logging import get_logger
-from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result

@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 
 from ropt._core import EnsembleEvaluator
+from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.context import EnOptContext
-from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray

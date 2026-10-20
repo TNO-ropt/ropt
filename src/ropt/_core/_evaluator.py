@@ -38,8 +38,8 @@ if TYPE_CHECKING:
     from numpy.random import Generator
     from numpy.typing import NDArray
 
+    from ropt._evaluation import EvaluationBatchCallback
     from ropt.context import EnOptContext
-    from ropt.evaluation import EvaluationBatchCallback
     from ropt.function_estimator import FunctionEstimator
     from ropt.realization_filter import RealizationFilter
     from ropt.sampler import Sampler

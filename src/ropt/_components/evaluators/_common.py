@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.evaluation import EvaluationBatchContext
+    from ropt._evaluation import EvaluationBatchContext
 
     from .base import EvaluationFunctionResult
 
