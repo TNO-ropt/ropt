@@ -3464,9 +3464,9 @@ triggered it and a <code>results</code> tuple, which holds the
   
       dataclass
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects of a <code>FINISHED_EVALUATION</code> and is
-empty for the other types. Its <code>source</code> is the compute step of the optimization
-that emitted the event, and calling <code>event.source.stop()</code> ends that optimization
-at the next evaluation boundary, with exit code <code>STOPPED</code>. The types an
+empty for the other types. Calling <code>event.stop()</code> ends the optimization that
+emitted the event at the next evaluation boundary, with exit code <code>STOPPED</code>.
+The types an
 optimization emits are:</p>
 <table>
 <thead>

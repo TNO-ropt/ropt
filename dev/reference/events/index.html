@@ -2565,10 +2565,6 @@ to track progress, store results, or stop the optimization. See
 
 
 
-
-
-
-
 <div class="doc doc-object doc-class">
 
 
@@ -2640,21 +2636,19 @@ to track progress, store results, or stop the optimization. See
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.events.EnOptEvent.source">source</span></code></td>
+            <td><code><span title="ropt.events.EnOptEvent.stop">stop</span></code></td>
             <td>
-                  <code><span title="ropt.components.compute_steps.base.ComputeStep">ComputeStep</span>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], None] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The compute step that emitted the event.</p>
+                <p>Stops the optimization that emitted the event.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
-        <p>A handler may call <code>source.stop()</code> to stop the optimization that emitted the
-event.</p>
-<p>See <a href="../../results/handlers/#writing-your-own-handler">Handling Results</a> for
+        <p>See <a href="../../results/handlers/#writing-your-own-handler">Handling Results</a> for
 when each event fires and what it carries.</p>
 
 
