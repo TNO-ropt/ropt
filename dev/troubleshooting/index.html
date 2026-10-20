@@ -865,7 +865,7 @@
   <span class="md-ellipsis">
     
   
-    Several Optimizations at Once
+    Running Multiple Optimizations
   
 
     
@@ -2651,7 +2651,7 @@ Optimizations started together with <a class="autorefs autorefs-internal" title=
 run concurrently. Given a pool, their evaluations go there; given none, each
 optimization evaluates on the thread that <code>run</code> started for it, so your
 evaluation function is called from several threads at once and has to tolerate
-that. See <a href="../running/many_runs/">Several Optimizations at Once</a>.</p>
+that. See <a href="../running/many_runs/">Running Multiple Optimizations</a>.</p>
 <p><strong>Metadata is copied with <code>copy.deepcopy</code>.</strong> Every result gets its own copy of
 the <code>metadata</code> you passed, so keep it to plain data — numbers, strings, lists,
 arrays. A lock, an open file, or a database connection cannot be copied and
@@ -2659,9 +2659,9 @@ raises a <code>TypeError</code> in the middle of the optimization.</p>
 <p><strong>An exception from your objective is not turned into a failed realization.</strong> It
 is re-raised from the <code>optimize</code> call, whichever pool the evaluation ran on, so
 a bug surfaces as the exception you wrote rather than as a missing value. Return
-<code>float("nan")</code> where a realization that could not produce a value should be
-tolerated; see
-<a href="../running/parallel/#when-an-evaluation-fails">When an evaluation fails</a>.</p>
+<code>float("nan")</code> or <code>numpy.nan</code> where a realization that could not produce a value
+should be tolerated; see <a href="../running/parallel/#when-an-evaluation-fails">When an evaluation
+fails</a>.</p>
 <table>
 <thead>
 <tr>
@@ -2793,7 +2793,7 @@ a time.</p>
 </tr>
 <tr>
 <td>A second concurrent optimization raises <code>WorkflowError</code> about output capture</td>
-<td>Only one optimization at a time may set <code>stdout</code> or <code>stderr</code>; see <a href="../running/many_runs/">Several Optimizations at Once</a>.</td>
+<td>Only one optimization at a time may set <code>stdout</code> or <code>stderr</code>; see <a href="../running/many_runs/">Running Multiple Optimizations</a>.</td>
 </tr>
 </tbody>
 </table>

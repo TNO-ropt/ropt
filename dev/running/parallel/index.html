@@ -1126,7 +1126,7 @@
   <span class="md-ellipsis">
     
   
-    Several Optimizations at Once
+    Running Multiple Optimizations
   
 
     
@@ -3262,8 +3262,8 @@ same way, and a new pool is needed.</p>
 <p><strong>An exception from your evaluation function</strong> is re-raised unchanged, from the
 <code>optimize</code> call, whichever pool it ran on. A bug in the objective therefore
 surfaces as the exception you wrote, with the pool left usable. Return
-<code>float("nan")</code> instead when a realization that could not produce a value should
-be tolerated; see
+<code>float("nan")</code> or <code>numpy.nan</code> instead when a realization that could not produce
+a value should be tolerated; see
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 for how many a batch may contain before the optimization ends with
 <code>TOO_FEW_REALIZATIONS</code>.</p>
@@ -3342,7 +3342,7 @@ pools of its own, but they are <em>its</em> handlers and <em>its</em> pools.</p>
   handlers cannot be moved between processes, so the return value is all
   that comes back. Callables that stay in your process, on the session or on
   a thread pool, can feed one handler that they share, as
-  <a href="../many_runs/">Several Optimizations at Once</a> shows.</li>
+  <a href="../many_runs/">Running Multiple Optimizations</a> shows.</li>
 <li><strong>Worker budgets multiply, with no way around it.</strong> A pool cannot be
   carried into a worker process, so a callable that needs one builds its
   own. Four callables that each build a ten-worker pool put <strong>forty</strong>
@@ -3621,13 +3621,13 @@ with <code>config_path</code>, <code>cluster</code> or <code>queue</code>; passi
         
         
           
-          <a href="../many_runs/" class="md-footer__link md-footer__link--next" aria-label="Next: Several Optimizations at Once">
+          <a href="../many_runs/" class="md-footer__link md-footer__link--next" aria-label="Next: Running Multiple Optimizations">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Several Optimizations at Once
+                Running Multiple Optimizations
               </div>
             </div>
             <div class="md-footer__button md-icon">

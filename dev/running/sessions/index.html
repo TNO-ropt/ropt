@@ -865,13 +865,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-belongs-to-a-session" class="md-nav__link">
+  <a href="#why-use-a-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What belongs to a session
+        Why use a session
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Why use a session">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#session-methods-and-module-level-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session methods and module-level functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -880,17 +897,6 @@
     <span class="md-ellipsis">
       
         Pools
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#several-optimizations-at-once" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Several optimizations at once
       
     </span>
   </a>
@@ -970,7 +976,7 @@
   <span class="md-ellipsis">
     
   
-    Several Optimizations at Once
+    Running Multiple Optimizations
   
 
     
@@ -2483,13 +2489,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-belongs-to-a-session" class="md-nav__link">
+  <a href="#why-use-a-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What belongs to a session
+        Why use a session
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Why use a session">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#session-methods-and-module-level-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session methods and module-level functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2498,17 +2521,6 @@
     <span class="md-ellipsis">
       
         Pools
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#several-optimizations-at-once" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Several optimizations at once
       
     </span>
   </a>
@@ -2559,11 +2571,9 @@
 
 <h1 id="sessions">Sessions</h1>
 <p>The module-level <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> and <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>
-evaluate one point at a time and return when they have finished. For anything
-more, open a <strong>session</strong> with <a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a> and start the work on
-it. A session gives access to pools of workers, runs several optimizations at
-once, aborts everything it runs when one part fails or when you ask it to, and
-cleans up when its block ends:</p>
+evaluate one point at a time and return when they have finished. To access the
+concurrency features of <code>ropt</code>, open a <a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a> and use its
+methods to run optimizations that evaluate functions in parallel:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
@@ -2571,19 +2581,39 @@ cleans up when its block ends:</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>pool.optimize</code> takes the same arguments as the module-level <code>optimize</code> and
-returns the same result. The session also has <code>optimize</code>, <code>evaluate</code> and
-<code>evaluate_batch</code> methods of its own, which evaluate one point at a time, as
-the module-level functions do.</p>
-<h2 id="what-belongs-to-a-session">What belongs to a session</h2>
+returns the same result, but evaluates multiple functions in parallel.</p>
+<h2 id="why-use-a-session">Why use a session</h2>
+<p>The module-level functions are enough for a single optimization that evaluates
+one point at a time. A session adds the following:</p>
+<ul>
+<li><strong>Parallel evaluation.</strong> Pools are built by a session; see <a href="#pools">Pools</a>.</li>
+<li><strong>Concurrent work.</strong> <a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>Session.run</code></a> runs optimizations, or
+  functions of your own, on threads at the same time, and returns their
+  results. See <a href="../many_runs/">Running Multiple Optimizations</a>.</li>
+<li><strong>One abort for all work.</strong> <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, called from
+  another thread, stops everything the session runs.</li>
+<li><strong>Failure handling.</strong> When one part fails, the session aborts the other parts
+  and raises the exception in your script.</li>
+<li><strong>Cleanup.</strong> When the <code>with</code> block ends, the session stops its work and
+  releases its workers.</li>
+</ul>
+<p>Concurrency alone does not require a session: module-level <code>optimize</code> calls
+made from threads of your own run at the same time. They are then independent:
+an abort or a failure in one does not reach the others.</p>
+<h3 id="session-methods-and-module-level-functions">Session methods and module-level functions</h3>
+<p>A session also has <a class="autorefs autorefs-internal" title="            optimize" href="../../reference/api/#ropt.Session.optimize"><code>optimize</code></a>,
+<a class="autorefs autorefs-internal" title="            evaluate" href="../../reference/api/#ropt.Session.evaluate"><code>evaluate</code></a> and
+<a class="autorefs autorefs-internal" title="            evaluate_batch" href="../../reference/api/#ropt.Session.evaluate_batch"><code>evaluate_batch</code></a>. Like the module-level
+functions, they evaluate one point at a time on the calling thread. The
+difference is that the optimization becomes part of the session:
+<code>Session.abort</code> stops it, and a failure in it aborts the other work of the
+session. A module-level <code>optimize</code> called from your script opens a session of
+its own, so an abort of the enclosing session does not reach it.</p>
 <p>Each call of <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or <code>run</code> on a session or
-on one of its pools starts a <strong>task</strong> that belongs to that session. What a
-session does to its work, it does to these tasks, and to everything started
-from inside them: an evaluation function, an event handler, a report callback,
-or a function given to <code>run</code>.</p>
-<p>Code that no task runs does not belong to the session, even inside its <code>with</code>
-block. That includes the code of your script itself, and a module-level
-function such as <code>optimize</code>, which opens a session of its own. An abort of the
-outer session does not reach either.</p>
+on one of its pools starts a <strong>task</strong>. Everything started from inside a task
+belongs to the same session: evaluation functions, event handlers, report
+callbacks, and functions given to <code>run</code>. This includes a module-level
+<code>optimize</code> called from inside a task.</p>
 <h2 id="pools">Pools</h2>
 <p>A pool runs evaluations in parallel, on threads, in worker processes, or as
 jobs on an HPC cluster. Pools are built by a session, with
@@ -2592,10 +2622,6 @@ jobs on an HPC cluster. Pools are built by a session, with
 <a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/api/#ropt.Session.hpc_pool"><code>hpc_pool</code></a>, and the session releases their workers
 when its block ends. Several pools can be open at once. See
 <a href="../parallel/">Evaluating in Parallel</a>.</p>
-<h2 id="several-optimizations-at-once">Several optimizations at once</h2>
-<p><a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>Session.run</code></a> runs functions on threads of their own and
-returns their results. Pass it several <code>optimize</code> calls and they run at the
-same time. See <a href="../many_runs/">Several Optimizations at Once</a>.</p>
 <h2 id="failures-and-aborts">Failures and aborts</h2>
 <p>When a task started from your script raises an exception, the session aborts
 its other tasks and raises the exception in your script.

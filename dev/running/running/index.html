@@ -1037,7 +1037,7 @@
   <span class="md-ellipsis">
     
   
-    Several Optimizations at Once
+    Running Multiple Optimizations
   
 
     
@@ -2718,15 +2718,13 @@ itself:</p>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">}}</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">variables</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>         <span class="c1"># the best variables found</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>  <span class="c1"># the objective value there</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">variables</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>         <span class="c1"># the best variables found</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>  <span class="c1"># the objective value there</span>
 </span></code></pre></div>
 <p>That is the basic pattern. The rest of this page explains each part and the
 additional options.</p>
@@ -2749,9 +2747,9 @@ additional options.</p>
   " href="../../reference/api/#ropt.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
   that identifies <em>which</em> evaluation this is:<ul>
 <li><code>context.realization</code> — the realization number, for a problem with an
-  ensemble of realizations; <code>optimize</code> then minimizes the weighted average
-  objective over all of them. See
-  <a href="../../getting_started/ensemble/">Ensemble-Based Optimization</a>.</li>
+  ensemble of realizations; <code>optimize</code> then minimizes a robust objective
+  over all of them. See <a href="../../getting_started/ensemble/">Ensemble-Based
+  Optimization</a>.</li>
 <li><code>context.perturbation</code> — the perturbation number, counted from 0, for an
   evaluation at a perturbed point; <code>-1</code> for a function evaluation. <code>ropt</code>
   evaluates perturbed points to estimate a
@@ -2771,8 +2769,9 @@ additional options.</p>
 There are three ways to return them:</p>
 <ul>
 <li>a <strong>single number</strong> when there is one objective and no nonlinear constraints;</li>
-<li>a <strong>list</strong> of numbers when there are several objectives or nonlinear
-  constraints — put the objectives first, then the constraints;</li>
+<li>a <strong>numpy vector</strong> or a <strong>sequence</strong> of numbers when there are several
+  objectives or nonlinear constraints — put the objectives first, then the
+  constraints;</li>
 <li>an <a class="autorefs autorefs-internal" title="            ropt.EvaluationFunctionResult
 
 
@@ -2782,18 +2781,17 @@ There are three ways to return them:</p>
   when you also want to attach <code>metadata</code>; it holds <code>objectives</code>, <code>constraints</code>
   and <code>metadata</code> in separate fields.</li>
 </ul>
-<p>If a realization fails to compute, return <code>float("nan")</code> for it. <code>ropt</code> treats
-<code>NaN</code> as a failed realization and keeps going, as long as enough realizations
-succeed. How many is enough is set by
+<p>If a realization fails to compute, return <code>float("nan")</code> or <code>numpy.nan</code> for it.
+<code>ropt</code> treats <code>NaN</code> as a failed realization and keeps going, as long as enough
+realizations succeed. How many is enough is set by
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>,
 which defaults to <em>all</em> of them — so a single <code>NaN</code> ends the optimization with
 <code>TOO_FEW_REALIZATIONS</code> unless you lower it.</p>
 <h3 id="running-an-external-program">Running an external program</h3>
-<p>When the evaluation function runs a simulator or another external program,
-start it with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>. It is the supported way to
-run external programs from <code>ropt</code>. It takes the program and its arguments as a
-list, like <code>subprocess.run</code>, waits for the program to exit, and returns its exit
-status:</p>
+<p>When the evaluation function runs a an external program, start it with
+<a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>. This is the supported way to run external
+programs from <code>ropt</code>. It takes the program and its arguments as a list, waits
+for the program to exit, and returns its exit status:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_program</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
@@ -2803,13 +2801,12 @@ status:</p>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="k">return</span> <span class="n">read_objective</span><span class="p">(</span><span class="n">workdir</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Unlike <code>subprocess.run</code>, <code>run_program</code> terminates the program, together with
-every program it started, when the optimization is stopped. This matters most
-when evaluations run in parallel or several optimizations run at once: an abort
-or a failure then stops every program that is still running. A program started
-with <code>subprocess.run</code> keeps running after an abort, and on a thread pool your
-script cannot exit before it does. See
-<a href="../programs/">Running External Programs</a>.</p>
+<p><code>run_program</code> terminates the program, together with every program it started,
+when the optimization is stopped. This matters most when evaluations run in
+parallel or several optimizations run at once: an abort or a failure then stops
+every program that is still running. A program started with the <code>subprocess.run</code>
+function from the Python standard library keeps running after an abort, so its
+use is not recommended. See <a href="../programs/">Running External Programs</a>.</p>
 <h2 id="the-result">The result</h2>
 <p><code>optimize</code> returns an <a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
 
@@ -2828,10 +2825,9 @@ which carries two things:</p>
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> — the same
-object a <a href="../../results/handlers/">handler</a> receives — so the best point and its
-values are read from it at the paths described in
-<a href="../../results/results/">Working with Results</a>:</p>
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>, so the best
+point and its values are read from it at the paths described in <a href="../../results/results/">Working with
+Results</a>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span>             <span class="c1"># the best variables</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span>      <span class="c1"># the objective value there</span>
@@ -2844,15 +2840,14 @@ succeeded, or no result ever satisfied the constraints — see
 <a href="#when-something-goes-wrong">When something goes wrong</a>. One check therefore
 covers every field.</p>
 <h2 id="reporting-progress">Reporting progress</h2>
-<p>Pass a <code>report</code> callback to watch the optimization as it runs. It is called once
+<p>Pass a <code>report</code> callback to track the optimization as it runs. It is called once
 for every function evaluation, with the
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> of that evaluation — the same
-object a handler is given:</p>
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> of that evaluation:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
@@ -2916,23 +2911,15 @@ continue.</p>
 </span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
 </span></code></pre></div>
-<p>With <a href="../many_runs/">several optimizations at once</a>, this stops only the
-optimization whose callback returned <code>True</code>; the others continue.</p>
+<p>When <a href="../many_runs/">running multiple optimizations at once</a>, this stops only the
+optimization whose callback returned <code>True</code>; the others continue. To abort all
+running optimizations in a session, call <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>.
+For its effect when several optimizations run together, see <a href="../many_runs/#stopping-from-outside">Aborting from
+outside</a>.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py">examples/stopping.py</a>,
 which stops an optimization after a fixed number of results and then reads the
-best point
-it had reached.</p>
-<div class="admonition note">
-<p class="admonition-title">Nothing to stop on an evaluation</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> and
-<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> take <code>report=</code> as well, but
-there the return value is <strong>ignored</strong>. An evaluation is a single batch with
-no optimizer loop to interrupt, so the callback reports and nothing more.</p>
-</div>
-<p>To abort an optimization from another thread, call
-<a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>. For its effect when several optimizations
-run together, see <a href="../many_runs/#stopping-from-outside">Aborting from outside</a>.</p>
+best point it had reached.</p>
 <h2 id="attaching-metadata">Attaching metadata</h2>
 <p>You can attach arbitrary <strong>metadata</strong> to an optimization or evaluation, from two
 sources:</p>
@@ -2985,11 +2972,11 @@ sources:</p>
   how to label and export that axis.</p>
 <p>Neither kind is interpreted by <code>ropt</code>. Constant metadata ends up on
 <code>result.results.metadata</code>; per-evaluation metadata on
-<code>result.results.evaluations.metadata</code> (one entry per realization). Both kinds can
-be tabulated as columns by the
-<a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a>. See
-<a href="../../results/results/#metadata">Working with Results</a> for how
-each appears in the pandas export. The full runnable script is
+<code>result.results.evaluations.metadata</code> (one entry per realization). Both kinds
+can be tabulated as columns by the
+<a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a>. See <a href="../../results/results/#metadata">Working with
+Results</a> for how each appears. The full runnable
+script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py">examples/metadata.py</a>.</p>
 <h2 id="evaluating-without-optimizing">Evaluating without optimizing</h2>
 <p>Sometimes you only want the objective value for a point, without running an
@@ -3027,14 +3014,13 @@ still returns normally, and indicates why in <code>result.exit_code</code> —
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value, for
 instance. An optimization that is aborted, for instance because another task
 raised, raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead (see
-<a href="../failures/">Failures and Aborts</a>).
-<a href="../../results/exit_codes/">Exit Codes</a> lists them all, and explains why a
+<a href="../failures/">Failures and Aborts</a>).</p>
+<p><a href="../../results/exit_codes/">Exit Codes</a> lists all exit codes, and explains why a
 reason and a result are independent: <code>result.results</code> is <code>None</code> when no feasible
 result was ever recorded, whatever the reason the optimization ended, and an
 optimization that stops part-way still returns the best result it had reached
-before that. The
-evaluations it did make reach the <a href="../../results/handlers/">handlers</a> attached to
-it either way.</p>
+before that. The evaluations it did make reach the
+<a href="../../results/handlers/">handlers</a> attached to it either way.</p>
 <p>What <em>is</em> raised falls into three groups:</p>
 <ul>
 <li>
@@ -3059,14 +3045,15 @@ it either way.</p>
 <li><a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> when <code>ropt</code> cannot
   start or complete work needed for the optimization.</li>
 <li><a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> when the optimization or
-  work it started is stopped before it finishes.</li>
+  work it started is forcefully stopped before it finishes.</li>
 </ul>
 </li>
 <li>
 <p><strong>Exceptions from your own evaluation function</strong> are not caught. They travel
-  back from wherever the evaluation ran — including a worker thread or process
-  — and are re-raised from the <code>optimize</code> call. Return <code>float("nan")</code> instead
-  if a failed realization should be tolerated rather than fatal.</p>
+  back from wherever the evaluation ran — including a worker thread or process —
+  and are re-raised from the <code>optimize</code> call. Return <code>float("nan")</code> or
+  <code>numpy.nan</code> instead if a failed realization should be tolerated rather than
+  fatal.</p>
 </li>
 </ul>
 <p>The <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> types above are imported from
@@ -3075,10 +3062,8 @@ it either way.</p>
 </span></code></pre></div>
 <p>It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
-function stay whatever you raised. The control-flow signals that <code>ropt</code> raises
-and catches itself are excluded as well, and stay in
-<a class="autorefs autorefs-internal" title="            ropt.exceptions" href="../../reference/exceptions/#ropt.exceptions"><code>ropt.exceptions</code></a>.</p>
-<p><a href="../many_runs/">Several Optimizations at Once</a> shows how several optimization
+function stay whatever you raised.</p>
+<p><a href="../many_runs/">Running Multiple Optimizations</a> shows how several optimization
 tasks can run in parallel. If a task raises an exception, every task started
 from inside it is aborted, and the exception is raised in the code that started
 the task. If that code is your script, every other task on the session is

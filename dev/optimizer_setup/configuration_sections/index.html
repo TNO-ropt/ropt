@@ -865,7 +865,7 @@
   <span class="md-ellipsis">
     
   
-    Several Optimizations at Once
+    Running Multiple Optimizations
   
 
     
@@ -3333,9 +3333,7 @@ to the terminal as usual.</p>
 <div class="admonition warning">
 <p class="admonition-title">Capture is for one optimization at a time</p>
 <p>Capturing rewires process-global state, so only one optimization at a time
-can do it. A second optimization that tries while another holds it — one of
-<a href="../../running/many_runs/">several optimizations at once</a>, or
-an optimization started from inside an evaluation callback — raises
+can do it. A second optimization that tries while another holds it raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Leave <code>stdout</code> and
 <code>stderr</code> unset on optimizations that overlap.</p>
 <p>Whether an optimizer reports at all is decided by <a href="#backend"><code>verbose</code></a>,

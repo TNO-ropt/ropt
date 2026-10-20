@@ -23,7 +23,7 @@
     
     
       
-        <title>Several Optimizations at Once - ropt Documentation</title>
+        <title>Running Multiple Optimizations - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#several-optimizations-at-once" class="md-skip">
+        <a href="#running-multiple-optimizations" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Several Optimizations at Once
+              Running Multiple Optimizations
             
           </span>
         </div>
@@ -877,7 +877,7 @@
   <span class="md-ellipsis">
     
   
-    Several Optimizations at Once
+    Running Multiple Optimizations
   
 
     
@@ -895,7 +895,7 @@
   <span class="md-ellipsis">
     
   
-    Several Optimizations at Once
+    Running Multiple Optimizations
   
 
     
@@ -2535,7 +2535,7 @@
   
 
 
-<h1 id="several-optimizations-at-once">Several Optimizations at Once</h1>
+<h1 id="running-multiple-optimizations">Running Multiple Optimizations</h1>
 <p>Several optimizations can run together rather than one after another. Wrap each
 <code>optimize</code> call in a zero-argument callable and pass the callables to
 <a class="autorefs autorefs-internal" title="            run" href="../../reference/api/#ropt.Session.run"><code>Session.run</code></a>, which starts each one on a thread of its
@@ -2586,7 +2586,7 @@ attached to its results (and shows up in a
 the optimizations that use the pool, not ten per optimization. Batch IDs stay
 distinct whatever you pass, since every optimization in the program draws them
 from one counter.</p>
-<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/several_optimizations.py">examples/several_optimizations.py</a>
+<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/multiple_optimizations.py">examples/multiple_optimizations.py</a>
 runs one optimization per start vector, at most two at a time, and tags each with
 its own metadata:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
