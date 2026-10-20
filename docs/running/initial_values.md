@@ -140,7 +140,7 @@ several configurations:
 ```python
 s.run(
     [
-        partial(s.optimize, config, x0, function, f0=f0, g0=g0)
+        partial(optimize, config, x0, function, f0=f0, g0=g0)
         for config in (config_a, config_b)
     ]
 )

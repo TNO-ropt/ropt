@@ -220,7 +220,7 @@ def test_optimize_local_handler_reused_by_concurrent_runs(
     history = HistoryHandler()
     with session() as opened:
         run = partial(
-            opened.optimize,
+            optimize,
             config,
             initial_values,
             test_functions[0],
@@ -630,7 +630,7 @@ def test_batch_ids_are_unique_across_concurrent_runs(
     sinks: list[list[int]] = [[], [], []]
     lock = threading.Lock()
     with session() as opened:
-        run = opened.thread_pool(workers=2).optimize if with_pool else opened.optimize
+        run = opened.thread_pool(workers=2).optimize if with_pool else optimize
         opened.run(
             [
                 partial(run, config, initial_values, _collect_batch_ids(sink, lock))
@@ -1106,10 +1106,7 @@ def test_concurrent_runs_without_a_pool_converge(
     starts = [initial_values, np.zeros(initial_values.size)]
     with session() as opened:
         results = opened.run(
-            [
-                partial(opened.optimize, config, start, test_functions[0])
-                for start in starts
-            ]
+            [partial(optimize, config, start, test_functions[0]) for start in starts]
         )
     for result in results:
         assert result.results is not None

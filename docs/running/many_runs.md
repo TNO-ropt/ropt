@@ -90,7 +90,7 @@ concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concur
     a file, talking to a database — holds up every optimization feeding it.
 
 !!! warning "Without a pool, the threads of `run` do the evaluating"
-    An optimization started with [`Session.optimize`][ropt.Session.optimize]
+    An optimization started with the module-level [`optimize`][ropt.optimize]
     evaluates in your own program, on the thread that `run` started for it.
     When several of them run at once, your evaluation function is called by
     several threads at once and must tolerate that. Start them on a pool when it

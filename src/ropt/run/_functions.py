@@ -41,8 +41,8 @@ def optimize(  # ruff: ignore[too-many-arguments]
 
     The evaluations run on the calling thread. See
     [Running Optimizations](../running/running.md) for a walkthrough, and
-    [`Session.optimize`][ropt.Session.optimize] for the same optimization on a
-    session you hold.
+    [`WorkerPool.optimize`][ropt.WorkerPool.optimize] for the same optimization
+    on a pool.
 
     Args:
         config:               The optimization configuration.

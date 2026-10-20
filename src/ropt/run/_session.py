@@ -7,8 +7,9 @@ session has an abort scope of its own, which is the current scope in its
 `with` block and in which every task started on it is nested, and `abort()`
 aborts it.
 
-A task is started on the session or on one of its pools, so what it belongs to
-is stated at the call site and never discovered from the surroundings. Any
+A task started on one of its pools, or with its `run`, belongs to the session.
+A task started with a module-level function is nested in the current scope
+where it starts, which in the `with` block is the scope of the session. Any
 number of pools — and any number of sessions — can be open at once.
 """
 
@@ -35,23 +36,14 @@ from ropt.components.executors._hpc_executor import clusters_with_queue
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, WorkflowError
 
-from ._evaluate import _evaluate, _evaluate_batch
-from ._optimize import _optimize
 from ._pool import WorkerPool
 from ._work import _run_work
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from numpy.typing import ArrayLike
-
-    from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
-    from ropt.results import FunctionResults, GradientResults
 
-    from ._function import EvaluationFunction
-    from ._report import ReportCallback
-    from ._result import EvaluationResult, OptimizationResult
 
 _LOCAL_QUEUE = "local"
 
@@ -77,9 +69,10 @@ class Session:
     Bind the session with `as` and call its factories inside the block. See
     [Sessions](../running/sessions.md) for an overview.
 
-    An optimization or evaluation started on the session itself evaluates
-    in-process, on the calling thread; one started on a pool of the session
-    evaluates on that pool's workers. Either way it belongs to this session.
+    An optimization or evaluation started on a pool of the session evaluates on
+    that pool's workers and belongs to this session. One started with a
+    module-level function in the session's `with` block, or inside one of its
+    tasks, evaluates in-process and is aborted with the session.
 
     A session may be opened inside another, and pools from different sessions
     never interact; a session opened inside another session's `with` block, or
@@ -165,144 +158,6 @@ class Session:
     def _open_abort_scope(self) -> AbortScope:
         self._require_open()
         return self._abort_scope
-
-    def optimize(  # ruff: ignore[too-many-arguments]
-        self,
-        config: dict[str, Any],
-        x0: ArrayLike,
-        function: EvaluationFunction,
-        *,
-        handlers: Sequence[EventHandler] | None = None,
-        report: ReportCallback | None = None,
-        constraint_tolerance: float = 1e-10,
-        metadata: dict[str, Any] | None = None,
-        f0: FunctionResults | None = None,
-        g0: GradientResults | None = None,
-        report_gradients: bool = False,
-    ) -> OptimizationResult:
-        """Run a single optimization in-process, on this session.
-
-        The evaluations run on the calling thread. Start the run on one of this
-        session's pools to give them workers. See
-        [Running Optimizations](../running/running.md) for a walkthrough.
-
-        Args:
-            config:               The optimization configuration.
-            x0:                   The initial variable vector.
-            function:             The per-realization evaluation function.
-            handlers:             Optional handlers, called in the order listed.
-            report:               Optional callback invoked per evaluation.
-            constraint_tolerance: The tolerance within which a constraint holds.
-            metadata:             Optional dictionary attached to every result.
-            f0:                   Optional function results at `x0`.
-            g0:                   Optional gradient results at `x0`.
-            report_gradients:     Whether `report` also receives gradient results.
-
-        Returns:
-            An [`OptimizationResult`][ropt.OptimizationResult].
-
-        Raises:
-            AbortedError:  If the optimization was aborted.
-            WorkflowError: If this session has closed.
-        """  # ruff: ignore[docstring-extraneous-exception]
-        return _optimize(
-            self,
-            None,
-            config,
-            x0,
-            function,
-            handlers=handlers,
-            report=report,
-            constraint_tolerance=constraint_tolerance,
-            metadata=metadata,
-            f0=f0,
-            g0=g0,
-            report_gradients=report_gradients,
-        )
-
-    def evaluate(  # ruff: ignore[too-many-arguments]
-        self,
-        config: dict[str, Any],
-        variables: ArrayLike,
-        function: EvaluationFunction,
-        *,
-        handlers: Sequence[EventHandler] | None = None,
-        report: ReportCallback | None = None,
-        metadata: dict[str, Any] | None = None,
-    ) -> EvaluationResult[FunctionResults]:
-        """Evaluate a single variable vector in-process, without optimizing.
-
-        See [Running Optimizations](../running/running.md) for a walkthrough.
-
-        Args:
-            config:    The optimization configuration.
-            variables: The variable vector to evaluate.
-            function:  The per-realization evaluation function.
-            handlers:  Optional handlers, called in the order listed.
-            report:    Optional callback invoked with the results.
-            metadata:  Optional dictionary attached to the results.
-
-        Returns:
-            An evaluation result.
-
-        Raises:
-            AbortedError:  If the evaluation was aborted.
-            ValueError:    If `variables` is not a single vector.
-            WorkflowError: If this session has closed.
-        """  # ruff: ignore[docstring-extraneous-exception]
-        return _evaluate(
-            self,
-            None,
-            config,
-            variables,
-            function,
-            handlers=handlers,
-            report=report,
-            metadata=metadata,
-        )
-
-    def evaluate_batch(  # ruff: ignore[too-many-arguments]
-        self,
-        config: dict[str, Any],
-        variables: ArrayLike,
-        function: EvaluationFunction,
-        *,
-        handlers: Sequence[EventHandler] | None = None,
-        report: ReportCallback | None = None,
-        metadata: dict[str, Any] | None = None,
-    ) -> EvaluationResult[tuple[FunctionResults, ...]]:
-        """Evaluate a batch of variable vectors in-process, without optimizing.
-
-        Each row of `variables` is one vector, and the results come back in the
-        same order. See [Running Optimizations](../running/running.md) for a
-        walkthrough.
-
-        Args:
-            config:    The optimization configuration.
-            variables: The variable vectors to evaluate, one per row.
-            function:  The per-realization evaluation function.
-            handlers:  Optional handlers, called in the order listed.
-            report:    Optional callback invoked with each evaluation.
-            metadata:  Optional dictionary attached to every result.
-
-        Returns:
-            An evaluation result.
-
-        Raises:
-            AbortedError:  If the evaluation was aborted.
-            ValueError:    If `variables` is not a 2-D matrix.
-            WorkflowError: If this session has closed.
-        """  # ruff: ignore[docstring-extraneous-exception]
-        return _evaluate_batch(
-            self,
-            None,
-            config,
-            variables,
-            function,
-            handlers=handlers,
-            report=report,
-            metadata=metadata,
-        )
 
     @overload
     def run[T](self, work: Callable[[], T], *, limit: int | None = None) -> T: ...

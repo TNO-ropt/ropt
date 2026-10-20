@@ -44,22 +44,19 @@ does not abort its other tasks. A module-level function called in such a thread
 is not aborted with the session either. With `Session.run`, the failure of one
 function aborts the others, and the exception is raised in your script.
 
-### Session methods and module-level functions
+### Module-level functions in a session
 
-A session also has [`optimize`][ropt.Session.optimize],
-[`evaluate`][ropt.Session.evaluate] and
-[`evaluate_batch`][ropt.Session.evaluate_batch]. Like the module-level
-functions, they evaluate one point at a time on the calling thread. The
-difference is that the optimization is started on the session: `Session.abort`
-stops it wherever it is called from, including a thread of your own. A
-module-level `optimize` is aborted with a session only when it is called in the
-session's `with` block or from inside one of its tasks.
+An optimization or evaluation that needs no pool uses the module-level
+[`optimize`][ropt.optimize], [`evaluate`][ropt.evaluate] and
+[`evaluate_batch`][ropt.evaluate_batch] in a session as well. Called in the
+session's `with` block, or from inside one of its tasks, they are aborted with
+the session.
 
-Each call of `optimize`, `evaluate`, `evaluate_batch` or `run` on a session or
-on one of its pools starts a **task**. Everything started from inside a task
-belongs to the same session: evaluation functions, event handlers, report
-callbacks, and functions given to `run`. This includes a module-level
-`optimize` called from inside a task.
+Each call of `optimize`, `evaluate`, `evaluate_batch` or `run` starts a
+**task**. A task started on one of the session's pools, with `Session.run`, or
+in the session's `with` block belongs to the session. Everything started from
+inside a task belongs to the same session: evaluation functions, event
+handlers, report callbacks, and functions given to `run`.
 
 ## Pools
 

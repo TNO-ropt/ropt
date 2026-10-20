@@ -149,7 +149,7 @@ def test_aborting_turns_true_in_an_evaluation_function_once_its_run_is_aborted()
             return _sphere(variables, context)
 
         with pytest.raises(AbortedError):
-            opened.optimize(_CONFIG, _INITIAL, objective)
+            optimize(_CONFIG, _INITIAL, objective)
 
     assert seen[0] == (False, True)
 
@@ -184,11 +184,9 @@ def test_an_optimization_ended_by_a_base_exception_aborts_the_work_it_started(
     error: type[BaseException],
 ) -> None:
     seen: list[AbortScope] = []
-    with session() as opened:
+    with session():
         with pytest.raises(error):
-            opened.optimize(
-                _CONFIG, _INITIAL, _records_its_scope_then_raises(seen, error)
-            )
+            optimize(_CONFIG, _INITIAL, _records_its_scope_then_raises(seen, error))
         assert seen[0].aborting
         assert seen[0].exit_code is ExitCode.ABORTED
 
@@ -198,11 +196,9 @@ def test_an_evaluation_ended_by_a_base_exception_aborts_the_work_it_started(
     error: type[BaseException],
 ) -> None:
     seen: list[AbortScope] = []
-    with session() as opened:
+    with session():
         with pytest.raises(error):
-            opened.evaluate(
-                _CONFIG, _INITIAL, _records_its_scope_then_raises(seen, error)
-            )
+            evaluate(_CONFIG, _INITIAL, _records_its_scope_then_raises(seen, error))
         assert seen[0].aborting
         assert seen[0].exit_code is ExitCode.ABORTED
 
@@ -293,7 +289,7 @@ def test_an_in_process_evaluation_batch_is_aborted_between_its_rows() -> None:
             return _sphere(variables, context)
 
         with pytest.raises(AbortedError) as raised:
-            opened.evaluate_batch(_CONFIG, matrix, objective)
+            evaluate_batch(_CONFIG, matrix, objective)
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
     assert calls == 1
@@ -388,7 +384,7 @@ def test_closing_a_session_aborts_a_run_on_another_thread() -> None:
     assert codes == [ExitCode.ABORTED]
 
 
-@pytest.mark.parametrize("where", ["session", "pool"])
+@pytest.mark.parametrize("where", ["module", "pool"])
 @pytest.mark.timeout(60)
 def test_session_abort_aborts_a_run_started_afterwards(where: str) -> None:
     # The session stays aborted, so a later run aborts before its first
@@ -404,9 +400,9 @@ def test_session_abort_aborts_a_run_started_afterwards(where: str) -> None:
     with session() as opened:
         pool = opened.thread_pool(workers=1)
         opened.abort()
-        runner = opened if where == "session" else pool
+        run = optimize if where == "module" else pool.optimize
         with pytest.raises(AbortedError) as raised:
-            runner.optimize(_CONFIG, _INITIAL, objective)
+            run(_CONFIG, _INITIAL, objective)
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
     assert calls == []
@@ -438,17 +434,17 @@ def test_session_abort_reaches_a_session_opened_in_its_block() -> None:
     with session() as outer, session() as inner:
         outer.abort()
         with pytest.raises(AbortedError) as raised:
-            inner.optimize(_CONFIG, _INITIAL, _sphere)
+            inner.thread_pool(workers=1).optimize(_CONFIG, _INITIAL, _sphere)
 
     assert raised.value.exit_code is ExitCode.USER_ABORT
 
 
 @pytest.mark.timeout(60)
 def test_session_abort_does_not_reach_the_session_it_was_opened_in() -> None:
-    with session() as outer:
+    with session():
         with session() as inner:
             inner.abort()
-        result = outer.optimize(_CONFIG, _INITIAL, _sphere)
+        result = optimize(_CONFIG, _INITIAL, _sphere)
 
     assert result.exit_code == ExitCode.FINISHED
 

@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt import session
+from ropt import evaluate, evaluate_batch, optimize, session
 from ropt.components.concurrency import current_abort_scope
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
@@ -57,36 +57,36 @@ def _pool_run(_opened: Session, inner: WorkerPool) -> None:
     inner.run(_boom)
 
 
-def _optimize(opened: Session, _inner: WorkerPool) -> None:
-    opened.optimize(_CONFIG, _INITIAL, _boom)
+def _optimize(_opened: Session, _inner: WorkerPool) -> None:
+    optimize(_CONFIG, _INITIAL, _boom)
 
 
-def _optimize_invalid_config(opened: Session, _inner: WorkerPool) -> None:
-    opened.optimize(_INVALID_CONFIG, _INITIAL, _sphere)
+def _optimize_invalid_config(_opened: Session, _inner: WorkerPool) -> None:
+    optimize(_INVALID_CONFIG, _INITIAL, _sphere)
 
 
-def _evaluate(opened: Session, _inner: WorkerPool) -> None:
-    opened.evaluate(_CONFIG, _INITIAL, _boom)
+def _evaluate(_opened: Session, _inner: WorkerPool) -> None:
+    evaluate(_CONFIG, _INITIAL, _boom)
 
 
-def _evaluate_invalid_config(opened: Session, _inner: WorkerPool) -> None:
-    opened.evaluate(_INVALID_CONFIG, _INITIAL, _sphere)
+def _evaluate_invalid_config(_opened: Session, _inner: WorkerPool) -> None:
+    evaluate(_INVALID_CONFIG, _INITIAL, _sphere)
 
 
-def _evaluate_wrong_shape(opened: Session, _inner: WorkerPool) -> None:
-    opened.evaluate(_CONFIG, np.tile(_INITIAL, (2, 1)), _sphere)
+def _evaluate_wrong_shape(_opened: Session, _inner: WorkerPool) -> None:
+    evaluate(_CONFIG, np.tile(_INITIAL, (2, 1)), _sphere)
 
 
-def _evaluate_batch(opened: Session, _inner: WorkerPool) -> None:
-    opened.evaluate_batch(_CONFIG, np.tile(_INITIAL, (2, 1)), _boom)
+def _evaluate_batch(_opened: Session, _inner: WorkerPool) -> None:
+    evaluate_batch(_CONFIG, np.tile(_INITIAL, (2, 1)), _boom)
 
 
-def _evaluate_batch_wrong_shape(opened: Session, _inner: WorkerPool) -> None:
-    opened.evaluate_batch(_CONFIG, _INITIAL, _sphere)
+def _evaluate_batch_wrong_shape(_opened: Session, _inner: WorkerPool) -> None:
+    evaluate_batch(_CONFIG, _INITIAL, _sphere)
 
 
 def _session_run(opened: Session, _inner: WorkerPool) -> None:
-    opened.run([partial(opened.optimize, _CONFIG, _INITIAL, _boom)] * 2)
+    opened.run([partial(optimize, _CONFIG, _INITIAL, _boom)] * 2)
 
 
 @pytest.mark.parametrize(
@@ -131,7 +131,7 @@ def test_caught_nested_failure_does_not_abort_the_run(
 
 
 def _run_from_an_in_process_objective(
-    opened: Session, work: Callable[[], None]
+    _opened: Session, work: Callable[[], None]
 ) -> ExitCode:
     def objective(
         variables: NDArray[np.float64], context: EvaluationFunctionContext
@@ -139,7 +139,7 @@ def _run_from_an_in_process_objective(
         work()
         return _sphere(variables, context)
 
-    return opened.optimize(_CONFIG, _INITIAL, objective).exit_code
+    return optimize(_CONFIG, _INITIAL, objective).exit_code
 
 
 def _run_from_a_report_callback(opened: Session, work: Callable[[], None]) -> ExitCode:
@@ -270,11 +270,13 @@ def test_failing_optimization_in_a_nested_session_run_aborts_only_that_call() ->
         def objective(
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
-            optimize = partial(opened.optimize, _CONFIG, _INITIAL)
+            optimize_with = partial(optimize, _CONFIG, _INITIAL)
             fails = _fails_once_both_evaluate(started)
             waits = _records_its_abort(started, exit_codes, recorded)
             try:
-                opened.run([partial(optimize, fails), partial(optimize, waits)])
+                opened.run(
+                    [partial(optimize_with, fails), partial(optimize_with, waits)]
+                )
             except ValueError as exc:
                 caught.append(type(exc))
             return _sphere(variables, context)
@@ -302,7 +304,7 @@ def test_nested_session_run_is_aborted_with_its_parent() -> None:
         def _optimizes_after_the_failure() -> None:
             try:
                 assert failed.wait(timeout=30)
-                optimization = partial(opened.optimize, _CONFIG, _INITIAL, _sphere)
+                optimization = partial(optimize, _CONFIG, _INITIAL, _sphere)
                 opened.run([optimization, optimization])
             except AbortedError as exc:
                 exit_codes.append(exc.exit_code)

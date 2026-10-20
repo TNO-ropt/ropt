@@ -88,48 +88,15 @@ def test_pool_from_a_closed_session_refused(
         entry_point(pool)
 
 
-def _session_optimize(opened: Session) -> None:
-    opened.optimize(_CONFIG, _INITIAL, _sphere)
+def test_run_on_an_open_session_accepted(opened: Session) -> None:
+    assert opened.run(partial(pow, 2, 3)) == 8
 
 
-def _session_evaluate(opened: Session) -> None:
-    opened.evaluate(_CONFIG, _INITIAL, _sphere)
-
-
-def _session_evaluate_batch(opened: Session) -> None:
-    opened.evaluate_batch(_CONFIG, _MATRIX, _sphere)
-
-
-def _session_run(opened: Session) -> None:
-    opened.run(partial(pow, 2, 3))
-
-
-_RUNS_ON_A_SESSION = pytest.mark.parametrize(
-    "entry_point",
-    [
-        pytest.param(_session_optimize, id="optimize"),
-        pytest.param(_session_evaluate, id="evaluate"),
-        pytest.param(_session_evaluate_batch, id="evaluate_batch"),
-        pytest.param(_session_run, id="run"),
-    ],
-)
-
-
-@_RUNS_ON_A_SESSION
-def test_run_on_an_open_session_accepted(
-    opened: Session, entry_point: Callable[[Session], None]
-) -> None:
-    entry_point(opened)
-
-
-@_RUNS_ON_A_SESSION
-def test_run_on_a_closed_session_refused(
-    entry_point: Callable[[Session], None],
-) -> None:
+def test_run_on_a_closed_session_refused() -> None:
     with session() as closing:
         pass
     with pytest.raises(WorkflowError, match="not open"):
-        entry_point(closing)
+        closing.run(partial(pow, 2, 3))
 
 
 def test_run_starting_while_a_session_closes_refused() -> None:
@@ -140,7 +107,7 @@ def test_run_starting_while_a_session_closes_refused() -> None:
 
     def _start_a_run() -> None:
         try:
-            closing.optimize(_CONFIG, _INITIAL, _sphere)
+            closing.run(partial(pow, 2, 3))
         except WorkflowError:
             outcomes.append("refused")
         else:
