@@ -37,9 +37,9 @@ from ropt._components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
-    ParallelEvaluator,
+    make_batch_evaluator,
 )
-from ropt._components.evaluators._parallel_evaluator import _handle_result
+from ropt._components.evaluators._evaluator import _handle_result
 from ropt._components.executors import (
     ExecutorFailure,
     HPCExecutor,
@@ -1111,7 +1111,7 @@ def _opt_workflow(
     config: dict[str, Any],
     test_function: EvaluationFunctionCallback,
 ) -> FunctionResults | None:
-    evaluator = ParallelEvaluator(function=test_function, executor=executor)
+    evaluator = make_batch_evaluator(function=test_function, executor=executor)
     result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator)
     step.add_event_handler(result_handler)
@@ -2190,7 +2190,7 @@ def test_multiprocessing_without_cloudpickle_rejects_lambda(
 def test_multiprocessing_without_cloudpickle_rejects_an_unpicklable_argument(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    # ParallelEvaluator submits a picklable module-level function and passes the
+    # make_batch_evaluator submits a picklable module-level function and passes the
     # user callback as an argument, so the arguments must be checked too.
     monkeypatch.setattr(
         "ropt._components.executors._process_executor.dumps", pickle.dumps

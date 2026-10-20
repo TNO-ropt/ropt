@@ -10,7 +10,7 @@ from ropt._components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
-    FunctionEvaluator,
+    make_batch_evaluator,
 )
 
 _Function = Callable[[NDArray[np.float64], EvaluationFunctionContext], float]
@@ -124,7 +124,7 @@ def evaluator(
         objective_functions: list[_Function] = test_functions,
         constraint_functions: list[_Function] | None = constraint_functions,
     ) -> Any:
-        return FunctionEvaluator(
+        return make_batch_evaluator(
             function=eval_func(objective_functions, constraint_functions)
         )
 

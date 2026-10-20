@@ -74,8 +74,8 @@ class EnsembleEvaluator:
     """Construct functions and gradients from an ensemble of functions.
 
     Uses the settings in an [`EnOptContext`][ropt.context.EnOptContext] to turn
-    the raw values from an evaluator callable, usually provided by an
-    [`Evaluator`][ropt._components.evaluators.Evaluator], into function and
+    the raw values from an evaluator callable, usually built by
+    [`make_batch_evaluator`][ropt._components.evaluators.make_batch_evaluator], into function and
     gradient estimates.
     """
 

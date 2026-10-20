@@ -1,30 +1,25 @@
-"""Evaluators: the objects a compute step uses to evaluate the model.
+"""Evaluators: the batch callables a compute step uses to evaluate the model.
 
-Each is an [`Evaluator`][ropt._components.evaluators.Evaluator] subclass. The
-plain callable protocols they wrap are in `ropt._evaluation`. See
+[`make_batch_evaluator`][ropt._components.evaluators.make_batch_evaluator]
+builds one from a function that is called once per row. The batch types it
+exchanges are in `ropt._evaluation`. See
 [Evaluating in Parallel](../running/parallel.md) for usage.
 """
 
 from __future__ import annotations
 
-from ._batch_evaluator import BatchEvaluator
 from ._counter import BatchIdCounter
-from ._function_evaluator import FunctionEvaluator
-from ._parallel_evaluator import ParallelEvaluator
+from ._evaluator import make_batch_evaluator
 from .base import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
-    Evaluator,
 )
 
 __all__ = [
-    "BatchEvaluator",
     "BatchIdCounter",
     "EvaluationFunctionCallback",
     "EvaluationFunctionContext",
     "EvaluationFunctionResult",
-    "Evaluator",
-    "FunctionEvaluator",
-    "ParallelEvaluator",
+    "make_batch_evaluator",
 ]

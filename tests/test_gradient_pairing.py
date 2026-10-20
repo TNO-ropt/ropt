@@ -41,7 +41,7 @@ def config_fixture() -> dict[str, Any]:
 
 
 def _ensemble(config: dict[str, Any], evaluator: Any) -> EnsembleEvaluator:
-    return EnsembleEvaluator(EnOptContext.model_validate(config), evaluator().eval)
+    return EnsembleEvaluator(EnOptContext.model_validate(config), evaluator())
 
 
 def test_gradient_of_a_combined_batch_keys_the_function_beside_it(

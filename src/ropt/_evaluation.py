@@ -5,9 +5,8 @@ which rows must be evaluated, an
 [`EvaluationBatchResult`][ropt._evaluation.EvaluationBatchResult] carries the
 objective and constraint values back, and
 [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] is the
-protocol such a callable must follow. The
-[`Evaluator`][ropt._components.evaluators.Evaluator] classes that wrap them are
-in `ropt._components.evaluators`.
+protocol such a callable must follow. The builder that creates one from a
+per-row function is in `ropt._components.evaluators`.
 """
 
 from dataclasses import dataclass, field

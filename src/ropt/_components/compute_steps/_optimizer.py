@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt._components.concurrency import AbortScope
-    from ropt._components.evaluators import Evaluator
+    from ropt._evaluation import EvaluationBatchCallback
     from ropt.context import EnOptContext
     from ropt.results import FunctionResults, GradientResults, Results
 
@@ -41,7 +41,7 @@ class OptimizationStep(ComputeStep[ExitCode]):
     def __init__(
         self,
         *,
-        evaluator: Evaluator,
+        evaluator: EvaluationBatchCallback,
         abort_scope: AbortScope | None = None,
         f0: FunctionResults | None = None,
         g0: GradientResults | None = None,
@@ -53,7 +53,7 @@ class OptimizationStep(ComputeStep[ExitCode]):
         everything derived from them is recomputed.
 
         Args:
-            evaluator:   The evaluator object to run function evaluations.
+            evaluator:   The callable that evaluates a batch of variables.
             abort_scope: An optional scope that cuts this step off.
             f0:          Optional function results at the initial variables.
             g0:          Optional gradient results at the initial variables.
@@ -114,7 +114,7 @@ class OptimizationStep(ComputeStep[ExitCode]):
 
         ensemble_evaluator = EnsembleEvaluator(
             self._context,
-            self._evaluator.eval,
+            self._evaluator,
             self._metadata,
             f0=self._f0,
             g0=self._g0,

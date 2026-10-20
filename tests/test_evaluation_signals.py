@@ -50,7 +50,7 @@ def _make(config: dict[str, Any], evaluator: Any) -> tuple[EnsembleEvaluator, _S
     signals = _Signals()
     ensemble = EnsembleEvaluator(
         EnOptContext.model_validate(config),
-        evaluator().eval,
+        evaluator(),
         signal_evaluation=signals,
     )
     return ensemble, signals

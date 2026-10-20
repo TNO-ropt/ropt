@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt._components.evaluators import FunctionEvaluator, ParallelEvaluator
+from ropt._components.evaluators import make_batch_evaluator
 
 from ._batch_ids import next_batch_id
 from ._function import adapt_function
 
 if TYPE_CHECKING:
     from ropt._components.concurrency import AbortScope
-    from ropt._components.evaluators import Evaluator
     from ropt._components.executors import Executor
+    from ropt._evaluation import EvaluationBatchCallback
     from ropt.context import EnOptContext
 
     from ._function import EvaluationFunction
@@ -23,7 +23,7 @@ def make_evaluator(
     function: EvaluationFunction,
     executor: Executor | None,
     abort_scope: AbortScope | None = None,
-) -> Evaluator:
+) -> EvaluationBatchCallback:
     n_obj = context.objectives.weights.size
     n_con = (
         0
@@ -31,13 +31,7 @@ def make_evaluator(
         else context.nonlinear_constraints.lower_bounds.size
     )
     callback = adapt_function(function, n_obj, n_con)
-    if executor is None:
-        return FunctionEvaluator(
-            function=callback,
-            batch_id_callback=next_batch_id,
-            abort_scope=abort_scope,
-        )
-    return ParallelEvaluator(
+    return make_batch_evaluator(
         function=callback,
         executor=executor,
         batch_id_callback=next_batch_id,

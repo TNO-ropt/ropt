@@ -181,7 +181,7 @@ def test_initial_values_cover_a_combined_batch(config: Any, evaluator: Any) -> N
     recorder = _Recorder()
     ensemble = EnsembleEvaluator(
         EnOptContext.model_validate(config),
-        evaluator([recorder]).eval,
+        evaluator([recorder]),
         f0=f0,
         g0=g0,
     )
@@ -195,7 +195,7 @@ def test_initial_gradient_results_leave_the_combined_batch_unperturbed(
     _, g0 = _record(config)
     recorder = _Recorder()
     ensemble = EnsembleEvaluator(
-        EnOptContext.model_validate(config), evaluator([recorder]).eval, g0=g0
+        EnOptContext.model_validate(config), evaluator([recorder]), g0=g0
     )
     ensemble.calculate(_INITIAL, compute_functions=True, compute_gradients=True)
     assert recorder.batches() == [[(0, -1), (1, -1)]]
@@ -257,7 +257,7 @@ def test_initial_function_results_reject_several_variable_vectors(
 ) -> None:
     f0, _ = _record(config)
     ensemble = EnsembleEvaluator(
-        EnOptContext.model_validate(config), evaluator([_objective]).eval, f0=f0
+        EnOptContext.model_validate(config), evaluator([_objective]), f0=f0
     )
     variables = np.repeat(_INITIAL[np.newaxis, :], 2, axis=0)
     with pytest.raises(ValueError, match="need a single variable vector"):

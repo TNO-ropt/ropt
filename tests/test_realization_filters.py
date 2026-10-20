@@ -671,7 +671,7 @@ def test_realization_filter_is_skipped_when_every_realization_failed(
             ],
         }
     )
-    ensemble = EnsembleEvaluator(context, evaluator([lambda _0, _1: np.nan]).eval)
+    ensemble = EnsembleEvaluator(context, evaluator([lambda _0, _1: np.nan]))
     (results,) = ensemble.calculate(
         np.zeros(1), compute_functions=True, compute_gradients=False
     )

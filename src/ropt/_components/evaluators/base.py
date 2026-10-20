@@ -1,99 +1,13 @@
-"""Defines base classes for evaluators."""
+"""The per-row types exchanged with an evaluation function."""
 
 from __future__ import annotations
 
-import threading
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Protocol
-
-from ropt._evaluation import EvaluationBatchResult
-from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
-
-    from ropt._evaluation import EvaluationBatchContext
-
-
-class Evaluator(ABC):
-    """Abstract base class for evaluator components within an optimization workflow.
-
-    Subclasses must implement the abstract `_eval` method, which performs the
-    actual evaluation of variables using an
-    [`EvaluationBatchContext`][ropt._evaluation.EvaluationBatchContext] and
-    returns an
-    [`EvaluationBatchResult`][ropt._evaluation.EvaluationBatchResult]. Callers use
-    [`eval`][ropt._components.evaluators.Evaluator.eval], which adds the
-    concurrency guard.
-
-    Note:
-        Evaluators are not safe for concurrent use. An evaluator raises a
-        [`WorkflowError`][ropt.exceptions.WorkflowError] if two threads execute
-        its `eval` method at the same time. Serial reuse is allowed: the same
-        instance may be reused by
-        several compute steps, including on different threads, as long as each
-        call fully completes before the next begins. For parallel workflows use
-        a dispatching evaluator such as
-        [`ParallelEvaluator`][ropt._components.evaluators.ParallelEvaluator], which
-        dispatches tasks to an executor rather than sharing an evaluator across
-        threads.
-    """
-
-    def __init__(self) -> None:
-        """Initialize the Evaluator."""
-        self._in_use = False
-        self._owner_lock = threading.Lock()
-
-    @abstractmethod
-    def _eval(
-        self, variables: NDArray[np.float64], context: EvaluationBatchContext
-    ) -> EvaluationBatchResult:
-        """Evaluate objective and constraint functions for given variables.
-
-        Implemented by concrete subclasses; callers use `eval`, which adds the
-        concurrency guard.
-
-        Args:
-            variables: The matrix of variables to evaluate, one vector per row.
-            context:   The evaluation context.
-
-        Returns:
-            An evaluation results object containing the calculated values.
-        """
-
-    def eval(
-        self, variables: NDArray[np.float64], context: EvaluationBatchContext
-    ) -> EvaluationBatchResult:
-        """Evaluate objective and constraint functions for given variables.
-
-        This follows the [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] protocol.
-
-        Args:
-            variables: The matrix of variables to evaluate, one vector per row.
-            context:   The evaluation context.
-
-        Returns:
-            An evaluation results object containing the calculated values.
-
-        Raises:
-            WorkflowError: If another thread is already executing `eval`.
-        """
-        with self._owner_lock:
-            if self._in_use:
-                msg = "The evaluator is already running on another thread."
-                raise WorkflowError(msg)
-            self._in_use = True
-        try:
-            result = self._eval(variables, context)
-        finally:
-            with self._owner_lock:
-                self._in_use = False
-        # The protocol is untyped at the boundary, so a wrong return value is
-        # caught here rather than deep in the ensemble code.
-        assert isinstance(result, EvaluationBatchResult)
-        return result
 
 
 @dataclass(slots=True)

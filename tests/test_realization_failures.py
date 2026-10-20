@@ -234,7 +234,7 @@ def test_gradient_is_nan_when_every_realization_failed(
         }
     )
     failing = evaluator([lambda _0, _1: np.nan], [lambda _0, _1: np.nan])
-    _, gradient = EnsembleEvaluator(context, failing.eval).calculate(
+    _, gradient = EnsembleEvaluator(context, failing).calculate(
         np.zeros(2), compute_functions=True, compute_gradients=True
     )
     assert isinstance(gradient, GradientResults)

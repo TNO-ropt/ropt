@@ -15,10 +15,8 @@ from ropt._components.concurrency import AbortScope, current_abort_scope
 from ropt._components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
-    Evaluator,
-    FunctionEvaluator,
+    make_batch_evaluator,
 )
-from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt._handlers import (
     CallbackHandler,
     EventHandler,
@@ -89,7 +87,7 @@ def test_function_evaluator_with_info(
             metadata={"foo": "bar"},
         )
 
-    evaluator = FunctionEvaluator(
+    evaluator = make_batch_evaluator(
         function=partial(_function, test_functions=test_functions)
     )
     result_handler = ResultsHandler()
@@ -120,7 +118,7 @@ def _run_with_metadata(
         )
 
     result_handler = ResultsHandler()
-    step = EvaluationStep(evaluator=FunctionEvaluator(function=_function))
+    step = EvaluationStep(evaluator=make_batch_evaluator(function=_function))
     step.add_event_handler(result_handler)
     step.run(context=EnOptContext.model_validate(config), variables=initial_values)
     results: FunctionResults = result_handler["results"]
@@ -686,7 +684,7 @@ def test_nested_optimization(
             )
         )
 
-    outer_evaluator = FunctionEvaluator(function=_optimizer)
+    outer_evaluator = make_batch_evaluator(function=_optimizer)
     step = OptimizationStep(evaluator=outer_evaluator)
     step.run(variables=initial, context=EnOptContext.model_validate(config))
     assert np.allclose(
@@ -1058,87 +1056,6 @@ def test_optimization_step_concurrent_run_raises(config: Any, evaluator: Any) ->
     finally:
         release.set()
         thread.join(timeout=5)
-
-
-def _eval_args() -> tuple[NDArray[np.float64], EvaluationBatchContext]:
-    # The guard tests below ignore both arguments; they only have to be valid.
-    return (
-        np.zeros((1, 1), dtype=np.float64),
-        EvaluationBatchContext(
-            context=EnOptContext.model_validate({"variables": {"variable_count": 1}}),
-            active=np.ones(1, dtype=np.bool_),
-            realizations=np.zeros(1, dtype=np.intc),
-            perturbations=np.full(1, -1, dtype=np.intc),
-            function_ids=np.zeros(1, dtype=np.intc),
-        ),
-    )
-
-
-def test_evaluator_raises_on_concurrent_use() -> None:
-    in_eval = threading.Event()
-    can_finish = threading.Event()
-    thread2_error: list[BaseException | None] = [None]
-
-    class _BlockingEvaluator(Evaluator):
-        @override
-        def _eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:
-            in_eval.set()
-            can_finish.wait()
-            return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
-
-    ev = _BlockingEvaluator()
-
-    def _thread1() -> None:
-        ev.eval(*_eval_args())
-
-    def _thread2() -> None:
-        in_eval.wait()
-        try:
-            ev.eval(*_eval_args())
-        except WorkflowError as exc:
-            thread2_error[0] = exc
-
-    t1 = threading.Thread(target=_thread1)
-    t2 = threading.Thread(target=_thread2)
-    t1.start()
-    t2.start()
-    t2.join(timeout=5.0)
-    can_finish.set()
-    t1.join(timeout=5.0)
-
-    assert isinstance(thread2_error[0], WorkflowError)
-    assert "thread" in str(thread2_error[0])
-
-
-class _RecordingEvaluator(Evaluator):
-    def __init__(self) -> None:
-        super().__init__()
-        self.threads: list[int] = []
-
-    @override
-    def _eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:
-        self.threads.append(threading.get_ident())
-        return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
-
-
-def test_evaluator_allows_staggered_use_on_different_threads() -> None:
-    evaluator = _RecordingEvaluator()
-
-    # First use finishes on a worker thread; a later, non-overlapping call from
-    # a different thread is allowed because the two calls never overlap.
-    _run_in_thread(lambda: evaluator.eval(*_eval_args()))
-    evaluator.eval(*_eval_args())
-
-    assert len(evaluator.threads) == 2
-
-
-def test_evaluator_allows_repeated_use_on_same_thread() -> None:
-    evaluator = _RecordingEvaluator()
-
-    evaluator.eval(*_eval_args())
-    evaluator.eval(*_eval_args())
-
-    assert len(evaluator.threads) == 2
 
 
 def test_event_handler_serializes_concurrent_use() -> None:

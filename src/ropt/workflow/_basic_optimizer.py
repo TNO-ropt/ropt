@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt._components.compute_steps import OptimizationStep
-from ropt._components.evaluators import BatchEvaluator, Evaluator
+from ropt._evaluation import EvaluationBatchResult
 from ropt._handlers import CallbackHandler, ResultsHandler
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
@@ -21,9 +21,9 @@ from ropt.enums import EnOptEventType, ExitCode
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
 
-    from ropt._evaluation import EvaluationBatchCallback
+    from ropt._evaluation import EvaluationBatchCallback, EvaluationBatchContext
     from ropt.events import EnOptEvent
     from ropt.results import FunctionResults
 
@@ -36,10 +36,9 @@ class BasicOptimizer:
     run an optimization and retrieve the best result. Internally it:
 
     1. validates `config` into an [`EnOptContext`][ropt.context.EnOptContext];
-    2. wraps a plain
-       [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] in a
-       [`BatchEvaluator`][ropt._components.evaluators.BatchEvaluator], or uses a
-       supplied [`Evaluator`][ropt._components.evaluators.Evaluator] as given;
+    2. wraps the
+       [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] so
+       that its return type is checked;
     3. creates an
        [`OptimizationStep`][ropt._components.compute_steps.OptimizationStep] and
        attaches a
@@ -80,7 +79,7 @@ class BasicOptimizer:
     def __init__(
         self,
         config: dict[str, Any],
-        evaluator: EvaluationBatchCallback | Evaluator,
+        evaluator: EvaluationBatchCallback,
         *,
         constraint_tolerance: float = 1e-10,
     ) -> None:
@@ -90,9 +89,7 @@ class BasicOptimizer:
             config:               The configuration for the optimization.
             evaluator:            An
                 [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback]
-                callable that evaluates a batch of variable vectors, or an
-                [`Evaluator`][ropt._components.evaluators.Evaluator] instance for
-                advanced features such as caching, parallel, or HPC evaluation.
+                callable that evaluates a batch of variable vectors.
             constraint_tolerance: The constraint violation tolerance; a
                 constraint within this tolerance is considered satisfied.
                 Violations are compared in the domain the optimizer works in,
@@ -122,13 +119,8 @@ class BasicOptimizer:
         Returns:
             The exit code returned by the optimization workflow.
         """
-        evaluator = (
-            self._evaluator
-            if isinstance(self._evaluator, Evaluator)
-            else BatchEvaluator(callback=self._evaluator)
-        )
         result_handler = ResultsHandler(constraint_tolerance=self._constraint_tolerance)
-        optimizer = OptimizationStep(evaluator=evaluator)
+        optimizer = OptimizationStep(evaluator=_checked(self._evaluator))
         optimizer.add_event_handler(result_handler)
         for event_type, function in self._observers:
             optimizer.add_event_handler(
@@ -174,6 +166,19 @@ def _custom_event_handlers() -> Iterator[Any]:
         except ModuleNotFoundError:
             continue
         yield getattr(module, class_name)
+
+
+def _checked(callback: EvaluationBatchCallback) -> EvaluationBatchCallback:
+    def _evaluate(
+        variables: NDArray[np.float64], context: EvaluationBatchContext
+    ) -> EvaluationBatchResult:
+        result = callback(variables, context)
+        # The protocol is untyped at the boundary, so a wrong return value is
+        # caught here rather than deep in the ensemble code.
+        assert isinstance(result, EvaluationBatchResult)
+        return result
+
+    return _evaluate
 
 
 @cache

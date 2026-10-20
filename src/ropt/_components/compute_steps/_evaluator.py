@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
     from ropt._components.concurrency import AbortScope
-    from ropt._components.evaluators import Evaluator
+    from ropt._evaluation import EvaluationBatchCallback
     from ropt.context import EnOptContext
     from ropt.results import Results
 
@@ -39,12 +39,15 @@ class EvaluationStep(ComputeStep[None]):
     """
 
     def __init__(
-        self, *, evaluator: Evaluator, abort_scope: AbortScope | None = None
+        self,
+        *,
+        evaluator: EvaluationBatchCallback,
+        abort_scope: AbortScope | None = None,
     ) -> None:
         """Initialize a default evaluator.
 
         Args:
-            evaluator:   The evaluator object to run function evaluations.
+            evaluator:   The callable that evaluates a batch of variables.
             abort_scope: An optional scope that cuts this step off.
         """
         super().__init__(abort_scope=abort_scope)
@@ -112,7 +115,7 @@ class EvaluationStep(ComputeStep[None]):
         self._metadata = metadata
         ensemble_evaluator = EnsembleEvaluator(
             context,
-            self._evaluator.eval,
+            self._evaluator,
             metadata,
             signal_evaluation=self._signal_evaluation,
         )
