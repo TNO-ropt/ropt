@@ -4,9 +4,9 @@ import numpy as np
 import pytest
 from numpy.random import default_rng
 
+from ropt._core._gradient import _apply_bounds, _perturb_variables
 from ropt.config import SamplerConfig
 from ropt.context import EnOptContext
-from ropt.core._gradient import _apply_bounds, _perturb_variables
 from ropt.enums import BoundaryType
 from ropt.sampler.scipy import SciPySampler
 

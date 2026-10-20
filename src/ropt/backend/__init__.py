@@ -3,7 +3,7 @@
 A backend receives an
 [`OptimizationProblem`][ropt.backend.OptimizationProblem], requests function and
 gradient values through the
-[`OptimizerCallback`][ropt.core.OptimizerCallback] interface, and advances the
+[`OptimizerCallback`][ropt.backend.OptimizerCallback] interface, and advances the
 optimization from an initial variable vector. It is selected through the
 `backend` section of the configuration, either as an instance or as a
 [`BackendConfig`][ropt.config.BackendConfig] naming a method. The configuration
@@ -17,6 +17,12 @@ optimizer in a separate process; further backends come from plugin packages. See
 """
 
 from ._base import Backend
+from ._callback import OptimizerCallback, OptimizerCallbackResult
 from ._problem import OptimizationProblem
 
-__all__ = ["Backend", "OptimizationProblem"]
+__all__ = [
+    "Backend",
+    "OptimizationProblem",
+    "OptimizerCallback",
+    "OptimizerCallbackResult",
+]

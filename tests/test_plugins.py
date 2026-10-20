@@ -19,9 +19,8 @@ from ropt.plugins import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from ropt.backend import OptimizationProblem
+    from ropt.backend import OptimizationProblem, OptimizerCallback
     from ropt.config import BackendConfig
-    from ropt.core import OptimizerCallback
     from ropt.plugins import MethodSpec
 
 

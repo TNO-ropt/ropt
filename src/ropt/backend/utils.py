@@ -156,7 +156,7 @@ def split_linear_constraints(
     """Split linear constraints into values compared against zero.
 
     Produces the same form as the non-linear constraint values delivered
-    through the [`OptimizerCallback`][ropt.core.OptimizerCallback], so that a
+    through the [`OptimizerCallback`][ropt.backend.OptimizerCallback], so that a
     backend that handles both together can concatenate them. Entry `k` evaluates
     to `coefficients[k] @ variables - offsets[k]`, which is non-negative when the
     constraint is satisfied. A constraint with a finite lower and a finite upper

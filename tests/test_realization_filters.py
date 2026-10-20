@@ -8,11 +8,11 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt import optimize
+from ropt._core import EnsembleEvaluator
 from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.components.event_handlers import CallbackHandler
 from ropt.config._realization_filter_config import RealizationFilterConfig
 from ropt.context import EnOptContext
-from ropt.core import EnsembleEvaluator
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import TooFewRealizations

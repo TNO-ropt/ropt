@@ -32,9 +32,8 @@ from ropt.enums import VariableType
 from ropt.exceptions import UnsupportedError
 
 if TYPE_CHECKING:
-    from ropt.backend import OptimizationProblem
+    from ropt.backend import OptimizationProblem, OptimizerCallback
     from ropt.config import BackendConfig
-    from ropt.core import OptimizerCallback
     from ropt.plugins import MethodSpec
 
 _logger = get_logger(__name__)

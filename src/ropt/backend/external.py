@@ -22,9 +22,12 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.backend import OptimizationProblem
+    from ropt.backend import (
+        OptimizationProblem,
+        OptimizerCallback,
+        OptimizerCallbackResult,
+    )
     from ropt.config import BackendConfig
-    from ropt.core import OptimizerCallback, OptimizerCallbackResult
     from ropt.plugins import MethodSpec
 
 _logger = get_logger(__name__)

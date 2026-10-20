@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt._core import EnsembleEvaluator
 from ropt.context import EnOptContext
-from ropt.core import EnsembleEvaluator
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
 if TYPE_CHECKING:

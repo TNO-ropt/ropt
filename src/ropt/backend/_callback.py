@@ -15,7 +15,7 @@ class OptimizerCallbackResult:
     """Holds the results from an optimizer callback evaluation.
 
     Bundles the objective and constraint values, and their gradients, returned
-    by an [`OptimizerCallback`][ropt.core.OptimizerCallback] evaluation. Both
+    by an [`OptimizerCallback`][ropt.backend.OptimizerCallback] evaluation. Both
     are `None` unless requested and successfully computed.
 
     Non-linear constraints arrive **normalized**: each is split into values that
@@ -69,7 +69,7 @@ class OptimizerCallback(Protocol):
         `variables` is a 1D array for a single vector, or a 2D array (one
         vector per row) for optimizers that evaluate a batch at once.
         `return_functions` and `return_gradients` select what the returned
-        [`OptimizerCallbackResult`][ropt.core.OptimizerCallbackResult] computes.
+        [`OptimizerCallbackResult`][ropt.backend.OptimizerCallbackResult] computes.
 
         Args:
             variables:        A 1D or 2D array of variable values to evaluate.

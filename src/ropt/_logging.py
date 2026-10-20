@@ -6,6 +6,10 @@ import logging
 
 
 def get_logger(name: str) -> logging.Logger:
-    # Strip the trailing private module component so that logger names only
-    # expose public package names, for example ropt.core._optimizer → ropt.core.
-    return logging.getLogger(name.rsplit("._", 1)[0])
+    # Logger names expose only public-looking names: a trailing private module
+    # is dropped and private packages lose their underscore, for example
+    # ropt._core._optimizer becomes ropt.core.
+    parts = name.split(".")
+    if parts[-1].startswith("_"):
+        parts.pop()
+    return logging.getLogger(".".join(part.removeprefix("_") for part in parts))

@@ -15,10 +15,10 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt import optimize
+from ropt._core._auto_scale import set_auto_scales
 from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.components.event_handlers import CallbackHandler
 from ropt.context import EnOptContext
-from ropt.core._auto_scale import set_auto_scales
 from ropt.enums import EnOptEventType
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.events import EnOptEvent

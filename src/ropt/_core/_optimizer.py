@@ -14,6 +14,7 @@ from ropt._logging import get_logger
 from ropt._native_streams import flush_native_streams
 from ropt._utils import split_constraints
 from ropt.backend import OptimizationProblem
+from ropt.backend._callback import OptimizerCallbackResult
 from ropt.enums import ExitCode
 from ropt.exceptions import (
     OptimizerStop,
@@ -21,8 +22,6 @@ from ropt.exceptions import (
     WorkflowError,
 )
 from ropt.results import FunctionResults, GradientResults
-
-from ._callback import OptimizerCallbackResult
 
 if TYPE_CHECKING:
     from collections.abc import Generator

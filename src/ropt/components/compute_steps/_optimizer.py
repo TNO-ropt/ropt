@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING, Any, override
 
 import numpy as np
 
+from ropt._core import EnsembleEvaluator, EnsembleOptimizer
 from ropt._logging import get_logger
 from ropt._scaling import scale
-from ropt.core import EnsembleEvaluator, EnsembleOptimizer
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import AbortedError, OptimizerStop

@@ -7,9 +7,9 @@ import pytest
 from numpy.random import Generator, default_rng
 
 from ropt import optimize
+from ropt._core._gradient import _perturb_variables
 from ropt.config import SamplerConfig
 from ropt.context import EnOptContext
-from ropt.core._gradient import _perturb_variables
 from ropt.sampler import Sampler
 
 if TYPE_CHECKING:

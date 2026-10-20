@@ -6,15 +6,15 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt._core import EnsembleEvaluator
+from ropt._core._evaluator import (
+    _get_failed_function_realizations,
+    _get_failed_gradient_realizations,
+)
 from ropt.components.compute_steps import EvaluationStep
 from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
-from ropt.core import EnsembleEvaluator
-from ropt.core._evaluator import (
-    _get_failed_function_realizations,
-    _get_failed_gradient_realizations,
-)
 from ropt.results import (
     ConstraintInfo,
     FunctionEvaluations,

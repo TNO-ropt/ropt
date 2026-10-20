@@ -12,9 +12,8 @@ from typing import TYPE_CHECKING, ClassVar, Literal
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from ropt.backend import OptimizationProblem
+    from ropt.backend import OptimizationProblem, OptimizerCallback
     from ropt.config import BackendConfig
-    from ropt.core import OptimizerCallback
     from ropt.plugins import MethodSpec
 
 
@@ -23,7 +22,7 @@ class Backend(ABC):
 
     A backend configures a concrete optimization algorithm, interacts with the
     `ropt` evaluation pipeline through an
-    [`OptimizerCallback`][ropt.core.OptimizerCallback], and executes the main
+    [`OptimizerCallback`][ropt.backend.OptimizerCallback], and executes the main
     optimization loop. See
     [Writing plugins](../advanced/writing_plugins.md).
 
@@ -38,7 +37,7 @@ class Backend(ABC):
     Non-linear constraints arrive **normalized**, as values that are
     non-negative when the constraint is satisfied, so a backend compares them
     against zero and never handles a bound. See
-    [`OptimizerCallbackResult`][ropt.core.OptimizerCallbackResult]. A backend
+    [`OptimizerCallbackResult`][ropt.backend.OptimizerCallbackResult]. A backend
     whose algorithm expects the opposite convention negates the values and
     their gradients.
 

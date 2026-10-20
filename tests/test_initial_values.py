@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 
 from ropt import HistoryHandler, optimize
+from ropt._core import EnsembleEvaluator
 from ropt.context import EnOptContext
-from ropt.core import EnsembleEvaluator
 from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:

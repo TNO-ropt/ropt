@@ -29,7 +29,7 @@ class OptimizationProblem:
     Everything on this object is **scaled** and lives in **free-variable
     space**: the variables that `variables.mask` fixes are gone, the bounds and
     the linear constraints are reduced to the ones that remain, and the values
-    delivered through the [`OptimizerCallback`][ropt.core.OptimizerCallback]
+    delivered through the [`OptimizerCallback`][ropt.backend.OptimizerCallback]
     use the same space. A backend therefore neither scales nor masks anything.
 
     See [`Backend`][ropt.backend.Backend] for the rest of the contract.
@@ -124,7 +124,7 @@ class OptimizationProblem:
         """Which non-linear constraint values are equalities.
 
         One flag per value delivered through the
-        [`OptimizerCallback`][ropt.core.OptimizerCallback]: a constraint with a
+        [`OptimizerCallback`][ropt.backend.OptimizerCallback]: a constraint with a
         finite lower and a finite upper bound delivers two values, an equality
         one, and a constraint with no finite bound none.
 
