@@ -26,9 +26,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike, NDArray
 
-    from ropt._components.concurrency import AbortScope
     from ropt._components.executors import Executor
-    from ropt._evaluation import EvaluationBatchCallback
     from ropt._handlers import EventHandler
     from ropt.results import FunctionResults
 
@@ -107,24 +105,6 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     )
 
 
-def _build_evaluation(  # ruff: ignore[too-many-arguments]
-    executor: Executor | None,
-    config: dict[str, Any],
-    function: EvaluationFunction,
-    *,
-    handlers: Sequence[EventHandler] | None,
-    report: ReportCallback | None,
-    scope: AbortScope,
-) -> tuple[EnOptContext, EvaluationBatchCallback, HistoryHandler, list[EventHandler]]:
-    context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(context, function, executor, scope)
-    # The results are collected by this run's own handler, in the order the
-    # vectors were given, which is the order they are returned in.
-    history = HistoryHandler()
-    ordered = [history, *make_handlers(handlers, report)]
-    return context, evaluator, history, ordered
-
-
 def _run_evaluation(  # ruff: ignore[too-many-arguments]
     session: Session | None,
     executor: Executor | None,
@@ -137,14 +117,12 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     with linked_abort_scope(session) as scope:
-        context, evaluator, history, ordered = _build_evaluation(
-            executor,
-            config,
-            function,
-            handlers=handlers,
-            report=report,
-            scope=scope,
-        )
+        context = EnOptContext.model_validate(config)
+        evaluator = make_evaluator(context, function, executor, scope)
+        # The results are collected by this run's own handler, in the order the
+        # vectors were given, which is the order they are returned in.
+        history = HistoryHandler()
+        ordered = [history, *make_handlers(handlers, report)]
         with scope.as_current():
             run_evaluation(
                 context=context,
