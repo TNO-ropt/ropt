@@ -110,7 +110,7 @@ nav:
       - "Installation": getting_started/installation.md
       - "Quickstart": getting_started/quickstart.md
       - "Ensemble-Based Optimization": getting_started/ensemble.md
-      - "Collecting Results with Handlers": getting_started/handlers.md
+      - "Collecting Results": getting_started/handlers.md
       - "Running in Parallel": getting_started/execution.md
       - "Examples": getting_started/examples.md
   - "Running":

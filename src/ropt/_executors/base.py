@@ -305,9 +305,8 @@ class ExecutorBase(Executor):
 
         `store` takes the index of an item in `items` and its result or an
         [`ExecutorFailure`][ropt._executors.ExecutorFailure].
-        It may raise, which is how a user-code exception reaches
-        the caller: whatever this batch started must be released before that
-        exception leaves.
+        It may raise; when it does, any work started by the batch must be
+        released before the exception is raised in the caller.
 
         An `abort_scope` that aborts must bring this call back promptly, leaving
         the items it did not store for the caller to mark as not run.

@@ -68,3 +68,26 @@ returns an [`OptimizationResult`][ropt.OptimizationResult]. Its `results` field
 holds the best evaluation of the optimization, as a
 [`FunctionResults`][ropt.results.FunctionResults] and is `None` if the
 optimization found nothing valid.
+
+### Positions and labels
+
+`ropt` identifies variables by their positions in the vector. In the example,
+`x, y = variables` assigns Python names to positions 0 and 1; the start point
+and any per-variable configuration values use the same order. When there are
+several objectives or constraints, their values likewise correspond to
+positions in the configuration. The evaluation function returns objectives
+first, then nonlinear constraints.
+
+To label the variables in exported results, add `names` to the configuration
+before calling `optimize`:
+
+```python
+config["names"] = {"variable": ("x", "y")}
+```
+
+These labels do not identify values for the optimizer or change their order.
+They appear in exported DataFrames, including tables made by
+[`DataFrameHandler`][ropt.DataFrameHandler]; without labels, the tables use
+numeric indices. The [`names`](../optimizer_setup/configuration_sections.md#names)
+section also supports labels for objectives, constraints and other result
+dimensions.

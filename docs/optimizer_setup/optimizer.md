@@ -51,6 +51,12 @@ process of its own:
 "backend": {"method": "external/scipy/slsqp"}
 ```
 
+This SciPy example shows the syntax; the built-in SciPy backend does not need
+process isolation. Some backend plugins may need it to run concurrently with
+other optimizations. Starting a child process and passing evaluation requests
+and results between processes adds overhead, so use `external/` when isolation
+is required.
+
 `ropt` spawns a child process, creates the named backend there, and lets it
 drive the optimization. The function and gradient evaluations still happen in
 the original process: the child sends each set of variables back, the parent

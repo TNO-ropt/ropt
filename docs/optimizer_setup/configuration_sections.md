@@ -654,9 +654,12 @@ Fields:
 
 ## `names`
 
-Optional mapping from axis names to tuples of labels. These labels are used to
-produce human-readable multi-index DataFrames when results are exported (see
-[Working with Results](../results/results.md)).
+Optional mapping from dimension names to tuples of labels. The API also calls
+these dimension names axis names. The labels are used to produce multi-index
+DataFrames when results are exported (see
+[Working with Results](../results/results.md)). They do not change the
+positional order of variables, objectives or constraints or how the optimizer
+uses their values.
 
 Each key is an [`AxisName`][ropt.enums.AxisName] value that identifies a
 dimension of the optimization problem:
@@ -670,11 +673,13 @@ dimension of the optimization problem:
 | `"realization"`            | The realizations in the ensemble                     |
 | `"perturbation"`           | The perturbations used for gradient estimation       |
 
-A key may also be the name of a metadata key that carries array values, which
-labels the [user axis](../results/results.md#user-defined-axes) that metadata spans.
+A key may also be the name of a metadata key that carries array values. In that
+case, the labels name the elements of the additional dimension described under
+[user-defined axes](../results/results.md#user-defined-axes).
 
 The corresponding value is a tuple of strings (or integers) whose length must
-match the count of that axis. For example, with 3 variables and 2 objectives:
+match the number of entries in that dimension. For example, with 3 variables
+and 2 objectives:
 
 ```python
 "names": {
@@ -683,6 +688,7 @@ match the count of that axis. For example, with 3 variables and 2 objectives:
 }
 ```
 
-You only need to provide labels for axes you want named — unlabelled axes
-default to integer indices. See [Working with Results](../results/results.md) for how
-these labels appear in exported DataFrames.
+You only need to provide labels for dimensions you want named — unlabelled
+dimensions default to integer indices. See
+[Working with Results](../results/results.md) for how these labels appear in
+exported DataFrames.

@@ -1,13 +1,45 @@
-# Collecting Results with Handlers
+# Collecting Results
 
-So far, [`optimize`][ropt.optimize] returned only the single best result. In
-many cases you want to see every result to watch progress over the optimization
-using a **handler**: an object that observes every result an optimization
-produces.
+## Using a result callback
 
-Multiple handlers can be passed via the `handlers` argument, each receving the
-full result objects, [`FunctionResults`][ropt.results.FunctionResults] and
-[`GradientResults`][ropt.results.GradientResults]. rather than the summary
+Pass a function as `result_callback` to receive results as evaluations finish.
+[`optimize`][ropt.optimize], [`evaluate`][ropt.evaluate], and
+[`evaluate_batch`][ropt.evaluate_batch] accept this parameter. For example,
+append each function result to a list:
+
+```python
+from ropt import optimize
+
+reported = []
+result = optimize(config, x0, objective, result_callback=reported.append)
+```
+
+The callback receives one
+[`FunctionResults`][ropt.results.FunctionResults] at a time. For
+[`optimize`][ropt.optimize], set `report_gradients=True` to also receive
+[`GradientResults`][ropt.results.GradientResults]; in that case, the callback
+must handle both result types.
+
+The callback does not replace or change the value returned by `optimize`,
+which remains the [`OptimizationResult`][ropt.OptimizationResult]. Returning
+`True` from the callback asks `optimize` to stop gracefully. Results later in
+the same batch are not passed to the callback. The return value is ignored by
+`evaluate` and `evaluate_batch`.
+
+Each optimization calls its callback independently. If several optimizations
+run concurrently with the same callback, they can call it at the same time. Use
+a separate callback for each optimization, make shared state thread-safe, or
+use a handler when collecting results across concurrent optimizations.
+
+## Using handlers
+
+An [`optimize`][ropt.optimize] call returns only its single best result. A
+**handler** lets you see every result an optimization produces: it is an object
+that observes the optimization and processes its results as they arrive.
+
+Pass handlers with the `handlers` argument. Each receives the full result
+objects, [`FunctionResults`][ropt.results.FunctionResults] and
+[`GradientResults`][ropt.results.GradientResults], rather than the summary
 `optimize` returns; see [Working with Results](../results/results.md).
 
 For instance, the [`HistoryHandler`][ropt.HistoryHandler] collects all results:
@@ -20,12 +52,8 @@ result = optimize(config, x0, objective, handlers=[history])
 print(len(history.results))   # every evaluation from this optimization
 ```
 
-Compare this with the result callback from
-[Follow the progress](ensemble.md#4-follow-the-progress-optional):
-The result callback is called once per evaluation, for one optimization. A handler is more
-general — it keeps or reacts to results, and, unlike the result callback, the same
-handler can be reused across several **sequential** calls to `optimize`,
-accumulating results from all of them.
+Unlike a result callback, a handler can be reused across several
+**sequential** calls to `optimize`, accumulating results from all of them.
 
 ## Built-in handlers
 

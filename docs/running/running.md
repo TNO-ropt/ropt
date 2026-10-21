@@ -1,12 +1,11 @@
 # Running Optimizations
 
 !!! note
-    This page calls [`optimize`][ropt.optimize] and
-    [`evaluate`][ropt.evaluate] without a pool, so they evaluate one point at a
-    time and return when they have finished. Parallel evaluation, several
-    optimizations at once and aborting from outside need a pool from a
-    [session](sessions.md). Everything this page
-    explains applies there unchanged.
+    This page calls [`optimize`][ropt.optimize] and [`evaluate`][ropt.evaluate]
+    without a evaluation pool, so they evaluate one point at a time and return
+    when they have finished. Parallel evaluation, several optimizations at once
+    and aborting from outside need a pool from a [session](sessions.md).
+    Everything this page explains applies there unchanged.
 
 Everything needed to run an optimization is imported from the `ropt` package
 itself:
@@ -33,14 +32,19 @@ config = {"variables": {"variable_count": 3, "perturbation_magnitudes": 1e-6}}
 def objective(variables, context):
     return float(np.sum((variables - 1.0) ** 2))
 
-result = optimize(config, np.zeros(3), objective)
-if result.results is not None:
-    print(result.results.variables)         # the best variables found
-    print(result.results.target_objective)  # the objective value there
+outcome = optimize(config, np.zeros(3), objective)
+if outcome.results is not None:
+    print(outcome.results.variables)         # the best variables found
+    print(outcome.results.target_objective)  # the objective value there
 ```
 
-That is the basic pattern. The rest of this page explains each part and the
-additional options.
+The start point, the evaluation function's variable vector and per-variable
+configuration arrays use the same positional order. You can add labels in the
+optional `names` section of the config dictionary, but they do not change that
+order; see
+[Positions and labels](../getting_started/quickstart.md#positions-and-labels).
+The rest of this page explains the evaluation function, results and additional
+options.
 
 ## The evaluation function
 
@@ -68,8 +72,9 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
       [gradient](../optimizer_setup/gradients.md).
     - `context.function_id` — the function evaluation number within the batch,
       counted from 0; `-1` for an evaluation at a perturbed point.
-    - `context.batch_id` — the batch number. `ropt` requests evaluations in
-      batches, and each batch in a program gets its own number.
+    - `context.batch_id` — a unique, increasing identifier for the evaluation
+      batch. When multiple optimizations run in the same process, IDs may not
+      start at 0 or be consecutive.
     - `context.row_idx` — the position of the evaluation within its batch,
       counted from 0.
     - `context.metadata` — the `metadata` dict the optimization was started
@@ -86,12 +91,23 @@ There are three ways to return them:
   when you also want to attach `metadata`; it holds `objectives`, `constraints`
   and `metadata` in separate fields.
 
+With several objectives or nonlinear constraints, each value must match its
+position in the corresponding configuration arrays, even if the entries have
+labels in the config's `names` section.
+
 If a realization fails to compute, return `float("nan")` or `numpy.nan` for it.
 `ropt` treats `NaN` as a failed realization and keeps going, as long as enough
 realizations succeed. How many is enough is set by
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations),
 which defaults to *all* of them — so a single `NaN` ends the optimization with
 `TOO_FEW_REALIZATIONS` unless you lower it.
+
+!!! warning
+    Do not return `NaN` when an evaluation fails because of a Python exception,
+    such as one caused by a programming or configuration error. Catching the
+    exception and returning `NaN` would hide the error. Return `NaN` only when
+    the function values cannot be computed, for example because a simulation
+    failed.
 
 ### Running an external program
 
@@ -124,25 +140,25 @@ use is not recommended. See [Running External Programs](programs.md).
 which carries two things:
 
 ```python
-result = optimize(config, x0, objective)
+outcome = optimize(config, x0, objective)
 
-result.exit_code  # why the optimization stopped (an ExitCode)
-result.results    # the best evaluation, or None if none was valid
+outcome.exit_code  # why the optimization stopped (an ExitCode)
+outcome.results    # the best evaluation, or None if none was valid
 ```
 
-`results` is a [`FunctionResults`][ropt.results.FunctionResults], so the best
+`outcome.results` is a [`FunctionResults`][ropt.results.FunctionResults], so the best
 point and its values are read from it at the paths described in [Working with
 Results](../results/results.md):
 
 ```python
-if result.results is not None:
-    result.results.variables             # the best variables
-    result.results.target_objective      # the objective value there
-    result.results.functions.objectives  # the separate objective values
-    result.results.functions.constraints # the nonlinear constraint values
+if outcome.results is not None:
+    outcome.results.variables             # the best variables
+    outcome.results.target_objective      # the objective value there
+    outcome.results.functions.objectives  # the separate objective values
+    outcome.results.functions.constraints # the nonlinear constraint values
 ```
 
-`results` is `None` when the optimization produced no valid result: too few
+`outcome.results` is `None` when the optimization produced no valid result: too few
 realizations
 succeeded, or no result ever satisfied the constraints — see
 [When something goes wrong](#when-something-goes-wrong). One check therefore
@@ -187,11 +203,12 @@ def report(result):
 optimize(config, x0, objective, result_callback=report, report_gradients=True)
 ```
 
-Gradients are generally paired with a function evaluation at the same point. A
-[`GradientResults`][ropt.results.GradientResults] records an ID of that function
-evaluation. The [`uses`][ropt.results.GradientResults.uses] method can be used
-to check if a [`FunctionResults`][ropt.results.FunctionResults] object has the
-same ID.
+A [`GradientResults`][ropt.results.GradientResults] records the ID of the
+function evaluation whose values were used to construct it.
+[`GradientResults.uses`][ropt.results.GradientResults.uses] checks whether a
+[`FunctionResults`][ropt.results.FunctionResults] object has that ID; it does
+not check whether the two results are at the same point. If point equality
+matters, compare their `variables` values separately.
 
 ### Stopping early from the callback
 
@@ -204,21 +221,21 @@ continue.
 from ropt import ExitCode
 
 
-def report(result):
+def stop_if_good_enough(result):
     if result.target_objective is not None and result.target_objective < 1e-6:
         return True  # good enough — stop this optimization
     return None
 
 
-result = optimize(config, x0, objective, result_callback=report)
-assert result.exit_code is ExitCode.STOPPED
+outcome = optimize(config, x0, objective, result_callback=stop_if_good_enough)
+assert outcome.exit_code is ExitCode.STOPPED
 ```
 
 When [running multiple optimizations at once](many_runs.md), this stops only the
 optimization whose callback returned `True`; the others continue. To abort all
-running optimizations in a session, call [`Session.abort`][ropt.Session.abort].
-For its effect when several optimizations run together, see [Aborting from
-outside](many_runs.md#stopping-from-outside).
+optimizations running in the same session, call the session's
+[`abort`][ropt.Session.abort] method. For its effect when several optimizations
+run together, see [Aborting from outside](many_runs.md#stopping-from-outside).
 
 The runnable script is
 [examples/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py),
@@ -236,8 +253,8 @@ sources:
   is one way to tag an optimization:
 
   ```python
-  result = optimize(config, x0, objective, metadata={"id": 7})
-  print(result.results.metadata["id"])   # 7
+  outcome = optimize(config, x0, objective, metadata={"id": 7})
+  print(outcome.results.metadata["id"])   # 7
   ```
 
   The same dict also reaches the evaluation function itself, as
@@ -247,8 +264,9 @@ sources:
 
 - **Per evaluation** — return an
   [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
-  from the evaluation function with a `metadata` field. This value is stored per
-  realization, next to the objective values:
+  from the evaluation function with a `metadata` field. For a function
+  evaluation, this value is stored per realization, next to the objective
+  values:
 
   ```python
   from ropt import EvaluationFunctionResult
@@ -258,31 +276,42 @@ sources:
       residual = variables - x0
       return EvaluationFunctionResult(objectives=value, metadata={"residual": residual})
 
-  result = optimize(config, x0, objective)
-  print(result.results.evaluations.metadata["residual"].shape)  # (3, 3)
+  outcome = optimize(config, x0, objective)
+  print(outcome.results.evaluations.metadata["residual"].shape)  # (3, 3)
   ```
 
-  A key does not have to be set by every realization; those that do not set it
-  get `np.nan` for numeric values and `None` otherwise, so a numeric column with
-  missing realizations is widened to `float64` — numpy has no integer NaN. A
-  key set by every realization keeps its natural dtype, and mixing strings and
+  When the evaluation function is called for perturbed points to estimate a
+  gradient, its metadata is stored per realization and perturbation on
+  `outcome.gradient.evaluations.metadata`, if a gradient result is available.
+
+  A key does not have to be set on every evaluation. Missing entries get
+  `np.nan` for numeric values and `None` otherwise, so a numeric column with
+  missing entries is widened to `float64` — numpy has no integer NaN. A key
+  set on every evaluation keeps its natural dtype, and mixing strings and
   non-strings under one key raises a `ValueError`.
 
-  Returning an array instead of a scalar gives the key its own
-  [user-defined axis](../results/results.md#user-defined-axes), which
-  the `names` section of the configuration can label and which the
-  [`DataFrameHandler`](../results/handlers.md#dataframehandler) spreads over one
-  column per entry.
+  Returning an array instead of a scalar adds a dimension for its elements,
+  named after the metadata key. This is a
+  [user-defined axis](../results/results.md#user-defined-axes). For function
+  evaluations, the metadata array has dimensions for realizations and the
+  metadata elements. For gradient evaluations, it also has a dimension for
+  perturbations. The `names` section of the configuration can label the
+  metadata elements, and the
+  [`DataFrameHandler`](../results/handlers.md#dataframehandler) exports them
+  as columns.
 
-  In the example above, the first axis is the realization; the second is the
-  `residual` user-defined axis. The
+  In the example above, each row corresponds to a realization and each column
+  to an element of `residual`. For metadata returned while evaluating
+  perturbed points, there is also a dimension for perturbations. The
   [`DataFrameHandler`](../results/handlers.md#dataframehandler) example shows
-  how to label and export that axis.
+  how to label and export the metadata elements.
 
 Neither kind is interpreted by `ropt`. Constant metadata ends up on
-`result.results.metadata`; per-evaluation metadata on
-`result.results.evaluations.metadata` (one entry per realization). Both kinds
-can be tabulated as columns by the
+`outcome.results.metadata`. Metadata returned for function evaluations is on
+`outcome.results.evaluations.metadata` (one entry per realization); metadata
+returned for perturbed evaluations is on
+`outcome.gradient.evaluations.metadata` (one entry per realization and
+perturbation). Both kinds can be tabulated as columns by the
 [`DataFrameHandler`](../results/handlers.md#dataframehandler). See [Working with
 Results](../results/results.md#metadata) for how each appears. The full runnable
 script is
@@ -317,7 +346,7 @@ which evaluates a single vector and then a matrix of them.
 ## When something goes wrong
 
 Not every problem is an exception. An optimization that cannot make progress
-still returns normally, and indicates why in `result.exit_code` —
+still returns normally, and indicates why in `outcome.exit_code` —
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value, for
 instance. An optimization that is aborted, for instance because another
 function given to the same `run` call raised, raises
@@ -325,10 +354,10 @@ function given to the same `run` call raised, raises
 [Failures and Aborts](failures.md)).
 
 [Exit Codes](../results/exit_codes.md) lists all exit codes, and explains why a
-reason and a result are independent: `result.results` is `None` when no feasible
-result was ever recorded, whatever the reason the optimization ended, and an
-optimization that stops part-way still returns the best result it had reached
-before that. The evaluations it did make reach the
+reason and a result are independent: `outcome.results` is `None` when no
+feasible result was ever recorded, whatever the reason the optimization ended,
+and an optimization that stops part-way still returns the best result it had
+reached before that. The evaluations it did make reach the
 [handlers](../results/handlers.md) attached to it either way.
 
 What *is* raised falls into three groups:
@@ -380,7 +409,7 @@ exception is raised in the code that made the call.
 ## A note on enums
 
 A few config values and result fields use enumerations.
-[`ExitCode`][ropt.enums.ExitCode], the type of `result.exit_code`, is imported
+[`ExitCode`][ropt.enums.ExitCode], the type of `outcome.exit_code`, is imported
 from `ropt`:
 
 ```python

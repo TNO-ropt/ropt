@@ -57,10 +57,11 @@ objective and one constraint, that is a two-element list:
 --8<-- "examples/constrained.py:objective"
 ```
 
-The order is positional — there are no names — so it must match the order in
-which the objectives and constraints are configured. See
-[Running Optimizations](../running/running.md#the-evaluation-function) for the
-other shapes the return value can take.
+The order is positional, even when optional
+[labels](../getting_started/quickstart.md#positions-and-labels) are configured:
+it must match the order in which the objectives and constraints are configured.
+See [Running Optimizations](../running/running.md#the-evaluation-function) for
+the other shapes the return value can take.
 
 Because the constraint is computed per realization and uses `A[r]`, it is
 *stochastic*: each realization constrains the problem slightly differently, and

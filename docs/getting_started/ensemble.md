@@ -87,10 +87,11 @@ computed.
 --8<-- "examples/ensemble.py:report"
 ```
 
-The callback belongs to one optimization and sees one evaluation at a time. To
-keep the results rather than just look at them — or to collect them across
-several optimizations — use a handler instead; see
-[Collecting Results with Handlers](handlers.md).
+The callback belongs to one optimization and sees one evaluation at a time. See
+[Using a result callback](handlers.md#using-a-result-callback) for what you can
+do with it. To keep the results rather than just look at them — or to collect
+them across several optimizations — use a handler instead; see
+[Using handlers](handlers.md#using-handlers).
 
 ## 5. Run it
 

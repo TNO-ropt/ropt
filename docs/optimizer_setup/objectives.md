@@ -29,9 +29,10 @@ def objectives(variables, context):
     return [cost(variables), risk(variables)]
 ```
 
-The order is positional — there are no names — and if the problem also has
-nonlinear constraints, their values follow the objectives in the same sequence.
-See [Constraints](constraints.md) and
+The order is positional: optional
+[labels](../getting_started/quickstart.md#positions-and-labels) do not select
+objectives. If the problem also has nonlinear constraints, their values follow
+the objectives in the same sequence. See [Constraints](constraints.md) and
 [Running Optimizations](../running/running.md#the-evaluation-function).
 
 Two properties of `weights` matter here:

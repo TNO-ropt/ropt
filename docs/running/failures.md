@@ -7,9 +7,9 @@ result callback or a function given to `run`. Those calls are **nested** in it.
 When a call fails, every call nested in it is aborted, at any depth, and the
 exception is raised in the code that made the call. For `run`, a failure of one
 of its functions is a failure of the whole call, so its other functions are
-aborted too. If no code catches the exception, it leaves the `with` block, and
-the session aborts everything that is still running. Code that catches the
-exception keeps the other calls running.
+aborted too. If an exception raised inside the session's `with` block is not
+caught there, the session aborts everything that is still running. Code that
+catches the exception keeps the other calls running.
 
 !!! note
 
@@ -47,11 +47,11 @@ does any `NaN`, and the other evaluations are not affected. How many failed
 realizations a batch may contain is set by
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations).
 
-Without the `try`, the exception leaves `objective`, and the optimization fails
-with it. `optimize` aborts the calls nested in it, including the `run` calls
-of the other evaluations and their simulations, and then raises the `SimulationError`
-in your script. The exception then leaves the `with` block, and the session
-aborts the rest of its work.
+Without the `try`, `objective` does not catch the exception, and the
+optimization fails. `optimize` aborts the calls nested in it, including the
+`run` calls of the other evaluations and their simulations, and then raises
+the `SimulationError` in your script. If the exception is not caught inside
+the `with` block, the session aborts the rest of its work.
 
 ## Nested calls { #nested-calls }
 
@@ -107,20 +107,20 @@ other functions are aborted, together with the calls nested in them.
 
 An optimization or evaluation that cannot be built because its configuration is
 invalid, or that is given arguments it rejects, such as a vector of the wrong
-shape, raises the exception before it has started anything to abort. Building a pool
-with a session that has closed, or passing one of its pools to a call, raises
-[`WorkflowError`][ropt.exceptions.WorkflowError] and aborts nothing. An
+shape, raises the exception before it has started anything to abort. Trying to
+create a pool using a closed session, or passing one of its pools to a call,
+raises [`WorkflowError`][ropt.exceptions.WorkflowError] and aborts nothing. An
 exception raised by a call that is being aborted is still raised, but aborts
 nothing further.
 
 A `KeyboardInterrupt` or `SystemExit` is not a failure. When one passes through
 a call, the calls nested in it, and for `run` its other functions, are aborted
-with `ABORTED`, and the exception is raised. Other calls in the session are not
-aborted until the exception leaves the session's `with` block.
+with `ABORTED`, and the exception is raised. Other calls in the session keep
+running if the exception is caught inside the session's `with` block.
 
-An exception that leaves the `with` block of a session, whether a failure or a
-`KeyboardInterrupt`, ends the session, which aborts the calls that are still
-running with `ABORTED`.
+If an exception raised inside the session's `with` block is not caught there,
+whether it is a failure or a `KeyboardInterrupt`, the session ends and aborts
+the calls that are still running with `ABORTED`.
 
 ## What an abort does
 

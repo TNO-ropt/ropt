@@ -133,7 +133,7 @@ the loop or function that uses it rather than around the whole program; see
 
 | What you see | Most likely cause |
 | --- | --- |
-| Ctrl-C appears to do nothing | A process-wide signal setting, changed by `polars` when `ropt` imports it. Call [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt]; see [Keyboard Interrupts](keyboard_interrupt.md). |
+| Ctrl-C appears to do nothing | An imported package may have changed a process-wide signal setting; affected `polars` versions do this when installed. Check [Keyboard Interrupts](keyboard_interrupt.md) for how to test and use [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt] if needed. |
 | The program will not exit after Ctrl-C | Evaluations with a thread pool are still running and cannot be interrupted. Check [`aborting`][ropt.aborting] in them, or start their programs with [`run_program`][ropt.run_program]. |
 | Pages of `multiprocessing` tracebacks, ending in `ExecutionError: Could not start worker processes` | The script has no `if __name__ == "__main__":` guard, so every worker re-ran it from the top. |
 | A process pool keeps hundreds of megabytes resident | Each worker is a separate interpreter. Close the session that built the pool when the optimizations that use it are done. |

@@ -1,10 +1,16 @@
 # Keyboard Interrupts
 
-When `polars` is installed, importing `ropt` stops Ctrl-C from breaking into a
-program that is waiting. A program that uses a thread pool or a process pool
-waits for its evaluations, so there Ctrl-C can have no effect at all. Call
-[`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt] at the
-top of every script that uses a pool, after the imports:
+Some imports can change how the program handles Ctrl-C while it waits. The
+`ropt[polars]` extra installs Polars; affected Polars versions change a
+process-wide signal setting on import, and `ropt` loads Polars when it is
+installed. Until the [Polars issue](https://github.com/pola-rs/polars/issues/21739)
+is fixed in a release, installing this extra can trigger the problem when
+`ropt` is imported. This is not a `ropt` pool limitation. Other libraries
+imported by your program may cause the same problem even without Polars.
+Check whether Ctrl-C interrupts your script while it waits for a thread or
+process pool. If it does not, call
+[`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt] after
+the imports:
 
 ```python
 from ropt.utils import restore_keyboard_interrupt
@@ -14,9 +20,9 @@ restore_keyboard_interrupt()
 
 ## The symptom
 
-You press Ctrl-C and nothing happens. Not "it takes a while" — nothing at all,
-however many times you press it. The optimization keeps going, and the only way
-out is to kill the process from another terminal.
+You press Ctrl-C while the program is waiting and it does not respond until
+the wait ends. A wait for evaluations may last indefinitely, so the
+optimization can appear to ignore Ctrl-C.
 
 It affects the *whole* program, not just the optimization:
 anything else that waits stops responding to Ctrl-C too.
@@ -35,17 +41,17 @@ they are imported. Because the flag is process-global, the effect is not
 confined to whoever set it: from that import onwards, Ctrl-C cannot break into
 any wait anywhere in the program.
 
-This is why the symptom is hard to place. Nothing in your code changed, no
-error is reported, and you need not have imported the culprit yourself — a
-package `ropt` imports on your behalf is enough. Importing `ropt` alone
-sets the flag (at the time of writing by way of polars, which `ropt` loads
-whenever it is installed).
+When Polars is installed, a direct `import polars` is not required to trigger
+the issue: `ropt` loads it. Without Polars, check the other packages your
+program imports: any package that sets the flag can cause the same symptom.
 
 ## Where to call it
 
-Call it **after** the imports, because an import is what sets the flag: calling
-this first and importing afterwards leaves you exactly where you started. If you
-import lazily, inside a function, call it after that import instead.
+If Ctrl-C does not interrupt a wait in your program, call the helper **after**
+the imports, because a later import can set the flag again. If you import a
+package lazily, inside a function, call it after that import instead. You can
+also check the behavior without `polars` installed, or after a Polars upgrade;
+the workaround is needed only if an imported package still changes the setting.
 
 ## Why `ropt` does not do this for you
 
