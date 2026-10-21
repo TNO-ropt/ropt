@@ -763,7 +763,7 @@
   <span class="md-ellipsis">
     
   
-    Collecting Results with Handlers
+    Collecting Results
   
 
     
@@ -2705,10 +2705,11 @@ computed.</p>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The callback belongs to one optimization and sees one evaluation at a time. To
-keep the results rather than just look at them — or to collect them across
-several optimizations — use a handler instead; see
-<a href="../handlers/">Collecting Results with Handlers</a>.</p>
+<p>The callback belongs to one optimization and sees one evaluation at a time. See
+<a href="../handlers/#using-a-result-callback">Using a result callback</a> for what you can
+do with it. To keep the results rather than just look at them — or to collect
+them across several optimizations — use a handler instead; see
+<a href="../handlers/#using-handlers">Using handlers</a>.</p>
 <h2 id="5-run-it">5. Run it</h2>
 <p>The call to <code>optimize</code> is the same as for a deterministic problem, with
 <code>INITIAL_VALUES</code> the start point defined above:</p>
@@ -2805,13 +2806,13 @@ objectives, the aggregates, the ensemble weights; see
         
         
           
-          <a href="../handlers/" class="md-footer__link md-footer__link--next" aria-label="Next: Collecting Results with Handlers">
+          <a href="../handlers/" class="md-footer__link md-footer__link--next" aria-label="Next: Collecting Results">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Collecting Results with Handlers
+                Collecting Results
               </div>
             </div>
             <div class="md-footer__button md-icon">

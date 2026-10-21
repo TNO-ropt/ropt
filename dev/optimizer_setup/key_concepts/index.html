@@ -636,7 +636,7 @@
   <span class="md-ellipsis">
     
   
-    Collecting Results with Handlers
+    Collecting Results
   
 
     
@@ -2509,6 +2509,13 @@ optimizer changes to improve the objective. For robust problems the same
 variable vector is evaluated across an ensemble of <strong>realizations</strong>, where each
 realization is one version of the model. A <strong>function evaluation</strong> combines the
 per-realization values into a single objective number.</p>
+<p>Variables, objectives and constraints are identified by their positions in
+vectors and configuration arrays. An optional <code>names</code> section in the config
+dictionary attaches labels to them for reporting, including exported
+DataFrames; the labels do not change how the optimizer uses the values. See
+<a href="../../getting_started/quickstart/#positions-and-labels">Positions and labels</a>
+for an example and the <a href="../configuration_sections/#names"><code>names</code></a> section for
+the available labels.</p>
 <p>Most optimizers also need a <strong>gradient evaluation</strong>. The objective usually
 cannot be differentiated by hand, so <code>ropt</code> estimates it: it evaluates small
 <strong>perturbations</strong> of the variable vector and infers the gradient from the

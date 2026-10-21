@@ -666,6 +666,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#positions-and-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Positions and labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -719,7 +736,7 @@
   <span class="md-ellipsis">
     
   
-    Collecting Results with Handlers
+    Collecting Results
   
 
     
@@ -2491,6 +2508,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="How it works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#positions-and-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Positions and labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2580,6 +2614,22 @@ holds the best evaluation of the optimization, as a
       dataclass
   " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and is <code>None</code> if the
 optimization found nothing valid.</p>
+<h3 id="positions-and-labels">Positions and labels</h3>
+<p><code>ropt</code> identifies variables by their positions in the vector. In the example,
+<code>x, y = variables</code> assigns Python names to positions 0 and 1; the start point
+and any per-variable configuration values use the same order. When there are
+several objectives or constraints, their values likewise correspond to
+positions in the configuration. The evaluation function returns objectives
+first, then nonlinear constraints.</p>
+<p>To label the variables in exported results, add <code>names</code> to the configuration
+before calling <code>optimize</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">config</span><span class="p">[</span><span class="s2">"names"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">)}</span>
+</span></code></pre></div>
+<p>These labels do not identify values for the optimizer or change their order.
+They appear in exported DataFrames, including tables made by
+<a class="autorefs autorefs-internal" title="            ropt.DataFrameHandler" href="../../reference/api/#ropt.DataFrameHandler"><code>DataFrameHandler</code></a>; without labels, the tables use
+numeric indices. The <a href="../../optimizer_setup/configuration_sections/#names"><code>names</code></a>
+section also supports labels for objectives, constraints and other result axes.</p>
 
 
 

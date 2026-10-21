@@ -23,7 +23,7 @@
     
     
       
-        <title>Collecting Results with Handlers - ropt Documentation</title>
+        <title>Collecting Results - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#collecting-results-with-handlers" class="md-skip">
+        <a href="#collecting-results" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Collecting Results with Handlers
+              Collecting Results
             
           </span>
         </div>
@@ -648,7 +648,7 @@
   <span class="md-ellipsis">
     
   
-    Collecting Results with Handlers
+    Collecting Results
   
 
     
@@ -666,7 +666,7 @@
   <span class="md-ellipsis">
     
   
-    Collecting Results with Handlers
+    Collecting Results
   
 
     
@@ -690,6 +690,28 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#using-a-result-callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using a result callback
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using handlers
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#built-in-handlers" class="md-nav__link">
@@ -2439,6 +2461,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#using-a-result-callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using a result callback
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using handlers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#built-in-handlers" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2469,13 +2513,52 @@
   
 
 
-<h1 id="collecting-results-with-handlers">Collecting Results with Handlers</h1>
-<p>So far, <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> returned only the single best result. In
-many cases you want to see every result to watch progress over the optimization
-using a <strong>handler</strong>: an object that observes every result an optimization
-produces.</p>
-<p>Multiple handlers can be passed via the <code>handlers</code> argument, each receving the
-full result objects, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+<h1 id="collecting-results">Collecting Results</h1>
+<h2 id="using-a-result-callback">Using a result callback</h2>
+<p>Pass a function as <code>result_callback</code> to receive results as evaluations finish.
+<a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>, and
+<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> accept this parameter. For example,
+append each function result to a list:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">reported</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">result_callback</span><span class="o">=</span><span class="n">reported</span><span class="o">.</span><span class="n">append</span><span class="p">)</span>
+</span></code></pre></div>
+<p>The callback receives one
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> at a time. For
+<a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, set <code>report_gradients=True</code> to also receive
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a>; in that case, the callback
+must handle both result types.</p>
+<p>The callback does not replace or change the value returned by <code>optimize</code>,
+which remains the <a class="autorefs autorefs-internal" title="            ropt.OptimizationResult
+
+
+  
+      dataclass
+  " href="../../reference/api/#ropt.OptimizationResult"><code>OptimizationResult</code></a>. Returning
+<code>True</code> from the callback asks <code>optimize</code> to stop gracefully. Results later in
+the same batch are not passed to the callback. The return value is ignored by
+<code>evaluate</code> and <code>evaluate_batch</code>.</p>
+<p>Each optimization calls its callback independently. If several optimizations
+run concurrently with the same callback, they can call it at the same time. Use
+a separate callback for each optimization, make shared state thread-safe, or
+use a handler when collecting results across concurrent optimizations.</p>
+<h2 id="using-handlers">Using handlers</h2>
+<p>An <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> call returns only its single best result. A
+<strong>handler</strong> lets you see every result an optimization produces: it is an object
+that observes the optimization and processes its results as they arrive.</p>
+<p>Pass handlers with the <code>handlers</code> argument. Each receives the full result
+objects, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -2486,21 +2569,17 @@ full result objects, <a class="autorefs autorefs-internal" title="            ro
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a>. rather than the summary
+  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a>, rather than the summary
 <code>optimize</code> returns; see <a href="../../results/results/">Working with Results</a>.</p>
 <p>For instance, the <a class="autorefs autorefs-internal" title="            ropt.HistoryHandler" href="../../reference/api/#ropt.HistoryHandler"><code>HistoryHandler</code></a> collects all results:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">))</span>   <span class="c1"># every evaluation from this optimization</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">))</span>   <span class="c1"># every evaluation from this optimization</span>
 </span></code></pre></div>
-<p>Compare this with the result callback from
-<a href="../ensemble/#4-follow-the-progress-optional">Follow the progress</a>:
-The result callback is called once per evaluation, for one optimization. A handler is more
-general — it keeps or reacts to results, and, unlike the result callback, the same
-handler can be reused across several <strong>sequential</strong> calls to <code>optimize</code>,
-accumulating results from all of them.</p>
+<p>Unlike a result callback, a handler can be reused across several
+<strong>sequential</strong> calls to <code>optimize</code>, accumulating results from all of them.</p>
 <h2 id="built-in-handlers">Built-in handlers</h2>
 <p><code>ropt</code> ships a few ready-to-use handlers, all imported from <code>ropt</code>:</p>
 <ul>

@@ -636,7 +636,7 @@
   <span class="md-ellipsis">
     
   
-    Collecting Results with Handlers
+    Collecting Results
   
 
     
@@ -2556,9 +2556,10 @@ single number, in the order the weights declare them:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">objectives</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">cost</span><span class="p">(</span><span class="n">variables</span><span class="p">),</span> <span class="n">risk</span><span class="p">(</span><span class="n">variables</span><span class="p">)]</span>
 </span></code></pre></div>
-<p>The order is positional — there are no names — and if the problem also has
-nonlinear constraints, their values follow the objectives in the same sequence.
-See <a href="../constraints/">Constraints</a> and
+<p>The order is positional: optional
+<a href="../../getting_started/quickstart/#positions-and-labels">labels</a> do not select
+objectives. If the problem also has nonlinear constraints, their values follow
+the objectives in the same sequence. See <a href="../constraints/">Constraints</a> and
 <a href="../../running/running/#the-evaluation-function">Running Optimizations</a>.</p>
 <p>Two properties of <code>weights</code> matter here:</p>
 <ul>

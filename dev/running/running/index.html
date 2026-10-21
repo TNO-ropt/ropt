@@ -636,7 +636,7 @@
   <span class="md-ellipsis">
     
   
-    Collecting Results with Handlers
+    Collecting Results
   
 
     
@@ -2694,12 +2694,11 @@
 <h1 id="running-optimizations">Running Optimizations</h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This page calls <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> and
-<a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> without a pool, so they evaluate one point at a
-time and return when they have finished. Parallel evaluation, several
-optimizations at once and aborting from outside need a pool from a
-<a href="../sessions/">session</a>. Everything this page
-explains applies there unchanged.</p>
+<p>This page calls <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> and <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>
+without a evaluation pool, so they evaluate one point at a time and return
+when they have finished. Parallel evaluation, several optimizations at once
+and aborting from outside need a pool from a <a href="../sessions/">session</a>.
+Everything this page explains applies there unchanged.</p>
 </div>
 <p>Everything needed to run an optimization is imported from the <code>ropt</code> package
 itself:</p>
@@ -2727,8 +2726,13 @@ itself:</p>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>         <span class="c1"># the best variables found</span>
 </span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>  <span class="c1"># the objective value there</span>
 </span></code></pre></div>
-<p>That is the basic pattern. The rest of this page explains each part and the
-additional options.</p>
+<p>The start point, the evaluation function's variable vector and per-variable
+configuration arrays use the same positional order. You can add labels in the
+optional <code>names</code> section of the config dictionary, but they do not change that
+order; see
+<a href="../../getting_started/quickstart/#positions-and-labels">Positions and labels</a>.
+The rest of this page explains the evaluation function, results and additional
+options.</p>
 <h2 id="the-evaluation-function">The evaluation function</h2>
 <p>The evaluation function is a Python function with two arguments:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationFunctionContext</span>
@@ -2782,6 +2786,9 @@ There are three ways to return them:</p>
   when you also want to attach <code>metadata</code>; it holds <code>objectives</code>, <code>constraints</code>
   and <code>metadata</code> in separate fields.</li>
 </ul>
+<p>With several objectives or nonlinear constraints, each value must match its
+position in the corresponding configuration arrays, even if those axes have
+labels in the config's <code>names</code> section.</p>
 <p>If a realization fails to compute, return <code>float("nan")</code> or <code>numpy.nan</code> for it.
 <code>ropt</code> treats <code>NaN</code> as a failed realization and keeps going, as long as enough
 realizations succeed. How many is enough is set by
