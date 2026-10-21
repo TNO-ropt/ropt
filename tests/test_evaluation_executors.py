@@ -31,7 +31,6 @@ import numpy as np
 import pytest
 
 from ropt import run, session
-from ropt._components.compute_steps import run_optimization
 from ropt._components.concurrency import AbortScope, _program, current_abort_scope
 from ropt._components.evaluators import (
     EvaluationFunctionCallback,
@@ -63,6 +62,7 @@ from ropt._components.executors._process_executor import (
     _stop_workers,
 )
 from ropt._handlers import EventHandler, ResultsHandler
+from ropt._running._run_optimizer import run_optimization
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode

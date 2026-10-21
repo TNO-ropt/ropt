@@ -99,7 +99,7 @@ def test_logger_names_identify_source(caplog: pytest.LogCaptureFixture) -> None:
     with caplog.at_level(logging.INFO, logger="ropt"):
         optimize(_CONFIG, _INITIAL, _objective)
     names = {r.name for r in caplog.records}
-    assert "ropt.components.compute_steps" in names
+    assert "ropt.running" in names
     assert "ropt.core" in names
 
 

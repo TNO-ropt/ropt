@@ -12,9 +12,9 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt._components.compute_steps import run_optimization
 from ropt._evaluation import EvaluationBatchResult
 from ropt._handlers import CallbackHandler, ResultsHandler
+from ropt._running._run_optimizer import run_optimization
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 

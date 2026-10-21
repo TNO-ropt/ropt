@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ropt._components.compute_steps import run_evaluation
 from ropt._handlers import HistoryHandler
 from ropt.context import EnOptContext
 
@@ -19,6 +18,7 @@ from ._evaluator import make_evaluator
 from ._handlers import make_handlers
 from ._linked_abort_scope import linked_abort_scope
 from ._result import EvaluationResult
+from ._run_evaluator import run_evaluation
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

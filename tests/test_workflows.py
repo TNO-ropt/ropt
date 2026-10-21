@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any, cast, override
 import numpy as np
 import pytest
 
-from ropt._components.compute_steps import run_evaluation, run_optimization
 from ropt._components.concurrency import AbortScope, current_abort_scope
 from ropt._components.evaluators import (
     EvaluationFunctionContext,
@@ -24,6 +23,8 @@ from ropt._handlers import (
     HistoryHandler,
     ResultsHandler,
 )
+from ropt._running._run_evaluator import run_evaluation
+from ropt._running._run_optimizer import run_optimization
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import AbortedError, OptimizerStop, WorkflowError

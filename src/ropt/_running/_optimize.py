@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ropt._components.compute_steps import run_optimization
 from ropt._handlers import ResultsHandler
 from ropt.context import EnOptContext
 
@@ -19,6 +18,7 @@ from ._evaluator import make_evaluator
 from ._handlers import make_handlers
 from ._linked_abort_scope import linked_abort_scope
 from ._result import OptimizationResult
+from ._run_optimizer import run_optimization
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
