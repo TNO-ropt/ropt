@@ -3209,8 +3209,10 @@ to them differs:</p>
 </tr>
 </tbody>
 </table>
-<p>The optimization raises at once and does not wait for them. When the session
-closes, it waits up to five seconds for its pools to become idle.</p>
+<p>With a pool, the optimization raises without waiting for running evaluations.
+Without a pool, it raises after the current evaluation returns, including when
+the abort arrived during the last evaluation. When the session closes, it
+waits up to five seconds for its pools to become idle.</p>
 <p><strong>A thread cannot be killed.</strong> Python provides no way to stop a running thread
 from outside. An evaluation with a thread pool stops early only if it checks
 <code>aborting</code>, or if the program it waits for was started with <code>run_program</code>.
