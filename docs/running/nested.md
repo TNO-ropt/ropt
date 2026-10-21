@@ -193,11 +193,28 @@ for the outer evaluations that were computed, not for every outer evaluation.
 
 The inner optimizations are concurrent, and [one
 handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) collects them
-all: it takes a lock around every event it handles, so the optimizations wait for
-each other rather than interleaving. Give every inner optimization the same
+all: it takes a lock around every event it handles, so two optimizations never
+write the same event at the same time. Give every inner optimization the same
 [`DataFrameHandler`](../results/handlers.md#dataframehandler) and every inner evaluation
 from every inner optimization lands in one table, keyed by the outer evaluation it
 belongs to.
+
+The rows of one event stay together, but the events of overlapping inner
+optimizations arrive in thread order, so their rows interleave and the order
+differs from run to run. The outer batches do not overlap: an outer batch
+finishes before the next one starts. Sorting on the two keys groups the rows by
+inner optimization:
+
+```python
+--8<-- "examples/nested_optimization.py:sort"
+```
+
+The pair of keys identifies one inner optimization, because the row index starts
+again in every outer batch. `maintain_order=True` makes the sort stable, so the
+rows of one inner optimization keep the order in which they arrived, which is
+the order of its batches. Without it, polars may reorder rows with equal keys.
+Calculations that do not use the row order, such as finding the best objective,
+do not need the sort.
 
 Reading the answer takes one more step than usual:
 

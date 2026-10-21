@@ -12,12 +12,14 @@ The inner optimizations all feed one `DataFrameHandler`. They overlap, which the
 handler allows: `handle_event` serializes its own calls, so a second
 optimization waits for the first. Each inner optimization tags its results with
 the outer evaluation that started it, so every row in the frame can be traced
-back.
+back. The rows of overlapping inner optimizations arrive interleaved, in an
+order that differs from run to run, so the frame is sorted by those tags.
 
 The outer optimizer works on integer variables and revisits points it has
 already tried. The outer evaluation function keeps a memo of the objectives it
-has computed, so a repeat returns the stored value instead of running another
-inner optimization.
+has computed, so a repeat from a later batch returns the stored value instead of
+running another inner optimization. Two evaluations of the same point in one
+batch can both miss the memo, and then both run an inner optimization.
 """
 
 from functools import partial
@@ -193,8 +195,9 @@ def main() -> None:
         )
     # --8<-- [end:run]
 
-    frame = tables["inner"]
-    assert frame is not None
+    # --8<-- [start:sort]
+    frame = tables["inner"].sort(["Outer-batch", "Outer-eval"], maintain_order=True)
+    # --8<-- [end:sort]
     print(frame)
 
     # The optimum has to be read from the shared frame rather than from the
