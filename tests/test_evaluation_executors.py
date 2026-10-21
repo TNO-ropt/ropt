@@ -23,7 +23,6 @@ from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 from multiprocessing.connection import Client, Listener
 from multiprocessing.sharedctypes import RawArray
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast, override
 from uuid import UUID, uuid4
 
@@ -69,6 +68,7 @@ from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Sequence
+    from pathlib import Path
 
     from numpy.typing import NDArray
 
@@ -299,14 +299,6 @@ def test_thread_executor_runs_work_with_its_abort_scope_as_current(
     assert values == [abort_scope]
 
 
-def _teardown_threads() -> set[threading.Thread]:
-    return {
-        thread
-        for thread in threading.enumerate()
-        if thread.name == "ropt-local-teardown"
-    }
-
-
 def test_dropping_a_local_executor_removes_its_temporary_directory() -> None:
     # `__del__` must not be reachable from anything the executor keeps alive, so
     # what this checks is that dropping the last reference is enough to run it.
@@ -332,16 +324,26 @@ def test_dropping_a_local_executor_keeps_a_directory_it_was_given(
     assert tmp_path.is_dir()
 
 
-def test_local_executor_rejecting_an_argument_leaves_no_thread_or_directory() -> None:
+def test_local_executor_rejecting_an_argument_leaves_no_thread_or_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # The teardown thread starts only after the base has accepted every
     # argument, and the temporary directory goes if the base rejects one.
-    temp_root = Path(tempfile.gettempdir())
-    directories = set(temp_root.glob("ropt-local-*"))
-    threads = _teardown_threads()
+    make_directory = tempfile.mkdtemp
+    monkeypatch.setattr(tempfile, "mkdtemp", partial(make_directory, dir=tmp_path))
+    started_threads: list[threading.Thread] = []
+    start_thread = threading.Thread.start
+
+    def track_start(thread: threading.Thread) -> None:
+        if thread.name == "ropt-local-teardown":
+            started_threads.append(thread)
+        start_thread(thread)
+
+    monkeypatch.setattr(threading.Thread, "start", track_start)
     with pytest.raises(ValueError, match="at least one"):
         LocalJobExecutor(workers=0)
-    assert set(temp_root.glob("ropt-local-*")) == directories
-    assert _teardown_threads() == threads
+    assert not list(tmp_path.iterdir())
+    assert not started_threads
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
