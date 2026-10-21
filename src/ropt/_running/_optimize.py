@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from ropt.results import FunctionResults, GradientResults
 
     from ._function import EvaluationFunction
-    from ._report import ReportCallback
+    from ._result_callback import ResultCallback
     from ._session import Session
 
 
@@ -43,7 +43,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     function: EvaluationFunction,
     *,
     handlers: Sequence[EventHandler] | None,
-    report: ReportCallback | None,
+    result_callback: ResultCallback | None,
     constraint_tolerance: float,
     metadata: dict[str, Any] | None,
     f0: FunctionResults | None = None,
@@ -58,7 +58,9 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
         ordered = [
             result_handler,
-            *make_handlers(handlers, report, report_gradients=report_gradients),
+            *make_handlers(
+                handlers, result_callback, report_gradients=report_gradients
+            ),
         ]
         with scope.as_current():
             exit_code = run_optimization(

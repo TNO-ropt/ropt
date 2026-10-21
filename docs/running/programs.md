@@ -108,7 +108,7 @@ In each case the program and every program it started receive `SIGTERM`, and
 those still running five seconds later receive `SIGKILL`.
 
 `run_program` behaves the same wherever it is called: in an evaluation function,
-an event handler, a report callback, a function given to
+an event handler, a result callback, a function given to
 [`run`][ropt.run], with every pool, or in your own code outside any
 optimization. Only the ways in which the caller can be stopped differ.
 [`Session.abort`][ropt.Session.abort] reaches code in the session's `with`

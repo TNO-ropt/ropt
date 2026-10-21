@@ -104,7 +104,7 @@ def main(*, queue: str | None = None, workdir: Path | None = None) -> None:
             INITIAL_VALUES,
             rosenbrock,
             pool=pool,
-            report=report,
+            result_callback=report,
         )
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")

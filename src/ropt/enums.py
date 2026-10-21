@@ -141,7 +141,7 @@ class ExitCode(IntEnum):
     """Returned when an event handler asked the optimization to stop.
 
     A graceful end at an evaluation boundary, on a criterion the caller
-    supplied. A `report` callback is such a handler.
+    supplied. A result callback is such a handler.
     """
 
     FINISHED = 5

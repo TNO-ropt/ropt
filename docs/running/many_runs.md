@@ -20,7 +20,7 @@ with session() as s:
 ```
 
 Each callable is an ordinary `optimize` call, so every optimization can have its
-own configuration, initial values, objective, `metadata` and `report` callback.
+own configuration, initial values, objective, `metadata` and result callback.
 
 The optimizations need a pool of their own, `runner` here, separate from the
 pool they evaluate with. A call made from work running with a pool cannot use
@@ -78,12 +78,12 @@ its own metadata:
 
 ## Watching optimizations that overlap
 
-`report=` belongs to one `optimize` call: give each optimization its own
+`result_callback=` belongs to one `optimize` call: give each optimization its own
 callback, or the same one to all of them. `handlers=` takes handlers that
 several optimizations may feed together — see [Sharing a handler across
 concurrent optimizations](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
-!!! warning "A shared `report=` callback is called by every optimization at once"
+!!! warning "A shared result callback is called by every optimization at once"
     Each optimization calls its callback on its own thread. Nothing serializes
     those calls, so a callback that appends to a list, updates a counter, or
     writes a file needs a lock of its own. Give each optimization its own
@@ -160,7 +160,7 @@ code means.
 
 ## Aborting from outside { #stopping-from-outside }
 
-The `report` callback runs inside the optimization it stops, which is no use to
+The result callback runs inside the optimization it stops, which is no use to
 a signal handler or a user interface. [`Session.abort`][ropt.Session.abort] is
 the one that is called from another thread: it aborts every call given one of
 the session's pools or made in its `with` block, and each raises
@@ -177,11 +177,11 @@ with session() as s:
 ```
 
 The two are not the same kind of ending, which is why they have different exit
-codes. A `report` callback stops the optimization *on a criterion*, at a point it
+codes. A result callback stops the optimization *on a criterion*, at a point it
 chose, and the optimization returns the best result it had reached. An abort
 applies no criterion, and the optimization returns no result. To keep what an
 aborted optimization had reached, collect its results as they arrive, with a
-`report` callback or a [handler](../results/handlers.md).
+result callback or a [handler](../results/handlers.md).
 
 An aborted optimization does not wait for the evaluations that are running.
 With no pool, the optimization runs the evaluation function itself, so the

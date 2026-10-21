@@ -3,7 +3,7 @@
 A call to [`optimize`][ropt.optimize], [`evaluate`][ropt.evaluate],
 [`evaluate_batch`][ropt.evaluate_batch] or [`run`][ropt.run], with or without a
 pool, can start further calls from inside its own work: from an evaluation function, an event handler, a
-report callback or a function given to `run`. Those calls are **nested** in it.
+result callback or a function given to `run`. Those calls are **nested** in it.
 When a call fails, every call nested in it is aborted, at any depth, and the
 exception is raised in the code that made the call. For `run`, a failure of one
 of its functions is a failure of the whole call, so its other functions are
@@ -57,7 +57,7 @@ aborts the rest of its work.
 
 A call to `optimize`, `evaluate`, `evaluate_batch` or `run` is **nested** in
 another such call when it is made, in the same process, from the work of that
-other call: from its evaluation function, event handlers or report callback,
+other call: from its evaluation function, event handlers or result callback,
 or from a function given to it if it is a `run` call. The outer call is its
 **parent**. This holds with or without a pool.
 
@@ -85,7 +85,7 @@ made from your script.
 
 `optimize`, `evaluate`, `evaluate_batch` and `run` raise the exception of a
 failure in the code that called them. For a nested call, that is the
-evaluation function, event handler, report callback or function given to `run`
+evaluation function, event handler, result callback or function given to `run`
 from which it was made. That code can catch the exception. If it does not, the
 call that the code belongs to fails in turn, and the same rules apply to that
 call.
@@ -169,7 +169,7 @@ that your own code raises, as the example above does.
 Work that is left running after its call was aborted runs to its end, unless it
 stops by itself or, with a process pool, its worker is killed five seconds later.
 Call [`aborting`][ropt.aborting] in long-running code — an
-evaluation function, an event handler, a report callback, or a function given to
+evaluation function, an event handler, a result callback, or a function given to
 `run` — to find out whether the call that runs it is being aborted:
 
 ```python

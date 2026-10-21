@@ -146,7 +146,7 @@ the loop or function that uses it rather than around the whole program; see
 
 **Optimizations started together really do run at once.** A handler given to all
 of them takes a lock around every event it handles, so it collects them safely,
-but a single `report=` callback does not: it is called by several threads at the
+but a single result callback does not: it is called by several threads at the
 same time. Keep such a callback free of shared state, or give each optimization
 its own.
 
@@ -169,7 +169,7 @@ a time.
 
 | What you see | Most likely cause |
 | --- | --- |
-| Results from a shared `report=` callback are jumbled or lost | The callback is called from the thread of every optimization at once. Collect the results in a [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) instead, or use one callback per optimization. |
+| Results from a shared result callback are jumbled or lost | The callback is called from the thread of every optimization at once. Collect the results in a [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) instead, or use one callback per optimization. |
 | An optimization started from a handler raises `WorkflowError` about the call stack, or hangs | Its handler list reaches a handler that is already running; see [Result Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs). |
 | Several optimizations are slower than expected while the workers sit idle | A shared handler is serializing them. Make it cheaper. |
 | A second concurrent optimization raises `WorkflowError` about output capture | Only one optimization at a time may set `stdout` or `stderr`; see [Running Multiple Optimizations](../running/many_runs.md). |

@@ -159,7 +159,9 @@ def test_failed_realizations(config: Any, eval_func: Any, external: str) -> None
     config["backend"]["method"] = f"{external}{_SLSQP}"
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    result = optimize(config, initial_values, eval_func(functions), report=_observer)
+    result = optimize(
+        config, initial_values, eval_func(functions), result_callback=_observer
+    )
     assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
@@ -179,7 +181,7 @@ def test_failed_realizations_constraints(
         config,
         initial_values,
         eval_func(test_functions, [lambda _0, _1: np.nan]),
-        report=_observer,
+        result_callback=_observer,
     )
     assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
 

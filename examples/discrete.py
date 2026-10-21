@@ -80,7 +80,7 @@ def main(*, linear: bool = False) -> None:
 
     # --8<-- [end:objective]
 
-    result = optimize(config, INITIAL_VALUES, function, report=report)
+    result = optimize(config, INITIAL_VALUES, function, result_callback=report)
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     print(f"optimal objective: {result.results.target_objective}")

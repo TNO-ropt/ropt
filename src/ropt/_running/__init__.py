@@ -9,15 +9,15 @@ from __future__ import annotations
 from ._function import EvaluationFunction
 from ._functions import evaluate, evaluate_batch, optimize, run
 from ._pool import WorkerPool
-from ._report import ReportCallback
 from ._result import EvaluationResult, OptimizationResult
+from ._result_callback import ResultCallback
 from ._session import Session, session
 
 __all__ = [
     "EvaluationFunction",
     "EvaluationResult",
     "OptimizationResult",
-    "ReportCallback",
+    "ResultCallback",
     "Session",
     "WorkerPool",
     "evaluate",

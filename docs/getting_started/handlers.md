@@ -20,10 +20,10 @@ result = optimize(config, x0, objective, handlers=[history])
 print(len(history.results))   # every evaluation from this optimization
 ```
 
-Compare this with the `report` callback from
+Compare this with the result callback from
 [Follow the progress](ensemble.md#4-follow-the-progress-optional):
-`report` is called once per evaluation, for one optimization. A handler is more
-general — it keeps or reacts to results, and, unlike `report`, the same
+The result callback is called once per evaluation, for one optimization. A handler is more
+general — it keeps or reacts to results, and, unlike the result callback, the same
 handler can be reused across several **sequential** calls to `optimize`,
 accumulating results from all of them.
 

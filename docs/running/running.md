@@ -150,7 +150,7 @@ covers every field.
 
 ## Reporting progress
 
-Pass a `report` callback to track the optimization as it runs. It is called once
+Pass a result callback to track the optimization as it runs. It is called once
 for every function evaluation, with the
 [`FunctionResults`][ropt.results.FunctionResults] of that evaluation:
 
@@ -159,7 +159,7 @@ def report(result):
     print(result.variables, result.target_objective)
 
 
-optimize(config, x0, objective, report=report)
+optimize(config, x0, objective, result_callback=report)
 ```
 
 To store results rather than print them, pass a **handler** with the `handlers`
@@ -184,7 +184,7 @@ def report(result):
         print("gradient", result.target_gradient)
 
 
-optimize(config, x0, objective, report=report, report_gradients=True)
+optimize(config, x0, objective, result_callback=report, report_gradients=True)
 ```
 
 Gradients are generally paired with a function evaluation at the same point. A
@@ -195,7 +195,7 @@ same ID.
 
 ### Stopping early from the callback
 
-The `report` callback doubles as a **user-defined stopping criterion**: return
+The result callback doubles as a **user-defined stopping criterion**: return
 `True` and the optimization stops gracefully after the current evaluation, with
 exit code `STOPPED`. Any other return value (including `None`) lets it
 continue.
@@ -210,7 +210,7 @@ def report(result):
     return None
 
 
-result = optimize(config, x0, objective, report=report)
+result = optimize(config, x0, objective, result_callback=report)
 assert result.exit_code is ExitCode.STOPPED
 ```
 

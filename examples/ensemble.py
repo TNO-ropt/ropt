@@ -4,7 +4,7 @@ An *ensemble* optimization minimizes the mean objective over a set of
 realizations with uncertain parameters. Compared to a deterministic optimization,
 the config gains a `realizations` section, and the per-realization objective uses
 `context.realization` to return the value for its own realization. A
-`report` callback prints each evaluation as it lands.
+result callback prints each evaluation as it lands.
 """
 
 from typing import Any
@@ -79,7 +79,7 @@ def report(result: FunctionResults) -> None:
 def main() -> None:
     """Run the ensemble optimization and check the result."""
     # --8<-- [start:run]
-    result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, report=report)
+    result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, result_callback=report)
     # --8<-- [end:run]
     # --8<-- [start:result]
     print(f"exit code:         {result.exit_code.message}")

@@ -42,7 +42,7 @@ optimize(
     config(FULL_REALIZATIONS),
     first.results.variables,
     rosenbrock,
-    report=reported.append,
+    result_callback=reported.append,
     f0=first.results,
     g0=first.gradient,
 )

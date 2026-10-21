@@ -1,6 +1,6 @@
-"""Progress reporting for an optimization or evaluation.
+"""Result callbacks for an optimization or evaluation.
 
-A report callback is the small counterpart of a result handler: it is wired up
+A result callback is the small counterpart of a result handler: it is wired up
 as an ordinary handler, but as one belonging to a single call, which is why it
 is given per call even where `handlers=` only takes shared groups.
 """
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from ropt.events import EnOptEvent
 
 
-ReportCallback = Callable[[FunctionResults], bool | None]
+ResultCallback = Callable[[FunctionResults], bool | None]
 """Called with each function evaluation; returning `True` stops the optimization.
 
 Results later in the same batch are not passed on.
@@ -31,14 +31,19 @@ widens its own annotation.
 """
 
 
-def make_report_handler(report: ReportCallback, *, gradients: bool) -> EventHandler:
+def make_result_callback_handler(
+    result_callback: ResultCallback, *, gradients: bool
+) -> EventHandler:
     def _callback(event: EnOptEvent) -> None:
         for item in event.results or ():
             if not gradients and not isinstance(item, FunctionResults):
                 continue
             # `gradients` widens what is passed beyond what the alias describes,
             # which no single signature can express.
-            if report(cast("FunctionResults", item)) and event.stop is not None:
+            if (
+                result_callback(cast("FunctionResults", item))
+                and event.stop is not None
+            ):
                 # A truthy return asks the emitting run to stop; the break is
                 # what makes reporting end there rather than run out the batch.
                 event.stop()

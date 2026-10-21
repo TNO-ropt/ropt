@@ -5,7 +5,7 @@ function. A single objective callback returns the
 objective **and** the constraint (objectives first, then constraints); the
 config declares the constraint bounds under `nonlinear_constraints`, and
 `constraint_tolerance` sets when a constraint counts as satisfied. A
-`report` callback flags any evaluation that violates the constraint. Pass
+result callback flags any evaluation that violates the constraint. Pass
 `--linear` to additionally impose a deterministic linear equality constraint
 (declared in the config rather than returned by the objective).
 """
@@ -109,7 +109,11 @@ def main(*, linear: bool = False) -> None:
         # --8<-- [end:linear]
     # --8<-- [start:run]
     result = optimize(
-        config, INITIAL_VALUES, rosenbrock, report=report, constraint_tolerance=1e-6
+        config,
+        INITIAL_VALUES,
+        rosenbrock,
+        result_callback=report,
+        constraint_tolerance=1e-6,
     )
     # --8<-- [end:run]
     assert result.results is not None

@@ -3,7 +3,7 @@
 Each call to `optimize` starts a fresh optimization, so restarting from the
 previous best point is just a loop: feed the returned `result.results.variables`
 back in as the next start point. The results at that point are passed back as
-`f0` and `g0`, so the new optimization does not evaluate it again. A `report`
+`f0` and `g0`, so the new optimization does not evaluate it again. A result
 callback appending to one list collects every evaluation from every restart, not
 just the final one.
 """
@@ -54,7 +54,9 @@ def main() -> None:
     f0: FunctionResults | None = None
     g0: GradientResults | None = None
     for _ in range(RESTARTS):
-        result = optimize(CONFIG, x0, rosenbrock, report=reported.append, f0=f0, g0=g0)
+        result = optimize(
+            CONFIG, x0, rosenbrock, result_callback=reported.append, f0=f0, g0=g0
+        )
         assert result.results is not None
         x0 = result.results.variables
         f0, g0 = result.results, result.gradient

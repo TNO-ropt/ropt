@@ -3,7 +3,7 @@
 Two of the four variables are continuous and two are discrete (integer-valued),
 so the problem is solved with a gradient-free *differential evolution* backend
 selected in the config. Discreteness is declared through `variables.types`;
-everything else is the same ensemble Rosenbrock setup. A `report` callback
+everything else is the same ensemble Rosenbrock setup. A result callback
 prints each evaluation as the search proceeds.
 """
 
@@ -78,7 +78,7 @@ def report(result: FunctionResults) -> None:
 
 def main() -> None:
     """Run the mixed-integer optimization and check the result."""
-    result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, report=report)
+    result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, result_callback=report)
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     print(f"optimal objective: {result.results.target_objective}")

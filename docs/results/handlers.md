@@ -8,15 +8,15 @@ them, tabulating them, or invoking a callback.
 A handler is given [`Results`][ropt.results.Results] objects —
 [`FunctionResults`][ropt.results.FunctionResults] and
 [`GradientResults`][ropt.results.GradientResults] — which is what every other part of
-`ropt` provides too: a `report` callback receives one per evaluation, and
+`ropt` provides too: a result callback receives one per evaluation, and
 `optimize` puts the best one on the `results` field of what it returns.
 Everything an optimization or evaluation produces is in them, at the field paths
 described in
 [Working with Results](results.md), which is the vocabulary the handlers below
 are configured in.
 
-The [`report`](../running/running.md#reporting-progress) callback you may already be using
-is only shorthand for this: `report=` builds a handler for you behind the
+The [result callback](../running/running.md#reporting-progress) is shorthand
+for a handler: `result_callback=` builds one for you behind the
 scenes, added to the optimization it is given to. One is built per optimization,
 each with a lock of its own, so the same callback given to optimizations that
 execute concurrently can be entered from several threads at once. A handler
@@ -467,7 +467,7 @@ Other methods:
 
 ## Writing your own handler
 
-The built-in handlers above, and the `report` callback, cover the results an
+The built-in handlers above, and the result callback, cover the results an
 optimization produces. A handler of your own is for everything else: reacting to
 the start or the end of an optimization, writing results out in a format of your
 own, or keeping a summary that none of the built-ins keeps.
@@ -542,7 +542,7 @@ write once the optimizations have finished.
     and evaluations feeding it have returned. That return is what makes the latest values visible. Reading
     it while one is still feeding the handler on another thread gives a valid
     but possibly stale value. To follow an optimization as it goes, use the
-    handler's own `_handle_event`, or a `report` callback, rather than polling
+    handler's own `_handle_event`, or a result callback, rather than polling
     another handler's state.
 
 ## Handlers and separate processes

@@ -26,7 +26,7 @@ str(code)     # '2'
 
 An optimization either **stops** or is **aborted**. It stops when a condition on
 the optimization is met — the optimizer converged, a budget ran out, a
-[`report` callback](../running/running.md#stopping-early-from-the-callback)
+[result callback](../running/running.md#stopping-early-from-the-callback)
 returned `True` — so it ends at a point that satisfied a stated criterion, and
 returns its result with the code. It is aborted when something ends it
 regardless of its state, and it then raises
@@ -47,7 +47,7 @@ except AbortedError as error:
 | `FINISHED`              | The optimizer ended the optimization, by converging or on a limit of its own such as `max_iterations`. |
 | `MAX_FUNCTIONS_REACHED` | The configured maximum number of function evaluations was reached.                                   |
 | `MAX_BATCHES_REACHED`   | The configured maximum number of evaluation batches was reached.                                     |
-| `STOPPED`               | A `report` callback returned `True`, ending the optimization at the next evaluation boundary.        |
+| `STOPPED`               | A result callback returned `True`, ending the optimization at the next evaluation boundary.        |
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
 | `ABORTED`               | The call was aborted from outside, as closing a session, or a `KeyboardInterrupt`, does to a call still under way. |
 | `ABORTED_ON_ERROR`      | A [failure](../running/failures.md) of the call it is nested in aborted it.                         |

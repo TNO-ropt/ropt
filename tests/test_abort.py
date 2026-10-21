@@ -204,7 +204,7 @@ def test_an_evaluation_ended_by_a_base_exception_aborts_the_work_it_started(
 
 @pytest.mark.timeout(60)
 def test_session_abort_between_batches_raises() -> None:
-    # Aborting from the report callback lands after a batch has finished, and
+    # Aborting from the result callback lands after a batch has finished, and
     # the run raises rather than returning what it had reached.
     with session() as opened:
         pool = opened.thread_pool(workers=1)
@@ -214,7 +214,11 @@ def test_session_abort_between_batches_raises() -> None:
 
         with pytest.raises(AbortedError) as raised:
             optimize(
-                _CONFIG, _INITIAL, _sphere, pool=pool, report=_abort_on_first_result
+                _CONFIG,
+                _INITIAL,
+                _sphere,
+                pool=pool,
+                result_callback=_abort_on_first_result,
             )
 
     assert raised.value.exit_code is ExitCode.USER_ABORT

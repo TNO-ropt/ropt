@@ -58,4 +58,4 @@ and [`RoptError`][ropt.exceptions.RoptError] with
 ## Callback types
 
 ::: ropt.EvaluationFunction
-::: ropt.ReportCallback
+::: ropt.ResultCallback

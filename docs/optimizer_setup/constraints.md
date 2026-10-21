@@ -83,7 +83,7 @@ that is too tight is a common reason for an empty result — see
 [Troubleshooting](../troubleshooting/index.md).
 
 To watch feasibility as the optimization proceeds, read `constraint_info` from
-the result the `report` callback receives. Its `nonlinear_violation` is zero
+the result the result callback receives. Its `nonlinear_violation` is zero
 where a constraint is met, positive by the amount it is exceeded, and `NaN` where
 the constraint value is `NaN`:
 

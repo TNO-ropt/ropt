@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from ropt.results import FunctionResults
 
     from ._function import EvaluationFunction
-    from ._report import ReportCallback
+    from ._result_callback import ResultCallback
     from ._session import Session
 
 _ONE_VECTOR = "evaluate() takes a single vector; use evaluate_batch() for a batch."
@@ -64,7 +64,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     function: EvaluationFunction,
     *,
     handlers: Sequence[EventHandler] | None,
-    report: ReportCallback | None,
+    result_callback: ResultCallback | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[FunctionResults]:
     array = _as_vector(variables)
@@ -75,7 +75,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         array,
         function,
         handlers=handlers,
-        report=report,
+        result_callback=result_callback,
         metadata=metadata,
     )
     return EvaluationResult(results=outcome.results[0])
@@ -89,7 +89,7 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     function: EvaluationFunction,
     *,
     handlers: Sequence[EventHandler] | None,
-    report: ReportCallback | None,
+    result_callback: ResultCallback | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     array = _as_matrix(variables)
@@ -100,7 +100,7 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
         array,
         function,
         handlers=handlers,
-        report=report,
+        result_callback=result_callback,
         metadata=metadata,
     )
 
@@ -113,7 +113,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     function: EvaluationFunction,
     *,
     handlers: Sequence[EventHandler] | None,
-    report: ReportCallback | None,
+    result_callback: ResultCallback | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     with linked_abort_scope(session) as scope:
@@ -122,7 +122,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
         # The results are collected by this run's own handler, in the order the
         # vectors were given, which is the order they are returned in.
         history = HistoryHandler()
-        ordered = [history, *make_handlers(handlers, report)]
+        ordered = [history, *make_handlers(handlers, result_callback)]
         with scope.as_current():
             run_evaluation(
                 context=context,

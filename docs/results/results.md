@@ -10,7 +10,7 @@ delivered to your code.
 
     [`Results`][ropt.results.Results] is the record every part of `ropt`
     returns: one object per variable vector evaluated, carrying every field
-    described below. Result handlers receive these, a `report` callback is given
+    described below. Result handlers receive these, a result callback is given
     one per evaluation, and both
     [`optimize`](../running/running.md) and
     [`evaluate`](../running/running.md#evaluating-without-optimizing) put them

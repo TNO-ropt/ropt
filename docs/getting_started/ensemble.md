@@ -78,7 +78,7 @@ first, then the constraints; see
 
 ## 4. Follow the progress (optional)
 
-To track a running optimization, pass a `report` callback: `ropt` calls it after
+To track a running optimization, pass a result callback: `ropt` calls it after
 every evaluation, with the
 [`FunctionResults`][ropt.results.FunctionResults] describing what was just
 computed.

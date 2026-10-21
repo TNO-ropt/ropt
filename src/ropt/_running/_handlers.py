@@ -13,23 +13,25 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ._report import make_report_handler
+from ._result_callback import make_result_callback_handler
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from ropt._handlers import EventHandler
 
-    from ._report import ReportCallback
+    from ._result_callback import ResultCallback
 
 
 def make_handlers(
     handlers: Sequence[EventHandler] | None,
-    report: ReportCallback | None,
+    result_callback: ResultCallback | None,
     *,
     report_gradients: bool = False,
 ) -> list[EventHandler]:
     ordered = list(handlers or ())
-    if report is not None:
-        ordered.append(make_report_handler(report, gradients=report_gradients))
+    if result_callback is not None:
+        ordered.append(
+            make_result_callback_handler(result_callback, gradients=report_gradients)
+        )
     return ordered

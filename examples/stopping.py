@@ -1,7 +1,7 @@
-"""Stopping an optimization from the `report` callback.
+"""Stopping an optimization from the result callback.
 
 An optimization normally ends when the optimizer converges or hits its own
-budget. The `report` callback sees every result as it arrives, so it can also
+budget. The result callback sees every result as it arrives, so it can also
 end the optimization itself: returning `True` stops it, and it finishes with
 `STOPPED`.
 
@@ -74,7 +74,9 @@ def stop_after_max_results(result: FunctionResults) -> bool:
 
 def main() -> None:
     """Run until the callback calls a halt, then read the best point found."""
-    result = optimize(CONFIG, INITIAL_VALUES, objective, report=stop_after_max_results)
+    result = optimize(
+        CONFIG, INITIAL_VALUES, objective, result_callback=stop_after_max_results
+    )
 
     print(f"{result.exit_code.message} after {_seen} results")
     assert result.exit_code == ExitCode.STOPPED

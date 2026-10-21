@@ -128,7 +128,7 @@ def main() -> None:
             objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
         return float(objective)
 
-    result = optimize(config, INITIAL_VALUES, rosenbrock, report=report)
+    result = optimize(config, INITIAL_VALUES, rosenbrock, result_callback=report)
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     print(f"optimal objective: {result.results.target_objective}")

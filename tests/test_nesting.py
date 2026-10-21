@@ -147,7 +147,9 @@ def _run_from_a_report_callback(opened: Session, work: Callable[[], None]) -> Ex
         work()
 
     pool = opened.thread_pool(workers=1)
-    return optimize(_CONFIG, _INITIAL, _sphere, pool=pool, report=report).exit_code
+    return optimize(
+        _CONFIG, _INITIAL, _sphere, pool=pool, result_callback=report
+    ).exit_code
 
 
 @pytest.mark.parametrize(

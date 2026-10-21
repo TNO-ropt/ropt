@@ -163,7 +163,7 @@ def test_optimize_report_callback_receives_evaluate_results(
     config: Any, test_functions: Any
 ) -> None:
     reported: list[FunctionResults] = []
-    optimize(config, initial_values, test_functions[0], report=reported.append)
+    optimize(config, initial_values, test_functions[0], result_callback=reported.append)
     assert reported
     assert all(isinstance(item, FunctionResults) for item in reported)
     assert any(item.target_objective is not None for item in reported)
@@ -175,7 +175,7 @@ def test_report_callback_receives_evaluated_variables(
     # The optimizer chooses these points, so the caller has no other way to
     # learn which one an evaluation belongs to.
     reported: list[FunctionResults] = []
-    optimize(config, initial_values, test_functions[0], report=reported.append)
+    optimize(config, initial_values, test_functions[0], result_callback=reported.append)
     variables = [item.variables for item in reported if item.variables is not None]
     assert variables
     assert len(variables) == len(reported)
@@ -259,7 +259,7 @@ def test_optimize_handlers_do_not_nest_during_a_run(
         initial_values,
         test_functions[0],
         handlers=[history],
-        report=_report,
+        result_callback=_report,
     )
     # Handlers run one after the other, not nested, and each clears its owner
     # on the way out. Drop that reset and `history` reports itself as running
@@ -332,7 +332,9 @@ def test_report_callback_stops_optimization(config: Any, test_functions: Any) ->
         reported += 1
         return True
 
-    result = optimize(config, initial_values, test_functions[0], report=_report)
+    result = optimize(
+        config, initial_values, test_functions[0], result_callback=_report
+    )
     assert result.exit_code == ExitCode.STOPPED
     assert reported == 1
 
@@ -353,7 +355,10 @@ def test_report_callback_stops_only_own_run(config: Any, test_functions: Any) ->
             pool=opened.thread_pool(workers=2),
         )
         results = run(
-            [partial(job, report=_stop), partial(job, report=_continue)],
+            [
+                partial(job, result_callback=_stop),
+                partial(job, result_callback=_continue),
+            ],
             pool=opened.thread_pool(workers=2),
         )
     assert results[0].exit_code == ExitCode.STOPPED
@@ -462,7 +467,9 @@ def test_evaluate_report_return_value_ignored(config: Any, test_functions: Any) 
         reported.append(result)
         return True
 
-    result = evaluate(config, initial_values, test_functions[0], report=_stop).results
+    result = evaluate(
+        config, initial_values, test_functions[0], result_callback=_stop
+    ).results
     assert len(reported) == 1
     assert result is not None
     assert result.target_objective == pytest.approx(0.66)
@@ -481,7 +488,9 @@ def test_evaluate_batch_report_return_value_ignored(
         return True
 
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    results = evaluate_batch(config, matrix, test_functions[0], report=_stop).results
+    results = evaluate_batch(
+        config, matrix, test_functions[0], result_callback=_stop
+    ).results
     assert len(reported) == 1
     assert len(results) == 2
 

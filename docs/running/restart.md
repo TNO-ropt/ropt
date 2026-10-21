@@ -25,7 +25,7 @@ each call to `optimize` is independent, this is a loop in your own code;
 
 The best point of one optimization is all you need to start the next. To also
 see every evaluation across the whole sequence of restarts, pass a
-[`report`](running.md#reporting-progress) callback: it is called with each
+[result callback](running.md#reporting-progress): it is called with each
 [`FunctionResults`][ropt.results.FunctionResults] as that evaluation finishes.
 A callback belongs to the optimization it is given to, so appending to one list
 is what carries the results across the restarts:
@@ -52,7 +52,7 @@ x0 = INITIAL_VALUES
 f0: FunctionResults | None = None
 g0: GradientResults | None = None
 for _ in range(RESTARTS):
-    result = optimize(CONFIG, x0, rosenbrock, report=reported.append, f0=f0, g0=g0)
+    result = optimize(CONFIG, x0, rosenbrock, result_callback=reported.append, f0=f0, g0=g0)
     assert result.results is not None
     x0 = result.results.variables  # restart from the best point found so far
     f0, g0 = result.results, result.gradient

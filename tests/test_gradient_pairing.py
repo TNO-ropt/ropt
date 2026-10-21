@@ -222,7 +222,7 @@ def test_report_receives_gradients_only_when_asked(
         return _report
 
     default: list[Any] = []
-    optimize(config, _INITIAL, test_functions[0], report=_collect(default))
+    optimize(config, _INITIAL, test_functions[0], result_callback=_collect(default))
     assert set(default) == {FunctionResults}
 
     both: list[Any] = []
@@ -230,7 +230,7 @@ def test_report_receives_gradients_only_when_asked(
         config,
         _INITIAL,
         test_functions[0],
-        report=_collect(both),
+        result_callback=_collect(both),
         report_gradients=True,
     )
     assert set(both) == {FunctionResults, GradientResults}

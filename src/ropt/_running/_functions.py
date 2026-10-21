@@ -24,8 +24,8 @@ if TYPE_CHECKING:
 
     from ._function import EvaluationFunction
     from ._pool import WorkerPool
-    from ._report import ReportCallback
     from ._result import EvaluationResult, OptimizationResult
+    from ._result_callback import ResultCallback
 
 
 def optimize(  # ruff: ignore[too-many-arguments]
@@ -35,7 +35,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     *,
     pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
-    report: ReportCallback | None = None,
+    result_callback: ResultCallback | None = None,
     constraint_tolerance: float = 1e-10,
     metadata: dict[str, Any] | None = None,
     f0: FunctionResults | None = None,
@@ -55,12 +55,12 @@ def optimize(  # ruff: ignore[too-many-arguments]
         pool:                 The pool to evaluate on, or `None` to evaluate
                               in-process.
         handlers:             Optional handlers, called in the order listed.
-        report:               Optional callback invoked per evaluation.
+        result_callback:      Optional callback invoked per evaluation.
         constraint_tolerance: The tolerance within which a constraint holds.
         metadata:             Optional dictionary attached to every result.
         f0:                   Optional function results at `x0`.
         g0:                   Optional gradient results at `x0`.
-        report_gradients:     Whether `report` also receives gradient results.
+        report_gradients:     Whether `result_callback` also receives gradient results.
 
     Returns:
         An [`OptimizationResult`][ropt.OptimizationResult].
@@ -77,7 +77,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         x0,
         function,
         handlers=handlers,
-        report=report,
+        result_callback=result_callback,
         constraint_tolerance=constraint_tolerance,
         metadata=metadata,
         f0=f0,
@@ -93,7 +93,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     *,
     pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
-    report: ReportCallback | None = None,
+    result_callback: ResultCallback | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> EvaluationResult[FunctionResults]:
     """Evaluate a single variable vector, without optimizing.
@@ -103,13 +103,13 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     walkthrough.
 
     Args:
-        config:    The optimization configuration.
-        variables: The variable vector to evaluate.
-        function:  The per-realization evaluation function.
-        pool:      The pool to evaluate on, or `None` to evaluate in-process.
-        handlers:  Optional handlers, called in the order listed.
-        report:    Optional callback invoked with the results.
-        metadata:  Optional dictionary attached to the results.
+        config:          The optimization configuration.
+        variables:       The variable vector to evaluate.
+        function:        The per-realization evaluation function.
+        pool:            The pool to evaluate on, or `None` to evaluate in-process.
+        handlers:        Optional handlers, called in the order listed.
+        result_callback: Optional callback invoked with the results.
+        metadata:        Optional dictionary attached to the results.
 
     Returns:
         An evaluation result.
@@ -127,7 +127,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         variables,
         function,
         handlers=handlers,
-        report=report,
+        result_callback=result_callback,
         metadata=metadata,
     )
 
@@ -139,7 +139,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
     *,
     pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
-    report: ReportCallback | None = None,
+    result_callback: ResultCallback | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     """Evaluate a batch of variable vectors, without optimizing.
@@ -150,13 +150,13 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
     a walkthrough.
 
     Args:
-        config:    The optimization configuration.
-        variables: The variable vectors to evaluate, one per row.
-        function:  The per-realization evaluation function.
-        pool:      The pool to evaluate on, or `None` to evaluate in-process.
-        handlers:  Optional handlers, called in the order listed.
-        report:    Optional callback invoked with each evaluation.
-        metadata:  Optional dictionary attached to every result.
+        config:          The optimization configuration.
+        variables:       The variable vectors to evaluate, one per row.
+        function:        The per-realization evaluation function.
+        pool:            The pool to evaluate on, or `None` to evaluate in-process.
+        handlers:        Optional handlers, called in the order listed.
+        result_callback: Optional callback invoked with each evaluation.
+        metadata:        Optional dictionary attached to every result.
 
     Returns:
         An evaluation result.
@@ -174,7 +174,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         variables,
         function,
         handlers=handlers,
-        report=report,
+        result_callback=result_callback,
         metadata=metadata,
     )
 
