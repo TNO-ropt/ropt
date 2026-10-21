@@ -2553,7 +2553,7 @@ pool and returns the results in the order the callables were given:</p>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="p">)</span>
 </span></code></pre></div>
 <p>Each callable is an ordinary <code>optimize</code> call, so every optimization can have its
-own configuration, initial values, objective, <code>metadata</code> and <code>report</code> callback.</p>
+own configuration, initial values, objective, <code>metadata</code> and result callback.</p>
 <p>The optimizations need a pool of their own, <code>runner</code> here, separate from the
 pool they evaluate with. A call made from work running with a pool cannot use
 that same pool: it raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Without
@@ -2609,12 +2609,12 @@ its own metadata:</p>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="p">)</span>
 </span></code></pre></div>
 <h2 id="watching-optimizations-that-overlap">Watching optimizations that overlap</h2>
-<p><code>report=</code> belongs to one <code>optimize</code> call: give each optimization its own
+<p><code>result_callback=</code> belongs to one <code>optimize</code> call: give each optimization its own
 callback, or the same one to all of them. <code>handlers=</code> takes handlers that
 several optimizations may feed together — see <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across
 concurrent optimizations</a>.</p>
 <div class="admonition warning">
-<p class="admonition-title">A shared <code>report=</code> callback is called by every optimization at once</p>
+<p class="admonition-title">A shared result callback is called by every optimization at once</p>
 <p>Each optimization calls its callback on its own thread. Nothing serializes
 those calls, so a callback that appends to a list, updates a counter, or
 writes a file needs a lock of its own. Give each optimization its own
@@ -2684,7 +2684,7 @@ distinguishes an abort that was asked for from one that a failure caused. A
 and is raised at once. See <a href="../../results/exit_codes/">Exit Codes</a> for what each
 code means.</p>
 <h2 id="stopping-from-outside">Aborting from outside</h2>
-<p>The <code>report</code> callback runs inside the optimization it stops, which is no use to
+<p>The result callback runs inside the optimization it stops, which is no use to
 a signal handler or a user interface. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> is
 the one that is called from another thread: it aborts every call given one of
 the session's pools or made in its <code>with</code> block, and each raises
@@ -2698,11 +2698,11 @@ the session's pools or made in its <code>with</code> block, and each raises
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">"aborted:"</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The two are not the same kind of ending, which is why they have different exit
-codes. A <code>report</code> callback stops the optimization <em>on a criterion</em>, at a point it
+codes. A result callback stops the optimization <em>on a criterion</em>, at a point it
 chose, and the optimization returns the best result it had reached. An abort
 applies no criterion, and the optimization returns no result. To keep what an
 aborted optimization had reached, collect its results as they arrive, with a
-<code>report</code> callback or a <a href="../../results/handlers/">handler</a>.</p>
+result callback or a <a href="../../results/handlers/">handler</a>.</p>
 <p>An aborted optimization does not wait for the evaluations that are running.
 With no pool, the optimization runs the evaluation function itself, so the
 evaluation in progress returns first. On a thread or process pool, the

@@ -2517,7 +2517,7 @@ integer value, as they do for any <code>IntEnum</code>:</p>
 </span></code></pre></div>
 <p>An optimization either <strong>stops</strong> or is <strong>aborted</strong>. It stops when a condition on
 the optimization is met — the optimizer converged, a budget ran out, a
-<a href="../../running/running/#stopping-early-from-the-callback"><code>report</code> callback</a>
+<a href="../../running/running/#stopping-early-from-the-callback">result callback</a>
 returned <code>True</code> — so it ends at a point that satisfied a stated criterion, and
 returns its result with the code. It is aborted when something ends it
 regardless of its state, and it then raises
@@ -2552,7 +2552,7 @@ holds the code:</p>
 </tr>
 <tr>
 <td><code>STOPPED</code></td>
-<td>A <code>report</code> callback returned <code>True</code>, ending the optimization at the next evaluation boundary.</td>
+<td>A result callback returned <code>True</code>, ending the optimization at the next evaluation boundary.</td>
 </tr>
 <tr>
 <td><code>TOO_FEW_REALIZATIONS</code></td>

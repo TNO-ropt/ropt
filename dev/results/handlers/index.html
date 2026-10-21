@@ -2714,14 +2714,14 @@ them, tabulating them, or invoking a callback.</p>
   
       dataclass
   " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> — which is what every other part of
-<code>ropt</code> provides too: a <code>report</code> callback receives one per evaluation, and
+<code>ropt</code> provides too: a result callback receives one per evaluation, and
 <code>optimize</code> puts the best one on the <code>results</code> field of what it returns.
 Everything an optimization or evaluation produces is in them, at the field paths
 described in
 <a href="../results/">Working with Results</a>, which is the vocabulary the handlers below
 are configured in.</p>
-<p>The <a href="../../running/running/#reporting-progress"><code>report</code></a> callback you may already be using
-is only shorthand for this: <code>report=</code> builds a handler for you behind the
+<p>The <a href="../../running/running/#reporting-progress">result callback</a> is shorthand
+for a handler: <code>result_callback=</code> builds one for you behind the
 scenes, added to the optimization it is given to. One is built per optimization,
 each with a lock of its own, so the same callback given to optimizations that
 execute concurrently can be entered from several threads at once. A handler
@@ -3413,7 +3413,7 @@ if you have <code>tabulate</code> installed:</p>
 the result waits for the write to finish.</p>
 </div>
 <h2 id="writing-your-own-handler">Writing your own handler</h2>
-<p>The built-in handlers above, and the <code>report</code> callback, cover the results an
+<p>The built-in handlers above, and the result callback, cover the results an
 optimization produces. A handler of your own is for everything else: reacting to
 the start or the end of an optimization, writing results out in a format of your
 own, or keeping a summary that none of the built-ins keeps.</p>
@@ -3518,7 +3518,7 @@ bound to a thread, so it can be read from anywhere once the optimizations
 and evaluations feeding it have returned. That return is what makes the latest values visible. Reading
 it while one is still feeding the handler on another thread gives a valid
 but possibly stale value. To follow an optimization as it goes, use the
-handler's own <code>_handle_event</code>, or a <code>report</code> callback, rather than polling
+handler's own <code>_handle_event</code>, or a result callback, rather than polling
 another handler's state.</p>
 </div>
 <h2 id="handlers-and-separate-processes">Handlers and separate processes</h2>

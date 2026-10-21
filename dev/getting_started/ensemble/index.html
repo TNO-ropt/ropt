@@ -2687,7 +2687,7 @@ objectives, or with constraints, returns a sequence instead — the objectives
 first, then the constraints; see
 <a href="../../optimizer_setup/constraints/">Constraints</a>.</p>
 <h2 id="4-follow-the-progress-optional">4. Follow the progress (optional)</h2>
-<p>To track a running optimization, pass a <code>report</code> callback: <code>ropt</code> calls it after
+<p>To track a running optimization, pass a result callback: <code>ropt</code> calls it after
 every evaluation, with the
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
@@ -2712,7 +2712,7 @@ several optimizations — use a handler instead; see
 <h2 id="5-run-it">5. Run it</h2>
 <p>The call to <code>optimize</code> is the same as for a deterministic problem, with
 <code>INITIAL_VALUES</code> the start point defined above:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">result_callback</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>ropt</code> evaluates all ten realizations at each point and averages them into the
 robust objective, which is what it optimizes.</p>

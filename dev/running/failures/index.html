@@ -2561,7 +2561,7 @@
 <p>A call to <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>,
 <a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> or <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, with or without a
 pool, can start further calls from inside its own work: from an evaluation function, an event handler, a
-report callback or a function given to <code>run</code>. Those calls are <strong>nested</strong> in it.
+result callback or a function given to <code>run</code>. Those calls are <strong>nested</strong> in it.
 When a call fails, every call nested in it is aborted, at any depth, and the
 exception is raised in the code that made the call. For <code>run</code>, a failure of one
 of its functions is a failure of the whole call, so its other functions are
@@ -2608,7 +2608,7 @@ aborts the rest of its work.</p>
 <h2 id="nested-calls">Nested calls</h2>
 <p>A call to <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or <code>run</code> is <strong>nested</strong> in
 another such call when it is made, in the same process, from the work of that
-other call: from its evaluation function, event handlers or report callback,
+other call: from its evaluation function, event handlers or result callback,
 or from a function given to it if it is a <code>run</code> call. The outer call is its
 <strong>parent</strong>. This holds with or without a pool.</p>
 <p>An evaluation function runs in your process when its optimization or evaluation
@@ -2632,7 +2632,7 @@ with the call that started the thread. Start the thread through
 <h2 id="where-the-exception-is-raised">Where the exception is raised</h2>
 <p><code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> and <code>run</code> raise the exception of a
 failure in the code that called them. For a nested call, that is the
-evaluation function, event handler, report callback or function given to <code>run</code>
+evaluation function, event handler, result callback or function given to <code>run</code>
 from which it was made. That code can catch the exception. If it does not, the
 call that the code belongs to fails in turn, and the same rules apply to that
 call.</p>
@@ -2720,7 +2720,7 @@ that your own code raises, as the example above does.</p>
 <p>Work that is left running after its call was aborted runs to its end, unless it
 stops by itself or, with a process pool, its worker is killed five seconds later.
 Call <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> in long-running code — an
-evaluation function, an event handler, a report callback, or a function given to
+evaluation function, an event handler, a result callback, or a function given to
 <code>run</code> — to find out whether the call that runs it is being aborted:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">aborting</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>

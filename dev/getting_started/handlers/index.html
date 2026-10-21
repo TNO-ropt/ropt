@@ -2495,10 +2495,10 @@ full result objects, <a class="autorefs autorefs-internal" title="            ro
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">))</span>   <span class="c1"># every evaluation from this optimization</span>
 </span></code></pre></div>
-<p>Compare this with the <code>report</code> callback from
+<p>Compare this with the result callback from
 <a href="../ensemble/#4-follow-the-progress-optional">Follow the progress</a>:
-<code>report</code> is called once per evaluation, for one optimization. A handler is more
-general — it keeps or reacts to results, and, unlike <code>report</code>, the same
+The result callback is called once per evaluation, for one optimization. A handler is more
+general — it keeps or reacts to results, and, unlike the result callback, the same
 handler can be reused across several <strong>sequential</strong> calls to <code>optimize</code>,
 accumulating results from all of them.</p>
 <h2 id="built-in-handlers">Built-in handlers</h2>

@@ -2841,7 +2841,7 @@ succeeded, or no result ever satisfied the constraints — see
 <a href="#when-something-goes-wrong">When something goes wrong</a>. One check therefore
 covers every field.</p>
 <h2 id="reporting-progress">Reporting progress</h2>
-<p>Pass a <code>report</code> callback to track the optimization as it runs. It is called once
+<p>Pass a result callback to track the optimization as it runs. It is called once
 for every function evaluation, with the
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
@@ -2853,7 +2853,7 @@ for every function evaluation, with the
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">result_callback</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span></code></pre></div>
 <p>To store results rather than print them, pass a <strong>handler</strong> with the <code>handlers</code>
 argument. <a class="autorefs autorefs-internal" title="            ropt.HistoryHandler" href="../../reference/api/#ropt.HistoryHandler"><code>HistoryHandler</code></a> keeps every result, and
@@ -2878,7 +2878,7 @@ evaluation. The callback then receives both kinds and has to tell them apart:</p
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">"gradient"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_gradient</span><span class="p">)</span>
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">,</span> <span class="n">report_gradients</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">result_callback</span><span class="o">=</span><span class="n">report</span><span class="p">,</span> <span class="n">report_gradients</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Gradients are generally paired with a function evaluation at the same point. A
 <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
@@ -2896,7 +2896,7 @@ to check if a <a class="autorefs autorefs-internal" title="            ropt.resu
   " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object has the
 same ID.</p>
 <h3 id="stopping-early-from-the-callback">Stopping early from the callback</h3>
-<p>The <code>report</code> callback doubles as a <strong>user-defined stopping criterion</strong>: return
+<p>The result callback doubles as a <strong>user-defined stopping criterion</strong>: return
 <code>True</code> and the optimization stops gracefully after the current evaluation, with
 exit code <code>STOPPED</code>. Any other return value (including <code>None</code>) lets it
 continue.</p>
@@ -2909,7 +2909,7 @@ continue.</p>
 </span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="k">return</span> <span class="kc">None</span>
 </span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">result_callback</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
 </span></code></pre></div>
 <p>When <a href="../many_runs/">running multiple optimizations at once</a>, this stops only the

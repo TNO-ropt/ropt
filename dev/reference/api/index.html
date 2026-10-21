@@ -2612,10 +2612,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.ReportCallback" class="md-nav__link">
+  <a href="#ropt.ResultCallback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ReportCallback
+        ResultCallback
       
     </span>
   </a>
@@ -3761,10 +3761,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.ReportCallback" class="md-nav__link">
+  <a href="#ropt.ResultCallback" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ReportCallback
+        ResultCallback
       
     </span>
   </a>
@@ -3900,7 +3900,7 @@ and <a class="autorefs autorefs-internal" title="            RoptError" href="..
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">result_callback</span><span class="p">:</span> <span class="n">ResultCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">f0</span><span class="p">:</span> <span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4011,15 +4011,15 @@ walkthrough.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>report</code>
+                <code>result_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ResultCallback
 
 
   
       module-attribute
-   (ropt._running._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
+   (ropt._running._result_callback.ResultCallback)" href="#ropt.ResultCallback">ResultCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4113,7 +4113,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether <code>report</code> also receives gradient results.</p>
+                <p>Whether <code>result_callback</code> also receives gradient results.</p>
               </div>
             </td>
             <td>
@@ -4210,7 +4210,7 @@ walkthrough.</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">result_callback</span><span class="p">:</span> <span class="n">ResultCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]</span>
 </span></code></pre></div>
@@ -4316,15 +4316,15 @@ walkthrough.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>report</code>
+                <code>result_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ResultCallback
 
 
   
       module-attribute
-   (ropt._running._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
+   (ropt._running._result_callback.ResultCallback)" href="#ropt.ResultCallback">ResultCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4450,7 +4450,7 @@ walkthrough.</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">result_callback</span><span class="p">:</span> <span class="n">ResultCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationResult</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span>
 </span></code></pre></div>
@@ -4557,15 +4557,15 @@ a walkthrough.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>report</code>
+                <code>result_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.ReportCallback
+                  <code><a class="autorefs autorefs-internal" title="            ropt.ResultCallback
 
 
   
       module-attribute
-   (ropt._running._report.ReportCallback)" href="#ropt.ReportCallback">ReportCallback</a> | None</code>
+   (ropt._running._result_callback.ResultCallback)" href="#ropt.ResultCallback">ResultCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8159,8 +8159,8 @@ it produces every result, or raises
 
 
 
-<h2 id="ropt.ReportCallback" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ropt.ReportCallback</span>
+<h2 id="ropt.ResultCallback" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ropt.ResultCallback</span>
 
 
   <span class="doc doc-labels">
@@ -8168,7 +8168,7 @@ it produces every result, or raises
   </span>
 
 </h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ReportCallback</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">FunctionResults</span><span class="p">],</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ResultCallback</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">FunctionResults</span><span class="p">],</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">

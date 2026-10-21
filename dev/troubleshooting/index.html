@@ -2753,7 +2753,7 @@ the loop or function that uses it rather than around the whole program; see
 <h2 id="running-many-at-once">Running many at once</h2>
 <p><strong>Optimizations started together really do run at once.</strong> A handler given to all
 of them takes a lock around every event it handles, so it collects them safely,
-but a single <code>report=</code> callback does not: it is called by several threads at the
+but a single result callback does not: it is called by several threads at the
 same time. Keep such a callback free of shared state, or give each optimization
 its own.</p>
 <p><strong>A slow shared handler holds up every optimization.</strong> The optimization that
@@ -2779,7 +2779,7 @@ a time.</p>
 </thead>
 <tbody>
 <tr>
-<td>Results from a shared <code>report=</code> callback are jumbled or lost</td>
+<td>Results from a shared result callback are jumbled or lost</td>
 <td>The callback is called from the thread of every optimization at once. Collect the results in a <a href="../results/handlers/#sharing-a-handler-across-concurrent-runs">handler</a> instead, or use one callback per optimization.</td>
 </tr>
 <tr>
