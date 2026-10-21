@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import logging
-import pickle  # ruff: ignore[suspicious-pickle-import]
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from functools import partial
 from typing import TYPE_CHECKING, Any, cast, override
@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any, cast, override
 import numpy as np
 import pytest
 
-from ropt._components.compute_steps import EvaluationStep, OptimizationStep
+from ropt._components.compute_steps import run_evaluation, run_optimization
 from ropt._components.concurrency import AbortScope, current_abort_scope
 from ropt._components.evaluators import (
     EvaluationFunctionContext,
@@ -61,9 +61,17 @@ def config_fixture() -> dict[str, Any]:
 
 def test_run_basic(config: dict[str, Any], evaluator: Any) -> None:
     result_handler = ResultsHandler()
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler)
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(result_handler)
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
+    )
     assert result_handler["results"] is not None
     assert np.allclose(result_handler["results"].variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -92,9 +100,17 @@ def test_function_evaluator_with_info(
         function=partial(_function, test_functions=test_functions)
     )
     result_handler = ResultsHandler()
-    step = OptimizationStep(evaluator=evaluator)
-    step.add_event_handler(result_handler)
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    run_evaluator = evaluator
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(result_handler)
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
+    )
     assert result_handler["results"] is not None
     assert np.allclose(result_handler["results"].variables, [0.0, 0.0, 0.5], atol=0.02)
     assert result_handler["results"].evaluations.metadata["foo"] == "bar"
@@ -119,9 +135,15 @@ def _run_with_metadata(
         )
 
     result_handler = ResultsHandler()
-    step = EvaluationStep(evaluator=make_batch_evaluator(function=_function))
-    step.add_event_handler(result_handler)
-    step.run(context=EnOptContext.model_validate(config), variables=initial_values)
+    run_evaluator = make_batch_evaluator(function=_function)
+    handlers: list[EventHandler] = []
+    handlers.append(result_handler)
+    run_evaluation(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        context=EnOptContext.model_validate(config),
+        variables=initial_values,
+    )
     results: FunctionResults = result_handler["results"]
     return results.evaluations.metadata
 
@@ -228,18 +250,38 @@ def test_rng(config: dict[str, Any], evaluator: Any) -> None:
     config2["variables"]["seed"] = 2
 
     result_handler = ResultsHandler()
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler)
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(result_handler)
 
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
+    )
     assert result_handler["results"] is not None
     variables1 = result_handler["results"].variables
     result_handler["results"] = None
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
+    )
     assert result_handler["results"] is not None
     variables2 = result_handler["results"].variables
     result_handler["results"] = None
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config2))
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config2),
+    )
     assert result_handler["results"] is not None
     variables3 = result_handler["results"].variables
 
@@ -249,13 +291,24 @@ def test_rng(config: dict[str, Any], evaluator: Any) -> None:
 
 def test_set_initial_values(config: dict[str, Any], evaluator: Any) -> None:
     result_handler = ResultsHandler()
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler)
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(result_handler)
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
+    )
     assert result_handler["results"] is not None
     variables1 = result_handler["results"].variables
     result_handler["variables"] = None
-    step.run(
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
         context=EnOptContext.model_validate(config),
         variables=[0, 0, 0],
     )
@@ -273,9 +326,17 @@ def test_set_initial_values(config: dict[str, Any], evaluator: Any) -> None:
 
 def test_reset_results(config: dict[str, Any], evaluator: Any) -> None:
     result_handler = ResultsHandler()
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler)
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(result_handler)
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
+    )
     saved_results = deepcopy(result_handler["results"])
     result_handler["results"] = None
     assert saved_results is not None
@@ -305,28 +366,47 @@ def test_two_optimizers_alternating(config: dict[str, Any], evaluator: Any) -> N
     result_handler1 = ResultsHandler()
     result_handler2 = ResultsHandler(what="last")
 
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler1)
-    step.add_event_handler(result_handler2)
-    step.add_event_handler(
-        CallbackHandler(
-            event_types={EnOptEventType.FINISHED_EVALUATION},
-            callback=_track_evaluations,
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.extend(
+        (
+            result_handler1,
+            result_handler2,
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=_track_evaluations,
+            ),
         )
     )
-    step.run(variables=[0.0, 0.2, 0.1], context=EnOptContext.model_validate(config1))
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=[0.0, 0.2, 0.1],
+        context=EnOptContext.model_validate(config1),
+    )
     assert result_handler2["results"] is not None
-    step.run(
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
         context=EnOptContext.model_validate(config2),
         variables=result_handler2["results"].variables,
     )
     assert result_handler2["results"] is not None
-    step.run(
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
         context=EnOptContext.model_validate(config1),
         variables=result_handler2["results"].variables,
     )
     assert result_handler2["results"] is not None
-    step.run(
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
         context=EnOptContext.model_validate(config2),
         variables=result_handler2["results"].variables,
     )
@@ -355,12 +435,22 @@ def test_optimization_sequential(config: dict[str, Any], evaluator: Any) -> None
     observer = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler)
-    step.add_event_handler(observer)
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.extend((result_handler, observer))
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
+    )
     assert result_handler["results"] is not None
-    step.run(
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
         context=EnOptContext.model_validate(config2),
         variables=result_handler["results"].variables,
     )
@@ -383,13 +473,21 @@ def test_restart_initial(config: dict[str, Any], evaluator: Any) -> None:
     config["gradient"] = {"evaluation_policy": "speculative"}
     config["optimizer"]["max_functions"] = 3
 
-    step = OptimizationStep(evaluator=evaluator())
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
     observer = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
-    step.add_event_handler(observer)
+    handlers.append(observer)
     for _ in range(2):
-        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+        run_optimization(
+            evaluator=run_evaluator,
+            handlers=handlers,
+            abort_scope=run_scope,
+            variables=initial_values,
+            context=EnOptContext.model_validate(config),
+        )
 
     assert len(completed) == 6
     assert np.all(completed[0].variables == initial_values)
@@ -409,20 +507,24 @@ def test_restart_last(config: dict[str, Any], evaluator: Any) -> None:
     config["gradient"] = {"evaluation_policy": "speculative"}
     config["optimizer"]["max_functions"] = 3
 
-    step = OptimizationStep(evaluator=evaluator())
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
     observer = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
     result_handler = ResultsHandler(what="last")
-    step.add_event_handler(observer)
-    step.add_event_handler(result_handler)
+    handlers.extend((observer, result_handler))
     for _ in range(2):
         variables = (
             initial_values
             if result_handler["results"] is None
             else result_handler["results"].variables
         )
-        step.run(
+        run_optimization(
+            evaluator=run_evaluator,
+            handlers=handlers,
+            abort_scope=run_scope,
             context=EnOptContext.model_validate(config),
             variables=variables,
         )
@@ -443,22 +545,27 @@ def test_restart_optimum(config: dict[str, Any], evaluator: Any) -> None:
     config["gradient"] = {"evaluation_policy": "speculative"}
     config["optimizer"]["max_functions"] = 4
 
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(
         CallbackHandler(
             event_types={EnOptEventType.FINISHED_EVALUATION},
             callback=_track_evaluations,
         )
     )
     result_handler = ResultsHandler()
-    step.add_event_handler(result_handler)
+    handlers.append(result_handler)
     for _ in range(2):
         variables = (
             initial_values
             if result_handler["results"] is None
             else result_handler["results"].variables
         )
-        step.run(
+        run_optimization(
+            evaluator=run_evaluator,
+            handlers=handlers,
+            abort_scope=run_scope,
             context=EnOptContext.model_validate(config),
             variables=variables,
         )
@@ -498,15 +605,17 @@ def test_restart_optimum_with_reset(
     config["gradient"] = {"evaluation_policy": "speculative"}
     config["optimizer"]["max_functions"] = max_functions
 
-    step = OptimizationStep(evaluator=evaluator(new_functions))
-    step.add_event_handler(
+    run_evaluator = evaluator(new_functions)
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(
         CallbackHandler(
             event_types={EnOptEventType.FINISHED_EVALUATION},
             callback=_track_evaluations,
         )
     )
     result_handler = ResultsHandler()
-    step.add_event_handler(result_handler)
+    handlers.append(result_handler)
     for _ in range(3):
         variables = (
             initial_values
@@ -514,7 +623,10 @@ def test_restart_optimum_with_reset(
             else result_handler["results"].variables
         )
         result_handler["results"] = None
-        step.run(
+        run_optimization(
+            evaluator=run_evaluator,
+            handlers=handlers,
+            abort_scope=run_scope,
             context=EnOptContext.model_validate(config),
             variables=variables,
         )
@@ -541,15 +653,20 @@ def test_repeat_metadata(config: dict[str, Any], evaluator: Any) -> None:
         "bar": "string",
     }
 
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(
         CallbackHandler(
             event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_results
         )
     )
     for idx in range(2):
         metadata["restart"] = idx
-        step.run(
+        run_optimization(
+            evaluator=run_evaluator,
+            handlers=handlers,
+            abort_scope=run_scope,
             context=EnOptContext.model_validate(config),
             metadata=metadata,
             variables=initial_values,
@@ -559,14 +676,22 @@ def test_repeat_metadata(config: dict[str, Any], evaluator: Any) -> None:
 
 def test_evaluator(config: dict[str, Any], evaluator: Any) -> None:
     result_handler = ResultsHandler()
-    step = EvaluationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler)
-    step.run(context=EnOptContext.model_validate(config), variables=[0.0, 0.0, 0.1])
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    handlers.append(result_handler)
+    run_evaluation(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        context=EnOptContext.model_validate(config),
+        variables=[0.0, 0.0, 0.1],
+    )
     assert result_handler["results"].functions is not None
     assert np.allclose(result_handler["results"].target_objective, 1.66)
 
     result_handler["results"] = None
-    step.run(
+    run_evaluation(
+        evaluator=run_evaluator,
+        handlers=handlers,
         context=EnOptContext.model_validate(config),
         variables=[0, 0, 0],
     )
@@ -579,9 +704,12 @@ def test_evaluator_multi(config: dict[str, Any], evaluator: Any) -> None:
     config["optimizer"]["max_functions"] = 4
 
     history_handler = HistoryHandler()
-    step = EvaluationStep(evaluator=evaluator())
-    step.add_event_handler(history_handler)
-    step.run(
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    handlers.append(history_handler)
+    run_evaluation(
+        evaluator=run_evaluator,
+        handlers=handlers,
         context=EnOptContext.model_validate(config),
         variables=np.array([[0, 0, 0.1], [0, 0, 0]]),
     )
@@ -594,9 +722,12 @@ def test_history_handler_results_property_returns_collected_results(
 ) -> None:
     history_handler = HistoryHandler()
     assert history_handler.results == ()
-    step = EvaluationStep(evaluator=evaluator())
-    step.add_event_handler(history_handler)
-    step.run(
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    handlers.append(history_handler)
+    run_evaluation(
+        evaluator=run_evaluator,
+        handlers=handlers,
         context=EnOptContext.model_validate(config),
         variables=np.array([[0, 0, 0.1], [0, 0, 0]]),
     )
@@ -609,9 +740,17 @@ def test_results_handler_result_property_returns_selected_result(
 ) -> None:
     result_handler = ResultsHandler()
     assert result_handler.result is None
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler)
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(result_handler)
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
+    )
     assert result_handler.result is not None
     assert result_handler.result is result_handler["results"]
 
@@ -636,9 +775,15 @@ def test_exit_code(
         case "max_batches":
             config["optimizer"]["max_batches"] = 4
 
-    step = OptimizationStep(evaluator=evaluator())
-    exit_code = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    exit_code = run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
     )
     assert exit_code == max_enum
 
@@ -666,10 +811,14 @@ def test_nested_optimization(
                 else outer_result_handler["results"].variables[1]
             )
             result_handler = ResultsHandler()
-            step = OptimizationStep(evaluator=evaluator())
-            step.add_event_handler(result_handler)
-            step.add_event_handler(outer_result_handler)
-            step.run(
+            run_evaluator = evaluator()
+            handlers: list[EventHandler] = []
+            run_scope = None
+            handlers.extend((result_handler, outer_result_handler))
+            run_optimization(
+                evaluator=run_evaluator,
+                handlers=handlers,
+                abort_scope=run_scope,
                 variables=new_variables,
                 context=EnOptContext.model_validate(nested_config),
             )
@@ -686,8 +835,16 @@ def test_nested_optimization(
         )
 
     outer_evaluator = make_batch_evaluator(function=_optimizer)
-    step = OptimizationStep(evaluator=outer_evaluator)
-    step.run(variables=initial, context=EnOptContext.model_validate(config))
+    run_evaluator = outer_evaluator
+    handlers: list[EventHandler] = []
+    run_scope = None
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial,
+        context=EnOptContext.model_validate(config),
+    )
     assert np.allclose(
         outer_result_handler["results"].variables,
         [0.0, 0.0, 0.5],
@@ -706,15 +863,23 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
             raise OptimizerStop(ExitCode.STOPPED)
 
     result_handler = ResultsHandler()
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler)
-    step.add_event_handler(
-        CallbackHandler(
-            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.extend(
+        (
+            result_handler,
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer
+            ),
         )
     )
-    exit_code = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
+    exit_code = run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
     )
     assert result_handler["results"] is not None
     assert exit_code == ExitCode.STOPPED
@@ -796,15 +961,23 @@ def test_handler_stop_ends_with_stopped(config: Any, evaluator: Any) -> None:
             assert event.stop is not None
             event.stop()
 
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(ResultsHandler())
-    step.add_event_handler(
-        CallbackHandler(
-            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.extend(
+        (
+            ResultsHandler(),
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer
+            ),
         )
     )
-    exit_code = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
+    exit_code = run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
     )
     assert exit_code == ExitCode.STOPPED
     assert evaluations == 1
@@ -825,19 +998,25 @@ def test_handler_stop_runs_remaining_handlers(config: Any, evaluator: Any) -> No
         nonlocal later_ran
         later_ran += 1
 
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(
-        CallbackHandler(
-            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_stop
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.extend(
+        (
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_stop
+            ),
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_later
+            ),
         )
     )
-    step.add_event_handler(
-        CallbackHandler(
-            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_later
-        )
-    )
-    exit_code = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
+    exit_code = run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
     )
     assert exit_code == ExitCode.STOPPED
     assert stops == 1
@@ -854,50 +1033,74 @@ def test_stop_request_cleared_between_runs(config: Any, evaluator: Any) -> None:
             assert event.stop is not None
             event.stop()
 
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(ResultsHandler())
-    step.add_event_handler(
-        CallbackHandler(
-            event_types={EnOptEventType.FINISHED_EVALUATION},
-            callback=_stop_first_evaluation,
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.extend(
+        (
+            ResultsHandler(),
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=_stop_first_evaluation,
+            ),
         )
     )
     context = EnOptContext.model_validate(config)
-    first = step.run(variables=initial_values, context=context)
-    second = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
+    first = run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=context,
+    )
+    second = run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
     )
     assert first == ExitCode.STOPPED
     assert second != ExitCode.STOPPED
 
 
-def test_abort_scope_aborts_every_step_that_observes_it(
+def test_abort_scope_aborts_every_run_that_observes_it(
     config: Any, evaluator: Any
 ) -> None:
     scope = AbortScope()
-    steps = [
-        OptimizationStep(evaluator=evaluator(), abort_scope=scope) for _ in range(2)
-    ]
     scope.abort()
-    for step in steps:
+    for _ in range(2):
         with pytest.raises(AbortedError) as raised:
-            step.run(
-                variables=initial_values, context=EnOptContext.model_validate(config)
+            run_optimization(
+                evaluator=evaluator(),
+                abort_scope=scope,
+                variables=initial_values,
+                context=EnOptContext.model_validate(config),
             )
         assert raised.value.exit_code is ExitCode.ABORTED
 
 
 def test_abort_scope_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -> None:
     scope = AbortScope()
-    step = OptimizationStep(evaluator=evaluator(), abort_scope=scope)
-    first = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = scope
+    first = run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
     )
     scope.abort()
     for _ in range(2):
         with pytest.raises(AbortedError):
-            step.run(
-                variables=initial_values, context=EnOptContext.model_validate(config)
+            run_optimization(
+                evaluator=run_evaluator,
+                handlers=handlers,
+                abort_scope=run_scope,
+                variables=initial_values,
+                context=EnOptContext.model_validate(config),
             )
     assert first != ExitCode.ABORTED
 
@@ -906,10 +1109,18 @@ def test_abort_scope_carries_the_exit_code_its_steps_raise_with(
     config: Any, evaluator: Any
 ) -> None:
     scope = AbortScope()
-    step = OptimizationStep(evaluator=evaluator(), abort_scope=scope)
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    run_scope = scope
     scope.abort(ExitCode.ABORTED_ON_ERROR)
     with pytest.raises(AbortedError) as raised:
-        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+        run_optimization(
+            evaluator=run_evaluator,
+            handlers=handlers,
+            abort_scope=run_scope,
+            variables=initial_values,
+            context=EnOptContext.model_validate(config),
+        )
     assert raised.value.exit_code is ExitCode.ABORTED_ON_ERROR
 
 
@@ -1048,17 +1259,23 @@ def test_evaluation_abort_from_finished_evaluation_skips_terminal_event(
         msg = "stop"
         raise RuntimeError(msg)
 
-    step = EvaluationStep(evaluator=evaluator())
-    step.add_event_handler(
-        CallbackHandler(event_types=_EVALUATION_EVENTS, callback=_record)
-    )
-    step.add_event_handler(
-        CallbackHandler(
-            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_abort
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    handlers.extend(
+        (
+            CallbackHandler(event_types=_EVALUATION_EVENTS, callback=_record),
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_abort
+            ),
         )
     )
     with pytest.raises(RuntimeError, match="stop"):
-        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+        run_evaluation(
+            evaluator=run_evaluator,
+            handlers=handlers,
+            variables=initial_values,
+            context=EnOptContext.model_validate(config),
+        )
     assert EnOptEventType.FINISHED_EVALUATION in emitted
     assert EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR not in emitted
 
@@ -1075,29 +1292,31 @@ def test_evaluation_abort_before_results_skips_remaining_events(
         msg = "stop"
         raise RuntimeError(msg)
 
-    step = EvaluationStep(evaluator=evaluator())
-    step.add_event_handler(
-        CallbackHandler(event_types=_EVALUATION_EVENTS, callback=_record)
-    )
-    step.add_event_handler(
-        CallbackHandler(event_types={EnOptEventType.START_EVALUATION}, callback=_abort)
+    run_evaluator = evaluator()
+    handlers: list[EventHandler] = []
+    handlers.extend(
+        (
+            CallbackHandler(event_types=_EVALUATION_EVENTS, callback=_record),
+            CallbackHandler(
+                event_types={EnOptEventType.START_EVALUATION}, callback=_abort
+            ),
+        )
     )
     with pytest.raises(RuntimeError, match="stop"):
-        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+        run_evaluation(
+            evaluator=run_evaluator,
+            handlers=handlers,
+            variables=initial_values,
+            context=EnOptContext.model_validate(config),
+        )
     assert EnOptEventType.START_EVALUATION in emitted
     assert EnOptEventType.FINISHED_EVALUATION not in emitted
     assert EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR not in emitted
 
 
-def test_workflow_object_cannot_be_pickled(evaluator: Any) -> None:
-    # Every workflow object owns a lock, which is what keeps it in its own
-    # process: there is nothing to send.
-    step = OptimizationStep(evaluator=evaluator())
-    with pytest.raises(TypeError, match="cannot pickle"):
-        pickle.dumps(step)
-
-
-def test_optimization_step_concurrent_run_raises(config: Any, evaluator: Any) -> None:
+def test_independent_optimizations_can_run_concurrently(
+    config: dict[str, Any], evaluator: Any
+) -> None:
     entered = threading.Event()
     release = threading.Event()
 
@@ -1105,23 +1324,30 @@ def test_optimization_step_concurrent_run_raises(config: Any, evaluator: Any) ->
         entered.set()
         release.wait(timeout=5)
 
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(
-        CallbackHandler(event_types={EnOptEventType.START_OPTIMIZER}, callback=_block)
+    run_evaluator = evaluator()
+    handler = CallbackHandler(
+        event_types={EnOptEventType.START_OPTIMIZER}, callback=_block
     )
     context = EnOptContext.model_validate(config)
 
-    thread = threading.Thread(
-        target=lambda: step.run(variables=initial_values, context=context)
-    )
-    thread.start()
-    try:
-        assert entered.wait(timeout=5)
-        with pytest.raises(WorkflowError, match="already running on another thread"):
-            step.run(variables=initial_values, context=context)
-    finally:
-        release.set()
-        thread.join(timeout=5)
+    with ThreadPoolExecutor(max_workers=1) as executor_pool:
+        future = executor_pool.submit(
+            run_optimization,
+            context,
+            initial_values,
+            run_evaluator,
+            [handler],
+        )
+        try:
+            assert entered.wait(timeout=5)
+            run_optimization(
+                evaluator=run_evaluator,
+                variables=initial_values,
+                context=EnOptContext.model_validate(config),
+            )
+        finally:
+            release.set()
+        assert future.result(timeout=5) is not None
 
 
 def test_event_handler_serializes_concurrent_use() -> None:

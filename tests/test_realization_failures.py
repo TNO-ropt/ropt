@@ -6,14 +6,14 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt._components.compute_steps import EvaluationStep
+from ropt._components.compute_steps import run_evaluation
 from ropt._components.evaluators import EvaluationFunctionContext
 from ropt._core import EnsembleEvaluator
 from ropt._core._evaluator import (
     _get_failed_function_realizations,
     _get_failed_gradient_realizations,
 )
-from ropt._handlers import ResultsHandler
+from ropt._handlers import EventHandler, ResultsHandler
 from ropt.context import EnOptContext
 from ropt.results import (
     ConstraintInfo,
@@ -196,9 +196,15 @@ def test_results_handler_skips_an_evaluation_where_all_realizations_failed(
         }
     )
     handler = ResultsHandler(what=what)
-    step = EvaluationStep(evaluator=evaluator([_square_failing_below_zero]))
-    step.add_event_handler(handler)
-    step.run(context=context, variables=[[-1.0], [1.0], [2.0], [-1.0]])
+    run_evaluator = evaluator([_square_failing_below_zero])
+    handlers: list[EventHandler] = []
+    handlers.append(handler)
+    run_evaluation(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        context=context,
+        variables=[[-1.0], [1.0], [2.0], [-1.0]],
+    )
     assert handler.result is not None
     assert handler.result.target_objective == target
 

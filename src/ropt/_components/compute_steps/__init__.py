@@ -1,21 +1,8 @@
-"""Compute steps: the executable units of an optimization workflow.
-
-A [`ComputeStep`][ropt._components.compute_steps.ComputeStep] drives a run and
-emits events about it. Two implementations ship with `ropt`:
-[`OptimizationStep`][ropt._components.compute_steps.OptimizationStep] runs an
-optimization algorithm, and
-[`EvaluationStep`][ropt._components.compute_steps.EvaluationStep] runs a single
-ensemble evaluation.
-"""
+"""Run an optimization or evaluation and emit its events."""
 
 from __future__ import annotations
 
-from ._evaluator import EvaluationStep
-from ._optimizer import OptimizationStep
-from .base import ComputeStep
+from ._evaluator import run_evaluation
+from ._optimizer import run_optimization
 
-__all__ = [
-    "ComputeStep",
-    "EvaluationStep",
-    "OptimizationStep",
-]
+__all__ = ["run_evaluation", "run_optimization"]

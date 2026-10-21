@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt._components.compute_steps import OptimizationStep
+from ropt._components.compute_steps import run_optimization
 from ropt._evaluation import EvaluationBatchResult
 from ropt._handlers import CallbackHandler, ResultsHandler
 from ropt.context import EnOptContext
@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
     from ropt._evaluation import EvaluationBatchCallback, EvaluationBatchContext
+    from ropt._handlers import EventHandler
     from ropt.events import EnOptEvent
     from ropt.results import FunctionResults
 
@@ -39,19 +40,15 @@ class BasicOptimizer:
     2. wraps the
        [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] so
        that its return type is checked;
-    3. creates an
-       [`OptimizationStep`][ropt._components.compute_steps.OptimizationStep] and
-       attaches a
+    3. attaches a
        [`ResultsHandler`][ropt.ResultsHandler] to
        remember the best result;
-    4. runs the step, exposing the best
+    4. runs the optimization, exposing the best
        [`FunctionResults`][ropt.results.FunctionResults] via
        [`results`][ropt.workflow.BasicOptimizer.results].
 
     Progress can be monitored by registering a callback with
     [`set_results_callback`][ropt.workflow.BasicOptimizer.set_results_callback].
-    For more control (multiple runs, custom event handlers, or parallel/async
-    evaluation) use the workflow components directly.
 
     **Injecting event handlers into every run.** Extra event handlers can be
     added to *every* `BasicOptimizer` run without changing any call site, for
@@ -120,18 +117,18 @@ class BasicOptimizer:
             The exit code returned by the optimization workflow.
         """
         result_handler = ResultsHandler(constraint_tolerance=self._constraint_tolerance)
-        optimizer = OptimizationStep(evaluator=_checked(self._evaluator))
-        optimizer.add_event_handler(result_handler)
+        handlers: list[EventHandler] = [result_handler]
         for event_type, function in self._observers:
-            optimizer.add_event_handler(
+            handlers.append(
                 CallbackHandler(event_types={event_type}, callback=function)
             )
-        for handler in _custom_event_handlers():
-            optimizer.add_event_handler(handler())
+        handlers.extend(handler() for handler in _custom_event_handlers())
 
-        exit_code = optimizer.run(
+        exit_code = run_optimization(
             variables=np.asarray(initial_values, dtype=np.float64),
             context=self._context,
+            evaluator=_checked(self._evaluator),
+            handlers=handlers,
         )
         self._results = result_handler["results"]
         return exit_code

@@ -1,9 +1,9 @@
-"""This module implements the default optimizer compute step."""
+"""Run an optimization and emit its lifecycle events."""
 
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -14,149 +14,111 @@ from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import AbortedError, OptimizerStop
 
-from .base import ComputeStep
+from ._events import emit_event, validate_handlers
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from numpy.typing import ArrayLike
 
     from ropt._components.concurrency import AbortScope
     from ropt._evaluation import EvaluationBatchCallback
+    from ropt._handlers import EventHandler
     from ropt.context import EnOptContext
     from ropt.results import FunctionResults, GradientResults, Results
 
-
 _logger = get_logger(__name__)
 
-MetaDataType = dict[str, int | float | bool | str]
 
+def run_optimization(  # ruff: ignore[too-many-arguments]
+    context: EnOptContext,
+    variables: ArrayLike,
+    evaluator: EvaluationBatchCallback,
+    handlers: Sequence[EventHandler] = (),
+    *,
+    abort_scope: AbortScope | None = None,
+    metadata: dict[str, Any] | None = None,
+    f0: FunctionResults | None = None,
+    g0: GradientResults | None = None,
+) -> ExitCode:
+    """Run an optimization, delivering events to handlers in order.
 
-class OptimizationStep(ComputeStep[ExitCode]):
-    """The default optimizer compute step.
+    Args:
+        context:     The optimization context.
+        variables:   The initial variable vector.
+        evaluator:   The callable that evaluates batches.
+        handlers:    Event handlers in delivery order.
+        abort_scope: An optional scope that cuts this run off.
+        metadata:    Optional metadata attached to emitted results.
+        f0:          Optional function results at the initial variables.
+        g0:          Optional gradient results at the initial variables.
 
-    Executes an optimization algorithm, iteratively performing function and
-    gradient evaluations. Emits `START_OPTIMIZER`, `START_EVALUATION`,
-    `FINISHED_EVALUATION`, and `FINISHED_OPTIMIZER` events.
+    Returns:
+        The optimization exit code.
+
+    Raises:
+        ValueError: If the input variables have the wrong shape.
     """
+    validate_handlers(handlers)
+    variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+    if variables.shape != (context.variables.variable_count,):
+        msg = "The input variables have the wrong shape"
+        raise ValueError(msg)
+    context.lock()
+    stop_requested = False
 
-    def __init__(
-        self,
-        *,
-        evaluator: EvaluationBatchCallback,
-        abort_scope: AbortScope | None = None,
-        f0: FunctionResults | None = None,
-        g0: GradientResults | None = None,
-    ) -> None:
-        """Initialize a default optimizer.
+    def stop() -> None:
+        nonlocal stop_requested
+        stop_requested = True
 
-        `f0` and `g0` hold results already known at the initial variables. Only
-        the unscaled evaluations and the realizations they cover are used;
-        everything derived from them is recomputed.
+    def send(event: EnOptEvent) -> None:
+        emit_event(event, handlers, stop)
 
-        Args:
-            evaluator:   The callable that evaluates a batch of variables.
-            abort_scope: An optional scope that cuts this step off.
-            f0:          Optional function results at the initial variables.
-            g0:          Optional gradient results at the initial variables.
-        """
-        super().__init__(abort_scope=abort_scope)
-        self._evaluator = evaluator
-        self._f0 = f0
-        self._g0 = g0
-
-    @override
-    def _run(
-        self,
-        context: EnOptContext,
-        variables: ArrayLike,
-        *,
-        metadata: dict[str, Any] | None = None,
-    ) -> ExitCode:
-        """Run the optimization.
-
-        `metadata` is attached to the emitted
-        [`Results`][ropt.results.Results] via the `FINISHED_EVALUATION` event.
-
-        Args:
-            context:    The optimizer context.
-            variables:  Initial variable vector(s).
-            metadata:   Optional dictionary attached to emitted results.
-
-        Returns:
-            An exit code describing the outcome of the optimization.
-
-        Raises:
-            ValueError: If the input variables have the wrong shape.
-        """
-        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-        if variables.shape != (context.variables.variable_count,):
-            msg = "The input variables have the wrong shape"
-            raise ValueError(msg)
-        # Claim the context: it is single use, so two runs cannot share one.
-        context.lock()
-
-        self._context = context
-        self._metadata = metadata
-
-        _logger.debug(
-            "Configuration: %d variable(s), %d realization(s), %d objective(s)",
-            context.variables.variable_count,
-            context.realizations.weights.size,
-            context.objectives.weights.size,
-        )
-        _logger.info("Starting optimization")
-        self._emit_event(
-            EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context)
-        )
-
-        variables = scale(
-            variables, context.variables.scales, context.variables.offsets
-        )
-
-        ensemble_evaluator = EnsembleEvaluator(
-            self._context,
-            self._evaluator,
-            self._metadata,
-            f0=self._f0,
-            g0=self._g0,
-            signal_evaluation=self._signal_evaluation,
-        )
-        ensemble_optimizer = EnsembleOptimizer(
-            context=self._context,
-            ensemble_evaluator=ensemble_evaluator,
-        )
-        exit_code = ensemble_optimizer.start(variables)
-
-        _logger.info("Optimization finished: %s", exit_code.name)
-        self._emit_event(
-            EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context)
-        )
-
-        return exit_code
-
-    def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
-        # Called by the ensemble optimizer around every evaluation: without
-        # results before one starts, with them once it has finished.
+    def signal_evaluation(results: tuple[Results, ...] | None = None) -> None:
         if results is None:
-            self._emit_event(
-                EnOptEvent(
-                    event_type=EnOptEventType.START_EVALUATION, context=self._context
-                )
+            send(
+                EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
             )
         else:
-            if self._metadata is not None:
+            if metadata is not None:
                 for item in results:
-                    item.metadata = deepcopy(self._metadata)
-
-            self._emit_event(
+                    item.metadata = deepcopy(metadata)
+            send(
                 EnOptEvent(
                     event_type=EnOptEventType.FINISHED_EVALUATION,
-                    context=self._context,
+                    context=context,
                     results=results,
-                ),
+                )
             )
-        # Poll on the optimizer stack so a handler's stop() becomes a clean exit.
-        if self._stop_requested:
+        if stop_requested:
             raise OptimizerStop(ExitCode.STOPPED)
-        if self._aborting:
-            assert self._abort_scope is not None
-            raise AbortedError(self._abort_scope.exit_code)
+        if abort_scope is not None and abort_scope.aborting:
+            raise AbortedError(abort_scope.exit_code)
+
+    _logger.debug(
+        "Configuration: %d variable(s), %d realization(s), %d objective(s)",
+        context.variables.variable_count,
+        context.realizations.weights.size,
+        context.objectives.weights.size,
+    )
+    _logger.info("Starting optimization")
+    send(EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context))
+
+    variables = scale(variables, context.variables.scales, context.variables.offsets)
+    ensemble_evaluator = EnsembleEvaluator(
+        context,
+        evaluator,
+        metadata,
+        f0=f0,
+        g0=g0,
+        signal_evaluation=signal_evaluation,
+    )
+    ensemble_optimizer = EnsembleOptimizer(
+        context=context,
+        ensemble_evaluator=ensemble_evaluator,
+    )
+    exit_code = ensemble_optimizer.start(variables)
+
+    _logger.info("Optimization finished: %s", exit_code.name)
+    send(EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context))
+    return exit_code

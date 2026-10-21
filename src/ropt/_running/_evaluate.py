@@ -1,9 +1,8 @@
 """The evaluations behind the module functions.
 
-The same shape as `_optimize`, with an evaluation step in place of the
-optimizer: one batch of variable vectors, evaluated once, with no loop around
-it. The caller decides whether it wanted one vector or a matrix of them, so
-neither has to guess which was meant.
+The same shape as `_optimize`, but evaluating one batch of variable vectors
+without an optimization loop. The caller decides whether it wanted one vector
+or a matrix of them, so neither has to guess which was meant.
 """
 
 from __future__ import annotations
@@ -12,12 +11,12 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ropt._components.compute_steps import EvaluationStep
+from ropt._components.compute_steps import run_evaluation
 from ropt._handlers import HistoryHandler
 from ropt.context import EnOptContext
 
 from ._evaluator import make_evaluator
-from ._handlers import attach_handlers
+from ._handlers import make_handlers
 from ._linked_abort_scope import linked_abort_scope
 from ._result import EvaluationResult
 
@@ -29,6 +28,7 @@ if TYPE_CHECKING:
 
     from ropt._components.concurrency import AbortScope
     from ropt._components.executors import Executor
+    from ropt._evaluation import EvaluationBatchCallback
     from ropt._handlers import EventHandler
     from ropt.results import FunctionResults
 
@@ -115,16 +115,14 @@ def _build_evaluation(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     scope: AbortScope,
-) -> tuple[EnOptContext, EvaluationStep, HistoryHandler]:
+) -> tuple[EnOptContext, EvaluationBatchCallback, HistoryHandler, list[EventHandler]]:
     context = EnOptContext.model_validate(config)
     evaluator = make_evaluator(context, function, executor, scope)
     # The results are collected by this run's own handler, in the order the
     # vectors were given, which is the order they are returned in.
     history = HistoryHandler()
-    step = EvaluationStep(evaluator=evaluator, abort_scope=scope)
-    step.add_event_handler(history)
-    attach_handlers(step, handlers, report)
-    return context, step, history
+    ordered = [history, *make_handlers(handlers, report)]
+    return context, evaluator, history, ordered
 
 
 def _run_evaluation(  # ruff: ignore[too-many-arguments]
@@ -139,7 +137,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     with linked_abort_scope(session) as scope:
-        context, step, history = _build_evaluation(
+        context, evaluator, history, ordered = _build_evaluation(
             executor,
             config,
             function,
@@ -148,9 +146,11 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
             scope=scope,
         )
         with scope.as_current():
-            step.run(
+            run_evaluation(
                 context=context,
                 variables=np.asarray(variables, dtype=np.float64),
+                evaluator=evaluator,
+                handlers=ordered,
                 metadata=metadata,
             )
     return EvaluationResult(results=tuple(history["results"] or ()))

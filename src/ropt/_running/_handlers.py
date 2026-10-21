@@ -1,4 +1,4 @@
-"""Wiring a run's result handlers to its compute step.
+"""Build the ordered event handlers of a run.
 
 Every entry point takes `handlers=`, a list of
 [`EventHandler`][ropt.EventHandler] objects. The same
@@ -11,27 +11,25 @@ See [Result Handlers](../results/handlers.md).
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ._report import make_report_handler
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from ropt._components.compute_steps import ComputeStep
     from ropt._handlers import EventHandler
 
     from ._report import ReportCallback
 
 
-def attach_handlers(
-    step: ComputeStep[Any],
+def make_handlers(
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     *,
     report_gradients: bool = False,
-) -> None:
-    for handler in handlers or ():
-        step.add_event_handler(handler)
+) -> list[EventHandler]:
+    ordered = list(handlers or ())
     if report is not None:
-        step.add_event_handler(make_report_handler(report, gradients=report_gradients))
+        ordered.append(make_report_handler(report, gradients=report_gradients))
+    return ordered

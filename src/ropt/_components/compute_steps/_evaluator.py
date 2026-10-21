@@ -1,9 +1,9 @@
-"""This module implements the default evaluator."""
+"""Evaluate a batch and emit its lifecycle events."""
 
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -14,139 +14,92 @@ from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
 
-from .base import ComputeStep
+from ._events import emit_event, validate_handlers
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, NDArray
+    from collections.abc import Sequence
 
-    from ropt._components.concurrency import AbortScope
+    from numpy.typing import ArrayLike
+
     from ropt._evaluation import EvaluationBatchCallback
+    from ropt._handlers import EventHandler
     from ropt.context import EnOptContext
     from ropt.results import Results
-
 
 _logger = get_logger(__name__)
 
 
-class EvaluationStep(ComputeStep[None]):
-    """The default evaluation step compute step.
+def run_evaluation(
+    context: EnOptContext,
+    variables: ArrayLike,
+    evaluator: EvaluationBatchCallback,
+    handlers: Sequence[EventHandler] = (),
+    *,
+    metadata: dict[str, Any] | None = None,
+) -> None:
+    """Evaluate variable vectors, delivering events to handlers in order.
 
-    Evaluates a batch of variable vectors (a single vector or a 2-D matrix
-    where each row is a variable vector) and yields
-    [`FunctionResults`][ropt.results.FunctionResults] objects. Emits
-    `START_ENSEMBLE_EVALUATOR`, `START_EVALUATION`, `FINISHED_EVALUATION`,
-    and `FINISHED_ENSEMBLE_EVALUATOR` events.
+    Args:
+        context:   The optimization context.
+        variables: A vector or matrix of variable vectors.
+        evaluator: The callable that evaluates batches.
+        handlers:  Event handlers in delivery order.
+        metadata:  Optional metadata attached to emitted results.
+
+    Raises:
+        ValueError: If the input variables have the wrong shape.
     """
+    validate_handlers(handlers)
+    variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
+    if variables.shape[-1] != context.variables.variable_count:
+        msg = "The input variables have the wrong shape"
+        raise ValueError(msg)
+    context.lock()
 
-    def __init__(
-        self,
-        *,
-        evaluator: EvaluationBatchCallback,
-        abort_scope: AbortScope | None = None,
-    ) -> None:
-        """Initialize a default evaluator.
+    def send(event: EnOptEvent) -> None:
+        emit_event(event, handlers, stop)
 
-        Args:
-            evaluator:   The callable that evaluates a batch of variables.
-            abort_scope: An optional scope that cuts this step off.
-        """
-        super().__init__(abort_scope=abort_scope)
-        self._evaluator = evaluator
+    def stop() -> None:
+        pass
 
-    @override
-    def _run(
-        self,
-        context: EnOptContext,
-        variables: ArrayLike,
-        *,
-        metadata: dict[str, Any] | None = None,
-    ) -> None:
-        """Run the ensemble evaluation.
-
-        `metadata` is attached to the emitted
-        [`FunctionResults`][ropt.results.FunctionResults] via the
-        `FINISHED_EVALUATION` event.
-
-        Args:
-            context:   Optimizer context.
-            variables: Variable vector(s) to evaluate.
-            metadata:  Optional dictionary attached to emitted results.
-
-        Raises:
-            ValueError: If the input variables have the wrong shape.
-        """
-        # A single vector is accepted as a batch of one, so everything below
-        # works on a matrix.
-        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
-        if variables.shape[-1] != context.variables.variable_count:
-            msg = "The input variables have the wrong shape"
-            raise ValueError(msg)
-        # Claim the context: it is single use, so two runs cannot share one.
-        context.lock()
-
-        _logger.info("Starting evaluation")
-        results = self._evaluate(context, variables, metadata)
-        _logger.info("Evaluation finished")
-        self._emit_event(
-            EnOptEvent(
-                event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
-                context=context,
-                results=results,
-            )
-        )
-
-    def _evaluate(
-        self,
-        context: EnOptContext,
-        variables: NDArray[np.float64],
-        metadata: dict[str, Any] | None,
-    ) -> tuple[Results, ...]:
-        self._emit_event(
-            EnOptEvent(
-                event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, context=context
-            )
-        )
-
-        variables = scale(
-            variables, context.variables.scales, context.variables.offsets
-        )
-
-        self._context = context
-        self._metadata = metadata
-        ensemble_evaluator = EnsembleEvaluator(
-            context,
-            self._evaluator,
-            metadata,
-            signal_evaluation=self._signal_evaluation,
-        )
-
-        results = ensemble_evaluator.calculate(
-            variables, compute_functions=True, compute_gradients=False
-        )
-
-        assert results
-        assert isinstance(results[0], FunctionResults)
-
-        return results
-
-    def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
-        # Called by the ensemble evaluator around every evaluation: without
-        # results before one starts, with them once it has finished.
+    def signal_evaluation(results: tuple[Results, ...] | None = None) -> None:
         if results is None:
-            self._emit_event(
-                EnOptEvent(
-                    event_type=EnOptEventType.START_EVALUATION, context=self._context
-                )
+            send(
+                EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
             )
         else:
-            if self._metadata is not None:
+            if metadata is not None:
                 for item in results:
-                    item.metadata = deepcopy(self._metadata)
-
-            self._emit_event(
+                    item.metadata = deepcopy(metadata)
+            send(
                 EnOptEvent(
                     event_type=EnOptEventType.FINISHED_EVALUATION,
-                    context=self._context,
+                    context=context,
                     results=results,
                 )
             )
+
+    _logger.info("Starting evaluation")
+    send(
+        EnOptEvent(event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, context=context)
+    )
+    variables = scale(variables, context.variables.scales, context.variables.offsets)
+    ensemble_evaluator = EnsembleEvaluator(
+        context,
+        evaluator,
+        metadata,
+        signal_evaluation=signal_evaluation,
+    )
+    results = ensemble_evaluator.calculate(
+        variables, compute_functions=True, compute_gradients=False
+    )
+    assert results
+    assert isinstance(results[0], FunctionResults)
+    _logger.info("Evaluation finished")
+    send(
+        EnOptEvent(
+            event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
+            context=context,
+            results=results,
+        )
+    )

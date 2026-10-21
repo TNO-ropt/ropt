@@ -31,7 +31,7 @@ import numpy as np
 import pytest
 
 from ropt import run, session
-from ropt._components.compute_steps import OptimizationStep
+from ropt._components.compute_steps import run_optimization
 from ropt._components.concurrency import AbortScope, _program, current_abort_scope
 from ropt._components.evaluators import (
     EvaluationFunctionCallback,
@@ -62,7 +62,7 @@ from ropt._components.executors._process_executor import (
     _Slot,
     _stop_workers,
 )
-from ropt._handlers import ResultsHandler
+from ropt._handlers import EventHandler, ResultsHandler
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
@@ -1113,9 +1113,17 @@ def _opt_workflow(
 ) -> FunctionResults | None:
     evaluator = make_batch_evaluator(function=test_function, executor=executor)
     result_handler = ResultsHandler()
-    step = OptimizationStep(evaluator=evaluator)
-    step.add_event_handler(result_handler)
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    run_evaluator = evaluator
+    handlers: list[EventHandler] = []
+    run_scope = None
+    handlers.append(result_handler)
+    run_optimization(
+        evaluator=run_evaluator,
+        handlers=handlers,
+        abort_scope=run_scope,
+        variables=initial_values,
+        context=EnOptContext.model_validate(config),
+    )
     return cast("FunctionResults | None", result_handler["results"])
 
 

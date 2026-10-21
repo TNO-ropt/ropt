@@ -29,13 +29,11 @@ def _run_callback(callback: Callable[[], None]) -> None:
 class AbortScope:
     """An abort request for a call and the calls nested in it.
 
-    A step is given one at construction and polls it at the same points it
-    polls its own [`stop`][ropt._components.compute_steps.ComputeStep.stop]
-    request, so one scope reaches any number of steps at once. The two differ
-    in kind: `stop` ends a run on a criterion it was given, while a scope aborts
-    it without consulting it. They also differ in lifetime, since `stop` is
-    cleared by the next `run` and a scope is not: a step that starts while the
-    scope is aborting is aborted from the outset.
+    A run polls its scope at the same points it polls an event handler's stop
+    request, so one scope reaches any number of runs at once. A stop ends an
+    optimization on a criterion it was given, while a scope aborts it without
+    consulting it. A scope cannot be reset: a run that starts while its scope
+    is aborting is aborted from the outset.
 
     Code that cannot poll registers a callback instead, which is how a blocked
     [`Executor.run`][ropt._components.executors.Executor.run] is woken rather
