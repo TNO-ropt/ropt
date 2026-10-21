@@ -132,10 +132,9 @@ generally comes from the optimizer.
 
     | Logger | Emits |
     | --- | --- |
-    | `ropt.running` | the start and finish of an optimization or evaluation, and the configuration it started from |
+    | `ropt.running` | the start and finish of an optimization or evaluation, its configuration, and work-item dispatch |
     | `ropt.core` | per-batch realization counts, stopping conditions, optimizer callbacks, and reuse of cached results |
     | `ropt.executors` | executor start-up, job submission and cancellation, retained working directories, and exceptions raised by work that an aborted call no longer waits for |
-    | `ropt.evaluators` | work-item dispatch |
     | `ropt.handlers` | each new best objective, and any handler that raised |
     | `ropt.backend.scipy`, `ropt.backend.external` | the method in use, and the external subprocess lifecycle |
     | `ropt.plugins` | plugin registration |

@@ -4,8 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt._evaluators import make_batch_evaluator
-
+from ._batch_evaluator import make_batch_evaluator
 from ._batch_ids import next_batch_id
 from ._function import adapt_function
 

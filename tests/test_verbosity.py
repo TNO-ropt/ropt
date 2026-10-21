@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from ropt import optimize
-from ropt._evaluators import (
+from ropt._evaluation import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )

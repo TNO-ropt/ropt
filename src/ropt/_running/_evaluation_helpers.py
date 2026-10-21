@@ -1,4 +1,4 @@
-"""Shared helpers for the builtin evaluators."""
+"""Build per-row contexts and collect results from an evaluation batch."""
 
 from __future__ import annotations
 
@@ -6,18 +6,15 @@ from typing import TYPE_CHECKING, Any, Final
 
 import numpy as np
 
+from ropt._evaluation import EvaluationFunctionContext
 from ropt.enums import AxisName
-
-from .base import EvaluationFunctionContext
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from numpy.typing import NDArray
 
-    from ropt._evaluation import EvaluationBatchContext
-
-    from .base import EvaluationFunctionResult
+    from ropt._evaluation import EvaluationBatchContext, EvaluationFunctionResult
 
 # A metadata key names the axis its array values span, so it must not collide
 # with a builtin axis or with the batch column the exporters add themselves.

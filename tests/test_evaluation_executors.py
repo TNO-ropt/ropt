@@ -32,13 +32,11 @@ import pytest
 
 from ropt import run, session
 from ropt._concurrency import AbortScope, _program, current_abort_scope
-from ropt._evaluators import (
+from ropt._evaluation import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
-    make_batch_evaluator,
 )
-from ropt._evaluators._evaluator import _handle_result
 from ropt._executors import (
     ExecutorFailure,
     HPCExecutor,
@@ -62,6 +60,7 @@ from ropt._executors._process_executor import (
     _stop_workers,
 )
 from ropt._handlers import EventHandler, ResultsHandler
+from ropt._running._batch_evaluator import _handle_result, make_batch_evaluator
 from ropt._running._run_optimizer import run_optimization
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.context import EnOptContext

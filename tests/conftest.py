@@ -6,12 +6,12 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt._evaluators import (
+from ropt._evaluation import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
-    make_batch_evaluator,
 )
+from ropt._running._batch_evaluator import make_batch_evaluator
 
 _Function = Callable[[NDArray[np.float64], EvaluationFunctionContext], float]
 

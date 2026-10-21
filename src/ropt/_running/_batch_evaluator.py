@@ -6,14 +6,18 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
+from ropt._evaluation import (
+    EvaluationBatchContext,
+    EvaluationBatchResult,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
+)
 from ropt._executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt._logging import get_logger
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 
-from ._common import _active_evaluations, _build_metadata, _scatter_result
-from ._counter import BatchIdCounter
-from .base import EvaluationFunctionContext, EvaluationFunctionResult
+from ._batch_ids import BatchIdCounter
+from ._evaluation_helpers import _active_evaluations, _build_metadata, _scatter_result
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -21,10 +25,8 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt._concurrency import AbortScope
-    from ropt._evaluation import EvaluationBatchCallback
+    from ropt._evaluation import EvaluationBatchCallback, EvaluationFunctionCallback
     from ropt._executors import Executor
-
-    from .base import EvaluationFunctionCallback
 
 _logger = get_logger(__name__)
 

@@ -11,11 +11,10 @@ import numpy as np
 import pytest
 
 from ropt._concurrency import AbortScope, current_abort_scope
-from ropt._evaluation import EvaluationBatchContext
-from ropt._evaluators import (
+from ropt._evaluation import (
+    EvaluationBatchContext,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
-    make_batch_evaluator,
 )
 from ropt._handlers import (
     CallbackHandler,
@@ -23,6 +22,7 @@ from ropt._handlers import (
     HistoryHandler,
     ResultsHandler,
 )
+from ropt._running._batch_evaluator import make_batch_evaluator
 from ropt._running._run_evaluator import run_evaluation
 from ropt._running._run_optimizer import run_optimization
 from ropt.context import EnOptContext

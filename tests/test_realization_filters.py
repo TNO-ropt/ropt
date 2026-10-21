@@ -9,7 +9,7 @@ from numpy.typing import NDArray
 
 from ropt import optimize
 from ropt._core import EnsembleEvaluator
-from ropt._evaluators import EvaluationFunctionContext
+from ropt._evaluation import EvaluationFunctionContext
 from ropt._handlers import CallbackHandler
 from ropt.config._realization_filter_config import RealizationFilterConfig
 from ropt.context import EnOptContext

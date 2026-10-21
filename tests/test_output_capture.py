@@ -17,7 +17,7 @@ import numpy as np
 import pytest
 
 from ropt import optimize
-from ropt._evaluators import (
+from ropt._evaluation import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
@@ -240,7 +240,7 @@ def test_capture_does_not_leak_file_descriptors(tmp_path: Path) -> None:
 _SUBPROCESS_SCRIPT = """
 import sys
 import numpy as np
-from ropt._evaluators import EvaluationFunctionResult
+from ropt._evaluation import EvaluationFunctionResult
 from ropt.plugins import register_plugin
 from ropt import optimize
 sys.path.insert(0, {tests!r})
