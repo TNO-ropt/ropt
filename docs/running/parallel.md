@@ -346,8 +346,10 @@ to them differs:
 | `process_pool` | as with a thread pool, and workers still busy five seconds later are **killed** |
 | `hpc_pool` | the jobs are **deleted from the queue**; on the local queue, each job **and every program it started** is terminated, and killed five seconds later if still running |
 
-The optimization raises at once and does not wait for them. When the session
-closes, it waits up to five seconds for its pools to become idle.
+With a pool, the optimization raises without waiting for running evaluations.
+Without a pool, it raises after the current evaluation returns, including when
+the abort arrived during the last evaluation. When the session closes, it
+waits up to five seconds for its pools to become idle.
 
 **A thread cannot be killed.** Python provides no way to stop a running thread
 from outside. An evaluation with a thread pool stops early only if it checks

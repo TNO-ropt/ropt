@@ -5,7 +5,7 @@ import pickle  # ruff: ignore[suspicious-pickle-import]
 import threading
 from copy import deepcopy
 from functools import partial
-from typing import TYPE_CHECKING, Any, override
+from typing import TYPE_CHECKING, Any, cast, override
 
 import numpy as np
 import pytest
@@ -17,6 +17,7 @@ from ropt._components.evaluators import (
     EvaluationFunctionResult,
     make_batch_evaluator,
 )
+from ropt._evaluation import EvaluationBatchContext
 from ropt._handlers import (
     CallbackHandler,
     EventHandler,
@@ -718,6 +719,71 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
     assert result_handler["results"] is not None
     assert exit_code == ExitCode.STOPPED
     assert last_evaluation == 1
+
+
+@pytest.mark.parametrize("row_count", [1, 2])
+def test_direct_evaluator_aborts_after_function_returns(
+    config: dict[str, Any], row_count: int
+) -> None:
+    scope = AbortScope()
+    calls = 0
+
+    def _function(
+        variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> EvaluationFunctionResult:
+        nonlocal calls
+        assert variables.shape == (len(initial_values),)
+        assert context.row_idx == calls
+        calls += 1
+        scope.abort(ExitCode.USER_ABORT)
+        return EvaluationFunctionResult(objectives=np.array([1.0, 2.0]))
+
+    context = EvaluationBatchContext(
+        context=EnOptContext.model_validate(config),
+        active=np.ones(row_count, dtype=np.bool_),
+        realizations=np.zeros(row_count, dtype=np.intc),
+        perturbations=np.zeros(row_count, dtype=np.intc),
+        function_ids=np.zeros(row_count, dtype=np.intc),
+    )
+    evaluate = make_batch_evaluator(function=_function, abort_scope=scope)
+    with pytest.raises(AbortedError) as raised:
+        evaluate(np.zeros((row_count, len(initial_values))), context)
+    assert raised.value.exit_code is ExitCode.USER_ABORT
+    assert calls == 1
+
+
+@pytest.mark.parametrize("invalid_result", ["type", "shape"])
+def test_direct_evaluator_rejects_bad_result_before_next_row(
+    config: dict[str, Any], invalid_result: str
+) -> None:
+    calls = 0
+
+    def _function(
+        variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> EvaluationFunctionResult:
+        nonlocal calls
+        assert variables.shape == (len(initial_values),)
+        assert context.row_idx == calls
+        calls += 1
+        if invalid_result == "type":
+            return cast("EvaluationFunctionResult", 1.0)
+        return EvaluationFunctionResult(objectives=np.array([1.0, 2.0, 3.0]))
+
+    context = EvaluationBatchContext(
+        context=EnOptContext.model_validate(config),
+        active=np.ones(2, dtype=np.bool_),
+        realizations=np.zeros(2, dtype=np.intc),
+        perturbations=np.zeros(2, dtype=np.intc),
+        function_ids=np.zeros(2, dtype=np.intc),
+    )
+    evaluate = make_batch_evaluator(function=_function)
+    if invalid_result == "type":
+        with pytest.raises(WorkflowError, match="must return EvaluationFunctionResult"):
+            evaluate(np.zeros((2, len(initial_values))), context)
+    else:
+        with pytest.raises(ValueError, match="could not broadcast input array"):
+            evaluate(np.zeros((2, len(initial_values))), context)
+    assert calls == 1
 
 
 def test_handler_stop_ends_with_stopped(config: Any, evaluator: Any) -> None:

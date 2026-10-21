@@ -38,7 +38,8 @@ def make_batch_evaluator(
 ) -> EvaluationBatchCallback:
     """Build a batch evaluation callable that calls a function once per row.
 
-    Without an executor the rows run one after another on the calling thread.
+    Without an executor the rows run one after another on the calling thread;
+    an abort is checked before and after each function call.
     With an executor each active row is sent as its own work item, and the
     callable returns once every result is back.
 
@@ -73,7 +74,7 @@ def make_batch_evaluator(
         active = list(_active_evaluations(evaluator_context, batch_id))
         if executor is None:
             for row_idx, result in _run_rows(function, variables, active, abort_scope):
-                _scatter_result(row_idx, result, results, metadata, no)
+                _handle_result(row_idx, result, results, metadata, no)
         else:
             values = _dispatch_rows(function, variables, active, executor, abort_scope)
             for (row_idx, _), value in zip(active, values, strict=True):
@@ -96,11 +97,12 @@ def _run_rows(
     abort_scope: AbortScope | None,
 ) -> Iterator[tuple[int, EvaluationFunctionResult]]:
     for row_idx, function_context in active:
-        # The rows run on this thread, so this is the only place the batch
-        # can be aborted part way.
         if abort_scope is not None and abort_scope.aborting:
             raise AbortedError(abort_scope.exit_code)
-        yield row_idx, function(variables[row_idx, :], function_context)
+        result = function(variables[row_idx, :], function_context)
+        if abort_scope is not None and abort_scope.aborting:
+            raise AbortedError(abort_scope.exit_code)
+        yield row_idx, result
 
 
 def _dispatch_rows(
