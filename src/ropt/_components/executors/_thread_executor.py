@@ -104,11 +104,11 @@ class ThreadExecutor(ExecutorBase):
                     future.add_done_callback(partial(_log_left_running, Future.result))
 
     @override
-    def _stop(self) -> None:
+    def _begin_shutdown(self) -> None:
         self._pool.shutdown(wait=False, cancel_futures=True)
 
     @override
-    def _close(self, deadline: float) -> None:
+    def _finish_shutdown(self, deadline: float) -> None:
         _wait_for(self._idle, lambda: self._running == 0, deadline)
 
     def _submit(self, item: WorkItem, abort_scope: AbortScope | None) -> Future[Any]:

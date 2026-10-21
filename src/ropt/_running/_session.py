@@ -127,7 +127,7 @@ class Session:
         executors = [pool._release() for pool in pools or ()]  # ruff: ignore[private-member-access]
         for executor in executors:
             if executor is not None:
-                executor._close(deadline)  # ruff: ignore[private-member-access]
+                executor._finish_shutdown(deadline)  # ruff: ignore[private-member-access]
 
     def abort(self) -> None:
         """Abort the calls given its pools or made in its `with` block.
@@ -145,7 +145,7 @@ class Session:
         with self._lock:
             pools = list(self._pools or ())
         for pool in pools:
-            pool._retire()  # ruff: ignore[private-member-access]
+            pool._retire_after_abort()  # ruff: ignore[private-member-access]
 
     def _open_abort_scope(self) -> AbortScope:
         self._require_open()

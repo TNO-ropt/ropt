@@ -137,7 +137,7 @@ class ProcessExecutor(ExecutorBase):
         return self._current
 
     @override
-    def _retire(self) -> None:
+    def _retire_after_abort(self) -> None:
         with self._state:
             workers = self._current
             if self._retiring or workers is None or not workers.busy():
@@ -155,7 +155,7 @@ class ProcessExecutor(ExecutorBase):
                 _stop_workers(workers.pool, kill=True)
 
     @override
-    def _close(self, deadline: float) -> None:
+    def _finish_shutdown(self, deadline: float) -> None:
         with self._state:
             workers, self._current = self._current, None
         if workers is None:

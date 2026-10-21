@@ -65,13 +65,13 @@ class WorkerPool:
         executor, self._executor = self._executor, None
         if not isinstance(executor, ExecutorBase):
             return None
-        executor._stop()  # ruff: ignore[private-member-access]
+        executor._begin_shutdown()  # ruff: ignore[private-member-access]
         return executor
 
-    def _retire(self) -> None:
+    def _retire_after_abort(self) -> None:
         executor = self._executor
         if isinstance(executor, ExecutorBase):
-            executor._retire()  # ruff: ignore[private-member-access]
+            executor._retire_after_abort()  # ruff: ignore[private-member-access]
 
 
 def pool_parts(pool: WorkerPool | None) -> tuple[Session | None, Executor | None]:

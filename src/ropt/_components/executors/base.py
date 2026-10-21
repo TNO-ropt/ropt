@@ -235,16 +235,16 @@ class ExecutorBase(Executor):
         """Initialize the executor."""
         super().__init__()
 
-    def _stop(self) -> None:
+    def _begin_shutdown(self) -> None:
         # Called when the owner releases the executor, after aborting its work:
         # refuse new work and start ending what runs, without waiting.
         pass
 
-    def _close(self, deadline: float) -> None:
-        # Called after `_stop`: wait until `deadline` at most for running work.
+    def _finish_shutdown(self, deadline: float) -> None:
+        # Called after `_begin_shutdown`: wait until `deadline` at most for running work.
         pass
 
-    def _retire(self) -> None:
+    def _retire_after_abort(self) -> None:
         # Called after the owner aborted the work: end what still runs once a
         # grace period has passed, without waiting for it here.
         pass
