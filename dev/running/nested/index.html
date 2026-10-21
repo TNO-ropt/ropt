@@ -2798,14 +2798,27 @@ for the outer evaluations that were computed, not for every outer evaluation.</p
 <h2 id="collecting-results-from-optimizations-that-overlap">Collecting results from optimizations that overlap</h2>
 <p>The inner optimizations are concurrent, and <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">one
 handler</a> collects them
-all: it takes a lock around every event it handles, so the optimizations wait for
-each other rather than interleaving. Give every inner optimization the same
+all: it takes a lock around every event it handles, so two optimizations never
+write the same event at the same time. Give every inner optimization the same
 <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a> and every inner evaluation
 from every inner optimization lands in one table, keyed by the outer evaluation it
 belongs to.</p>
+<p>The rows of one event stay together, but the events of overlapping inner
+optimizations arrive in thread order, so their rows interleave and the order
+differs from run to run. The outer batches do not overlap: an outer batch
+finishes before the next one starts. Sorting on the two keys groups the rows by
+inner optimization:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">frame</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="s2">"inner"</span><span class="p">]</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s2">"Outer-batch"</span><span class="p">,</span> <span class="s2">"Outer-eval"</span><span class="p">],</span> <span class="n">maintain_order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></code></pre></div>
+<p>The pair of keys identifies one inner optimization, because the row index starts
+again in every outer batch. <code>maintain_order=True</code> makes the sort stable, so the
+rows of one inner optimization keep the order in which they arrived, which is
+the order of its batches. Without it, polars may reorder rows with equal keys.
+Calculations that do not use the row order, such as finding the best objective,
+do not need the sort.</p>
 <p>Reading the answer takes one more step than usual:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">best</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">"Objective"</span><span class="p">)</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">best</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Variable,</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span><span class="p">)]</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">best</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">"Objective"</span><span class="p">)</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">best</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Variable,</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span><span class="p">)]</span>
 </span></code></pre></div>
 <p>The outer result is not the place to look. The outer layer only ever sees its
 own variables and holds the inner ones at their initial values, so the optimum
