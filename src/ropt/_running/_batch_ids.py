@@ -8,6 +8,6 @@ event handler.
 
 from __future__ import annotations
 
-from ropt._components.evaluators import BatchIdCounter
+from ropt._evaluators import BatchIdCounter
 
 next_batch_id = BatchIdCounter()

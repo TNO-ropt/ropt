@@ -20,14 +20,14 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Self
 
-from ropt._components.concurrency import AbortScope, _grace, current_abort_scope
-from ropt._components.executors import (
+from ropt._concurrency import AbortScope, _grace, current_abort_scope
+from ropt._executors import (
     HPCExecutor,
     LocalJobExecutor,
     ProcessExecutor,
     ThreadExecutor,
 )
-from ropt._components.executors._hpc_executor import clusters_with_queue
+from ropt._executors._hpc_executor import clusters_with_queue
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, WorkflowError
 
@@ -36,7 +36,7 @@ from ._pool import WorkerPool
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from ropt._components.executors import Executor
+    from ropt._executors import Executor
 
 
 _LOCAL_QUEUE = "local"

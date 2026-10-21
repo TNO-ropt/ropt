@@ -10,13 +10,13 @@ from typing import TYPE_CHECKING, Any, cast, override
 import numpy as np
 import pytest
 
-from ropt._components.concurrency import AbortScope, current_abort_scope
-from ropt._components.evaluators import (
+from ropt._concurrency import AbortScope, current_abort_scope
+from ropt._evaluation import EvaluationBatchContext
+from ropt._evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     make_batch_evaluator,
 )
-from ropt._evaluation import EvaluationBatchContext
 from ropt._handlers import (
     CallbackHandler,
     EventHandler,

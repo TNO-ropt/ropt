@@ -14,7 +14,7 @@ a failure. ropt's own arithmetic — `extra_polls`, `query_retries`, worker
 limits — stays in the mocked tests, where it is deterministic and fast.
 
 The submitted callables are all resolvable from the standard library, because a
-compute node runs `sys.executable -m ropt._components.executors` and cannot
+compute node runs `sys.executable -m ropt._executors` and cannot
 import this test module. The tests that run the HPC examples are the exception:
 they put the example directories on `PYTHONPATH`, which the scheduler passes to
 the job, so a compute node can import them by name.
@@ -33,7 +33,7 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from ropt._components.executors import ExecutorFailure, HPCExecutor, WorkItem
+from ropt._executors import ExecutorFailure, HPCExecutor, WorkItem
 
 if TYPE_CHECKING:
     from collections.abc import Iterator

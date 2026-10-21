@@ -1,7 +1,7 @@
 """High-level optimization driver.
 
 [`BasicOptimizer`][ropt.workflow.BasicOptimizer] runs a single optimization by
-assembling the low-level `ropt._components` building blocks.
+assembling internal evaluators, executors and workflow functions.
 """
 
 from ropt._evaluation import (

@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike
 
-    from ropt._components.concurrency import AbortScope
+    from ropt._concurrency import AbortScope
     from ropt._evaluation import EvaluationBatchCallback
     from ropt._handlers import EventHandler
     from ropt.context import EnOptContext

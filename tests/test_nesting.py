@@ -17,7 +17,7 @@ import numpy as np
 import pytest
 
 from ropt import evaluate, evaluate_batch, optimize, run, session
-from ropt._components.concurrency import current_abort_scope
+from ropt._concurrency import current_abort_scope
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
 

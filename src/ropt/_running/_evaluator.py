@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt._components.evaluators import make_batch_evaluator
+from ropt._evaluators import make_batch_evaluator
 
 from ._batch_ids import next_batch_id
 from ._function import adapt_function
 
 if TYPE_CHECKING:
-    from ropt._components.concurrency import AbortScope
-    from ropt._components.executors import Executor
+    from ropt._concurrency import AbortScope
     from ropt._evaluation import EvaluationBatchCallback
+    from ropt._executors import Executor
     from ropt.context import EnOptContext
 
     from ._function import EvaluationFunction

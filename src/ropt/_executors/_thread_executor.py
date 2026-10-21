@@ -26,7 +26,7 @@ from .base import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from ropt._components.concurrency import AbortScope
+    from ropt._concurrency import AbortScope
 
 _logger = get_logger(__name__)
 

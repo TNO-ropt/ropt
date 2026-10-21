@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
 
-from ropt._components.executors import ExecutorFailure, WorkItem, WorkNotRun
+from ropt._executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt.exceptions import AbortedError, ExecutionError
 
 from ._linked_abort_scope import linked_abort_scope
@@ -18,8 +18,8 @@ from ._linked_abort_scope import linked_abort_scope
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from ropt._components.concurrency import AbortScope
-    from ropt._components.executors import Executor
+    from ropt._concurrency import AbortScope
+    from ropt._executors import Executor
 
     from ._session import Session
 

@@ -3,7 +3,7 @@
 Unlike the thread and process executors, there is no channel back from a job:
 work travels over the filesystem, as a serialized `<id>.in` file the job reads
 and an `<id>.out` file it writes, with `<id>.txt` for whatever it printed. The
-job runs `ropt._components.executors` as a module, with the interpreter that
+job runs `ropt._executors` as a module, with the interpreter that
 started it, which is the one `ropt` is installed in.
 
 So there is nothing to await, only a backend to ask, and asking blocks. The
@@ -59,7 +59,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from uuid import UUID
 
-    from ropt._components.concurrency import AbortScope
+    from ropt._concurrency import AbortScope
 
 _logger = get_logger(__name__)
 
@@ -553,7 +553,7 @@ class JobExecutorBase(ExecutorBase):
                 [
                     sys.executable,
                     "-m",
-                    "ropt._components.executors",
+                    "ropt._executors",
                     str(input_file),
                     str(output_file),
                 ],

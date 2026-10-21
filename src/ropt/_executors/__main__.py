@@ -13,7 +13,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from ropt._components.executors._picklable import picklable_exception
+from ropt._executors._picklable import picklable_exception
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dump, load
 
 

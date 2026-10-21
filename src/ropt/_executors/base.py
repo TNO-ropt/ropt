@@ -2,7 +2,7 @@
 
 An executor runs work items on a concrete mechanism: worker threads, worker
 processes, local jobs, or an HPC cluster.
-[`run`][ropt._components.executors.Executor.run] blocks until every call it was
+[`run`][ropt._executors.Executor.run] blocks until every call it was
 given has a result, so the thread that waits for the results is the thread that
 does the work of getting them, and an executor owns no thread of its own.
 
@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from concurrent.futures import Future
 
-    from ropt._components.concurrency import AbortScope
+    from ropt._concurrency import AbortScope
 
 _logger = get_logger(__name__)
 
@@ -151,7 +151,7 @@ class Executor(ABC):
     [When an evaluation fails](../running/parallel.md#when-an-evaluation-fails)
     for the distinction an implementation must make between an infrastructure
     failure, returned in the call's position as an
-    [`ExecutorFailure`][ropt._components.executors.ExecutorFailure], and an
+    [`ExecutorFailure`][ropt._executors.ExecutorFailure], and an
     exception from the work item's own function, which is re-raised in the
     caller.
     """
@@ -168,9 +168,9 @@ class Executor(ABC):
 
         Blocks until every call has a result, or until `abort_scope` aborts. A
         call the machinery could not run gets an
-        [`ExecutorFailure`][ropt._components.executors.ExecutorFailure] in its
+        [`ExecutorFailure`][ropt._executors.ExecutorFailure] in its
         position, and a call left without a result by an abort gets a
-        [`WorkNotRun`][ropt._components.executors.WorkNotRun].
+        [`WorkNotRun`][ropt._executors.WorkNotRun].
 
         An exception raised by a call's own function is re-raised here, without
         waiting for the rest of the batch. With `collect_errors` it is placed in
@@ -226,7 +226,7 @@ class ExecutorBase(Executor):
     caller whose context has it set, including a thread started with a copy of
     that context. Workers in another interpreter cannot reach the executor, so
     it is never set there. Such a subclass also runs the work item inside the
-    [`as_current`][ropt._components.concurrency.AbortScope.as_current] block of
+    [`as_current`][ropt._concurrency.AbortScope.as_current] block of
     the `abort_scope` that `run` was given, so that a call made from the
     work item takes the one that sent it as its parent.
     """
@@ -304,7 +304,7 @@ class ExecutorBase(Executor):
         """Run the items, passing each result to `store` as it arrives.
 
         `store` takes the index of an item in `items` and its result or an
-        [`ExecutorFailure`][ropt._components.executors.ExecutorFailure].
+        [`ExecutorFailure`][ropt._executors.ExecutorFailure].
         It may raise, which is how a user-code exception reaches
         the caller: whatever this batch started must be released before that
         exception leaves.

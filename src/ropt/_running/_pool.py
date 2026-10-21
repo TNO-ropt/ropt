@@ -13,11 +13,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt._components.executors.base import ExecutorBase
+from ropt._executors.base import ExecutorBase
 from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
-    from ropt._components.executors import Executor
+    from ropt._executors import Executor
 
     from ._session import Session
 

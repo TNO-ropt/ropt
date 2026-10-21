@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt._components.executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
+from ropt._executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt._logging import get_logger
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 
@@ -20,9 +20,9 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt._components.concurrency import AbortScope
-    from ropt._components.executors import Executor
+    from ropt._concurrency import AbortScope
     from ropt._evaluation import EvaluationBatchCallback
+    from ropt._executors import Executor
 
     from .base import EvaluationFunctionCallback
 

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Protocol, Union
 
 import numpy as np
 
-from ropt._components.evaluators import (
+from ropt._evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,

@@ -36,7 +36,7 @@ class AbortScope:
     is aborting is aborted from the outset.
 
     Code that cannot poll registers a callback instead, which is how a blocked
-    [`Executor.run`][ropt._components.executors.Executor.run] is woken rather
+    [`Executor.run`][ropt._executors.Executor.run] is woken rather
     than left waiting for work that will not run.
 
     A scope can be nested in a parent scope, so that it aborts with it, and can
@@ -155,7 +155,7 @@ class AbortScope:
         """Make this the current abort scope inside the block.
 
         Inside the block,
-        [`current_abort_scope`][ropt._components.concurrency.current_abort_scope]
+        [`current_abort_scope`][ropt._concurrency.current_abort_scope]
         returns this scope.
 
         Yields:

@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike, NDArray
 
-    from ropt._components.executors import Executor
+    from ropt._executors import Executor
     from ropt._handlers import EventHandler
     from ropt.results import FunctionResults
 

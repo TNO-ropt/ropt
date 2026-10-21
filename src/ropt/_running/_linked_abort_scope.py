@@ -11,7 +11,7 @@ from __future__ import annotations
 import contextlib
 from typing import TYPE_CHECKING
 
-from ropt._components.concurrency import AbortScope, current_abort_scope
+from ropt._concurrency import AbortScope, current_abort_scope
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError, ExecutorStopped
 

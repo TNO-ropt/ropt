@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 from pydantic import ValidationError
 
 from ropt import optimize
-from ropt._components.evaluators import EvaluationFunctionContext
+from ropt._evaluators import EvaluationFunctionContext
 from ropt._handlers import CallbackHandler
 from ropt.backend.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,

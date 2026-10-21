@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import TYPE_CHECKING, Any, override
 
-from ropt._components.concurrency import AbortScope, _grace
+from ropt._concurrency import AbortScope, _grace
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
 from ropt.enums import ExitCode

@@ -28,7 +28,7 @@ from ropt import (
     run_program,
     session,
 )
-from ropt._components.concurrency import _grace, current_abort_scope
+from ropt._concurrency import _grace, current_abort_scope
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError
 
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
         OptimizationResult,
         Session,
     )
-    from ropt._components.concurrency import AbortScope
+    from ropt._concurrency import AbortScope
     from ropt.results import FunctionResults
 
 _INITIAL = np.array([0.0, 0.0, 0.1])

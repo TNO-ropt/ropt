@@ -1,9 +1,9 @@
 """Executors: where an evaluator sends work to be run.
 
-An executor runs [`WorkItem`][ropt._components.executors.WorkItem] objects on a
+An executor runs [`WorkItem`][ropt._executors.WorkItem] objects on a
 concrete mechanism: threads, processes, local jobs, or an HPC cluster.
-[`Executor`][ropt._components.executors.Executor] is the interface a compute step
-sees; [`ExecutorBase`][ropt._components.executors.ExecutorBase] adds the
+[`Executor`][ropt._executors.Executor] is the interface an evaluator
+uses; [`ExecutorBase`][ropt._executors.ExecutorBase] adds the
 lifecycle the built-in executors share. See
 [Evaluating in Parallel](../running/parallel.md) for usage.
 """

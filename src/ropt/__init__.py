@@ -34,8 +34,8 @@ from __future__ import annotations
 
 import logging
 
-from ropt._components.concurrency import aborting, run_program
-from ropt._components.evaluators import (
+from ropt._concurrency import aborting, run_program
+from ropt._evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )

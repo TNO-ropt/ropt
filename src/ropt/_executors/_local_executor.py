@@ -22,7 +22,7 @@ import threading
 from pathlib import Path
 from typing import TYPE_CHECKING, override
 
-from ropt._components.concurrency._program import Program
+from ropt._concurrency._program import Program
 from ropt._logging import get_logger
 
 from ._job_executor import JobExecutorBase
