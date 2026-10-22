@@ -3490,8 +3490,9 @@ calculations. These perturbations can be deterministic or stochastic.</p>
   used for all realizations.</li>
 </ul>
 <h2 id="names"><code>names</code></h2>
-<p>Optional mapping from axis names to tuples of labels. These labels are used to
-produce human-readable multi-index DataFrames when results are exported (see
+<p>Optional mapping from dimension names to tuples of labels. The API also calls
+these dimension names axis names. The labels are used to produce multi-index
+DataFrames when results are exported (see
 <a href="../../results/results/">Working with Results</a>). They do not change the
 positional order of variables, objectives or constraints or how the optimizer
 uses their values.</p>
@@ -3531,18 +3532,21 @@ dimension of the optimization problem:</p>
 </tr>
 </tbody>
 </table>
-<p>A key may also be the name of a metadata key that carries array values, which
-labels the <a href="../../results/results/#user-defined-axes">user axis</a> that metadata spans.</p>
+<p>A key may also be the name of a metadata key that carries array values. In that
+case, the labels name the elements of the additional dimension described under
+<a href="../../results/results/#user-defined-axes">user-defined axes</a>.</p>
 <p>The corresponding value is a tuple of strings (or integers) whose length must
-match the count of that axis. For example, with 3 variables and 2 objectives:</p>
+match the number of entries in that dimension. For example, with 3 variables
+and 2 objectives:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">),</span>
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="s2">"objective"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"f0"</span><span class="p">,</span> <span class="s2">"f1"</span><span class="p">),</span>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>You only need to provide labels for axes you want named — unlabelled axes
-default to integer indices. See <a href="../../results/results/">Working with Results</a> for how
-these labels appear in exported DataFrames.</p>
+<p>You only need to provide labels for dimensions you want named — unlabelled
+dimensions default to integer indices. See
+<a href="../../results/results/">Working with Results</a> for how these labels appear in
+exported DataFrames.</p>
 
 
 

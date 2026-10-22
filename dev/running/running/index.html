@@ -2721,10 +2721,10 @@ itself:</p>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">variables</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>         <span class="c1"># the best variables found</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>  <span class="c1"># the objective value there</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">outcome</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="k">if</span> <span class="n">outcome</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">outcome</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>         <span class="c1"># the best variables found</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">outcome</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>  <span class="c1"># the objective value there</span>
 </span></code></pre></div>
 <p>The start point, the evaluation function's variable vector and per-variable
 configuration arrays use the same positional order. You can add labels in the
@@ -2761,8 +2761,9 @@ options.</p>
   <a href="../../optimizer_setup/gradients/">gradient</a>.</li>
 <li><code>context.function_id</code> — the function evaluation number within the batch,
   counted from 0; <code>-1</code> for an evaluation at a perturbed point.</li>
-<li><code>context.batch_id</code> — the batch number. <code>ropt</code> requests evaluations in
-  batches, and each batch in a program gets its own number.</li>
+<li><code>context.batch_id</code> — a unique, increasing identifier for the evaluation
+  batch. When multiple optimizations run in the same process, IDs may not
+  start at 0 or be consecutive.</li>
 <li><code>context.row_idx</code> — the position of the evaluation within its batch,
   counted from 0.</li>
 <li><code>context.metadata</code> — the <code>metadata</code> dict the optimization was started
@@ -2787,7 +2788,7 @@ There are three ways to return them:</p>
   and <code>metadata</code> in separate fields.</li>
 </ul>
 <p>With several objectives or nonlinear constraints, each value must match its
-position in the corresponding configuration arrays, even if those axes have
+position in the corresponding configuration arrays, even if the entries have
 labels in the config's <code>names</code> section.</p>
 <p>If a realization fails to compute, return <code>float("nan")</code> or <code>numpy.nan</code> for it.
 <code>ropt</code> treats <code>NaN</code> as a failed realization and keeps going, as long as enough
@@ -2795,6 +2796,14 @@ realizations succeed. How many is enough is set by
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>,
 which defaults to <em>all</em> of them — so a single <code>NaN</code> ends the optimization with
 <code>TOO_FEW_REALIZATIONS</code> unless you lower it.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not return <code>NaN</code> when an evaluation fails because of a Python exception,
+such as one caused by a programming or configuration error. Catching the
+exception and returning <code>NaN</code> would hide the error. Return <code>NaN</code> only when
+the function values cannot be computed, for example because a simulation
+failed.</p>
+</div>
 <h3 id="running-an-external-program">Running an external program</h3>
 <p>When the evaluation function runs a an external program, start it with
 <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>. This is the supported way to run external
@@ -2823,12 +2832,12 @@ use is not recommended. See <a href="../programs/">Running External Programs</a>
       dataclass
   " href="../../reference/api/#ropt.OptimizationResult"><code>OptimizationResult</code></a>,
 which carries two things:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">outcome</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span>  <span class="c1"># why the optimization stopped (an ExitCode)</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">result</span><span class="o">.</span><span class="n">results</span>    <span class="c1"># the best evaluation, or None if none was valid</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">outcome</span><span class="o">.</span><span class="n">exit_code</span>  <span class="c1"># why the optimization stopped (an ExitCode)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">outcome</span><span class="o">.</span><span class="n">results</span>    <span class="c1"># the best evaluation, or None if none was valid</span>
 </span></code></pre></div>
-<p><code>results</code> is a <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+<p><code>outcome.results</code> is a <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -2836,13 +2845,13 @@ which carries two things:</p>
   " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>, so the best
 point and its values are read from it at the paths described in <a href="../../results/results/">Working with
 Results</a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span>             <span class="c1"># the best variables</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span>      <span class="c1"># the objective value there</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">objectives</span>  <span class="c1"># the separate objective values</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span> <span class="c1"># the nonlinear constraint values</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">if</span> <span class="n">outcome</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">outcome</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span>             <span class="c1"># the best variables</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">outcome</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span>      <span class="c1"># the objective value there</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">outcome</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">objectives</span>  <span class="c1"># the separate objective values</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">outcome</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span> <span class="c1"># the nonlinear constraint values</span>
 </span></code></pre></div>
-<p><code>results</code> is <code>None</code> when the optimization produced no valid result: too few
+<p><code>outcome.results</code> is <code>None</code> when the optimization produced no valid result: too few
 realizations
 succeeded, or no result ever satisfied the constraints — see
 <a href="#when-something-goes-wrong">When something goes wrong</a>. One check therefore
@@ -2887,21 +2896,22 @@ evaluation. The callback then receives both kinds and has to tell them apart:</p
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
 </span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">result_callback</span><span class="o">=</span><span class="n">report</span><span class="p">,</span> <span class="n">report_gradients</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Gradients are generally paired with a function evaluation at the same point. A
-<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+<p>A <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> records an ID of that function
-evaluation. The <a class="autorefs autorefs-internal" title="            uses" href="../../reference/results/#ropt.results.GradientResults.uses"><code>uses</code></a> method can be used
-to check if a <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> records the ID of the
+function evaluation whose values were used to construct it.
+<a class="autorefs autorefs-internal" title="            uses" href="../../reference/results/#ropt.results.GradientResults.uses"><code>GradientResults.uses</code></a> checks whether a
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object has the
-same ID.</p>
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object has that ID; it does
+not check whether the two results are at the same point. If point equality
+matters, compare their <code>variables</code> values separately.</p>
 <h3 id="stopping-early-from-the-callback">Stopping early from the callback</h3>
 <p>The result callback doubles as a <strong>user-defined stopping criterion</strong>: return
 <code>True</code> and the optimization stops gracefully after the current evaluation, with
@@ -2910,20 +2920,20 @@ continue.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">stop_if_good_enough</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
 </span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># good enough — stop this optimization</span>
 </span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="k">return</span> <span class="kc">None</span>
 </span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
 </span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">result_callback</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">outcome</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">result_callback</span><span class="o">=</span><span class="n">stop_if_good_enough</span><span class="p">)</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="k">assert</span> <span class="n">outcome</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
 </span></code></pre></div>
 <p>When <a href="../many_runs/">running multiple optimizations at once</a>, this stops only the
 optimization whose callback returned <code>True</code>; the others continue. To abort all
-running optimizations in a session, call <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>.
-For its effect when several optimizations run together, see <a href="../many_runs/#stopping-from-outside">Aborting from
-outside</a>.</p>
+optimizations running in the same session, call the session's
+<a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>abort</code></a> method. For its effect when several optimizations
+run together, see <a href="../many_runs/#stopping-from-outside">Aborting from outside</a>.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py">examples/stopping.py</a>,
 which stops an optimization after a fixed number of results and then reads the
@@ -2936,8 +2946,8 @@ sources:</p>
   <code>evaluate_batch</code>. <code>ropt</code> copies it onto every result the call produces, which
   is one way to tag an optimization:</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>   <span class="c1"># 7</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">outcome</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">outcome</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>   <span class="c1"># 7</span>
 </span></code></pre></div>
 <p>The same dict also reaches the evaluation function itself, as
   <code>context.metadata</code> — useful when the evaluation needs to know which
@@ -2951,8 +2961,9 @@ sources:</p>
   
       dataclass
   " href="../../reference/api/#ropt.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
-  from the evaluation function with a <code>metadata</code> field. This value is stored per
-  realization, next to the objective values:</li>
+  from the evaluation function with a <code>metadata</code> field. For a function
+  evaluation, this value is stored per realization, next to the objective
+  values:</li>
 </ul>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationFunctionResult</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
@@ -2961,27 +2972,37 @@ sources:</p>
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">residual</span> <span class="o">=</span> <span class="n">variables</span> <span class="o">-</span> <span class="n">x0</span>
 </span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    <span class="k">return</span> <span class="n">EvaluationFunctionResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"residual"</span><span class="p">:</span> <span class="n">residual</span><span class="p">})</span>
 </span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"residual"</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># (3, 3)</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">outcome</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">outcome</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"residual"</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># (3, 3)</span>
 </span></code></pre></div>
-<p>A key does not have to be set by every realization; those that do not set it
-  get <code>np.nan</code> for numeric values and <code>None</code> otherwise, so a numeric column with
-  missing realizations is widened to <code>float64</code> — numpy has no integer NaN. A
-  key set by every realization keeps its natural dtype, and mixing strings and
+<p>When the evaluation function is called for perturbed points to estimate a
+  gradient, its metadata is stored per realization and perturbation on
+  <code>outcome.gradient.evaluations.metadata</code>, if a gradient result is available.</p>
+<p>A key does not have to be set on every evaluation. Missing entries get
+  <code>np.nan</code> for numeric values and <code>None</code> otherwise, so a numeric column with
+  missing entries is widened to <code>float64</code> — numpy has no integer NaN. A key
+  set on every evaluation keeps its natural dtype, and mixing strings and
   non-strings under one key raises a <code>ValueError</code>.</p>
-<p>Returning an array instead of a scalar gives the key its own
-  <a href="../../results/results/#user-defined-axes">user-defined axis</a>, which
-  the <code>names</code> section of the configuration can label and which the
-  <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a> spreads over one
-  column per entry.</p>
-<p>In the example above, the first axis is the realization; the second is the
-  <code>residual</code> user-defined axis. The
+<p>Returning an array instead of a scalar adds a dimension for its elements,
+  named after the metadata key. This is a
+  <a href="../../results/results/#user-defined-axes">user-defined axis</a>. For function
+  evaluations, the metadata array has dimensions for realizations and the
+  metadata elements. For gradient evaluations, it also has a dimension for
+  perturbations. The <code>names</code> section of the configuration can label the
+  metadata elements, and the
+  <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a> exports them
+  as columns.</p>
+<p>In the example above, each row corresponds to a realization and each column
+  to an element of <code>residual</code>. For metadata returned while evaluating
+  perturbed points, there is also a dimension for perturbations. The
   <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a> example shows
-  how to label and export that axis.</p>
+  how to label and export the metadata elements.</p>
 <p>Neither kind is interpreted by <code>ropt</code>. Constant metadata ends up on
-<code>result.results.metadata</code>; per-evaluation metadata on
-<code>result.results.evaluations.metadata</code> (one entry per realization). Both kinds
-can be tabulated as columns by the
+<code>outcome.results.metadata</code>. Metadata returned for function evaluations is on
+<code>outcome.results.evaluations.metadata</code> (one entry per realization); metadata
+returned for perturbed evaluations is on
+<code>outcome.gradient.evaluations.metadata</code> (one entry per realization and
+perturbation). Both kinds can be tabulated as columns by the
 <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a>. See <a href="../../results/results/#metadata">Working with
 Results</a> for how each appears. The full runnable
 script is
@@ -3018,17 +3039,17 @@ receives, so everything is read the same way wherever it came from. Here
 which evaluates a single vector and then a matrix of them.</p>
 <h2 id="when-something-goes-wrong">When something goes wrong</h2>
 <p>Not every problem is an exception. An optimization that cannot make progress
-still returns normally, and indicates why in <code>result.exit_code</code> —
+still returns normally, and indicates why in <code>outcome.exit_code</code> —
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value, for
 instance. An optimization that is aborted, for instance because another
 function given to the same <code>run</code> call raised, raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> instead (see
 <a href="../failures/">Failures and Aborts</a>).</p>
 <p><a href="../../results/exit_codes/">Exit Codes</a> lists all exit codes, and explains why a
-reason and a result are independent: <code>result.results</code> is <code>None</code> when no feasible
-result was ever recorded, whatever the reason the optimization ended, and an
-optimization that stops part-way still returns the best result it had reached
-before that. The evaluations it did make reach the
+reason and a result are independent: <code>outcome.results</code> is <code>None</code> when no
+feasible result was ever recorded, whatever the reason the optimization ended,
+and an optimization that stops part-way still returns the best result it had
+reached before that. The evaluations it did make reach the
 <a href="../../results/handlers/">handlers</a> attached to it either way.</p>
 <p>What <em>is</em> raised falls into three groups:</p>
 <ul>
@@ -3079,7 +3100,7 @@ exception is raised in the code that made the call.
 <a href="../failures/">Failures and Aborts</a> describes each case.</p>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations.
-<a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, the type of <code>result.exit_code</code>, is imported
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, the type of <code>outcome.exit_code</code>, is imported
 from <code>ropt</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
 </span></code></pre></div>
