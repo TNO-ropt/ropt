@@ -2565,9 +2565,9 @@ result callback or a function given to <code>run</code>. Those calls are <strong
 When a call fails, every call nested in it is aborted, at any depth, and the
 exception is raised in the code that made the call. For <code>run</code>, a failure of one
 of its functions is a failure of the whole call, so its other functions are
-aborted too. If no code catches the exception, it leaves the <code>with</code> block, and
-the session aborts everything that is still running. Code that catches the
-exception keeps the other calls running.</p>
+aborted too. If an exception raised inside the session's <code>with</code> block is not
+caught there, the session aborts everything that is still running. Code that
+catches the exception keeps the other calls running.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This page describes what a failure does to other calls. What a single
@@ -2600,11 +2600,11 @@ else is aborted: the optimization counts that realization as failed, as it
 does any <code>NaN</code>, and the other evaluations are not affected. How many failed
 realizations a batch may contain is set by
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>.</p>
-<p>Without the <code>try</code>, the exception leaves <code>objective</code>, and the optimization fails
-with it. <code>optimize</code> aborts the calls nested in it, including the <code>run</code> calls
-of the other evaluations and their simulations, and then raises the <code>SimulationError</code>
-in your script. The exception then leaves the <code>with</code> block, and the session
-aborts the rest of its work.</p>
+<p>Without the <code>try</code>, <code>objective</code> does not catch the exception, and the
+optimization fails. <code>optimize</code> aborts the calls nested in it, including the
+<code>run</code> calls of the other evaluations and their simulations, and then raises
+the <code>SimulationError</code> in your script. If the exception is not caught inside
+the <code>with</code> block, the session aborts the rest of its work.</p>
 <h2 id="nested-calls">Nested calls</h2>
 <p>A call to <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or <code>run</code> is <strong>nested</strong> in
 another such call when it is made, in the same process, from the work of that
@@ -2649,18 +2649,18 @@ depth. When one function given to <code>run</code> raises, the <code>run</code> 
 other functions are aborted, together with the calls nested in them.</p>
 <p>An optimization or evaluation that cannot be built because its configuration is
 invalid, or that is given arguments it rejects, such as a vector of the wrong
-shape, raises the exception before it has started anything to abort. Building a pool
-with a session that has closed, or passing one of its pools to a call, raises
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> and aborts nothing. An
+shape, raises the exception before it has started anything to abort. Trying to
+create a pool using a closed session, or passing one of its pools to a call,
+raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> and aborts nothing. An
 exception raised by a call that is being aborted is still raised, but aborts
 nothing further.</p>
 <p>A <code>KeyboardInterrupt</code> or <code>SystemExit</code> is not a failure. When one passes through
 a call, the calls nested in it, and for <code>run</code> its other functions, are aborted
-with <code>ABORTED</code>, and the exception is raised. Other calls in the session are not
-aborted until the exception leaves the session's <code>with</code> block.</p>
-<p>An exception that leaves the <code>with</code> block of a session, whether a failure or a
-<code>KeyboardInterrupt</code>, ends the session, which aborts the calls that are still
-running with <code>ABORTED</code>.</p>
+with <code>ABORTED</code>, and the exception is raised. Other calls in the session keep
+running if the exception is caught inside the session's <code>with</code> block.</p>
+<p>If an exception raised inside the session's <code>with</code> block is not caught there,
+whether it is a failure or a <code>KeyboardInterrupt</code>, the session ends and aborts
+the calls that are still running with <code>ABORTED</code>.</p>
 <h2 id="what-an-abort-does">What an abort does</h2>
 <p>A nested call is aborted when its parent is, with the same exit code:
 <code>USER_ABORT</code> after <a href="../many_runs/#stopping-from-outside"><code>Session.abort</code></a>, <code>ABORTED</code>

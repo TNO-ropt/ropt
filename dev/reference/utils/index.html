@@ -2855,9 +2855,10 @@ that cannot vary has no scale.</p>
 on <code>SIGINT</code> when they are imported, after which Ctrl-C no longer breaks
 into a program that is waiting. This clears the flag, and is a no-op on
 platforms that do not have one.</p>
-<p><code>ropt</code> imports <code>polars</code> when it is installed, which sets the flag. Call
-this at the top of a script that uses a thread or process pool, after the
-imports. See <a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a>.</p>
+<p><code>ropt</code> imports <code>polars</code> when it is installed; affected versions set the
+flag. Other imports can do so too. If Ctrl-C fails to interrupt a wait in
+your program, call this after the imports. See
+<a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a>.</p>
 
 
     </div>

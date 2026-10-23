@@ -2870,13 +2870,12 @@
 
 
 <h1 id="evaluating-in-parallel">Evaluating in Parallel</h1>
-<p>Evaluations within one optimization can run in parallel, and you can run your
-own functions in parallel using an evaluation <strong>pool</strong>.</p>
+<p>An evaluation <strong>pool</strong> runs evaluations within one optimization, or functions
+passed to <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, in parallel. This page compares pool types and
+explains how many workers they can use. For opening and closing the session
+that owns a pool, see <a href="../sessions/">Sessions</a>.</p>
 <h2 id="running-in-parallel">Running in parallel</h2>
-<p>By default <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> calls the evaluation function itself,
-one evaluation at a time. To run the evaluations in parallel, open a
-<a href="../sessions/"><code>session</code></a>, build a <strong>pool</strong> with it and pass the pool to
-<code>optimize</code>:</p>
+<p>Pass a pool from an open session to <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">session</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
@@ -2884,11 +2883,6 @@ one evaluation at a time. To run the evaluations in parallel, open a
 </span></code></pre></div>
 <p>The runnable script for this section is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py">examples/parallel.py</a>.</p>
-<p>The session that created the pool releases their workers when its block ends, so
-most code needs no further cleanup. Nothing is implicit: an optimization
-evaluates its functions using the pool it was given. An optimization started
-with <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> without a pool has no session, and executes
-its function evaluations serially.</p>
 <p>The available pools are:</p>
 <ul>
 <li><a href="#thread-pool"><code>thread_pool</code></a>: runs evaluations on threads in your process.</li>
@@ -2912,10 +2906,9 @@ its function evaluations serially.</p>
 <p>Threads stay <strong>inside</strong> your program and share its memory, so any Python
 function works and nothing is copied. The other two run the work <strong>outside</strong>
 it, so the objective and its data are copied there.</p>
-<p>Only the evaluations ever leave. The optimizer itself, the pool object and your
-handlers all stay in the process that opened the session and started the
-optimization, whichever pool you choose. Throughout this page, <strong>your program</strong>
-means that process.</p>
+<p>The optimizer itself, the pool object and your handlers remain in the process
+that opened the session and started the optimization, whichever pool you
+choose. Throughout this page, <strong>your program</strong> means that process.</p>
 <details class="info">
 <summary>New to threads and processes?</summary>
 <p>A <strong>process</strong> is a running program with its own private memory. A <strong>thread</strong>
@@ -2933,10 +2926,9 @@ an HPC pool runs each evaluation as a job on a cluster, which is the
 same arrangement spread over more machines.</p>
 </details>
 <h3 id="how-many-workers">How many workers?</h3>
-<p>With in a single optimization <code>ropt</code> parallelizes the evaluations within one
-optimization batch. A single optimization is a sequence of batches, and the next
-one cannot start before the current one is complete. Furthermore, multiple
-optimizations can run at the same time, each parallizing their own batches.</p>
+<p>Within an optimization, evaluations in the same batch can run in parallel.
+The next batch cannot start until the current one finishes. Multiple
+optimizations can run at the same time, each with its own active batch.</p>
 <p>So the number of workers that can be kept busy is roughly</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>batch size  ×  optimizations running at once
 </span></code></pre></div>
@@ -2945,9 +2937,10 @@ figure the extra workers have nothing to do and sit idle.</p>
 <p>Batch size follows from the problem, not from a setting: it is how many
 evaluations the optimizer requests at once. For a gradient-based optimization
 over an ensemble that is one per realization, plus their perturbations on the
-batches where a gradient is estimated. The second factor is <code>1</code> unless you run
-<a href="../many_runs/">several optimizations at once</a>, where it is the number of workers
-of the pool given to <code>run</code>.</p>
+batches where a gradient is estimated. With one optimization, only one batch
+is active at a time. If you <a href="../many_runs/">run several optimizations together</a>,
+each can have an active batch; the pool passed to <code>run</code> limits how many
+optimizations can run at once.</p>
 <p>Each evaluation in a batch is sent to a worker as a separate job. Up to
 <code>workers</code> jobs can run at once with a pool; the rest wait until a worker is
 available. An optimization started without a pool calls the evaluation
@@ -2969,25 +2962,12 @@ where one shared pool puts ten. Which pool it may be is a separate
 question, and the rules are in
 <a href="#pools-inside-an-evaluation">Pools inside an evaluation</a> below.</p>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Releasing a pool early</p>
-<p>A pool holds its workers until the session that built it closes. In a loop
-that means opening the session inside the loop rather than around it, above
-all for a process pool, which holds a worker interpreter per worker:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">cases</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>        <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
-</span></code></pre></div>
-<p>A pool used after its session has closed raises a
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> rather than quietly
-evaluating inside your own program.</p>
-</div>
 <h3 id="thread-pool">Evaluating on threads</h3>
 <p>A <a class="autorefs autorefs-internal" title="            thread_pool" href="../../reference/api/#ropt.Session.thread_pool"><code>thread_pool</code></a> runs the evaluations on
 background threads inside your own process. Nothing is copied, so any Python
 function works as the objective and it can freely use the data around it:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </span></code></pre></div>
 <p>Use it when each evaluation spends most of its time <strong>waiting</strong> — starting an
 external program, reading a file, calling a network service. While one waits,
@@ -2998,16 +2978,32 @@ does not get faster on more threads. Array libraries are a different matter:
 meanwhile. "My objective computes" is therefore not on its own a reason to reach
 past this pool — see <a href="#which-pool">Which pool should I use?</a>.</p>
 <h3 id="process-pool">Evaluating in worker processes</h3>
-<p>A <a class="autorefs autorefs-internal" title="            process_pool" href="../../reference/api/#ropt.Session.process_pool"><code>process_pool</code></a> runs the evaluations in a
-handful of separate processes, reused across the optimization. Each has its own
-interpreter, so this is where heavy Python code actually runs faster:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<p>A <a class="autorefs autorefs-internal" title="            process_pool" href="../../reference/api/#ropt.Session.process_pool"><code>process_pool</code></a> runs evaluations in separate
+processes, reused across the optimization. Each has its own interpreter, so
+heavy Python code can run in parallel:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </span></code></pre></div>
-<p>This pool applies when the evaluation is <strong>Python code</strong>, or when each
-evaluation needs its own copy of something a library keeps globally. An
-objective that mostly runs an external program gains nothing here that a thread
-pool would not have given more cheaply.</p>
+<p>This pool applies when the evaluation runs heavy <strong>Python code</strong>, or when each
+worker needs a separate copy of state kept by a library used in the evaluation
+function. An objective that mostly runs an external program gains nothing here
+that a thread pool would not have given more cheaply.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>"Isolating the optimizer is different from isolating evaluations" A
+process pool runs the <strong>evaluation function</strong> in worker processes; the
+optimization backend still runs in the process that called <code>optimize</code>. If
+the backend cannot safely run alongside other optimizations because its
+library keeps process-wide state, prefix its method with <code>external/</code>. This
+runs the <strong>backend</strong> in a separate process while evaluations still use the
+pool passed to <code>optimize</code>. Starting a process and transferring evaluation
+requests and results between processes adds overhead. The built-in SciPy
+backend does not need this isolation, but some backend plugins may. See
+<a href="../../optimizer_setup/optimizer/#external-backend">Running the method in a separate
+process</a> for the
+configuration and constraints, and <a href="../many_runs/">Running Multiple
+Optimizations</a> for concurrent runs.</p>
+</div>
 <p>The objective and its data are <strong>copied</strong> to the workers, so they must be
 serializable. An objective defined at module level — or in the script you ran,
 which each worker re-imports — works as is; a lambda, a closure, or a
@@ -3015,24 +3011,18 @@ function defined in a notebook cell needs the <code>cloudpickle</code> extra (se
 <a href="../../getting_started/installation/#optional-extras">Installation</a>). Results can
 only come <strong>back</strong> through the return value; see
 <a href="../../results/handlers/#handlers-and-separate-processes">Handlers and separate processes</a>.</p>
-<p>An evaluation still running when the optimization is aborted can test for it
-with <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a>, and an external program it started with
-<a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> is terminated, as with a thread pool. Workers
-still busy five seconds after the abort are killed. A program started in another way, for
-example with <code>subprocess.run</code>, keeps running after its worker is killed; see
-<a href="../programs/">Running External Programs</a>.</p>
 <h3 id="running-on-an-hpc-cluster">Running on an HPC cluster</h3>
-<p>An <a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/api/#ropt.Session.hpc_pool"><code>hpc_pool</code></a> submits each evaluation as a job to
-an HPC queue through <a href="https://pysqa.readthedocs.io/"><code>pysqa</code></a>; it needs the
-<code>ropt[hpc]</code> extra. <code>workdir</code> is required and must be an existing absolute
+<p>An <a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/api/#ropt.Session.hpc_pool"><code>hpc_pool</code></a> submits each evaluation as a job to an
+HPC queue through the <a href="https://pysqa.readthedocs.io/"><code>pysqa</code></a> package; it needs
+the <code>ropt[hpc]</code> extra. <code>workdir</code> is required and must be an existing absolute
 directory on a filesystem the compute nodes share. A job is a fresh command, so
 the evaluation function must live in a module the job can import, which means a
 module installed on the compute nodes, or the <code>ropt[cloudpickle]</code> extra. With no
 further arguments it uses the default cluster and queue from the <code>pysqa</code>
 configuration of your <code>ropt</code> installation:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/hpc.py">examples/hpc.py</a>.
@@ -3048,7 +3038,7 @@ and the resources a job asks for, are set out in
 another node. It needs neither the <code>ropt[hpc]</code> extra nor a cluster
 configuration, so an objective can be tested on it before it is run on a
 cluster:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s2">"local"</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s2">"local"</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The cluster settings <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code>, <code>submit_options</code>
 and <code>query_retries</code> are ignored, and a <code>template</code> or a <code>scheduler</code> raises a
@@ -3154,31 +3144,36 @@ not help here" and pushes people towards processes — where the identical
 problem is waiting one layer down.</p>
 <p>The fix is to give each evaluation one core's worth of library threads,
 before <code>numpy</code> is imported:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MKL_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MKL_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
 </span></code></pre></div>
 <p>Then let the pool provide the parallelism instead.</p>
 </details>
 <h3 id="pools-inside-an-evaluation">Pools inside an evaluation</h3>
-<p>An evaluation function may start an optimization of its own — that is how
-<a href="../nested/">Nested Optimization</a> works — and give it a pool, on two
-conditions.</p>
-<p>It must be a <strong>different</strong> pool. A nested optimization waits for its own
-evaluations to finish, so one handed the pool it is already running on would
-wait for the workers it is itself occupying — a deadlock as soon as they are all
-busy, which is the normal case, since an optimization fills its pool with one
-work item per realization. Rather than hang, the pool refuses work submitted by
-the evaluation itself with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
-A thread that the evaluation starts is not recognized as a worker, so work submitted from it is not refused and can still
-deadlock the pool. Give the inner optimization its own pool, or none at all,
-so that it calls the evaluation function itself.</p>
-<p>The evaluation must stay <strong>in your process</strong>, so with a thread pool or with no
-pool. With a process or HPC pool the evaluation function is copied
-into a worker, and a pool cannot be copied with it: open a session and build
-the inner pool inside the worker, or run the inner optimization without one. An
-evaluation function that carries a pool along anyway is refused when the
-work item is sent, rather than failing somewhere deep inside the optimization.</p>
+<p>An outer evaluation function can start an inner optimization, as shown in
+<a href="../nested/">Nested Optimization</a>. If inner optimizations need to share a pool
+or handler created in the process that starts the outer optimization, run the
+<strong>outer optimization</strong> without a pool or with a thread pool. Its evaluations
+then run in the same process as those objects.</p>
+<p>The inner optimization must use a <strong>different</strong> pool from the one running its
+outer evaluation. An inner optimization waits for its own evaluations to finish,
+so using the same pool would wait for the workers it is itself occupying — a
+deadlock as soon as they are all busy, which is the normal case, since an
+optimization fills its pool with one work item per realization. Rather than
+hang, the pool refuses work submitted by the evaluation itself with a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A thread that the evaluation
+starts is not recognized as a worker, so work submitted from it is not refused
+and can still deadlock the pool. Give the inner optimization its own pool, or
+none at all, so that it calls the evaluation function itself.</p>
+<p>If the outer optimization uses a process or HPC pool, its evaluation function
+runs in a worker. A pool or handler created in the calling process cannot be
+passed to that worker. Nested optimization is still possible: create the
+inner pool in a session opened by each outer evaluation and create its
+handlers there, or run the inner optimization without a pool. Each worker then
+has its own resources, rather than a pool or handler shared across outer
+evaluations; return any data needed by the calling process. See
+<a href="../nested/#two-pools-not-one">Two pools, not one</a> for both arrangements.</p>
 <h2 id="stopping-a-run">Stopping an optimization</h2>
 <p>Press Ctrl-C and <code>ropt</code> stops dispatching new work at once. What happens to the
 evaluations already running depends on the pool, because what <em>can</em> be done
@@ -3197,7 +3192,7 @@ to them differs:</p>
 </tr>
 <tr>
 <td><code>thread_pool</code></td>
-<td><a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> turns <code>True</code> and programs started with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> are terminated; otherwise they <strong>run to completion</strong></td>
+<td>Python code can check <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> to stop early; programs started with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> are terminated; otherwise evaluations <strong>run to completion</strong></td>
 </tr>
 <tr>
 <td><code>process_pool</code></td>
@@ -3213,26 +3208,33 @@ to them differs:</p>
 Without a pool, it raises after the current evaluation returns, including when
 the abort arrived during the last evaluation. When the session closes, it
 waits up to five seconds for its pools to become idle.</p>
-<p><strong>A thread cannot be killed.</strong> Python provides no way to stop a running thread
-from outside. An evaluation with a thread pool stops early only if it checks
-<code>aborting</code>, or if the program it waits for was started with <code>run_program</code>.
-Otherwise it ends when it ends, and your program cannot exit before it does.</p>
-<p><strong>A process pool kills its workers after five seconds.</strong> A worker that is still
-busy then is killed. A program the evaluation started with <code>run_program</code> is terminated with it; a
-program started in another way keeps running.</p>
+<p><strong>Python code can stop cooperatively.</strong> In a thread or process worker, a
+long-running evaluation can check <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> and return early
+when it becomes <code>True</code>. A thread cannot be killed from outside: if it does not
+check and is not waiting for <code>run_program</code>, it runs to completion, and your
+program cannot exit before it does. In a process pool, workers still busy five
+seconds after an abort are killed. <code>aborting()</code> does not signal an HPC job; see
+<a href="../failures/#stopping-early-when-aborted">Stopping early when aborted</a> for an
+example of checking it in Python code.</p>
+<p><strong>External programs need <code>run_program</code>.</strong> On abort, a program started with
+<a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> is terminated. Killing a process-pool worker
+does not stop a program it started with <code>subprocess.run</code>, which may keep
+running; see <a href="../programs/">Running External Programs</a>.</p>
 <p><strong>A terminated program gets five seconds to exit.</strong> A program started with
 <code>run_program</code>, and a job on the local queue, are first asked to exit, together
 with every program they started. Whatever is still running five seconds later is
 killed.</p>
 <div class="admonition warning">
-<p class="admonition-title">Call <code>restore_keyboard_interrupt</code> in scripts that use a pool</p>
-<p>Importing <code>ropt</code> changes a process-wide setting that stops Ctrl-C from
-breaking into a program that is <em>waiting</em>, and a program that waits for a
-thread pool or a process pool is waiting. Without the fix, Ctrl-C can have
-no effect at all. Call
-<a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a> at the
-top of the script, after the imports; see
-<a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a>.</p>
+<p class="admonition-title">Check Ctrl-C with thread and process pools</p>
+<p>A script waiting for evaluations can stop responding to Ctrl-C if an
+imported package changes the process-wide SIGINT setting. The <code>ropt[polars]</code>
+extra installs Polars; with affected Polars versions, importing <code>ropt</code> loads
+it and triggers this issue. This is not a limitation of <code>ropt</code> itself, and
+other imports can cause the same problem even without Polars. Check your
+script and see <a href="../../troubleshooting/keyboard_interrupt/">Keyboard
+Interrupts</a> for the cause and the
+<a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a>
+workaround.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Platforms</p>
@@ -3269,43 +3271,40 @@ for how many a batch may contain before the optimization ends with
 format carries a traceback. The job therefore attaches the formatted traceback
 to the exception as a note, so it travels with it. An exception that cannot be
 serialized at all arrives as a <code>RuntimeError</code> carrying its <code>repr</code> and notes.</p>
-<p>A job that died before writing a result leaves its only trace in the file
-holding its captured output. With an HPC pool that file is kept
-when an evaluation fails, even when the pool removes the rest, and its last
-lines are added to the error message. The message names the file whether or not
-it could be read: a shared filesystem need not show its contents yet, and a
-submission script that does not redirect the job's output — with
-<code>#SBATCH --output={{output}}</code> or its equivalent — never writes them at all.</p>
+<p>For an HPC pool or its local queue, a job that fails before returning a result
+may have written a reason to its output file. <code>ropt</code> includes the last lines
+of that file in the error message when they can be read, and keeps the file
+even if cleanup is enabled. The error message gives the file path if no
+output can be read. For cluster jobs, the submission script must capture the
+job's output for this information to be available; see
+<a href="#configuring-an-hpc-pool">Configuring an HPC pool</a>.</p>
 <h2 id="offloading-your-own-work">Running your own work</h2>
 <p>You can hand <strong>your own</strong> functions to a pool with <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>. It is
-useful when code
-you control — a custom handler, a custom component, or a helper you call between
-optimizations — has an expensive, self-contained piece of work you want to run
-with a pool instead of in your own code.</p>
+useful when code you control has an expensive, self-contained piece of work you
+want to run with a pool instead of in your own code.</p>
 <p>Pass a single callable to run it once and get its result back:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span><span class="p">,</span> <span class="n">session</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">run</span><span class="p">,</span> <span class="n">session</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </span></code></pre></div>
 <p><code>run</code> takes <strong>zero-argument</strong> callables — bind arguments with
 <code>functools.partial</code> or use an object method. Pass a <strong>sequence</strong> of callables to
 run them concurrently and get a tuple of results in order; they may be entirely
 different functions:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">partial</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">y</span><span class="p">)],</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">partial</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">y</span><span class="p">)],</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
 </span></code></pre></div>
 <p>As with the evaluation function on a process or HPC pool, the
 callables and their arguments are <strong>copied to the workers</strong>, since they run in
 separate processes.</p>
 <p>With a thread pool the callables run <strong>in your process</strong>, on the pool's
 workers, at most <code>workers</code> of them at once. They are not copied, so they need
-not be picklable. The workers do not see the context variables of the code that
-called <code>run</code>. Without a pool, <code>run</code> calls the callables one after another on
-the calling thread, and returns when the last one has finished.</p>
+not be picklable. Without a pool, <code>run</code> calls the callables one after another
+on the calling thread, and returns when the last one has finished.</p>
 <p>A callable given to <code>run</code> with a pool cannot itself call <code>run</code>, <code>optimize</code>,
 <code>evaluate</code> or <code>evaluate_batch</code> with that same pool: the call raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Give the inner call another
@@ -3317,15 +3316,13 @@ before all of its callables have finished, <code>run</code> raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. Its <code>exit_code</code> distinguishes an
 abort that was asked for from one that a failure caused, and is
 <code>EXECUTOR_SHUT_DOWN</code> when the pool could no longer run the work.</p>
-<p>With a pool, <code>run</code> raises at once and does not wait for a callable that is still
-running. With a thread or process pool, that callable runs to its end unless it
-checks <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> or its program was started with
-<a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>, and an exception it raises is logged as a
-warning. With a process pool its worker is killed if it is still running five
-seconds later. With an HPC pool it is cancelled. Without a pool, <code>run</code> raises
-when the running callable returns, and starts none of the remaining ones; it
-also raises if the last callable returns after the abort, since its value may
-come from an early return after checking <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a>.</p>
+<p>After an abort, <code>run</code> stops starting callables that have not begun. With a
+pool, it raises without waiting for those already running. Without a pool,
+the current callable must return before <code>run</code> raises, even if it was the last
+one. A callable still running after <code>run</code> raises may finish later; an
+exception it raises is logged as a warning. See
+<a href="../failures/#what-an-abort-does">What an abort does</a> for what happens to
+running work with each pool, including how to stop it early.</p>
 <div class="admonition warning">
 <p class="admonition-title">Work given to <code>run</code> coordinates with nothing</p>
 <p>A callable given to <code>run</code> goes wherever its pool puts it, and on a process
@@ -3336,7 +3333,7 @@ pools of its own, but they are <em>its</em> handlers and <em>its</em> pools.</p>
   created inside one sees only that callable's results and cannot be brought back:
   handlers cannot be moved between processes, so the return value is all
   that comes back. Callables that stay in your process, without a pool or on
-  a thread pool, can feed one handler that they share, as
+  a thread pool, can access handlers that they share, as
   <a href="../many_runs/">Running Multiple Optimizations</a> shows.</li>
 <li><strong>Worker budgets multiply, with no way around it.</strong> A pool cannot be
   carried into a worker process, so a callable that needs one builds its
@@ -3377,7 +3374,7 @@ combined.</p>
 <h3 id="using-an-installed-configuration">Using an installed configuration</h3>
 <p>This is the usual case. The configuration already describes the clusters and
 their queues, so all you do is pick one and say how much of it you want:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s2">"long"</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s2">"long"</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>queue</code> names a queue <strong>defined in the configuration</strong>, which is not necessarily
 your scheduler's partition name — it selects a configured entry, and that
@@ -3397,32 +3394,32 @@ queues exist, or read them off the configuration.</p>
 alongside <code>ropt</code>, at <code>&lt;prefix&gt;/share/ropt/pysqa/</code>, where <code>&lt;prefix&gt;</code> is the Python
 installation prefix. Deployments ship pre-configured clusters by installing them
 there. Find the directory with:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">])</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">])</span>
 </span></code></pre></div>
 <p>The directory holds a <code>queue.yaml</code> listing the queues, plus one submission
 script per queue. A minimal Slurm configuration:</p>
-<div class="language-yaml highlight"><span class="filename">queue.yaml</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">queue_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SLURM</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nt">queue_primary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">normal</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="nt">queues</span><span class="p">:</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nt">normal</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">cores_max</span><span class="p">:</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">,</span><span class="nt"> cores_min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> run_time_max</span><span class="p">:</span><span class="w"> </span><span class="nv">3600</span><span class="p p-Indicator">,</span><span class="nt"> script</span><span class="p">:</span><span class="w"> </span><span class="nv">normal.sh</span><span class="p p-Indicator">}</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="nt">long</span><span class="p">:</span><span class="w">   </span><span class="p p-Indicator">{</span><span class="nt">cores_max</span><span class="p">:</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">,</span><span class="nt"> cores_min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> run_time_max</span><span class="p">:</span><span class="w"> </span><span class="nv">86400</span><span class="p p-Indicator">,</span><span class="nt"> script</span><span class="p">:</span><span class="w"> </span><span class="nv">long.sh</span><span class="p p-Indicator">}</span>
+<div class="language-yaml highlight"><span class="filename">queue.yaml</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">queue_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SLURM</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nt">queue_primary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">normal</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="nt">queues</span><span class="p">:</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nt">normal</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">cores_max</span><span class="p">:</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">,</span><span class="nt"> cores_min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> run_time_max</span><span class="p">:</span><span class="w"> </span><span class="nv">3600</span><span class="p p-Indicator">,</span><span class="nt"> script</span><span class="p">:</span><span class="w"> </span><span class="nv">normal.sh</span><span class="p p-Indicator">}</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nt">long</span><span class="p">:</span><span class="w">   </span><span class="p p-Indicator">{</span><span class="nt">cores_max</span><span class="p">:</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">,</span><span class="nt"> cores_min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> run_time_max</span><span class="p">:</span><span class="w"> </span><span class="nv">86400</span><span class="p p-Indicator">,</span><span class="nt"> script</span><span class="p">:</span><span class="w"> </span><span class="nv">long.sh</span><span class="p p-Indicator">}</span>
 </span></code></pre></div>
-<div class="language-jinja highlight"><span class="filename">normal.sh</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="x">#!/bin/bash</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="x">#SBATCH --partition=normal</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="x">#SBATCH --job-name=</span><span class="cp">{{</span><span class="nv">job_name</span><span class="cp">}}</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="x">#SBATCH --output=</span><span class="cp">{{</span><span class="nv">output</span><span class="cp">}}</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="x">#SBATCH --chdir=</span><span class="cp">{{</span><span class="nv">working_directory</span><span class="cp">}}</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="x">#SBATCH --ntasks=</span><span class="cp">{{</span><span class="nv">cores</span><span class="cp">}}</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="cp">{%</span>- <span class="k">if</span> <span class="nv">run_time_max</span> <span class="cp">%}</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="x">#SBATCH --time=</span><span class="cp">{{</span> <span class="o">[</span><span class="m">1</span><span class="o">,</span> <span class="nv">run_time_max</span> <span class="o">//</span> <span class="m">60</span><span class="o">]|</span><span class="nf">max</span> <span class="cp">}}</span>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="cp">{%</span>- <span class="k">endif</span> <span class="cp">%}</span>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="cp">{%</span>- <span class="k">if</span> <span class="nv">memory_max</span> <span class="cp">%}</span>
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="x">#SBATCH --mem=</span><span class="cp">{{</span><span class="nv">memory_max</span><span class="cp">}}</span><span class="x">G</span>
-</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="cp">{%</span>- <span class="k">endif</span> <span class="cp">%}</span>
-</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>
-</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="cp">{{</span><span class="nv">command</span><span class="cp">}}</span>
+<div class="language-jinja highlight"><span class="filename">normal.sh</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="x">#!/bin/bash</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="x">#SBATCH --partition=normal</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="x">#SBATCH --job-name=</span><span class="cp">{{</span><span class="nv">job_name</span><span class="cp">}}</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="x">#SBATCH --output=</span><span class="cp">{{</span><span class="nv">output</span><span class="cp">}}</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="x">#SBATCH --chdir=</span><span class="cp">{{</span><span class="nv">working_directory</span><span class="cp">}}</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="x">#SBATCH --ntasks=</span><span class="cp">{{</span><span class="nv">cores</span><span class="cp">}}</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="cp">{%</span>- <span class="k">if</span> <span class="nv">run_time_max</span> <span class="cp">%}</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="x">#SBATCH --time=</span><span class="cp">{{</span> <span class="o">[</span><span class="m">1</span><span class="o">,</span> <span class="nv">run_time_max</span> <span class="o">//</span> <span class="m">60</span><span class="o">]|</span><span class="nf">max</span> <span class="cp">}}</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="cp">{%</span>- <span class="k">endif</span> <span class="cp">%}</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="cp">{%</span>- <span class="k">if</span> <span class="nv">memory_max</span> <span class="cp">%}</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="x">#SBATCH --mem=</span><span class="cp">{{</span><span class="nv">memory_max</span><span class="cp">}}</span><span class="x">G</span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="cp">{%</span>- <span class="k">endif</span> <span class="cp">%}</span>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="cp">{{</span><span class="nv">command</span><span class="cp">}}</span>
 </span></code></pre></div>
 <p>The scripts are
 <a href="https://jinja.palletsprojects.com/en/stable/templates/">Jinja</a> templates, of
@@ -3436,15 +3433,15 @@ cluster, each declaring its own <code>queue_type</code>; see the
 <h3 id="asking-for-resources">Asking for resources</h3>
 <p><code>cores</code>, <code>memory_max</code> and <code>run_time_max</code> are passed to the submission script,
 and <code>submit_options</code> carries anything else that script declares:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">,</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">queue</span><span class="o">=</span><span class="s2">"long"</span><span class="p">,</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">memory_max</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="n">run_time_max</span><span class="o">=</span><span class="mi">7200</span><span class="p">,</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="n">submit_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"account"</span><span class="p">:</span> <span class="s2">"my-project"</span><span class="p">},</span>
-</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="n">queue</span><span class="o">=</span><span class="s2">"long"</span><span class="p">,</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">memory_max</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="n">run_time_max</span><span class="o">=</span><span class="mi">7200</span><span class="p">,</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="n">submit_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"account"</span><span class="p">:</span> <span class="s2">"my-project"</span><span class="p">},</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>For <code>account</code> to have any effect the script must reference it. A variable a
 script never mentions is ignored, and one the script mentions but nobody
@@ -3468,27 +3465,27 @@ to <code>"slurm"</code>.</p>
 to be written into the script, along with everything else the scheduler needs.
 For Slurm that looks like this — other systems use entirely different
 directives:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">TEMPLATE</span> <span class="o">=</span> <span class="s2">"""</span><span class="se">\</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="s2">#!/bin/bash</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="s2">#SBATCH --partition=long</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="s2">#SBATCH --job-name={{job_name}}</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="s2">#SBATCH --output={{output}}</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="s2">#SBATCH --chdir={{working_directory}}</span>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="s2">#SBATCH --ntasks={{cores}}</span>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="s2">{</span><span class="si">%- i</span><span class="s2">f memory_max %}</span>
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="s2">#SBATCH --mem={{memory_max}}G</span>
-</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="s2">{</span><span class="si">%- e</span><span class="s2">ndif %}</span>
-</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>
-</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="s2">{{command}}</span>
-</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="s2">"""</span>
-</span><span id="__span-16-14"><a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>
-</span><span id="__span-16-15"><a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span>
-</span><span id="__span-16-16"><a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>    <span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-</span><span id="__span-16-17"><a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>    <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">,</span>
-</span><span id="__span-16-18"><a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>    <span class="n">template</span><span class="o">=</span><span class="n">TEMPLATE</span><span class="p">,</span>
-</span><span id="__span-16-19"><a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a>    <span class="n">scheduler</span><span class="o">=</span><span class="s2">"slurm"</span><span class="p">,</span>
-</span><span id="__span-16-20"><a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-</span><span id="__span-16-21"><a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">TEMPLATE</span> <span class="o">=</span> <span class="s2">"""</span><span class="se">\</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="s2">#!/bin/bash</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="s2">#SBATCH --partition=long</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="s2">#SBATCH --job-name={{job_name}}</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="s2">#SBATCH --output={{output}}</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="s2">#SBATCH --chdir={{working_directory}}</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="s2">#SBATCH --ntasks={{cores}}</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="s2">{</span><span class="si">%- i</span><span class="s2">f memory_max %}</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="s2">#SBATCH --mem={{memory_max}}G</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="s2">{</span><span class="si">%- e</span><span class="s2">ndif %}</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="s2">{{command}}</span>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="s2">"""</span>
+</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>
+</span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span>
+</span><span id="__span-15-16"><a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>    <span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span><span id="__span-15-17"><a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>    <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">,</span>
+</span><span id="__span-15-18"><a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>    <span class="n">template</span><span class="o">=</span><span class="n">TEMPLATE</span><span class="p">,</span>
+</span><span id="__span-15-19"><a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>    <span class="n">scheduler</span><span class="o">=</span><span class="s2">"slurm"</span><span class="p">,</span>
+</span><span id="__span-15-20"><a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+</span><span id="__span-15-21"><a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>The script is a <a href="https://jinja.palletsprojects.com/en/stable/templates/">Jinja</a>
 template, rendered by <code>pysqa</code> through the <code>jinja2</code> package. <code>{{name}}</code>

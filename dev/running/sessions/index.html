@@ -2570,10 +2570,11 @@
 
 
 <h1 id="sessions">Sessions</h1>
-<p>Without a pool, <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> and <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>
-evaluate one point at a time and return when they have finished. To access the
-concurrency features of <code>ropt</code>, open a <a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a>, build a pool
-with it, and pass the pool to the functions that should evaluate in parallel:</p>
+<p>Without an evaluation pool, <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> evaluate one point at a time and return when they
+have finished. To access the concurrency features of <code>ropt</code>, open a
+<a class="autorefs autorefs-internal" title="            ropt.session" href="../../reference/api/#ropt.session"><code>session</code></a>, build a pool with it, and pass the pool to the
+functions that should evaluate in parallel:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">session</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
@@ -2583,29 +2584,27 @@ with it, and pass the pool to the functions that should evaluate in parallel:</p
 <p>With a pool, <code>optimize</code> returns the same result, but evaluates multiple
 functions in parallel on the pool's workers.</p>
 <h2 id="why-use-a-session">Why use a session</h2>
-<p>The functions without a pool are enough for a single optimization that
-evaluates one point at a time. A session adds the following:</p>
+<p>A session adds the following:</p>
 <ul>
 <li><strong>Parallel evaluation.</strong> Pools are built by a session; see <a href="#pools">Pools</a>.</li>
 <li><strong>Concurrent work.</strong> <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, given a pool, runs optimizations, or
-  functions of your own, on the pool's workers at the same time, and returns
-  their results. See <a href="../many_runs/">Running Multiple Optimizations</a>.</li>
+  generic functions, concurrently on the pool's workers, and returns their
+  results. See <a href="../many_runs/">Running Multiple Optimizations</a>.</li>
 <li><strong>One abort for all work.</strong> <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, called from
   another thread, stops everything started with the session's pools or in its
   <code>with</code> block.</li>
 <li><strong>Cleanup.</strong> When the <code>with</code> block ends, the session stops its work and
   releases its workers.</li>
 </ul>
-<p>Concurrency alone does not require a session: <code>optimize</code> calls made from threads
-of your own run at the same time. They are then independent: an abort or a
-failure in one does not reach the others. This also holds for sessions opened in
-different threads: they run independently.</p>
-<p>Inside a session, start concurrent work with <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> and a pool rather
-than with threads of your own. An exception raised in a thread of your own
-stays in that thread: it does not leave the <code>with</code> block, so the session does
-not abort its other work. A function called without a pool in such a thread is
-not aborted with the session either. With <code>run</code>, the failure of one function
-aborts the others, and the exception is raised in your script.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Concurrency itself does not necessarily require a session: <code>optimize</code> calls
+made from threads of your own run at the same time. They are then
+independent: an abort or a failure in one does not reach the others. This
+also holds for sessions opened in different threads: they run independently.
+Inside a session, start concurrent work with <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> and a pool
+rather than with threads of your own.</p>
+</div>
 <h3 id="calls-without-a-pool-in-a-session">Calls without a pool in a session</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>,
 <a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> and <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> can be called
@@ -2613,25 +2612,25 @@ without a pool. They then work sequentially: the first three evaluate one point
 at a time, and <code>run</code> calls its functions one after another.</p>
 <p>Called in the session's <code>with</code> block, or from inside a call made there, these
 calls are still aborted with the session: by
-<a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, or when an exception leaves the <code>with</code>
-block. An aborted call raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, or if an exception raised inside the
+<code>with</code> block is not caught there. An aborted call raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>.</p>
 <h2 id="pools">Pools</h2>
-<p>A pool runs evaluations in parallel, on threads, in worker processes, or as
-jobs on an HPC cluster. Pools are built by a session, with
+<p>A session creates thread, process and HPC pools with
 <a class="autorefs autorefs-internal" title="            thread_pool" href="../../reference/api/#ropt.Session.thread_pool"><code>thread_pool</code></a>,
 <a class="autorefs autorefs-internal" title="            process_pool" href="../../reference/api/#ropt.Session.process_pool"><code>process_pool</code></a> and
-<a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/api/#ropt.Session.hpc_pool"><code>hpc_pool</code></a>, and the session releases their workers
-when its block ends. Several pools can be open at once. See
-<a href="../parallel/">Evaluating in Parallel</a>.</p>
+<a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/api/#ropt.Session.hpc_pool"><code>hpc_pool</code></a>. Several pools can be open at once. See
+<a href="../parallel/">Evaluating in Parallel</a> for how to choose and use them.</p>
 <h2 id="failures-and-aborts">Failures and aborts</h2>
 <p>When a call to <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or <code>run</code> raises an
 exception, the calls made from inside it are aborted, and the exception is
-raised in your script. If your script does not catch it, the exception leaves
-the <code>with</code> block, and the session aborts everything that is still running.
-<a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, called from another thread, aborts every
-call given one of its pools or made in its <code>with</code> block, and the session stays aborted.
-Ctrl-C aborts them when the <code>KeyboardInterrupt</code> leaves the <code>with</code> block. An
-aborted call raises
+raised in your script. If the exception is not caught inside the <code>with</code> block,
+the session aborts everything that is still running. Pressing Ctrl-C raises
+<code>KeyboardInterrupt</code>; if it is not caught inside the <code>with</code> block, the session
+aborts its running calls in the same way.</p>
+<p><a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, called from another thread, aborts every
+call given one of its pools or made in its <code>with</code> block, and the session stays
+aborted. An aborted call raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. See
 <a href="../failures/">Failures and Aborts</a> and
 <a href="../many_runs/#stopping-from-outside">Aborting from outside</a>.</p>
@@ -2644,8 +2643,8 @@ way and releases its pools. It then waits up to five seconds in total for
 work running with its pools to end. Worker processes still busy after that are
 killed, and threads are no longer waited for; see
 <a href="../parallel/#stopping-a-run">Stopping an optimization</a>.</p>
-<p>A session cannot be opened again once it has closed. Building a pool on a
-closed session, or passing one of its pools to a call, raises
+<p>A session cannot be opened again once it has closed. Trying to create a pool
+using a closed session, or passing one of its pools to a call, raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A session may be opened
 inside another, and the pools of different sessions are independent. A session
 opened in the <code>with</code> block of another, or in a call made there, is aborted

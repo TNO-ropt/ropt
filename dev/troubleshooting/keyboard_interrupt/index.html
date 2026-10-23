@@ -2558,19 +2558,25 @@
 
 
 <h1 id="keyboard-interrupts">Keyboard Interrupts</h1>
-<p>When <code>polars</code> is installed, importing <code>ropt</code> stops Ctrl-C from breaking into a
-program that is waiting. A program that uses a thread pool or a process pool
-waits for its evaluations, so there Ctrl-C can have no effect at all. Call
-<a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a> at the
-top of every script that uses a pool, after the imports:</p>
+<p>Some imports can change how the program handles Ctrl-C while it waits. The
+<code>ropt[polars]</code> extra installs Polars; affected Polars versions change a
+process-wide signal setting on import, and <code>ropt</code> loads Polars when it is
+installed. Until the <a href="https://github.com/pola-rs/polars/issues/21739">Polars issue</a>
+is fixed in a release, installing this extra can trigger the problem when
+<code>ropt</code> is imported. This is not a <code>ropt</code> pool limitation. Other libraries
+imported by your program may cause the same problem even without Polars.
+Check whether Ctrl-C interrupts your script while it waits for a thread or
+process pool. If it does not, call
+<a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a> after
+the imports:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">restore_keyboard_interrupt</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">restore_keyboard_interrupt</span><span class="p">()</span>
 </span></code></pre></div>
 <h2 id="the-symptom">The symptom</h2>
-<p>You press Ctrl-C and nothing happens. Not "it takes a while" — nothing at all,
-however many times you press it. The optimization keeps going, and the only way
-out is to kill the process from another terminal.</p>
+<p>You press Ctrl-C while the program is waiting and it does not respond until
+the wait ends. A wait for evaluations may last indefinitely, so the
+optimization can appear to ignore Ctrl-C.</p>
 <p>It affects the <em>whole</em> program, not just the optimization:
 anything else that waits stops responding to Ctrl-C too.</p>
 <h2 id="what-causes-it">What causes it</h2>
@@ -2584,15 +2590,15 @@ extension modules install their own <code>SIGINT</code> handler with the flag <s
 they are imported. Because the flag is process-global, the effect is not
 confined to whoever set it: from that import onwards, Ctrl-C cannot break into
 any wait anywhere in the program.</p>
-<p>This is why the symptom is hard to place. Nothing in your code changed, no
-error is reported, and you need not have imported the culprit yourself — a
-package <code>ropt</code> imports on your behalf is enough. Importing <code>ropt</code> alone
-sets the flag (at the time of writing by way of polars, which <code>ropt</code> loads
-whenever it is installed).</p>
+<p>When Polars is installed, a direct <code>import polars</code> is not required to trigger
+the issue: <code>ropt</code> loads it. Without Polars, check the other packages your
+program imports: any package that sets the flag can cause the same symptom.</p>
 <h2 id="where-to-call-it">Where to call it</h2>
-<p>Call it <strong>after</strong> the imports, because an import is what sets the flag: calling
-this first and importing afterwards leaves you exactly where you started. If you
-import lazily, inside a function, call it after that import instead.</p>
+<p>If Ctrl-C does not interrupt a wait in your program, call the helper <strong>after</strong>
+the imports, because a later import can set the flag again. If you import a
+package lazily, inside a function, call it after that import instead. You can
+also check the behavior without <code>polars</code> installed, or after a Polars upgrade;
+the workaround is needed only if an imported package still changes the setting.</p>
 <h2 id="why-ropt-does-not-do-this-for-you">Why <code>ropt</code> does not do this for you</h2>
 <p><code>SA_RESTART</code> is process-global state that belongs to your program. A library
 that quietly changes it does so for every other part of that program,

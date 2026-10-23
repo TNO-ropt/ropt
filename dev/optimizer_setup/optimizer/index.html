@@ -2617,6 +2617,11 @@ one case that <em>is</em> ignored silently is integer variables; see
 process of its own:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"external/scipy/slsqp"</span><span class="p">}</span>
 </span></code></pre></div>
+<p>This SciPy example shows the syntax; the built-in SciPy backend does not need
+process isolation. Some backend plugins may need it to run concurrently with
+other optimizations. Starting a child process and passing evaluation requests
+and results between processes adds overhead, so use <code>external/</code> when isolation
+is required.</p>
 <p><code>ropt</code> spawns a child process, creates the named backend there, and lets it
 drive the optimization. The function and gradient evaluations still happen in
 the original process: the child sends each set of variables back, the parent

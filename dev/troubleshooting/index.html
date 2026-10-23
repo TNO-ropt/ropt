@@ -2718,7 +2718,7 @@ the loop or function that uses it rather than around the whole program; see
 <tbody>
 <tr>
 <td>Ctrl-C appears to do nothing</td>
-<td>A process-wide signal setting, changed by <code>polars</code> when <code>ropt</code> imports it. Call <a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a>; see <a href="keyboard_interrupt/">Keyboard Interrupts</a>.</td>
+<td>An imported package may have changed a process-wide signal setting; affected <code>polars</code> versions do this when installed. Check <a href="keyboard_interrupt/">Keyboard Interrupts</a> for how to test and use <a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a> if needed.</td>
 </tr>
 <tr>
 <td>The program will not exit after Ctrl-C</td>
