@@ -454,7 +454,7 @@ class SciPyBackend(Backend):
         if (
             self._cached_variables is None
             or variables.shape != self._cached_variables.shape
-            or not np.allclose(variables, self._cached_variables)
+            or not np.array_equal(variables, self._cached_variables)
         ):
             self._cached_variables = None
             self._cached_function = None

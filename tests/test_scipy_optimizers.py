@@ -1,6 +1,7 @@
-# ruff: file-ignore[float-equality-comparison]
+# ruff: file-ignore[float-equality-comparison, private-member-access]
 
 from typing import Any, Literal
+from unittest.mock import Mock
 
 import numpy as np
 import pytest
@@ -10,6 +11,7 @@ from pydantic import ValidationError
 from ropt import optimize
 from ropt._evaluation import EvaluationFunctionContext
 from ropt._handlers import CallbackHandler
+from ropt.backend import OptimizerCallbackResult
 from ropt.backend.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
@@ -18,6 +20,7 @@ from ropt.backend.scipy import (
     _CONSTRAINT_SUPPORT_NONLINEAR_EQ,
     _CONSTRAINT_SUPPORT_NONLINEAR_INEQ,
     SUPPORTED_SCIPY_METHODS,
+    SciPyBackend,
 )
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
@@ -52,6 +55,30 @@ def config_fixture() -> dict[str, Any]:
             "weights": [0.75, 0.25],
         },
     }
+
+
+def test_scipy_cache_distinguishes_close_points() -> None:
+    backend = SciPyBackend.__new__(SciPyBackend)
+    backend._cached_variables = None
+    backend._cached_function = None
+    backend._cached_gradient = None
+    backend._evaluation_policy = "auto"
+    backend._parallel = False
+    backend._method = "slsqp"
+    evaluate = Mock(
+        side_effect=lambda variables, **_: OptimizerCallbackResult(
+            functions=np.array([variables[0], variables[0] + 1]),
+            gradients=None,
+        )
+    )
+    backend._optimizer_callback = evaluate
+    first = np.array([1.0])
+    second = np.array([1.0 + 1e-9])
+
+    np.testing.assert_array_equal(backend._function(first), [1.0])
+    np.testing.assert_array_equal(backend._nonlinear_values(second), [second[0] + 1])
+    np.testing.assert_array_equal(backend._function(second), [second[0]])
+    assert evaluate.call_count == 2
 
 
 def test_scipy_invalid_options(config: Any) -> None:

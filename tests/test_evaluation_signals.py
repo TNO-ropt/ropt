@@ -83,6 +83,30 @@ def test_cached_function_results_are_returned_without_being_reported(
     assert signals.reported == [first]
 
 
+def test_close_function_point_is_evaluated_instead_of_returned_from_cache(
+    config: Any, evaluator: Any
+) -> None:
+    ensemble, signals = _make(config, evaluator)
+    first = ensemble.calculate(
+        _INITIAL, compute_functions=True, compute_gradients=False
+    )
+    close_point = _INITIAL.copy()
+    close_point[0] = 5e-16
+    second = ensemble.calculate(
+        close_point, compute_functions=True, compute_gradients=False
+    )
+    repeated = ensemble.calculate(
+        close_point.copy(), compute_functions=True, compute_gradients=False
+    )
+
+    assert second[0] is not first[0]
+    assert isinstance(second[0], FunctionResults)
+    np.testing.assert_array_equal(second[0].scaled.variables, close_point)
+    assert repeated[0] is second[0]
+    assert signals.starts == 2
+    assert signals.reported == [first, second]
+
+
 def test_gradient_evaluation_with_a_cached_function_reports_only_the_gradient(
     config: Any, evaluator: Any
 ) -> None:

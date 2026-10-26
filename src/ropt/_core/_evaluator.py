@@ -153,11 +153,8 @@ class EnsembleEvaluator:
         assert compute_functions or compute_gradients
 
         # Invalidate the cached results if not usable:
-        if self._cached_results is not None and not np.allclose(
-            self._cached_results.scaled.variables,
-            variables,
-            rtol=0.0,
-            atol=1e-15,
+        if self._cached_results is not None and not np.array_equal(
+            self._cached_results.scaled.variables, variables
         ):
             self._cached_results = None
 
