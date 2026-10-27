@@ -2711,15 +2711,14 @@ only when its caller is stopped, in one of three ways:</p>
 <p>In each case the program and every program it started receive <code>SIGTERM</code>, and
 those still running five seconds later receive <code>SIGKILL</code>.</p>
 <p><code>run_program</code> behaves the same wherever it is called: in an evaluation function,
-an event handler, a result callback, a function given to
-<a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, with every pool, or in your own code outside any
-optimization. Only the ways in which the caller can be stopped differ.
-<a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> reaches code in the session's <code>with</code>
-block and the calls made there or given the session's pools. It does not reach code after
-the block, such as an evaluation function that you call directly, nor code in a
-thread that your own code starts without
-<a href="../failures/#nested-calls">copying its context</a>. In the main thread such calls
-still end on Ctrl-C, through the <code>KeyboardInterrupt</code>. In an
+an event handler, a result callback, a function given to <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, with
+every pool, or in your own code outside any optimization. Only the ways in which
+the caller can be stopped differ. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> reaches
+code in the session's <code>with</code> block and the calls made there or given the
+session's pools. It does not reach code after the block, such as an evaluation
+function that you call directly, nor code in a thread that your own code starts
+without <a href="../failures/#which-calls-are-aborted">copying its context</a>. In the main
+thread such calls still end on Ctrl-C, through the <code>KeyboardInterrupt</code>. In an
 HPC job no abort reaches the program, but cancelling the job ends the process
 that called <code>run_program</code>.</p>
 <div class="admonition note">

@@ -3214,7 +3214,7 @@ when it becomes <code>True</code>. A thread cannot be killed from outside: if it
 check and is not waiting for <code>run_program</code>, it runs to completion, and your
 program cannot exit before it does. In a process pool, workers still busy five
 seconds after an abort are killed. <code>aborting()</code> does not signal an HPC job; see
-<a href="../failures/#stopping-early-when-aborted">Stopping early when aborted</a> for an
+<a href="../failures/#stopping-early-when-aborted">Stopping work cooperatively</a> for an
 example of checking it in Python code.</p>
 <p><strong>External programs need <code>run_program</code>.</strong> On abort, a program started with
 <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> is terminated. Killing a process-pool worker
@@ -3310,7 +3310,7 @@ on the calling thread, and returns when the last one has finished.</p>
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Give the inner call another
 pool, or none.</p>
 <p><a href="../failures/">Failures and Aborts</a> describes how a failure or an abort reaches
-a <code>run</code> call and the calls nested in it. When a callable raises, <code>run</code> aborts
+a <code>run</code> call and the calls started from its work. When a callable raises, <code>run</code> aborts
 the other callables and raises the exception at once. When an abort arrives
 before all of its callables have finished, <code>run</code> raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. Its <code>exit_code</code> distinguishes an
@@ -3321,7 +3321,7 @@ pool, it raises without waiting for those already running. Without a pool,
 the current callable must return before <code>run</code> raises, even if it was the last
 one. A callable still running after <code>run</code> raises may finish later; an
 exception it raises is logged as a warning. See
-<a href="../failures/#what-an-abort-does">What an abort does</a> for what happens to
+<a href="../failures/#what-an-abort-does">What happens to running work</a> for what happens to
 running work with each pool, including how to stop it early.</p>
 <div class="admonition warning">
 <p class="admonition-title">Work given to <code>run</code> coordinates with nothing</p>

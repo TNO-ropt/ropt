@@ -949,17 +949,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#nested-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Nested calls
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#where-the-exception-is-raised" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -971,13 +960,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-a-failure-aborts" class="md-nav__link">
+  <a href="#which-calls-are-aborted" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What a failure aborts
+        Which calls are aborted
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Which calls are aborted">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-a-failure-aborts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failures and interrupts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aborting-a-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aborting a session
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -985,7 +1002,7 @@
   <a href="#what-an-abort-does" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What an abort does
+        What happens to running work
       
     </span>
   </a>
@@ -996,7 +1013,7 @@
   <a href="#stopping-early-when-aborted" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stopping early when aborted
+        Stopping work cooperatively
       
     </span>
   </a>
@@ -2483,17 +2500,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#nested-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Nested calls
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#where-the-exception-is-raised" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2505,13 +2511,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-a-failure-aborts" class="md-nav__link">
+  <a href="#which-calls-are-aborted" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What a failure aborts
+        Which calls are aborted
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Which calls are aborted">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-a-failure-aborts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failures and interrupts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aborting-a-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aborting a session
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2519,7 +2553,7 @@
   <a href="#what-an-abort-does" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What an abort does
+        What happens to running work
       
     </span>
   </a>
@@ -2530,7 +2564,7 @@
   <a href="#stopping-early-when-aborted" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stopping early when aborted
+        Stopping work cooperatively
       
     </span>
   </a>
@@ -2558,16 +2592,10 @@
 
 
 <h1 id="failures-and-aborts">Failures and Aborts</h1>
-<p>A call to <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>,
-<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> or <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, with or without a
-pool, can start further calls from inside its own work: from an evaluation function, an event handler, a
-result callback or a function given to <code>run</code>. Those calls are <strong>nested</strong> in it.
-When a call fails, every call nested in it is aborted, at any depth, and the
-exception is raised in the code that made the call. For <code>run</code>, a failure of one
-of its functions is a failure of the whole call, so its other functions are
-aborted too. If an exception raised inside the session's <code>with</code> block is not
-caught there, the session aborts everything that is still running. Code that
-catches the exception keeps the other calls running.</p>
+<p>When <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>,
+<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> or <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> raises an exception,
+you can catch it where you made the call. This page explains which other calls
+are aborted and what happens to their running work.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This page describes what a failure does to other calls. What a single
@@ -2587,55 +2615,29 @@ happens when a worker breaks down in
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>            <span class="k">return</span> <span class="n">run</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">simulate</span><span class="p">,</span> <span class="n">variables</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">simulators</span><span class="p">)</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="k">except</span> <span class="n">SimulationError</span><span class="p">:</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="k">except</span> <span class="n">MySimulationError</span><span class="p">:</span>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </span></code></pre></div>
-<p><code>simulate</code> and <code>SimulationError</code> stand for your own function and an exception
-that it raises. <code>run</code> is called from the evaluation function, so it is
-<a href="#nested-calls">nested</a> in the optimization. When <code>simulate</code> raises
-<code>SimulationError</code>, <code>run</code> raises it in <code>objective</code>, which returns <code>NaN</code>. Nothing
-else is aborted: the optimization counts that realization as failed, as it
+<p><code>simulate</code> and <code>MySimulationError</code> stand for your own function and an exception
+that it raises. When <code>simulate</code> raises <code>MySimulationError</code>, <code>run</code> raises it in
+<code>objective</code>, which returns <code>NaN</code>. Nothing else is aborted: the optimization
+counts that realization as failed, as it
 does any <code>NaN</code>, and the other evaluations are not affected. How many failed
 realizations a batch may contain is set by
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>.</p>
 <p>Without the <code>try</code>, <code>objective</code> does not catch the exception, and the
-optimization fails. <code>optimize</code> aborts the calls nested in it, including the
+optimization fails. <code>optimize</code> aborts the calls started from its work, including the
 <code>run</code> calls of the other evaluations and their simulations, and then raises
-the <code>SimulationError</code> in your script. If the exception is not caught inside
+the <code>MySimulationError</code> in your script. If the exception is not caught inside
 the <code>with</code> block, the session aborts the rest of its work.</p>
-<h2 id="nested-calls">Nested calls</h2>
-<p>A call to <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or <code>run</code> is <strong>nested</strong> in
-another such call when it is made, in the same process, from the work of that
-other call: from its evaluation function, event handlers or result callback,
-or from a function given to it if it is a <code>run</code> call. The outer call is its
-<strong>parent</strong>. This holds with or without a pool.</p>
-<p>An evaluation function runs in your process when its optimization or evaluation
-has no pool or a thread pool, and so does a function given to <code>run</code> without a
-pool or with a thread pool. With a process or HPC pool they run in another process.
-A call they make in the worker of a process pool is aborted when the call that
-runs them is; a call they make in an HPC job is not nested. Neither is a call
-made from your script.</p>
-<div class="admonition note">
-<p class="admonition-title">Threads that your code starts</p>
-<p>A call made from a thread that your own code starts is not nested, even
-when the thread is started from an evaluation function, so it is not aborted
-with the call that started the thread. Start the thread through
-<code>contextvars.copy_context().run</code> to make it nested:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">contextvars</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">contextvars</span><span class="o">.</span><span class="n">copy_context</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">work</span><span class="p">,))</span>
-</span></code></pre></div>
-</div>
 <h2 id="where-the-exception-is-raised">Where the exception is raised</h2>
 <p><code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> and <code>run</code> raise the exception of a
-failure in the code that called them. For a nested call, that is the
-evaluation function, event handler, result callback or function given to <code>run</code>
-from which it was made. That code can catch the exception. If it does not, the
-call that the code belongs to fails in turn, and the same rules apply to that
-call.</p>
+failure in the code that called them. That code can catch the exception.
+For example, <code>objective</code> catches the exception from <code>run</code> above. If it does
+not catch it, the optimization fails in turn and raises the exception in
+your script.</p>
 <p><code>run</code> raises the first exception raised by one of its functions, as soon as it
 arrives, and the results of its other functions are lost; see
 <a href="../multiple_runs/#failure-in-one-run">Failure in one optimization</a> for a way to keep
@@ -2643,44 +2645,72 @@ them.</p>
 <p>An optimization that stops with an exit code has not failed in this sense. One
 that stops with <code>TOO_FEW_REALIZATIONS</code>, for instance, returns its result like any
 other, and nothing is aborted.</p>
-<h2 id="what-a-failure-aborts">What a failure aborts</h2>
-<p>When a call raises an exception, every call nested in it is aborted, at any
-depth. When one function given to <code>run</code> raises, the <code>run</code> call fails, so its
-other functions are aborted, together with the calls nested in them.</p>
+<h2 id="which-calls-are-aborted">Which calls are aborted</h2>
+<p>When a call fails, <code>ropt</code> aborts the calls started from its work. In the example
+above, failure of the optimization aborts the <code>run</code> calls started by
+<code>objective</code>. This applies at every depth, with or without a pool. When one
+function given to <code>run</code> fails, its other functions and the calls they started
+are aborted too.</p>
+<p>Calls made from an evaluation, a callback or work given to <code>run</code> inherit this
+relationship when they run in the same process. Calls made in process-pool
+workers also receive the abort. HPC jobs are cancelled instead, as described
+under <a href="#what-an-abort-does">What happens to running work</a>.</p>
+<p>If your script catches the exception inside the session's <code>with</code> block, the
+failure does not abort the session. Other independent calls keep running, and
+your script can start more work using the same session. If the exception
+escapes the block, the session closes and its pools cannot be reused.</p>
+<h3 id="what-a-failure-aborts">Failures and interrupts</h3>
+<p>The failing call raises its original exception. Other calls aborted as a
+consequence raise <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with
+<code>exit_code</code> set to <code>ABORTED_ON_ERROR</code>. When an abort
+propagates to a call started from the affected work, it keeps the same exit
+code, even if that call uses another session's pool or no pool. Further calls
+started from that work after the abort are aborted immediately.</p>
 <p>An optimization or evaluation that cannot be built because its configuration is
 invalid, or that is given arguments it rejects, such as a vector of the wrong
-shape, raises the exception before it has started anything to abort. Trying to
-create a pool using a closed session, or passing one of its pools to a call,
-raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> and aborts nothing. An
-exception raised by a call that is being aborted is still raised, but aborts
-nothing further.</p>
+shape, raises the exception before it has started any work. The rejected call
+itself therefore aborts nothing.</p>
+<p>Trying to create a pool using a closed session, or passing one of its pools
+to a call, raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. These
+operations also abort nothing directly.</p>
+<p>In both cases, if the exception is not caught inside an open session's <code>with</code>
+block, that session ends and aborts its remaining work with <code>ABORTED</code>.</p>
+<p>An exception raised by a call that is being aborted is still raised, but
+aborts nothing further.</p>
 <p>A <code>KeyboardInterrupt</code> or <code>SystemExit</code> is not a failure. When one passes through
-a call, the calls nested in it, and for <code>run</code> its other functions, are aborted
+a call, the calls started from its work, and for <code>run</code> its other functions, are aborted
 with <code>ABORTED</code>, and the exception is raised. Other calls in the session keep
 running if the exception is caught inside the session's <code>with</code> block.</p>
 <p>If an exception raised inside the session's <code>with</code> block is not caught there,
 whether it is a failure or a <code>KeyboardInterrupt</code>, the session ends and aborts
 the calls that are still running with <code>ABORTED</code>.</p>
-<h2 id="what-an-abort-does">What an abort does</h2>
-<p>A nested call is aborted when its parent is, with the same exit code:
-<code>USER_ABORT</code> after <a href="../multiple_runs/#stopping-from-outside"><code>Session.abort</code></a>, <code>ABORTED</code>
-when the session's <code>with</code> block ends or a <code>KeyboardInterrupt</code> or <code>SystemExit</code>
-passes through the parent, and <code>ABORTED_ON_ERROR</code> after a failure.
-This also holds when the nested call is given a pool of another session, or no
-pool at all. A nested call that is made after its parent was aborted is aborted
-at once.</p>
+<h3 id="aborting-a-session">Aborting a session</h3>
 <p>When a session is aborted, so are the calls given its pools or made in its
-<code>with</code> block, and the sessions opened there. An aborted session stays aborted:
+<code>with</code> block, and the sessions opened there. Calling
+<a href="../multiple_runs/#stopping-from-outside"><code>Session.abort</code></a> uses <code>USER_ABORT</code>;
+leaving the session's <code>with</code> block uses <code>ABORTED</code>.
+An aborted session stays aborted:
 every call given one of its pools, or made in its <code>with</code> block, after the abort
 is aborted at once. See
 <a href="../multiple_runs/#stopping-from-outside">Aborting from outside</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Calls on threads you start are not aborted automatically</p>
+<p>A call made from a thread that your own code starts does not inherit the
+abort of the call that started the thread, even if it starts inside an
+evaluation. Copy the context so that aborts propagate to its calls:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">contextvars</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">contextvars</span><span class="o">.</span><span class="n">copy_context</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">work</span><span class="p">,))</span>
+</span></code></pre></div>
+<p>Calls on that thread can still be aborted through a session whose pool
+they use.</p>
+</div>
+<h2 id="what-an-abort-does">What happens to running work</h2>
 <p>An aborted call raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
 <code>exit_code</code> is the exit code of the abort; see
-<a href="../../results/exit_codes/">Exit Codes</a>. It raises without waiting for the work it
-has running, and returns no result. A function given to <code>run</code> that has not
-started never starts, and if it is running with a pool, <code>run</code> does not wait for
-it. What
-happens to work that is already running depends on the pool:</p>
+<a href="../../results/exit_codes/">Exit Codes</a>. It returns no result and starts no
+pending work. Whether it waits for work already running depends on the pool:</p>
 <table>
 <thead>
 <tr>
@@ -2707,21 +2737,25 @@ happens to work that is already running depends on the pool:</p>
 </tr>
 </tbody>
 </table>
+<p>Process workers receive the abort request, so calls made inside them
+are aborted too. Calls inside an HPC job do not receive that request; instead,
+the calling process requests cancellation of the job through the scheduler.</p>
 <p>Without a pool, the optimization or evaluation runs the evaluation function
 itself, so the evaluation in progress has to return first. Where the call does
-not wait,
-an exception raised by work that is still running is logged as a warning, unless
-it is an <code>AbortedError</code>.</p>
+not wait, an exception raised by work that is still running is logged as a
+warning, unless it is an <code>AbortedError</code>.</p>
 <p><code>run</code>, an optimization and an evaluation also raise <code>AbortedError</code> when
 their pool can no longer run the work. In an evaluation function, returning
 <code>NaN</code> for that counts the realization as failed, so catch only the exceptions
 that your own code raises, as the example above does.</p>
-<h2 id="stopping-early-when-aborted">Stopping early when aborted</h2>
-<p>Work that is left running after its call was aborted runs to its end, unless it
-stops by itself or, with a process pool, its worker is killed five seconds later.
-Call <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting</code></a> in long-running code — an
-evaluation function, an event handler, a result callback, or a function given to
-<code>run</code> — to find out whether the call that runs it is being aborted:</p>
+<h2 id="stopping-early-when-aborted">Stopping work cooperatively</h2>
+<p><a class="autorefs autorefs-internal" title="            ropt.aborting" href="../../reference/api/#ropt.aborting"><code>aborting()</code></a> lets running Python code detect an abort and
+stop early. It works in code run by <code>ropt</code> <strong>without a pool, on a thread pool,
+and in process-pool workers</strong>. It does not receive the calling process's
+abort request inside an HPC job; those jobs are cancelled instead.</p>
+<p>Check <code>aborting()</code> between steps of a long-running evaluation or a function
+given to <code>run</code>. It returns <code>True</code> when the call running that code is being
+aborted:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">aborting</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">work</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
@@ -2730,17 +2764,23 @@ evaluation function, an event handler, a result callback, or a function given to
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>            <span class="k">return</span> <span class="kc">None</span>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">step</span><span class="p">()</span>
 </span></code></pre></div>
-<p>A call nested in an aborted call is aborted as well, so code that starts an
-optimization, an evaluation or a <code>run</code> call needs no check of its own: the
-nested call raises <code>AbortedError</code> at once. An external program started with
+<p>This check is especially useful on threads, which cannot be forcibly stopped.
+In process-pool workers, the abort request becomes visible within a fraction
+of a second, allowing the work to stop before its worker is killed.
+Without a pool, the call must wait for the running function to return, so
+checking <code>aborting()</code> can shorten that wait too.</p>
+<p>An optimization, evaluation or <code>run</code> call started from work that is already
+being aborted raises <code>AbortedError</code> immediately. Code that makes these calls
+therefore needs no abort check of its own. An external program started with
 <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a> is terminated when the call that runs it is
 aborted, and
 <code>run_program</code> then raises <code>AbortedError</code>; see
 <a href="../programs/">Running External Programs</a>.</p>
-<p>In the <code>with</code> block of a session, outside any call, <code>aborting</code> returns whether
-the session is aborted. It returns <code>False</code> outside any call and session block,
-which includes the jobs of an HPC pool. In the worker processes of a process pool it turns <code>True</code> within a
-fraction of a second of the abort.</p>
+<p>In the <code>with</code> block of a session, outside any call, <code>aborting()</code> returns whether
+the session is aborted. Outside a <code>ropt</code> call or session block it returns
+<code>False</code>. This also applies inside an HPC job unless the job opens its own
+session or starts its own <code>ropt</code> call: those can report their own aborts,
+but not the abort of the call that submitted the job.</p>
 
 
 

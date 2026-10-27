@@ -2713,8 +2713,9 @@ optimization applies its own
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 to it.</p>
 <h2 id="when-an-inner-run-fails">When an inner optimization fails</h2>
-<p>The inner optimization is started from the outer evaluation function, so it is
-<a href="../failures/#nested-calls">nested</a> in the outer optimization. An exception it
+<p>The inner optimization is started from the outer evaluation function, so
+<a href="../failures/#which-calls-are-aborted">aborting the outer optimization also aborts it</a>.
+An exception it
 raises is raised in the outer evaluation function and aborts nothing outside the
 inner optimization. The evaluation function can catch it and return <code>NaN</code> for
 that realization:</p>
