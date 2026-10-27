@@ -1030,7 +1030,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../many_runs/" class="md-nav__link">
+      <a href="../multiple_runs/" class="md-nav__link">
         
   
   
@@ -2929,11 +2929,11 @@ continue.</p>
 </span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">outcome</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">result_callback</span><span class="o">=</span><span class="n">stop_if_good_enough</span><span class="p">)</span>
 </span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="k">assert</span> <span class="n">outcome</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
 </span></code></pre></div>
-<p>When <a href="../many_runs/">running multiple optimizations at once</a>, this stops only the
+<p>When <a href="../multiple_runs/">running multiple optimizations at once</a>, this stops only the
 optimization whose callback returned <code>True</code>; the others continue. To abort all
 optimizations running in the same session, call the session's
 <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>abort</code></a> method. For its effect when several optimizations
-run together, see <a href="../many_runs/#stopping-from-outside">Aborting from outside</a>.</p>
+run together, see <a href="../multiple_runs/#stopping-from-outside">Aborting from outside</a>.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py">examples/stopping.py</a>,
 which stops an optimization after a fixed number of results and then reads the
@@ -2952,7 +2952,7 @@ sources:</p>
 <p>The same dict also reaches the evaluation function itself, as
   <code>context.metadata</code> — useful when the evaluation needs to know which
   optimization it is part of. With several optimizations at once, this is how
-  they are told apart; see <a href="../many_runs/">Give each optimization an ID</a>.</p>
+  they are told apart; see <a href="../multiple_runs/">Give each optimization an ID</a>.</p>
 <ul>
 <li><strong>Per evaluation</strong> — return an
   <a class="autorefs autorefs-internal" title="            ropt.EvaluationFunctionResult
@@ -3093,7 +3093,7 @@ reached before that. The evaluations it did make reach the
 <p>It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
 function stay whatever you raised.</p>
-<p><a href="../many_runs/">Running Multiple Optimizations</a> shows how several optimizations
+<p><a href="../multiple_runs/">Running Multiple Optimizations</a> shows how several optimizations
 can run in parallel. If a call to <code>optimize</code>, <code>evaluate</code>, <code>evaluate_batch</code> or
 <code>run</code> raises an exception, every call made from inside it is aborted, and the
 exception is raised in the code that made the call.

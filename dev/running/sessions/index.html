@@ -969,7 +969,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../many_runs/" class="md-nav__link">
+      <a href="../multiple_runs/" class="md-nav__link">
         
   
   
@@ -2589,7 +2589,7 @@ functions in parallel on the pool's workers.</p>
 <li><strong>Parallel evaluation.</strong> Pools are built by a session; see <a href="#pools">Pools</a>.</li>
 <li><strong>Concurrent work.</strong> <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, given a pool, runs optimizations, or
   generic functions, concurrently on the pool's workers, and returns their
-  results. See <a href="../many_runs/">Running Multiple Optimizations</a>.</li>
+  results. See <a href="../multiple_runs/">Running Multiple Optimizations</a>.</li>
 <li><strong>One abort for all work.</strong> <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>, called from
   another thread, stops everything started with the session's pools or in its
   <code>with</code> block.</li>
@@ -2633,7 +2633,7 @@ call given one of its pools or made in its <code>with</code> block, and the sess
 aborted. An aborted call raises
 <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>. See
 <a href="../failures/">Failures and Aborts</a> and
-<a href="../many_runs/#stopping-from-outside">Aborting from outside</a>.</p>
+<a href="../multiple_runs/#stopping-from-outside">Aborting from outside</a>.</p>
 <p>An abort stops the programs that the aborted calls started with
 <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../../reference/api/#ropt.run_program"><code>run_program</code></a>, and every program those programs started. See
 <a href="../programs/">Running External Programs</a>.</p>

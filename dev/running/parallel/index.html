@@ -12,7 +12,7 @@
         <link rel="prev" href="../sessions/">
       
       
-        <link rel="next" href="../many_runs/">
+        <link rel="next" href="../multiple_runs/">
       
       
         
@@ -1119,7 +1119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../many_runs/" class="md-nav__link">
+      <a href="../multiple_runs/" class="md-nav__link">
         
   
   
@@ -2938,7 +2938,7 @@ figure the extra workers have nothing to do and sit idle.</p>
 evaluations the optimizer requests at once. For a gradient-based optimization
 over an ensemble that is one per realization, plus their perturbations on the
 batches where a gradient is estimated. With one optimization, only one batch
-is active at a time. If you <a href="../many_runs/">run several optimizations together</a>,
+is active at a time. If you <a href="../multiple_runs/">run several optimizations together</a>,
 each can have an active batch; the pool passed to <code>run</code> limits how many
 optimizations can run at once.</p>
 <p>Each evaluation in a batch is sent to a worker as a separate job. Up to
@@ -3001,7 +3001,7 @@ requests and results between processes adds overhead. The built-in SciPy
 backend does not need this isolation, but some backend plugins may. See
 <a href="../../optimizer_setup/optimizer/#external-backend">Running the method in a separate
 process</a> for the
-configuration and constraints, and <a href="../many_runs/">Running Multiple
+configuration and constraints, and <a href="../multiple_runs/">Running Multiple
 Optimizations</a> for concurrent runs.</p>
 </div>
 <p>The objective and its data are <strong>copied</strong> to the workers, so they must be
@@ -3334,7 +3334,7 @@ pools of its own, but they are <em>its</em> handlers and <em>its</em> pools.</p>
   handlers cannot be moved between processes, so the return value is all
   that comes back. Callables that stay in your process, without a pool or on
   a thread pool, can access handlers that they share, as
-  <a href="../many_runs/">Running Multiple Optimizations</a> shows.</li>
+  <a href="../multiple_runs/">Running Multiple Optimizations</a> shows.</li>
 <li><strong>Worker budgets multiply, with no way around it.</strong> A pool cannot be
   carried into a worker process, so a callable that needs one builds its
   own. Four callables that each build a ten-worker pool put <strong>forty</strong>
@@ -3613,7 +3613,7 @@ with <code>config_path</code>, <code>cluster</code> or <code>queue</code>; passi
         
         
           
-          <a href="../many_runs/" class="md-footer__link md-footer__link--next" aria-label="Next: Running Multiple Optimizations">
+          <a href="../multiple_runs/" class="md-footer__link md-footer__link--next" aria-label="Next: Running Multiple Optimizations">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next

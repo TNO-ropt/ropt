@@ -858,7 +858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../running/many_runs/" class="md-nav__link">
+      <a href="../running/multiple_runs/" class="md-nav__link">
         
   
   
@@ -2651,7 +2651,7 @@ Optimizations started together with <a class="autorefs autorefs-internal" title=
 run concurrently. Given a pool, their evaluations go there; given none, each
 optimization evaluates on the worker of <code>run</code> that runs it, so your
 evaluation function is called from several threads at once and has to tolerate
-that. See <a href="../running/many_runs/">Running Multiple Optimizations</a>.</p>
+that. See <a href="../running/multiple_runs/">Running Multiple Optimizations</a>.</p>
 <p><strong>Metadata is copied with <code>copy.deepcopy</code>.</strong> Every result gets its own copy of
 the <code>metadata</code> you passed, so keep it to plain data — numbers, strings, lists,
 arrays. A lock, an open file, or a database connection cannot be copied and
@@ -2792,7 +2792,7 @@ a time.</p>
 </tr>
 <tr>
 <td>A second concurrent optimization raises <code>WorkflowError</code> about output capture</td>
-<td>Only one optimization at a time may set <code>stdout</code> or <code>stderr</code>; see <a href="../running/many_runs/">Running Multiple Optimizations</a>.</td>
+<td>Only one optimization at a time may set <code>stdout</code> or <code>stderr</code>; see <a href="../running/multiple_runs/">Running Multiple Optimizations</a>.</td>
 </tr>
 </tbody>
 </table>

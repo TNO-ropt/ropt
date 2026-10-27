@@ -962,6 +962,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Aborting from outside">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ctrl-c-and-session-aborts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ctrl-C and session aborts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2513,6 +2530,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Aborting from outside">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ctrl-c-and-session-aborts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ctrl-C and session aborts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2536,10 +2570,37 @@
 
 
 <h1 id="running-multiple-optimizations">Running Multiple Optimizations</h1>
-<p>Several optimizations can run together rather than one after another. Wrap each
-<code>optimize</code> call in a zero-argument callable and pass the callables to
-<a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> with a thread pool. <code>run</code> starts each one on a worker of that
-pool and returns the results in the order the callables were given:</p>
+<p>Several optimizations can run in parallel on a thread, process or HPC pool.
+Wrap each <code>optimize</code> call in a zero-argument callable and pass the callables to
+<a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> with the chosen pool. <code>run</code> starts each one on a worker of
+that pool and returns the results in the order the callables were given.</p>
+<p>The pool type determines what the optimizations can share:</p>
+<ul>
+<li><strong>Threads</strong> run in the calling process and can share evaluation pools,
+  handlers and other Python objects. Shared handlers handle one event at a
+  time, but shared result callbacks and other mutable state need their own
+  synchronization.</li>
+<li><strong>Processes and HPC jobs</strong> run outside the calling process. The callables,
+  their data and their return values must be serializable. Each callable must
+  create any sessions, evaluation pools and handlers it needs in its worker;
+  it cannot use those from the calling process. Return any collected results
+  explicitly, since changes to objects in a worker do not update objects in
+  the calling process.</li>
+</ul>
+<p>The examples below use threads so that the optimizations can share an
+evaluation pool and handlers. See
+<a href="../parallel/#pools-inside-an-evaluation">Pools inside an evaluation</a> for the
+same restrictions when an evaluation starts an optimization.</p>
+<div class="admonition warning">
+<p class="admonition-title">Some backends need process isolation</p>
+<p>When optimizations run on threads, their backends share one process. A
+backend plugin that uses process-wide state or fixed filenames may need
+<a href="../../optimizer_setup/optimizer/#external-backend"><code>external/...</code></a> to run
+safely alongside other optimizations. The built-in SciPy backend does not
+need this isolation. See
+<a href="../parallel/#process-pool">Isolating the optimizer</a> for the distinction
+between isolating a backend and isolating its evaluations.</p>
+</div>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">session</span>
@@ -2547,10 +2608,11 @@ pool and returns the results in the order the callables were given:</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">runner</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">start_points</span><span class="p">))</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="p">[</span><span class="n">partial</span><span class="p">(</span><span class="n">optimize</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span> <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">],</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n">pool</span><span class="o">=</span><span class="n">runner</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="p">)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">optimizations</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="n">partial</span><span class="p">(</span><span class="n">optimize</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="p">]</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">optimizations</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">runner</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Each callable is an ordinary <code>optimize</code> call, so every optimization can have its
 own configuration, initial values, objective, <code>metadata</code> and result callback.</p>
@@ -2591,6 +2653,12 @@ attached to its results (and shows up in a
   <code>thread_pool(workers=n)</code>, or a process or HPC pool — runs several
   evaluations at once.</li>
 </ul>
+<p>Without an evaluation pool, each optimization calls the evaluation function
+directly on the worker running that optimization. If <code>run</code> uses a thread pool,
+several threads may therefore call the evaluation function at once. If it
+cannot safely handle concurrent calls, give the optimizations a shared
+evaluation pool with one worker, or a process or HPC pool that isolates the
+evaluations.</p>
 <p>One pool is one budget: <code>workers=10</code> means ten evaluations at a time across all
 the optimizations that use the pool, not ten per optimization. Batch IDs stay
 distinct whatever you pass, since every optimization in the program draws them
@@ -2609,60 +2677,28 @@ its own metadata:</p>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="p">)</span>
 </span></code></pre></div>
 <h2 id="watching-optimizations-that-overlap">Watching optimizations that overlap</h2>
-<p><code>result_callback=</code> belongs to one <code>optimize</code> call: give each optimization its own
-callback, or the same one to all of them. <code>handlers=</code> takes handlers that
-several optimizations may feed together — see <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across
-concurrent optimizations</a>.</p>
-<div class="admonition warning">
-<p class="admonition-title">A shared result callback is called by every optimization at once</p>
-<p>Each optimization calls its callback on its own thread. Nothing serializes
-those calls, so a callback that appends to a list, updates a counter, or
-writes a file needs a lock of its own. Give each optimization its own
-callback when they must stay apart, or pass a
-<a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">handler</a> in
-<code>handlers=</code>, which takes a lock around every event it handles.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">A shared handler makes the optimizations wait for each other</p>
-<p>That lock is not free. An optimization that emits a result waits until the
-handler has finished with it, and a second optimization waits for the first.
-A slow handler therefore throttles all of them, once per result produced.</p>
-<p>So keep a shared handler cheap. A handler that must do slow work — writing
-a file, talking to a database — holds up every optimization feeding it.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Without a pool, the workers of <code>run</code> do the evaluating</p>
-<p>An optimization started with <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> without a pool
-evaluates in your own program, on the worker of <code>run</code> that runs it.
-When several of them run at once, your evaluation function is called by
-several threads at once and must tolerate that. Give them a pool when it
-must not be.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Not every backend can take part</p>
-<p>An optimizer that needs a working directory of its own, writes to a file
-whose name is fixed, or keeps state inside its library between calls cannot
-run while anything else is running in the same process — another
-optimization of its own kind included. Each backend documents whether this
-applies to it. Select it as
-<a href="../../optimizer_setup/optimizer/#external-backend"><code>external/...</code></a> and
-it gets a process of its own, where none of that is shared.</p>
-<p>Optimizer output capture is likewise for one optimization at a time. If more
-than one of them sets
-<a href="../../optimizer_setup/configuration_sections/#optimizer"><code>stdout</code> or <code>stderr</code></a>, the
-second to start raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
-Leave both unset here, and set <a href="../../optimizer_setup/configuration_sections/#backend"><code>verbose=False</code></a>
-unless you want the optimizers' reports interleaved on the terminal.</p>
-</div>
+<p>For optimizations running on threads, <code>result_callback=</code> can receive a different
+callback for each optimization, or the same callback for all of them. A shared
+callback can be called concurrently, so it needs its own lock if it changes
+shared data or writes to a shared file.</p>
+<p>Alternatively, pass a shared handler in <code>handlers=</code>. A handler takes a lock
+around each event it handles, so the optimizations wait for it one at a time.
+Slow work in a shared handler therefore delays every optimization using it.
+See <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent
+optimizations</a>
+for an example and details.</p>
+<p>Optimizer output capture supports only one optimization at a time in each
+process. If concurrent optimizations in the same process set
+<a href="../../optimizer_setup/configuration_sections/#optimizer"><code>stdout</code> or <code>stderr</code></a>,
+the second to start raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
+Leave both unset for optimizations running on threads, and set
+<a href="../../optimizer_setup/configuration_sections/#backend"><code>verbose=False</code></a> to
+avoid interleaved optimizer reports on the terminal.</p>
 <h2 id="failure-in-one-run">Failure in one optimization</h2>
-<p>The optimizations started from the callables of one <code>run</code> call are
-<a href="../failures/#nested-calls">nested</a> in it. When one of them raises, <code>run</code>
-aborts the others and raises that exception at once.
-<a href="../failures/">Failures and Aborts</a> gives the rules for every case. An aborted
-optimization raises <code>AbortedError</code> with <code>ABORTED_ON_ERROR</code> — at once with a pool,
-or at its next evaluation boundary without one — but <code>run</code> does not wait for
-it, and its result is lost. Optimizations still waiting for a worker are not
-started after the abort.</p>
+<p>When an optimization in a <code>run</code> call raises an exception, <code>run</code> aborts the
+others and raises that exception without returning their results. See
+<a href="../failures/">Failures and Aborts</a> for exception propagation, abort timing
+and exit codes.</p>
 <p>A callable that catches the exception of its optimization does not fail, so the
 other optimizations are not aborted. Catch the exceptions you expect, and return
 something that marks the failure:</p>
@@ -2672,23 +2708,34 @@ something that marks the failure:</p>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="k">except</span> <span class="n">SimulationError</span><span class="p">:</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="k">return</span> <span class="kc">None</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">results</span> <span class="o">=</span> <span class="n">run</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">optimize_or_none</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">],</span> <span class="n">pool</span><span class="o">=</span><span class="n">runner</span><span class="p">)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">optimizations</span> <span class="o">=</span> <span class="p">[</span><span class="n">partial</span><span class="p">(</span><span class="n">optimize_or_none</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span> <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">]</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">results</span> <span class="o">=</span> <span class="n">run</span><span class="p">(</span><span class="n">optimizations</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">runner</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>SimulationError</code> stands for an exception that your own objective raises.</p>
-<p><a href="#stopping-from-outside"><code>Session.abort</code></a> reaches every optimization on
-the session's pools, and <code>run</code> then raises
-<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with <code>USER_ABORT</code>. When a failure
-aborted it, the exit code is <code>ABORTED_ON_ERROR</code>, so the exit code
-distinguishes an abort that was asked for from one that a failure caused. A
-<code>KeyboardInterrupt</code> aborts the optimizations of the <code>run</code> call it passes through,
-and is raised at once. See <a href="../../results/exit_codes/">Exit Codes</a> for what each
-code means.</p>
 <h2 id="stopping-from-outside">Aborting from outside</h2>
-<p>The result callback runs inside the optimization it stops, which is no use to
-a signal handler or a user interface. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> is
-the one that is called from another thread: it aborts every call given one of
-the session's pools or made in its <code>with</code> block, and each raises
-<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with <code>USER_ABORT</code>.</p>
+<p>A result callback can stop its own optimization. To stop work from outside
+the optimization, for example from a user-interface thread, call
+<a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a>. This aborts every call given one of
+the session's pools or made in its <code>with</code> block. Each affected call raises
+<a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> with <code>USER_ABORT</code> and returns
+no result.</p>
+<p><code>Session.abort()</code> aborts the whole session, not just one optimization, and
+the affected calls return no result. To retain intermediate results, collect
+them as they arrive with a result callback or a <a href="../../results/handlers/">handler</a>.
+To stop only one optimization when a criterion is met, use its result callback
+instead. This stops only the optimization that owns the callback and returns
+its best result; other optimizations in the session continue.</p>
+<p>After <code>Session.abort()</code>, the session cannot be reused; open a new session to
+start more work. See <a href="../failures/#what-an-abort-does">What an abort does</a> for
+abort propagation and what happens to running evaluations.</p>
+<h3 id="ctrl-c-and-session-aborts">Ctrl-C and session aborts</h3>
+<p>Normally, Ctrl-C raises <code>KeyboardInterrupt</code>; it does not call <code>Session.abort()</code>.
+See <a href="../failures/#what-a-failure-aborts">Failures and Aborts</a> for which calls
+are aborted when that exception propagates.</p>
+<p>If you want Ctrl-C to abort the whole session explicitly instead, install a
+<code>SIGINT</code> handler as below. This replaces the normal <code>KeyboardInterrupt</code>
+behavior: the optimization raises <code>AbortedError</code> with <code>USER_ABORT</code>, and the
+session cannot be reused.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">abort</span><span class="p">())</span>
@@ -2697,32 +2744,8 @@ the session's pools or made in its <code>with</code> block, and each raises
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="k">except</span> <span class="n">AbortedError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">"aborted:"</span><span class="p">,</span> <span class="n">error</span><span class="o">.</span><span class="n">exit_code</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The two are not the same kind of ending, which is why they have different exit
-codes. A result callback stops the optimization <em>on a criterion</em>, at a point it
-chose, and the optimization returns the best result it had reached. An abort
-applies no criterion, and the optimization returns no result. To keep what an
-aborted optimization had reached, collect its results as they arrive, with a
-result callback or a <a href="../../results/handlers/">handler</a>.</p>
-<p>An aborted optimization does not wait for the evaluations that are running.
-With no pool, the optimization runs the evaluation function itself, so the
-evaluation in progress returns first. On a thread or process pool, the
-evaluations already running continue after the optimization has ended, and their workers are free only once they
-return. With an HPC pool they are cancelled.</p>
-<p>An abort is permanent: the session stays aborted. A call given one of its
-pools afterwards, or in its <code>with</code> block, raises <code>AbortedError</code> with <code>USER_ABORT</code> at
-once. Code that catches the <code>AbortedError</code> inside the block can record what
-happened, but cannot start more work in the session; catching it outside the
-<code>with</code> block works as well. To try again, open a new session. A
-<a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> call is aborted as a whole: a callable still waiting for a
-worker is not started. Leaving the session's <code>with</code> block
-aborts its calls as well, and then releases its pools, which is what refuses a
-call made after that. Releasing an HPC pool cancels the jobs it still
-has, so none are left running when the block has ended. A call aborted that way
-raises with <code>ABORTED</code> rather than <code>USER_ABORT</code>, since it was the block ending
-rather than a request to abort.</p>
-<p>A call without a pool, such as <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, made in the
-<code>with</code> block of a session, is aborted with the session. Made outside any
-session block, it cannot be aborted this way.</p>
+<p>See <a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a>
+if Ctrl-C does not interrupt your program while it waits.</p>
 
 
 

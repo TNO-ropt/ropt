@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../many_runs/">
+        <link rel="prev" href="../multiple_runs/">
       
       
         <link rel="next" href="../programs/">
@@ -861,7 +861,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../many_runs/" class="md-nav__link">
+      <a href="../multiple_runs/" class="md-nav__link">
         
   
   
@@ -2638,7 +2638,7 @@ call that the code belongs to fails in turn, and the same rules apply to that
 call.</p>
 <p><code>run</code> raises the first exception raised by one of its functions, as soon as it
 arrives, and the results of its other functions are lost; see
-<a href="../many_runs/#failure-in-one-run">Failure in one optimization</a> for a way to keep
+<a href="../multiple_runs/#failure-in-one-run">Failure in one optimization</a> for a way to keep
 them.</p>
 <p>An optimization that stops with an exit code has not failed in this sense. One
 that stops with <code>TOO_FEW_REALIZATIONS</code>, for instance, returns its result like any
@@ -2663,7 +2663,7 @@ whether it is a failure or a <code>KeyboardInterrupt</code>, the session ends an
 the calls that are still running with <code>ABORTED</code>.</p>
 <h2 id="what-an-abort-does">What an abort does</h2>
 <p>A nested call is aborted when its parent is, with the same exit code:
-<code>USER_ABORT</code> after <a href="../many_runs/#stopping-from-outside"><code>Session.abort</code></a>, <code>ABORTED</code>
+<code>USER_ABORT</code> after <a href="../multiple_runs/#stopping-from-outside"><code>Session.abort</code></a>, <code>ABORTED</code>
 when the session's <code>with</code> block ends or a <code>KeyboardInterrupt</code> or <code>SystemExit</code>
 passes through the parent, and <code>ABORTED_ON_ERROR</code> after a failure.
 This also holds when the nested call is given a pool of another session, or no
@@ -2673,7 +2673,7 @@ at once.</p>
 <code>with</code> block, and the sessions opened there. An aborted session stays aborted:
 every call given one of its pools, or made in its <code>with</code> block, after the abort
 is aborted at once. See
-<a href="../many_runs/#stopping-from-outside">Aborting from outside</a>.</p>
+<a href="../multiple_runs/#stopping-from-outside">Aborting from outside</a>.</p>
 <p>An aborted call raises <a class="autorefs autorefs-internal" title="            AbortedError" href="../../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a>, whose
 <code>exit_code</code> is the exit code of the abort; see
 <a href="../../results/exit_codes/">Exit Codes</a>. It raises without waiting for the work it
@@ -2776,7 +2776,7 @@ fraction of a second of the abort.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../many_runs/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Running Multiple Optimizations">
+          <a href="../multiple_runs/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Running Multiple Optimizations">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>

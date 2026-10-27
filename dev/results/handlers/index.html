@@ -858,7 +858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/many_runs/" class="md-nav__link">
+      <a href="../../running/multiple_runs/" class="md-nav__link">
         
   
   
@@ -2746,7 +2746,7 @@ each in turn:</p>
 <h2 id="sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent optimizations</h2>
 <p>The same handler may also be given to optimizations that execute
 <strong>concurrently</strong> — those started together with
-<a href="../../running/many_runs/"><code>run</code></a>, or ones you start on threads of your own. A handler's
+<a href="../../running/multiple_runs/"><code>run</code></a>, or ones you start on threads of your own. A handler's
 <a class="autorefs autorefs-internal" title="            handle_event" href="../../reference/api/#ropt.EventHandler.handle_event"><code>handle_event</code></a>
 takes a lock around each call, so a second optimization waits for the first to
 finish rather than interleaving with it:</p>
