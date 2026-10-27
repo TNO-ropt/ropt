@@ -107,21 +107,27 @@ only when its caller is stopped, in one of three ways:
 In each case the program and every program it started receive `SIGTERM`, and
 those still running five seconds later receive `SIGKILL`.
 
-`run_program` behaves the same wherever it is called: in an evaluation function,
-an event handler, a result callback, a function given to
-[`run`][ropt.run], with every pool, or in your own code outside any
-optimization. Only the ways in which the caller can be stopped differ.
-[`Session.abort`][ropt.Session.abort] reaches code in the session's `with`
-block and the calls made there or given the session's pools. It does not reach code after
-the block, such as an evaluation function that you call directly, nor code in a
-thread that your own code starts without
-[copying its context](failures.md#nested-calls). In the main thread such calls
-still end on Ctrl-C, through the `KeyboardInterrupt`. In an
-HPC job no abort reaches the program, but cancelling the job ends the process
-that called `run_program`.
+The cleanup described above applies wherever you call `run_program`. What
+differs is how the call is interrupted:
+
+- **Within a session**, [`Session.abort`][ropt.Session.abort] reaches
+  `run_program` through the session's `with` block or through work using one
+  of its pools.
+- **Outside a session**, there is no session abort to react to. In the main
+  thread, Ctrl-C can still interrupt `run_program` with `KeyboardInterrupt`
+  and trigger cleanup.
+- **On a thread started outside the `ropt` API**, for example with
+  `threading.Thread`, the session's abort is not inherited automatically.
+  See [copying the thread's context](failures.md#which-calls-are-aborted)
+  to make aborts reach it.
+- **Inside an HPC job**, `run_program` does not receive the submitting call's
+  abort request. Instead, cancelling the job ends the process that called
+  `run_program`, which triggers cleanup.
 
 !!! note "Programs that leave the process group"
-    On POSIX the program runs in a process group of its own, and an abort
-    signals that group. A program that it starts in a new session or process
-    group of its own, as a daemon does, is not reached. Outside POSIX only the
-    program itself is terminated, and programs it started may keep running.
+    On POSIX systems, including Linux and macOS, `run_program` starts the
+    external program in a separate process group. Cleanup terminates that
+    group, including child programs that remain in it. A child that creates
+    a new process group or session is not terminated by this cleanup.
+    On Windows and other non-POSIX systems, only the external program itself
+    is terminated; its child programs may keep running.

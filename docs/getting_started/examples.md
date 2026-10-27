@@ -28,7 +28,7 @@ read that page with the script open beside it.
 | [`restart.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/restart.py) | Restarting from the best point, collecting every result | [Restarting from the Best Point](../running/restart.md) |
 | [`initial_values.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/initial_values.py) | Restarting with a larger ensemble, reusing what is known there | [Reusing Results at the Starting Point](../running/initial_values.md) |
 | [`parallel.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/parallel.py) | Evaluating on a thread or process pool | [Evaluating in Parallel](../running/parallel.md) |
-| [`multiple_optimizations.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/multiple_optimizations.py) | Running several optimizations concurrently | [Running Multiple Optimizations](../running/many_runs.md) |
+| [`multiple_optimizations.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/multiple_optimizations.py) | Running several optimizations concurrently | [Running Multiple Optimizations](../running/multiple_runs.md) |
 | [`nested_optimization.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/nested_optimization.py) | An inner optimization per outer evaluation, with its own pool | [Nested Optimization](../running/nested.md) |
 | [`programs.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/programs.py) | Running a simulator from the objective, and stopping it on an abort | [Running External Programs](../running/programs.md) |
 | [`simulator.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simulator.py) | A stand-in simulator, run by `programs.py` | [Running External Programs](../running/programs.md) |

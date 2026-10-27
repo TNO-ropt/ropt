@@ -80,7 +80,7 @@ any file your evaluation function opens by relative name, just as surely. Each
 backend states in its own documentation whether this applies to it; where it
 does, `external/` is what lets it run alongside anything else, because the state
 it needs is then its own. This matters as soon as optimizations overlap — see
-[Running Multiple Optimizations](../running/many_runs.md).
+[Running Multiple Optimizations](../running/multiple_runs.md).
 
 Two details differ from the other backends:
 

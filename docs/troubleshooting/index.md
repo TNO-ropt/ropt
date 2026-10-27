@@ -85,7 +85,7 @@ Optimizations started together with [`run`][ropt.run] and a pool
 run concurrently. Given a pool, their evaluations go there; given none, each
 optimization evaluates on the worker of `run` that runs it, so your
 evaluation function is called from several threads at once and has to tolerate
-that. See [Running Multiple Optimizations](../running/many_runs.md).
+that. See [Running Multiple Optimizations](../running/multiple_runs.md).
 
 **Metadata is copied with `copy.deepcopy`.** Every result gets its own copy of
 the `metadata` you passed, so keep it to plain data — numbers, strings, lists,
@@ -172,7 +172,7 @@ a time.
 | Results from a shared result callback are jumbled or lost | The callback is called from the thread of every optimization at once. Collect the results in a [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) instead, or use one callback per optimization. |
 | An optimization started from a handler raises `WorkflowError` about the call stack, or hangs | Its handler list reaches a handler that is already running; see [Result Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs). |
 | Several optimizations are slower than expected while the workers sit idle | A shared handler is serializing them. Make it cheaper. |
-| A second concurrent optimization raises `WorkflowError` about output capture | Only one optimization at a time may set `stdout` or `stderr`; see [Running Multiple Optimizations](../running/many_runs.md). |
+| A second concurrent optimization raises `WorkflowError` about output capture | Only one optimization at a time may set `stdout` or `stderr`; see [Running Multiple Optimizations](../running/multiple_runs.md). |
 
 ## Configuration
 

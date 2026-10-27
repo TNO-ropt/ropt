@@ -14,10 +14,11 @@ if TYPE_CHECKING:
 
 
 class CallbackHandler(EventHandler):
-    """Forwards events of matching types to a callback.
+    """Forward selected events to a callback.
 
-    A callback that blocks, for example on file I/O or network calls, holds up
-    the run that emitted the event.
+    The callback receives an [`EnOptEvent`][ropt.events.EnOptEvent], not an
+    individual result. Its return value is ignored. See
+    [Callback handlers](../results/handlers.md#callbackhandler) for usage.
     """
 
     def __init__(
@@ -38,11 +39,6 @@ class CallbackHandler(EventHandler):
 
     @override
     def _handle_event(self, event: EnOptEvent) -> None:
-        """Handle incoming events.
-
-        Args:
-            event: The event object.
-        """
         if event.event_type in self._event_types:
             self._callback(event)
 

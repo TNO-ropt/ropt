@@ -138,7 +138,7 @@ class Session:
         its pools afterwards, or made in its `with` block, is aborted as soon as it starts.
 
         Calling it is thread-safe, and safe when nothing is running.
-        See [Aborting from outside](../running/many_runs.md#stopping-from-outside)
+        See [Aborting from outside](../running/multiple_runs.md#stopping-from-outside)
         for which calls are reached and when.
         """
         self._abort_scope.abort(ExitCode.USER_ABORT)

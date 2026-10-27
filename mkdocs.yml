@@ -117,12 +117,12 @@ nav:
       - "Running Optimizations": running/running.md
       - "Sessions": running/sessions.md
       - "Evaluating in Parallel": running/parallel.md
-      - "Running Multiple Optimizations": running/many_runs.md
+      - "Running Multiple Optimizations": running/multiple_runs.md
       - "Failures and Aborts": running/failures.md
       - "Running External Programs": running/programs.md
-      - "Nested Optimization": running/nested.md
       - "Restarting from the Best Point": running/restart.md
       - "Reusing Results at the Starting Point": running/initial_values.md
+      - "Nested Optimization": running/nested.md
       - "Logging": running/logging.md
   - "Results":
       - "Working with Results": results/results.md

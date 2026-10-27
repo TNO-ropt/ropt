@@ -24,7 +24,7 @@ A session adds the following:
 - **Parallel evaluation.** Pools are built by a session; see [Pools](#pools).
 - **Concurrent work.** [`run`][ropt.run], given a pool, runs optimizations, or
   generic functions, concurrently on the pool's workers, and returns their
-  results. See [Running Multiple Optimizations](many_runs.md).
+  results. See [Running Multiple Optimizations](multiple_runs.md).
 - **One abort for all work.** [`Session.abort`][ropt.Session.abort], called from
   another thread, stops everything started with the session's pools or in its
   `with` block.
@@ -74,7 +74,7 @@ call given one of its pools or made in its `with` block, and the session stays
 aborted. An aborted call raises
 [`AbortedError`][ropt.exceptions.AbortedError]. See
 [Failures and Aborts](failures.md) and
-[Aborting from outside](many_runs.md#stopping-from-outside).
+[Aborting from outside](multiple_runs.md#stopping-from-outside).
 
 An abort stops the programs that the aborted calls started with
 [`run_program`][ropt.run_program], and every program those programs started. See

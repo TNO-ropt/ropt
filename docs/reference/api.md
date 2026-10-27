@@ -46,6 +46,7 @@ and [`RoptError`][ropt.exceptions.RoptError] with
 ## Handlers
 
 ::: ropt.EventHandler
+::: ropt.CallbackHandler
 ::: ropt.ResultsHandler
 ::: ropt.HistoryHandler
 ::: ropt.DataFrameHandler

@@ -101,8 +101,9 @@ to it.
 
 ## When an inner optimization fails { #when-an-inner-run-fails }
 
-The inner optimization is started from the outer evaluation function, so it is
-[nested](failures.md#nested-calls) in the outer optimization. An exception it
+The inner optimization is started from the outer evaluation function, so
+[aborting the outer optimization also aborts it](failures.md#which-calls-are-aborted).
+An exception it
 raises is raised in the outer evaluation function and aborts nothing outside the
 inner optimization. The evaluation function can catch it and return `NaN` for
 that realization:
@@ -163,12 +164,12 @@ why.
 
 ## Reusing an outer evaluation
 
-The outer variables are integers and the outer method is population-based, so
-the optimizer proposes points it has already evaluated. Each repeat would run a
-complete inner optimization for a value that is already known. The two lines at
-the top of the evaluation function return the stored value instead. The memo is
-an ordinary dictionary, created beside the pools and passed to the function
-through `partial`.
+In the example, the outer variables are integers and the outer method is
+population-based. The optimizer may propose points it has already evaluated.
+Each repeat would run a complete inner optimization for a value that is already
+known. The two lines at the top of the evaluation function return the stored
+value instead. The memo is an ordinary dictionary, created beside the pools and
+passed to the function through `partial`.
 
 The key is exact. Integer variables arrive as whole-numbered doubles and are
 re-proposed unchanged, so a repeated vector is identical bit for bit. The
@@ -176,10 +177,10 @@ realization index is part of the key because a memo keyed on the variables alone
 gives the wrong value for a problem with more than one realization.
 
 The dictionary is reachable only because the outer evaluations run on threads,
-in this process. With a process pool or an HPC pool the function is
+in the current process. With a process pool or an HPC pool the function is
 copied into a worker, which starts from an empty dictionary and discards it when
-it finishes, without raising. See
-[Which pool should I use?](parallel.md#which-pool).
+it finishes, without raising. See [Which pool should I
+use?](parallel.md#which-pool).
 
 Two outer evaluations run at the same time, so both can find the same key
 missing and both compute it. The stored value is the same either way, so the
@@ -216,11 +217,18 @@ the order of its batches. Without it, polars may reorder rows with equal keys.
 Calculations that do not use the row order, such as finding the best objective,
 do not need the sort.
 
+With the pandas engine, use
+`frame = tables["inner"].sort_values(["Outer-batch", "Outer-eval"])` instead.
+
 Reading the answer takes one more step than usual:
 
 ```python
 --8<-- "examples/nested_optimization.py:best"
 ```
+
+For pandas, select the best row with
+`best = frame.sort_values("Objective").iloc[0]`; the variable extraction is
+unchanged.
 
 The outer result is not the place to look. The outer layer only ever sees its
 own variables and holds the inner ones at their initial values, so the optimum

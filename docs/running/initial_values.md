@@ -133,7 +133,7 @@ evaluation of each kind; every later point is evaluated normally.
 
 ## Several optimizations at once
 
-When [multiple optimizations](many_runs.md) start from the same `x0`, they can
+When [multiple optimizations](multiple_runs.md) start from the same `x0`, they can
 share one `f0` and `g0`, which is the case when the same point is optimized under
 several configurations:
 

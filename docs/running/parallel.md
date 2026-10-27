@@ -85,7 +85,7 @@ Batch size follows from the problem, not from a setting: it is how many
 evaluations the optimizer requests at once. For a gradient-based optimization
 over an ensemble that is one per realization, plus their perturbations on the
 batches where a gradient is estimated. With one optimization, only one batch
-is active at a time. If you [run several optimizations together](many_runs.md),
+is active at a time. If you [run several optimizations together](multiple_runs.md),
 each can have an active batch; the pool passed to `run` limits how many
 optimizations can run at once.
 
@@ -163,7 +163,7 @@ that a thread pool would not have given more cheaply.
     [Running the method in a separate
     process](../optimizer_setup/optimizer.md#external-backend) for the
     configuration and constraints, and [Running Multiple
-    Optimizations](many_runs.md) for concurrent runs.
+    Optimizations](multiple_runs.md) for concurrent runs.
 
 The objective and its data are **copied** to the workers, so they must be
 serializable. An objective defined at module level — or in the script you ran,
@@ -347,7 +347,7 @@ when it becomes `True`. A thread cannot be killed from outside: if it does not
 check and is not waiting for `run_program`, it runs to completion, and your
 program cannot exit before it does. In a process pool, workers still busy five
 seconds after an abort are killed. `aborting()` does not signal an HPC job; see
-[Stopping early when aborted](failures.md#stopping-early-when-aborted) for an
+[Stopping work cooperatively](failures.md#stopping-early-when-aborted) for an
 example of checking it in Python code.
 
 **External programs need `run_program`.** On abort, a program started with
@@ -462,7 +462,7 @@ A callable given to `run` with a pool cannot itself call `run`, `optimize`,
 pool, or none.
 
 [Failures and Aborts](failures.md) describes how a failure or an abort reaches
-a `run` call and the calls nested in it. When a callable raises, `run` aborts
+a `run` call and the calls started from its work. When a callable raises, `run` aborts
 the other callables and raises the exception at once. When an abort arrives
 before all of its callables have finished, `run` raises
 [`AbortedError`][ropt.exceptions.AbortedError]. Its `exit_code` distinguishes an
@@ -474,7 +474,7 @@ pool, it raises without waiting for those already running. Without a pool,
 the current callable must return before `run` raises, even if it was the last
 one. A callable still running after `run` raises may finish later; an
 exception it raises is logged as a warning. See
-[What an abort does](failures.md#what-an-abort-does) for what happens to
+[What happens to running work](failures.md#what-an-abort-does) for what happens to
 running work with each pool, including how to stop it early.
 
 !!! warning "Work given to `run` coordinates with nothing"
@@ -487,7 +487,7 @@ running work with each pool, including how to stop it early.
       handlers cannot be moved between processes, so the return value is all
       that comes back. Callables that stay in your process, without a pool or on
       a thread pool, can access handlers that they share, as
-      [Running Multiple Optimizations](many_runs.md) shows.
+      [Running Multiple Optimizations](multiple_runs.md) shows.
     - **Worker budgets multiply, with no way around it.** A pool cannot be
       carried into a worker process, so a callable that needs one builds its
       own. Four callables that each build a ten-worker pool put **forty**

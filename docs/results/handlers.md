@@ -5,106 +5,45 @@ An [`optimize`][ropt.optimize] call returns only the best result. A
 that observes an optimization and processes its results as they arrive — keeping
 them, tabulating them, or invoking a callback.
 
-A handler is given [`Results`][ropt.results.Results] objects —
-[`FunctionResults`][ropt.results.FunctionResults] and
-[`GradientResults`][ropt.results.GradientResults] — which is what every other part of
-`ropt` provides too: a result callback receives one per evaluation, and
-`optimize` puts the best one on the `results` field of what it returns.
-Everything an optimization or evaluation produces is in them, at the field paths
-described in
-[Working with Results](results.md), which is the vocabulary the handlers below
-are configured in.
-
-The [result callback](../running/running.md#reporting-progress) is shorthand
-for a handler: `result_callback=` builds one for you behind the
-scenes, added to the optimization it is given to. One is built per optimization,
-each with a lock of its own, so the same callback given to optimizations that
-execute concurrently can be entered from several threads at once. A handler
-object given to those optimizations is entered by one at a time, because the
-lock belongs to the handler. A callback that accumulates across concurrent
-optimizations needs synchronization of its own.
-
-Attach handlers to an optimization with the `handlers` argument. The same
-handler can be passed to several `optimize` calls, accumulating the results of
-each in turn:
+Attach a handler to an optimization with the `handlers` argument:
 
 ```python
 from ropt import HistoryHandler, optimize
 
 history = HistoryHandler()
 
-optimize(config, x0, objective, handlers=[history])       # a single optimization
-for x0 in start_points:                                   # ...or reused to
-    optimize(config, x0, objective, handlers=[history])   # accumulate in turn
-
-print(history.results)   # every result collected, across all the optimizations
+outcome = optimize(config, x0, objective, handlers=[history])
+print(history.results)
 ```
 
 Handlers that store results expose them through `handler["results"]` (and, for
 `HistoryHandler`, the `history.results` shortcut).
 
-## Sharing a handler across concurrent optimizations { #sharing-a-handler-across-concurrent-runs }
+## What handlers receive
 
-The same handler may also be given to optimizations that execute
-**concurrently** — those started together with
-[`run`](../running/many_runs.md), or ones you start on threads of your own. A handler's
-[`handle_event`][ropt.EventHandler.handle_event]
-takes a lock around each call, so a second optimization waits for the first to
-finish rather than interleaving with it:
+Handlers receive [`EnOptEvent`][ropt.events.EnOptEvent] objects for the event
+types they subscribe to. An event identifies what happened and carries the
+configuration and any associated results. Some events, such as the start of
+an optimization, contain no results.
 
-```python
-from functools import partial
-
-from ropt import HistoryHandler, optimize, run, session
-
-history = HistoryHandler()
-with session() as s:
-    pool = s.thread_pool(workers=4)
-    run(
-        [
-            partial(optimize, config, x0, objective, pool=pool, handlers=[history])
-            for x0 in start_points
-        ],
-        pool=s.thread_pool(workers=len(start_points)),
-    )
-
-print(history.results)
-```
-
-The results of the concurrent optimizations arrive interleaved, in an order that
-depends on which optimization reaches the handler first. Take the order from the
-results themselves — `batch_id`, or a `metadata` field you set per optimization —
-rather than from the order they arrive in.
-
-[examples/handlers.py](https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py)
-feeds two handlers from the same set of concurrent optimizations:
-
-```python
---8<-- "examples/handlers.py:shared"
-```
-
-!!! warning "Do not start an optimization from inside a handler that it can reach"
-    A handler is free to start an optimization of its own, but its own lock is
-    held while it does. If that optimization lists the same handler, the handler
-    is entered a second time. The outcome depends on the optimization the
-    handler starts, not on the call that is feeding the handler. A nested
-    [`optimize`][ropt.optimize] emits on the thread that called it — the
-    one already inside the handler — so this raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. A nested optimization
-    started with [`run`][ropt.run] and a pool emits on a worker of that pool,
-    which waits for a lock the first thread will
-    not release until the optimization ends, and both stop. The same holds for
-    two handlers that each start an optimization reaching the other. Give the
-    inner optimization handlers of its own.
-
-Two handlers that write to the same external state are each serialized on their
-own, but not as a pair: one optimization can be inside the first while another
-is inside the second. Take a [`threading.Lock`][threading.Lock] of your own
-inside both `_handle_event` implementations if they must not overlap.
+`HistoryHandler`, `ResultsHandler` and `DataFrameHandler` subscribe to
+`FINISHED_EVALUATION` events and process the
+[`FunctionResults`][ropt.results.FunctionResults] and
+[`GradientResults`][ropt.results.GradientResults] objects in the event's
+`results` tuple. These are the same result classes used by result callbacks
+and by the return value of `optimize`. Their fields are described in
+[Working with Results](results.md).
 
 ## Built-in handlers
 
 The handlers below are exported from `ropt`, ready to use as they are.
+
+### `HistoryHandler`
+
+[`HistoryHandler`][ropt.HistoryHandler] keeps *every* result it receives,
+in order, as a tuple. Read it with `handler.results`, which is an empty tuple
+until the first result arrives, or with `handler["results"]`, the raw stored
+value, which is `None` until then.
 
 ### `ResultsHandler`
 
@@ -134,13 +73,6 @@ from, so for this gradient the second test always passes. `handler["gradient"]`
 is `None` while that gradient has not arrived, and stays `None` for a point
 where no gradient was computed — the best point of an optimization often is one.
 
-
-### `HistoryHandler`
-
-[`HistoryHandler`][ropt.HistoryHandler] keeps *every* result it receives,
-in order, as a tuple. Read it with `handler.results`, which is an empty tuple
-until the first result arrives, or with `handler["results"]`, the raw stored
-value, which is `None` until then.
 
 ### `DataFrameHandler`
 
@@ -258,69 +190,69 @@ upper variable bounds are finite, or if linear or nonlinear constraints are
 configured. Without it, a table that lists a `constraint_info` or
 `scaled.constraint_info` entry raises a `ValueError`.
 
-Fields of a `"functions"` table:
+??? info "Available fields for function tables"
 
-| Field                                        | Content |
-| -------------------------------------------- | ------- |
-| `batch_id`                                   | Batch ID |
-| `realization`                                | Realization index |
-| `function_id`                                | Index of the evaluation within its batch |
-| `variables`                                  | Variable values |
-| `target_objective`                           | Weighted objective that the optimizer minimizes, in its own domain |
-| `functions.objectives`                       | Objective values, aggregated over the realizations |
-| `functions.constraints`                      | Nonlinear constraint values, aggregated over the realizations |
-| `evaluations.objectives`                     | Objective values of each realization |
-| `evaluations.constraints`                    | Nonlinear constraint values of each realization |
-| `evaluations.metadata.<key>`                 | Per-realization metadata |
-| `realizations.evaluated_realizations`        | `True` if the realization was evaluated |
-| `realizations.objective_weights`             | Objective weight of each realization |
-| `realizations.constraint_weights`            | Constraint weight of each realization |
-| `constraint_info.bound_lower`                | Variables minus their lower bounds |
-| `constraint_info.bound_upper`                | Variables minus their upper bounds |
-| `constraint_info.bound_violation`            | Violation of the variable bounds |
-| `constraint_info.linear_lower`               | Linear constraint values minus their lower bounds |
-| `constraint_info.linear_upper`               | Linear constraint values minus their upper bounds |
-| `constraint_info.linear_violation`           | Violation of the linear constraints |
-| `constraint_info.nonlinear_lower`            | Nonlinear constraint values minus their lower bounds |
-| `constraint_info.nonlinear_upper`            | Nonlinear constraint values minus their upper bounds |
-| `constraint_info.nonlinear_violation`        | Violation of the nonlinear constraints |
-| `metadata.<key>`                             | Metadata of the optimization |
-| `scaled.variables`                           | `variables`, scaled |
-| `scaled.functions.objectives`                | `functions.objectives`, scaled |
-| `scaled.functions.constraints`               | `functions.constraints`, scaled |
-| `scaled.constraint_info.bound_lower`         | `constraint_info.bound_lower`, scaled |
-| `scaled.constraint_info.bound_upper`         | `constraint_info.bound_upper`, scaled |
-| `scaled.constraint_info.bound_violation`     | `constraint_info.bound_violation`, scaled |
-| `scaled.constraint_info.linear_lower`        | `constraint_info.linear_lower`, scaled |
-| `scaled.constraint_info.linear_upper`        | `constraint_info.linear_upper`, scaled |
-| `scaled.constraint_info.linear_violation`    | `constraint_info.linear_violation`, scaled |
-| `scaled.constraint_info.nonlinear_lower`     | `constraint_info.nonlinear_lower`, scaled |
-| `scaled.constraint_info.nonlinear_upper`     | `constraint_info.nonlinear_upper`, scaled |
-| `scaled.constraint_info.nonlinear_violation` | `constraint_info.nonlinear_violation`, scaled |
+    | Field                                        | Content |
+    | -------------------------------------------- | ------- |
+    | `batch_id`                                   | Batch ID |
+    | `realization`                                | Realization index |
+    | `function_id`                                | Index of the evaluation within its batch |
+    | `variables`                                  | Variable values |
+    | `target_objective`                           | Weighted objective that the optimizer minimizes, in its own domain |
+    | `functions.objectives`                       | Objective values, aggregated over the realizations |
+    | `functions.constraints`                      | Nonlinear constraint values, aggregated over the realizations |
+    | `evaluations.objectives`                     | Objective values of each realization |
+    | `evaluations.constraints`                    | Nonlinear constraint values of each realization |
+    | `evaluations.metadata.<key>`                 | Per-realization metadata |
+    | `realizations.evaluated_realizations`        | `True` if the realization was evaluated |
+    | `realizations.objective_weights`             | Objective weight of each realization |
+    | `realizations.constraint_weights`            | Constraint weight of each realization |
+    | `constraint_info.bound_lower`                | Variables minus their lower bounds |
+    | `constraint_info.bound_upper`                | Variables minus their upper bounds |
+    | `constraint_info.bound_violation`            | Violation of the variable bounds |
+    | `constraint_info.linear_lower`               | Linear constraint values minus their lower bounds |
+    | `constraint_info.linear_upper`               | Linear constraint values minus their upper bounds |
+    | `constraint_info.linear_violation`           | Violation of the linear constraints |
+    | `constraint_info.nonlinear_lower`            | Nonlinear constraint values minus their lower bounds |
+    | `constraint_info.nonlinear_upper`            | Nonlinear constraint values minus their upper bounds |
+    | `constraint_info.nonlinear_violation`        | Violation of the nonlinear constraints |
+    | `metadata.<key>`                             | Metadata of the optimization |
+    | `scaled.variables`                           | `variables`, scaled |
+    | `scaled.functions.objectives`                | `functions.objectives`, scaled |
+    | `scaled.functions.constraints`               | `functions.constraints`, scaled |
+    | `scaled.constraint_info.bound_lower`         | `constraint_info.bound_lower`, scaled |
+    | `scaled.constraint_info.bound_upper`         | `constraint_info.bound_upper`, scaled |
+    | `scaled.constraint_info.bound_violation`     | `constraint_info.bound_violation`, scaled |
+    | `scaled.constraint_info.linear_lower`        | `constraint_info.linear_lower`, scaled |
+    | `scaled.constraint_info.linear_upper`        | `constraint_info.linear_upper`, scaled |
+    | `scaled.constraint_info.linear_violation`    | `constraint_info.linear_violation`, scaled |
+    | `scaled.constraint_info.nonlinear_lower`     | `constraint_info.nonlinear_lower`, scaled |
+    | `scaled.constraint_info.nonlinear_upper`     | `constraint_info.nonlinear_upper`, scaled |
+    | `scaled.constraint_info.nonlinear_violation` | `constraint_info.nonlinear_violation`, scaled |
 
-Fields of a `"gradients"` table:
+??? info "Available fields for gradient tables"
 
-| Field                                 | Content |
-| ------------------------------------- | ------- |
-| `batch_id`                            | Batch ID |
-| `realization`                         | Realization index |
-| `perturbation`                        | Perturbation index |
-| `variables`                           | Variable values that were perturbed |
-| `target_gradient`                     | Gradient that the optimizer descends, in its own domain |
-| `gradients.objectives`                | Gradient of each objective |
-| `gradients.constraints`               | Gradient of each nonlinear constraint |
-| `perturbed_variables`                 | Perturbed variable values |
-| `evaluations.perturbed_objectives`    | Objective values of each perturbation |
-| `evaluations.perturbed_constraints`   | Nonlinear constraint values of each perturbation |
-| `evaluations.metadata.<key>`          | Per-perturbation metadata |
-| `realizations.evaluated_realizations` | `True` if the realization was evaluated |
-| `realizations.objective_weights`      | Objective weight of each realization |
-| `realizations.constraint_weights`     | Constraint weight of each realization |
-| `metadata.<key>`                      | Metadata of the optimization |
-| `scaled.variables`                    | `variables`, scaled |
-| `scaled.perturbed_variables`          | `perturbed_variables`, scaled |
-| `scaled.gradients.objectives`         | `gradients.objectives`, scaled |
-| `scaled.gradients.constraints`        | `gradients.constraints`, scaled |
+    | Field                                 | Content |
+    | ------------------------------------- | ------- |
+    | `batch_id`                            | Batch ID |
+    | `realization`                         | Realization index |
+    | `perturbation`                        | Perturbation index |
+    | `variables`                           | Variable values that were perturbed |
+    | `target_gradient`                     | Gradient that the optimizer descends, in its own domain |
+    | `gradients.objectives`                | Gradient of each objective |
+    | `gradients.constraints`               | Gradient of each nonlinear constraint |
+    | `perturbed_variables`                 | Perturbed variable values |
+    | `evaluations.perturbed_objectives`    | Objective values of each perturbation |
+    | `evaluations.perturbed_constraints`   | Nonlinear constraint values of each perturbation |
+    | `evaluations.metadata.<key>`          | Per-perturbation metadata |
+    | `realizations.evaluated_realizations` | `True` if the realization was evaluated |
+    | `realizations.objective_weights`      | Objective weight of each realization |
+    | `realizations.constraint_weights`     | Constraint weight of each realization |
+    | `metadata.<key>`                      | Metadata of the optimization |
+    | `scaled.variables`                    | `variables`, scaled |
+    | `scaled.perturbed_variables`          | `perturbed_variables`, scaled |
+    | `scaled.gradients.objectives`         | `gradients.objectives`, scaled |
+    | `scaled.gradients.constraints`        | `gradients.constraints`, scaled |
 
 The `names` and `source_key` attributes of a result are not fields of a table:
 an entry of `names` repeats the labels that are already part of the column
@@ -335,69 +267,73 @@ from the complete dict has one row per realization, or per realization and
 perturbation. Delete the `constraint_info` and `scaled.constraint_info` entries
 for a problem without bounds or constraints.
 
-```python
-FUNCTION_COLUMNS = {
-    "batch_id": "Batch",
-    "realization": "Realization",
-    "function_id": "Function ID",
-    "variables": "Variable",
-    "target_objective": "Target objective",
-    "functions.objectives": "Objective",
-    "functions.constraints": "Constraint",
-    "evaluations.objectives": "Realization objective",
-    "evaluations.constraints": "Realization constraint",
-    "realizations.evaluated_realizations": "Evaluated",
-    "realizations.objective_weights": "Objective weight",
-    "realizations.constraint_weights": "Constraint weight",
-    "constraint_info.bound_lower": "Bound lower difference",
-    "constraint_info.bound_upper": "Bound upper difference",
-    "constraint_info.bound_violation": "Bound violation",
-    "constraint_info.linear_lower": "Linear lower difference",
-    "constraint_info.linear_upper": "Linear upper difference",
-    "constraint_info.linear_violation": "Linear violation",
-    "constraint_info.nonlinear_lower": "Nonlinear lower difference",
-    "constraint_info.nonlinear_upper": "Nonlinear upper difference",
-    "constraint_info.nonlinear_violation": "Nonlinear violation",
-    "scaled.variables": "Scaled variable",
-    "scaled.functions.objectives": "Scaled objective",
-    "scaled.functions.constraints": "Scaled constraint",
-    "scaled.constraint_info.bound_lower": "Scaled bound lower difference",
-    "scaled.constraint_info.bound_upper": "Scaled bound upper difference",
-    "scaled.constraint_info.bound_violation": "Scaled bound violation",
-    "scaled.constraint_info.linear_lower": "Scaled linear lower difference",
-    "scaled.constraint_info.linear_upper": "Scaled linear upper difference",
-    "scaled.constraint_info.linear_violation": "Scaled linear violation",
-    "scaled.constraint_info.nonlinear_lower": "Scaled nonlinear lower difference",
-    "scaled.constraint_info.nonlinear_upper": "Scaled nonlinear upper difference",
-    "scaled.constraint_info.nonlinear_violation": "Scaled nonlinear violation",
-    # "metadata.<key>": "<title>",
-    # "evaluations.metadata.<key>": "<title>",
-}
-```
+??? example "Column dictionary for function tables"
 
-```python
-GRADIENT_COLUMNS = {
-    "batch_id": "Batch",
-    "realization": "Realization",
-    "perturbation": "Perturbation",
-    "variables": "Variable",
-    "target_gradient": "Target gradient",
-    "gradients.objectives": "Objective gradient",
-    "gradients.constraints": "Constraint gradient",
-    "perturbed_variables": "Perturbed variable",
-    "evaluations.perturbed_objectives": "Perturbed objective",
-    "evaluations.perturbed_constraints": "Perturbed constraint",
-    "realizations.evaluated_realizations": "Evaluated",
-    "realizations.objective_weights": "Objective weight",
-    "realizations.constraint_weights": "Constraint weight",
-    "scaled.variables": "Scaled variable",
-    "scaled.perturbed_variables": "Scaled perturbed variable",
-    "scaled.gradients.objectives": "Scaled objective gradient",
-    "scaled.gradients.constraints": "Scaled constraint gradient",
-    # "metadata.<key>": "<title>",
-    # "evaluations.metadata.<key>": "<title>",
-}
-```
+    ```python
+    FUNCTION_COLUMNS = {
+        "batch_id": "Batch",
+        "realization": "Realization",
+        "function_id": "Function ID",
+        "variables": "Variable",
+        "target_objective": "Target objective",
+        "functions.objectives": "Objective",
+        "functions.constraints": "Constraint",
+        "evaluations.objectives": "Realization objective",
+        "evaluations.constraints": "Realization constraint",
+        "realizations.evaluated_realizations": "Evaluated",
+        "realizations.objective_weights": "Objective weight",
+        "realizations.constraint_weights": "Constraint weight",
+        "constraint_info.bound_lower": "Bound lower difference",
+        "constraint_info.bound_upper": "Bound upper difference",
+        "constraint_info.bound_violation": "Bound violation",
+        "constraint_info.linear_lower": "Linear lower difference",
+        "constraint_info.linear_upper": "Linear upper difference",
+        "constraint_info.linear_violation": "Linear violation",
+        "constraint_info.nonlinear_lower": "Nonlinear lower difference",
+        "constraint_info.nonlinear_upper": "Nonlinear upper difference",
+        "constraint_info.nonlinear_violation": "Nonlinear violation",
+        "scaled.variables": "Scaled variable",
+        "scaled.functions.objectives": "Scaled objective",
+        "scaled.functions.constraints": "Scaled constraint",
+        "scaled.constraint_info.bound_lower": "Scaled bound lower difference",
+        "scaled.constraint_info.bound_upper": "Scaled bound upper difference",
+        "scaled.constraint_info.bound_violation": "Scaled bound violation",
+        "scaled.constraint_info.linear_lower": "Scaled linear lower difference",
+        "scaled.constraint_info.linear_upper": "Scaled linear upper difference",
+        "scaled.constraint_info.linear_violation": "Scaled linear violation",
+        "scaled.constraint_info.nonlinear_lower": "Scaled nonlinear lower difference",
+        "scaled.constraint_info.nonlinear_upper": "Scaled nonlinear upper difference",
+        "scaled.constraint_info.nonlinear_violation": "Scaled nonlinear violation",
+        # "metadata.<key>": "<title>",
+        # "evaluations.metadata.<key>": "<title>",
+    }
+    ```
+
+??? example "Column dictionary for gradient tables"
+
+    ```python
+    GRADIENT_COLUMNS = {
+        "batch_id": "Batch",
+        "realization": "Realization",
+        "perturbation": "Perturbation",
+        "variables": "Variable",
+        "target_gradient": "Target gradient",
+        "gradients.objectives": "Objective gradient",
+        "gradients.constraints": "Constraint gradient",
+        "perturbed_variables": "Perturbed variable",
+        "evaluations.perturbed_objectives": "Perturbed objective",
+        "evaluations.perturbed_constraints": "Perturbed constraint",
+        "realizations.evaluated_realizations": "Evaluated",
+        "realizations.objective_weights": "Objective weight",
+        "realizations.constraint_weights": "Constraint weight",
+        "scaled.variables": "Scaled variable",
+        "scaled.perturbed_variables": "Scaled perturbed variable",
+        "scaled.gradients.objectives": "Scaled objective gradient",
+        "scaled.gradients.constraints": "Scaled constraint gradient",
+        # "metadata.<key>": "<title>",
+        # "evaluations.metadata.<key>": "<title>",
+    }
+    ```
 
 #### Example: tables of both types
 
@@ -448,8 +384,7 @@ Other methods:
     `set_callback` fires on every update, so it is a convenient hook for saving
     the tables — to watch progress live or to write a final report. Pandas'
     `to_string()` gives aligned, human-readable columns with no extra
-    dependencies; use `to_csv()` for machine-readable data, or `to_markdown()`
-    if you have `tabulate` installed:
+    dependencies; use `to_csv()` for machine-readable data:
 
     ```python
     def dump(output_dir):
@@ -464,6 +399,105 @@ Other methods:
 
     Because this writes to disk on every update, the optimization that emitted
     the result waits for the write to finish.
+
+### `CallbackHandler`
+
+[`CallbackHandler`][ropt.CallbackHandler] forwards selected events to a
+function. Usually, `result_callback=` is sufficient for reporting results
+or stopping an optimization when a criterion is met. Use `CallbackHandler`
+when the function needs the event itself, including notifications that do
+not carry results. It also provides a way to
+[share a callback with a lock](#sharing-a-handler-across-concurrent-runs).
+
+```python
+from ropt import CallbackHandler, optimize
+from ropt.enums import EnOptEventType
+from ropt.events import EnOptEvent
+
+def report_finished(event: EnOptEvent) -> None:
+    print("Optimization finished:", event.event_type)
+
+handler = CallbackHandler(
+    event_types={EnOptEventType.FINISHED_OPTIMIZER},
+    callback=report_finished,
+)
+outcome = optimize(config, x0, objective, handlers=[handler])
+```
+
+Unlike a result callback, this function receives an `EnOptEvent` and its return
+value is ignored. Where the event provides a `stop` callable, call
+`event.stop()` to request stopping the optimization. To process evaluation
+results, subscribe to `FINISHED_EVALUATION` and iterate over `event.results`.
+
+## Sharing a handler across optimizations { #sharing-a-handler-across-concurrent-runs }
+
+Reuse a handler across sequential optimizations to collect their results
+in one place:
+
+```python
+history = HistoryHandler()
+for x0 in start_points:
+    optimize(config, x0, objective, handlers=[history])
+print(history.results)
+```
+
+The same handler can also be shared by optimizations running concurrently
+on threads. Pass the **same handler object** to each optimization:
+
+```python
+from functools import partial
+
+from ropt import HistoryHandler, optimize, run, session
+
+history = HistoryHandler()
+with session() as s:
+    pool = s.thread_pool(workers=4)
+    optimizations = [
+        partial(optimize, config, x0, objective, pool=pool, handlers=[history])
+        for x0 in start_points
+    ]
+    run(optimizations, pool=s.thread_pool(workers=len(start_points)))
+
+print(history.results)
+```
+
+A handler's [`handle_event`][ropt.EventHandler.handle_event] holds its lock
+while processing each event. A second optimization waits for the first to
+finish, so no additional lock is needed merely because they share the
+handler. Slow work in the handler delays every optimization using it.
+
+The [result callback](../running/running.md#reporting-progress) is implemented
+by a handler created separately for each optimization. Passing the same
+function as `result_callback=` therefore does not share a lock: the function
+can be called concurrently. If it updates shared data, provide synchronization
+yourself or use **one shared [`CallbackHandler`](#callbackhandler)** instead.
+Its lock covers the whole callback invocation. Creating a separate
+`CallbackHandler` for each optimization does not provide a shared lock.
+
+The results arrive interleaved, in an order that depends on which
+optimization reaches the handler first. Use `batch_id` or a `metadata` field
+set per optimization to identify them, rather than their arrival order.
+
+[examples/handlers.py](https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py)
+feeds two handlers from the same set of concurrent optimizations:
+
+```python
+--8<-- "examples/handlers.py:shared"
+```
+
+!!! warning "Do not start an optimization from inside a handler that it can reach"
+    A handler holds its lock while processing an event. If it starts an
+    optimization that uses the same handler, that optimization tries to
+    acquire the lock again. On the same thread, this raises
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. On another thread, it
+    waits for the lock while the first thread waits for the optimization,
+    causing a deadlock. Two handlers can cause the same problem if each starts
+    an optimization using the other. Give inner optimizations their own handlers.
+
+Two handlers that write to the same external state each have their own lock,
+so they can still run at the same time. Use a shared
+[`threading.Lock`][threading.Lock] inside both `_handle_event` implementations
+if those operations must not overlap.
 
 ## Writing your own handler
 
@@ -596,13 +630,6 @@ Handlers see those returned results and nothing else. Anything the objective did
 only in memory — setting a module global, appending to a shared list, updating an
 object — happened **inside the worker** and is discarded when it finishes; your
 handlers and your main program never see it.
-
-!!! note "Pools stay in the main process"
-    A pool is tied to the process that opened its session, so it is not usable
-    in a worker. An objective that closes over one — to run work with it, or to
-    start an inner optimization with it — is stopped in the worker, which reports the
-    object by name. Do that work in the objective itself, or return what you
-    need and act on it in the main process.
 
 So to get extra information from an evaluation to a handler (or to a later part
 of your program), **return it** instead of stashing it in shared state: attach it

@@ -77,7 +77,7 @@ The `seed` value (default: `1`) ensures consistent results across repeated
 optimizations. To obtain unique results for each optimization, modify the seed.
 A common
 approach is to use a tuple with a unique ID as the first
-element, ensuring reproducibility across nested and parallel evaluations.
+element, ensuring reproducibility across optimizations.
 
 !!! tip "Named constants"
 

@@ -8,19 +8,23 @@ delivered to your code.
 
 !!! note "One kind of result object"
 
-    [`Results`][ropt.results.Results] is the record every part of `ropt`
-    returns: one object per variable vector evaluated, carrying every field
-    described below. Result handlers receive these, a result callback is given
-    one per evaluation, and both
-    [`optimize`](../running/running.md) and
-    [`evaluate`](../running/running.md#evaluating-without-optimizing) put them
-    on the `results` field of the result object they return. Whichever way you
-    reach a result, it reads the same.
+    Evaluation data uses the same [`Results`][ropt.results.Results] classes
+    throughout `ropt`. Handlers and result callbacks receive these objects,
+    and the return values of [`optimize`](../running/running.md) and
+    [`evaluate`](../running/running.md#evaluating-without-optimizing) expose
+    them through their `results` field. Each object describes one evaluated
+    variable vector. Its fields have the same meaning regardless of how you
+    obtain it.
 
 ## The result hierarchy
 
-During optimization, function and gradient evaluations generate data that is
-reported via [`EnOptEvent`][ropt.events.EnOptEvent] objects passed to callbacks.
+Result handlers receive [`EnOptEvent`][ropt.events.EnOptEvent] objects:
+notifications that identify an optimization or evaluation event and carry
+the configuration and any associated results. When an evaluation finishes,
+the event's `results` field contains the function or gradient results
+produced. A result callback receives the individual result objects rather
+than the event itself. See [Writing your own handler](handlers.md#writing-your-own-handler)
+for the event types and how to handle them.
 
 Each [`Results`][ropt.results.Results] object represents the outcome of the
 calculation for a **single variable vector** — that is, the objective and
@@ -37,14 +41,13 @@ Two concrete subclasses exist:
 - [`GradientResults`][ropt.results.GradientResults] — gradient estimates for
   the objective and constraints.
 
-Each carries nested [`ResultField`][ropt.results.ResultField] objects:
+### Fields of function and gradient results { #what-each-field-holds }
 
-| Result             | Fields                                                                                          |
-| ------------------ | ----------------------------------------------------------------------------------------------- |
-| `FunctionResults`  | `variables`, `target_objective`, `evaluations` ([`FunctionEvaluations`][ropt.results.FunctionEvaluations]), `functions` ([`Functions`][ropt.results.Functions]), `realizations` ([`Realizations`][ropt.results.Realizations]), `constraint_info` ([`ConstraintInfo`][ropt.results.ConstraintInfo]), `scaled` ([`ScaledFunctionResults`][ropt.results.ScaledFunctionResults]). |
-| `GradientResults`  | `variables`, `perturbed_variables`, `target_gradient`, `evaluations` ([`GradientEvaluations`][ropt.results.GradientEvaluations]), `gradients` ([`Gradients`][ropt.results.Gradients]), `realizations` ([`Realizations`][ropt.results.Realizations]), `scaled` ([`ScaledGradientResults`][ropt.results.ScaledGradientResults]). |
-
-### What each field holds
+The fields below describe the data stored in `FunctionResults` and
+`GradientResults`. Some fields hold arrays directly; others group related
+data in [`ResultField`][ropt.results.ResultField] objects. For example, a
+`FunctionResults` object stores per-realization objective values in
+`evaluations.objectives` and their aggregates in `functions.objectives`.
 
 #### `FunctionResults` fields
 
@@ -416,11 +419,7 @@ Two groups of fields have a single domain:
 - `target_objective` and `target_gradient` exist only in the domain the
   optimizer works in. Each is a weighted total over objectives that may differ
   in both scale and direction, so there is no single factor to undo. The
-  gradient is differentiated with respect to the *scaled* variables. A combined
-  objective in configured terms is built from `functions.objectives`, which
-  already holds the configured values, using the `weights` and `maximize`
-  entries of the
-  [objectives](../optimizer_setup/configuration_sections.md#objectives) section.
+  gradient is differentiated with respect to the *scaled* variables.
 
 Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
@@ -443,7 +442,8 @@ Results carry two independent kinds of metadata, neither interpreted by `ropt`:
   optimization or evaluation. It is set once, at the start: pass a `metadata`
   dict to the [`optimize`][ropt.optimize] / [`evaluate`][ropt.evaluate]
   functions. Use it to tag or identify an optimization, for example
-  `{"run_id": 7}`.
+  `{"run_id": 7}`. The evaluation function also receives this dictionary as
+  `context.metadata` on every call.
 - **Per-realization metadata** — the `metadata` dict on the `evaluations` field,
   with one array entry per realization. It is produced by the objective when it
   returns an
@@ -473,10 +473,22 @@ result.results.evaluations.metadata   # {'shift': array([...])}
 The full runnable script is
 [examples/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py).
 
-## Exporting to pandas
+## Exporting results
 
-`ropt` can export results to `pandas` DataFrames for analysis and reporting.
-This requires the `pandas` optional extra (see [Installation](../getting_started/installation.md)).
+Results can be exported to pandas or Polars DataFrames. The two formats use
+the same field selection and unstacking options, but represent row labels
+differently. Install the corresponding `pandas` or `polars` optional extra;
+see [Installation](../getting_started/installation.md).
+
+Use [`to_pandas`][ropt.results.Results.to_pandas] or
+[`to_polars`][ropt.results.Results.to_polars] for a single result, and
+[`results_to_pandas`][ropt.results.results_to_pandas] or
+[`results_to_polars`][ropt.results.results_to_polars] for a sequence of results.
+
+The runnable script is
+[examples/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py).
+It uses Polars by default and pandas with `--pandas`, so only one of the two
+needs to be installed.
 
 !!! note
 
@@ -485,7 +497,13 @@ This requires the `pandas` optional extra (see [Installation](../getting_started
     update such tables for you as an optimization runs; see
     [Result Handlers](handlers.md).
 
-The row index and the unstacked column labels come from the
+### Selecting fields and labels
+
+Row-label dimensions use their [`AxisName`][ropt.enums.AxisName] names,
+such as `"variable"`, `"realization"` and `"objective"`. The export also
+includes `batch_id` to distinguish results from different batches.
+
+The row labels and the unstacked column labels come from the
 [`names`](../optimizer_setup/configuration_sections.md#names) mapping in the
 configuration. If a dimension is not named, its labels fall back to 0-based
 integer indices. For example, exporting the objectives of a single result
@@ -493,8 +511,13 @@ integer indices. For example, exporting the objectives of a single result
 objectives:
 
 ```python
-df = result.to_pandas(["evaluations.objectives"])
+pandas_frame = result.to_pandas(["evaluations.objectives"])
+polars_frame = result.to_polars(["evaluations.objectives"])
 ```
+
+For compactness, the shared examples below show the pandas representation.
+Polars contains the same selected values; the
+[format differences](#exporting-to-polars) are described after the shared options.
 
 ```
                                evaluations.objectives
@@ -505,24 +528,28 @@ batch_id realization objective
                      1                           1.02
 ```
 
-Adding a `names` entry replaces those numbers with meaningful labels. The
-examples below assume the realizations are named `"r0"`/`"r1"` and the objectives
-`"val"`/`"cost"`.
-
-### Exporting selected fields
-
-The [`to_pandas`][ropt.results.Results.to_pandas] method on an individual
-result exports a list of fields, each named by a dotted path from the result:
+Adding a `names` entry replaces those numbers with meaningful labels:
 
 ```python
-df = result.to_pandas(["variables", "evaluations.objectives"])
+CONFIG = {
+    ...
+    "names": {
+        "variable": ("x0", "x1", "x2"),
+        "realization": ("r0", "r1"),
+        "objective": ("val", "cost"),
+    },
+}
 ```
 
-The runnable script for this section is
-[examples/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py),
-which exports one result stacked, the same result unstacked, and then every
-result of the optimization in one frame. It uses polars by default and pandas
-with `--pandas`, so only one of the two needs to be installed.
+The examples below use these labels.
+
+Both single-result methods export a list of fields, each named by a dotted
+path from the result:
+
+```python
+pandas_frame = result.to_pandas(["variables", "evaluations.objectives"])
+polars_frame = result.to_polars(["variables", "evaluations.objectives"])
+```
 
 A path may name a field of the result itself (`"variables"`,
 `"target_objective"`), a field of one of its sub-objects
@@ -538,11 +565,13 @@ field that is `None` is an error.
     set has no order to follow, and naming the same path twice raises a
     `ValueError`, because one column cannot appear twice.
 
-By default, each dimension of an exported field becomes a level in a
-multi-index. For example, `objectives` in
+### Moving dimensions into columns
+
+By default, each dimension of an exported field becomes a row label.
+For example, `objectives` in
 [`FunctionEvaluations`][ropt.results.FunctionEvaluations] has dimensions
 identified by `REALIZATION` and `OBJECTIVE`, so exporting it keeps both in the
-index — now with the configured names:
+row labels — now with the configured names:
 
 ```python
 df = result.to_pandas(["evaluations.objectives"])
@@ -557,7 +586,7 @@ batch_id realization objective
                      cost                        1.02
 ```
 
-Passing `unstack` moves selected dimensions out of the index and into columns.
+Passing `unstack` moves selected dimensions from row labels into columns.
 Here the `OBJECTIVE` dimension is unstacked:
 
 ```python
@@ -567,6 +596,7 @@ df = result.to_pandas(
     ["evaluations.objectives"],
     unstack=[AxisName.OBJECTIVE],
 )
+# Use result.to_polars(...) with the same arguments for Polars.
 ```
 
 ```
@@ -576,18 +606,17 @@ batch_id realization
          r1                                   2.35                            1.02
 ```
 
-The unstacked dimension is flattened into the column labels, so each new column
-is a tuple of the full field path and the corresponding label — here
-`("evaluations.objectives", "val")` and `("evaluations.objectives", "cost")`.
-Unstacking more dimensions adds more elements to these tuples. Unstacking every
+Each new column identifies the full field path and the labels of its
+unstacked dimensions. Pandas uses tuple column labels; Polars joins the field
+path and dimension labels into a string, as described below. Unstacking every
 dimension of every selected field leaves one row per result, which makes
 results from different batches comparable row by row.
 
 ### Aggregating multiple results
 
-[`results_to_pandas`][ropt.results.results_to_pandas] builds on `to_pandas` to
-convert a *sequence* of results into a single DataFrame. It takes no `unstack`
-argument, because an aggregated frame always pivots the same way:
+`results_to_pandas` and `results_to_polars` convert a *sequence* of results
+into a single DataFrame. Neither takes an `unstack` argument, because both
+always pivot the same way:
 
 !!! note
     Every dimension becomes columns **except those for realizations and
@@ -597,13 +626,14 @@ A field with neither of those dimensions therefore gives exactly one row per
 result:
 
 ```python
-from ropt import results_to_pandas
+from ropt import results_to_pandas, results_to_polars
 
 df = results_to_pandas(
     all_results,
     fields=["variables"],
     result_type="functions",
 )
+# Use results_to_polars(...) with the same arguments for Polars.
 ```
 
 ```
@@ -614,9 +644,9 @@ batch_id
 3                    0.61             0.50             0.10
 ```
 
-Each column is a `(field, label)` pair, and here each row is one result
-identified by its `batch_id`; selecting a field that keeps the `realization`
-axis adds a level to the index and one row per realization. Field names use dot
+Here each row is one result identified by its `batch_id`; selecting a field
+that keeps the `realization` dimension adds a row label and one row per
+realization. Field names use dot
 notation for nested sub-fields (for example, `variables`, `target_objective`),
 and the fields appear in the order you list them. The `result_type`
 argument selects which results to process: `"functions"` for
@@ -646,7 +676,7 @@ batch_id realization
 If the value a realization returns is an array rather than a scalar, the
 metadata also has a dimension for its elements, named after the key. This
 [user-defined dimension](#user-defined-axes) is exported like the built-in
-dimensions. Exporting a single result keeps it in the index, here for a
+dimensions. Exporting a single result keeps it as a row label, here for a
 two-element `residual` labelled `"x"`/`"y"`:
 
 ```python
@@ -683,10 +713,19 @@ batch_id realization
          r1                                         0.22                                0.05
 ```
 
-The **result metadata**, set once per optimization, sits directly on the result,
-so it has no array dimensions and gives one value per result. It can hold a tag
-that identifies the optimization. It may be nested to any depth, and is
-reachable from `to_pandas` and `results_to_pandas` alike:
+The **result metadata** is supplied once per optimization and attached to
+each result. A scalar entry, such as a tag identifying the optimization,
+gives one value per result. A one-dimensional array adds a dimension named
+after its key, just as array-valued per-realization metadata does. Single-result
+exports keep that dimension as a row label unless it is unstacked.
+When exporting several results with `results_to_pandas` or `results_to_polars`,
+each array position becomes a separate column. For example,
+`metadata.scores = [10, 20]` produces two columns containing `10` and `20`
+on the row for that result.
+
+Result metadata can contain dictionaries nested to any depth. Their entries
+are selected using dotted paths in both the single-result and sequence export
+functions:
 
 ```python
 df = results_to_pandas(
@@ -704,36 +743,16 @@ batch_id
 3                       2              0.11
 ```
 
-### Labels and the index
+### pandas and Polars layout differences
 
-Every axis of an exported field becomes an index level, named after its
-[`AxisName`][ropt.enums.AxisName] value (for example `"variable"`, `"realization"`,
-`"objective"`), and `batch_id` is always prepended so results from different
-batches stay distinct. The label on each level — and on each unstacked column —
-comes from the [`names`](../optimizer_setup/configuration_sections.md#names) mapping in the configuration, a
-dict from axis name to a tuple of labels:
+#### Exporting to pandas
 
-```python
-CONFIG = {
-    ...
-    "names": {
-        "variable": ("x0", "x1", "x2"),
-        "objective": ("val", "cost"),
-    },
-}
-```
+Pandas stores row labels in an index, with one level per retained dimension.
+Unstacked column labels are tuples of the field path and dimension labels,
+such as `("evaluations.objectives", "val")`. Each additional unstacked
+dimension adds an element to the tuple.
 
-An axis without a `names` entry falls back to 0-based integer indices, as in the
-first example of this section.
-
-## Exporting to polars
-
-Every pandas export has a `polars` counterpart:
-[`to_polars`][ropt.results.Results.to_polars] and
-[`results_to_polars`][ropt.results.results_to_polars]. They accept the same
-arguments and select and unstack exactly the same fields, so everything in the
-previous section carries over. This requires the `polars` optional extra (see
-[Installation](../getting_started/installation.md)).
+#### Exporting to polars
 
 Polars has no index and its column names must be strings, which leads to the two
 differences you need to know about. The frames below are shown without the
@@ -772,43 +791,6 @@ df = result.to_polars(
 batch_id  realization  evaluations.objectives,val  evaluations.objectives,cost
 1         r0           2.10                        0.94
 1         r1           2.35                        1.02
-```
-
-Aggregating a sequence of results works the same way:
-
-```python
-from ropt import results_to_polars
-
-df = results_to_polars(
-    all_results,
-    fields=["variables"],
-    result_type="functions",
-)
-```
-
-```
-batch_id  variables,x0  variables,x1  variables,x2
-1         0.30          0.42          -0.11
-2         0.55          0.48          0.02
-3         0.61          0.50          0.10
-```
-
-Metadata behaves exactly as described [above](#metadata-columns), and both kinds
-are reachable from either function:
-
-```python
-df = results_to_polars(
-    all_results,
-    fields=["metadata.run_id", "target_objective"],
-    result_type="functions",
-)
-```
-
-```
-batch_id  metadata.run_id  target_objective
-1         0                1.83
-2         1                0.42
-3         2                0.11
 ```
 
 !!! note

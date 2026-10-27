@@ -32,5 +32,5 @@ out.
 ## See also
 
 - To run several optimizations in parallel, see [Running Multiple
-  Optimizations](../running/many_runs.md).
+  Optimizations](../running/multiple_runs.md).
 - Sessions are described in [Sessions](../running/sessions.md).

@@ -40,6 +40,7 @@ from ropt._evaluation import (
     EvaluationFunctionResult,
 )
 from ropt._handlers import (
+    CallbackHandler,
     DataFrameHandler,
     EventHandler,
     HistoryHandler,
@@ -78,6 +79,7 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 __all__ = [
     "AbortedError",
+    "CallbackHandler",
     "DataFrameHandler",
     "EvaluationFunction",
     "EvaluationFunctionContext",

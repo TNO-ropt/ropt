@@ -231,11 +231,11 @@ outcome = optimize(config, x0, objective, result_callback=stop_if_good_enough)
 assert outcome.exit_code is ExitCode.STOPPED
 ```
 
-When [running multiple optimizations at once](many_runs.md), this stops only the
+When [running multiple optimizations at once](multiple_runs.md), this stops only the
 optimization whose callback returned `True`; the others continue. To abort all
 optimizations running in the same session, call the session's
 [`abort`][ropt.Session.abort] method. For its effect when several optimizations
-run together, see [Aborting from outside](many_runs.md#stopping-from-outside).
+run together, see [Aborting from outside](multiple_runs.md#stopping-from-outside).
 
 The runnable script is
 [examples/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/stopping.py),
@@ -260,7 +260,7 @@ sources:
   The same dict also reaches the evaluation function itself, as
   `context.metadata` — useful when the evaluation needs to know which
   optimization it is part of. With several optimizations at once, this is how
-  they are told apart; see [Give each optimization an ID](many_runs.md).
+  they are told apart; see [Give each optimization an ID](multiple_runs.md).
 
 - **Per evaluation** — return an
   [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
@@ -400,7 +400,7 @@ It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
 function stay whatever you raised.
 
-[Running Multiple Optimizations](many_runs.md) shows how several optimizations
+[Running Multiple Optimizations](multiple_runs.md) shows how several optimizations
 can run in parallel. If a call to `optimize`, `evaluate`, `evaluate_batch` or
 `run` raises an exception, every call made from inside it is aborted, and the
 exception is raised in the code that made the call.

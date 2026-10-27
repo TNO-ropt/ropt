@@ -67,19 +67,20 @@ print(f"evaluations collected across all restarts: {len(reported)}")
 print(f"best objective after {RESTARTS} restarts: {result.results.target_objective}")
 ```
 
+!!! note "Restarting from the last point"
+    To restart from the last valid point evaluated rather than the best point,
+    create a [`ResultsHandler`][ropt.ResultsHandler] with `what="last"` and
+    pass it to `optimize` in `handlers=[handler]`. After the optimization,
+    check that `handler.result` is not `None`, then use
+    `handler.result.variables` as the next start point. Failed evaluations
+    are not retained, so this may not be the last point attempted.
+
 ## Not evaluating the restart point again
 
-The optimization that found the best point evaluated it, and returns that
-evaluation on `result.results`, together with the gradient computed at the same
-point on `result.gradient`. Passing the two back as `f0` and `g0` gives the next
-optimization those values, so it does not evaluate the point a second time.
-
-`result.gradient` is `None` when no gradient was computed at the best point, and
-`optimize` accepts that: the perturbations at the start point are then evaluated
-as usual. Setting
-[`evaluation_policy`](../optimizer_setup/gradients.md#evaluation-policy) to
-`"speculative"` requests a gradient at every function evaluation, which leaves
-a gradient available at whatever point the optimization returns.
+The loop passes `result.results` as `f0` and `result.gradient` as `g0` to
+reuse evaluations already performed at the restart point. See
+[Reusing Results at the Starting Point](initial_values.md) for gradient
+availability and the rules for reuse when the configuration changes.
 
 ## See also
 

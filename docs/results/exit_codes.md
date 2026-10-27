@@ -50,8 +50,8 @@ except AbortedError as error:
 | `STOPPED`               | A result callback returned `True`, ending the optimization at the next evaluation boundary.        |
 | `TOO_FEW_REALIZATIONS`  | Too few realizations were evaluated successfully to form an aggregate.                               |
 | `ABORTED`               | The call was aborted from outside, as closing a session, or a `KeyboardInterrupt`, does to a call still under way. |
-| `ABORTED_ON_ERROR`      | A [failure](../running/failures.md) of the call it is nested in aborted it.                         |
-| `USER_ABORT`            | [`Session.abort`](../running/many_runs.md#stopping-from-outside) aborted the call.                   |
+| `ABORTED_ON_ERROR`      | A [failure](../running/failures.md) of the call that started this work aborted it.                         |
+| `USER_ABORT`            | [`Session.abort`](../running/multiple_runs.md#stopping-from-outside) aborted the call.                   |
 | `EXECUTOR_SHUT_DOWN`    | The pool the call was evaluating on could no longer run the work, which in practice means the interpreter was shutting down under it. |
 | `UNKNOWN`               | The zero value of the enumeration. No call reports it.                                               |
 

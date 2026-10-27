@@ -1,6 +1,7 @@
 import dataclasses
 import re
 import runpy
+import textwrap
 from pathlib import Path
 from typing import Any
 
@@ -27,7 +28,7 @@ _MALFORMED_REF = re.compile(r"\[`[^`\n]*\]\[[^`\n]*`\]")
 _PYTHON_BLOCK = re.compile(r"```python\n(.*?)```", re.DOTALL)
 _EXAMPLE_LINK = re.compile(r"examples/\w+\.py")
 _TABLE_CODE = re.compile(r"^\| `(\w+)`", re.MULTILINE)
-_TABLE_FIELD = re.compile(r"^\| `([\w.<>]+)`", re.MULTILINE)
+_TABLE_FIELD = re.compile(r"^[ \t]*\| `([\w.<>]+)`", re.MULTILINE)
 _COMMENTED_FIELD = re.compile(r'^\s*# "([\w.<>]+)":', re.MULTILINE)
 
 # Attributes of a result that do not export to a table column.
@@ -156,15 +157,23 @@ def _handlers_column_dicts() -> dict[str, Any]:
     section = _handlers_section("#### Column dicts to copy", "#### Example")
     namespace: dict[str, Any] = {}
     for block in _PYTHON_BLOCK.findall(section):
-        exec(block, namespace)  # ruff: ignore[exec-builtin]
+        exec(textwrap.dedent(block), namespace)  # ruff: ignore[exec-builtin]
     return namespace
 
 
 @pytest.mark.parametrize(
     ("table_type", "start", "end"),
     [
-        ("functions", 'Fields of a `"functions"` table:', 'Fields of a `"gradients"`'),
-        ("gradients", 'Fields of a `"gradients"` table:', "The `names` and"),
+        (
+            "functions",
+            '??? info "Available fields for function tables"',
+            '??? info "Available fields for gradient tables"',
+        ),
+        (
+            "gradients",
+            '??? info "Available fields for gradient tables"',
+            "The `names` and",
+        ),
     ],
 )
 def test_handlers_page_tabulates_every_result_field(
