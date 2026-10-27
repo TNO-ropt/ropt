@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../nested/">
+        <link rel="prev" href="../programs/">
       
       
         <link rel="next" href="../initial_values/">
@@ -942,34 +942,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../nested/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Nested Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -1111,6 +1083,34 @@
     
   
     Reusing Results at the Starting Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nested/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nested Optimization
   
 
     
@@ -2615,17 +2615,20 @@ holds every evaluation from every restart, not just the last one:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"evaluations collected across all restarts: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reported</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"best objective after </span><span class="si">{</span><span class="n">RESTARTS</span><span class="si">}</span><span class="s2"> restarts: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Restarting from the last point</p>
+<p>To restart from the last valid point evaluated rather than the best point,
+create a <a class="autorefs autorefs-internal" title="            ropt.ResultsHandler" href="../../reference/api/#ropt.ResultsHandler"><code>ResultsHandler</code></a> with <code>what="last"</code> and
+pass it to <code>optimize</code> in <code>handlers=[handler]</code>. After the optimization,
+check that <code>handler.result</code> is not <code>None</code>, then use
+<code>handler.result.variables</code> as the next start point. Failed evaluations
+are not retained, so this may not be the last point attempted.</p>
+</div>
 <h2 id="not-evaluating-the-restart-point-again">Not evaluating the restart point again</h2>
-<p>The optimization that found the best point evaluated it, and returns that
-evaluation on <code>result.results</code>, together with the gradient computed at the same
-point on <code>result.gradient</code>. Passing the two back as <code>f0</code> and <code>g0</code> gives the next
-optimization those values, so it does not evaluate the point a second time.</p>
-<p><code>result.gradient</code> is <code>None</code> when no gradient was computed at the best point, and
-<code>optimize</code> accepts that: the perturbations at the start point are then evaluated
-as usual. Setting
-<a href="../../optimizer_setup/gradients/#evaluation-policy"><code>evaluation_policy</code></a> to
-<code>"speculative"</code> requests a gradient at every function evaluation, which leaves
-a gradient available at whatever point the optimization returns.</p>
+<p>The loop passes <code>result.results</code> as <code>f0</code> and <code>result.gradient</code> as <code>g0</code> to
+reuse evaluations already performed at the restart point. See
+<a href="../initial_values/">Reusing Results at the Starting Point</a> for gradient
+availability and the rules for reuse when the configuration changes.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li>Restarting concurrent, rather than sequential, optimizations collects into the
@@ -2667,7 +2670,7 @@ a gradient available at whatever point the optimization returns.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../nested/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Nested Optimization">
+          <a href="../programs/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Running External Programs">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2677,7 +2680,7 @@ a gradient available at whatever point the optimization returns.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Nested Optimization
+                Running External Programs
               </div>
             </div>
           </a>

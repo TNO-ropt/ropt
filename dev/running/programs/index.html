@@ -12,7 +12,7 @@
         <link rel="prev" href="../failures/">
       
       
-        <link rel="next" href="../nested/">
+        <link rel="next" href="../restart/">
       
       
         
@@ -1047,34 +1047,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../nested/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Nested Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../restart/" class="md-nav__link">
         
   
@@ -1111,6 +1083,34 @@
     
   
     Reusing Results at the Starting Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nested/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nested Optimization
   
 
     
@@ -2710,23 +2710,31 @@ only when its caller is stopped, in one of three ways:</p>
 </ul>
 <p>In each case the program and every program it started receive <code>SIGTERM</code>, and
 those still running five seconds later receive <code>SIGKILL</code>.</p>
-<p><code>run_program</code> behaves the same wherever it is called: in an evaluation function,
-an event handler, a result callback, a function given to <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a>, with
-every pool, or in your own code outside any optimization. Only the ways in which
-the caller can be stopped differ. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> reaches
-code in the session's <code>with</code> block and the calls made there or given the
-session's pools. It does not reach code after the block, such as an evaluation
-function that you call directly, nor code in a thread that your own code starts
-without <a href="../failures/#which-calls-are-aborted">copying its context</a>. In the main
-thread such calls still end on Ctrl-C, through the <code>KeyboardInterrupt</code>. In an
-HPC job no abort reaches the program, but cancelling the job ends the process
-that called <code>run_program</code>.</p>
+<p>The cleanup described above applies wherever you call <code>run_program</code>. What
+differs is how the call is interrupted:</p>
+<ul>
+<li><strong>Within a session</strong>, <a class="autorefs autorefs-internal" title="            abort" href="../../reference/api/#ropt.Session.abort"><code>Session.abort</code></a> reaches
+  <code>run_program</code> through the session's <code>with</code> block or through work using one
+  of its pools.</li>
+<li><strong>Outside a session</strong>, there is no session abort to react to. In the main
+  thread, Ctrl-C can still interrupt <code>run_program</code> with <code>KeyboardInterrupt</code>
+  and trigger cleanup.</li>
+<li><strong>On a thread started outside the <code>ropt</code> API</strong>, for example with
+  <code>threading.Thread</code>, the session's abort is not inherited automatically.
+  See <a href="../failures/#which-calls-are-aborted">copying the thread's context</a>
+  to make aborts reach it.</li>
+<li><strong>Inside an HPC job</strong>, <code>run_program</code> does not receive the submitting call's
+  abort request. Instead, cancelling the job ends the process that called
+  <code>run_program</code>, which triggers cleanup.</li>
+</ul>
 <div class="admonition note">
 <p class="admonition-title">Programs that leave the process group</p>
-<p>On POSIX the program runs in a process group of its own, and an abort
-signals that group. A program that it starts in a new session or process
-group of its own, as a daemon does, is not reached. Outside POSIX only the
-program itself is terminated, and programs it started may keep running.</p>
+<p>On POSIX systems, including Linux and macOS, <code>run_program</code> starts the
+external program in a separate process group. Cleanup terminates that
+group, including child programs that remain in it. A child that creates
+a new process group or session is not terminated by this cleanup.
+On Windows and other non-POSIX systems, only the external program itself
+is terminated; its child programs may keep running.</p>
 </div>
 
 
@@ -2780,13 +2788,13 @@ program itself is terminated, and programs it started may keep running.</p>
         
         
           
-          <a href="../nested/" class="md-footer__link md-footer__link--next" aria-label="Next: Nested Optimization">
+          <a href="../restart/" class="md-footer__link md-footer__link--next" aria-label="Next: Restarting from the Best Point">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Nested Optimization
+                Restarting from the Best Point
               </div>
             </div>
             <div class="md-footer__button md-icon">

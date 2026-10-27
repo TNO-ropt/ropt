@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../programs/">
+        <link rel="prev" href="../initial_values/">
       
       
-        <link rel="next" href="../restart/">
+        <link rel="next" href="../logging/">
       
       
         
@@ -942,6 +942,62 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../initial_values/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reusing Results at the Starting Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1074,62 +1130,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../restart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Restarting from the Best Point
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../initial_values/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reusing Results at the Starting Point
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -2775,21 +2775,21 @@ and
 <a href="../parallel/#pools-inside-an-evaluation">Pools inside an evaluation</a> for
 why.</p>
 <h2 id="reusing-an-outer-evaluation">Reusing an outer evaluation</h2>
-<p>The outer variables are integers and the outer method is population-based, so
-the optimizer proposes points it has already evaluated. Each repeat would run a
-complete inner optimization for a value that is already known. The two lines at
-the top of the evaluation function return the stored value instead. The memo is
-an ordinary dictionary, created beside the pools and passed to the function
-through <code>partial</code>.</p>
+<p>In the example, the outer variables are integers and the outer method is
+population-based. The optimizer may propose points it has already evaluated.
+Each repeat would run a complete inner optimization for a value that is already
+known. The two lines at the top of the evaluation function return the stored
+value instead. The memo is an ordinary dictionary, created beside the pools and
+passed to the function through <code>partial</code>.</p>
 <p>The key is exact. Integer variables arrive as whole-numbered doubles and are
 re-proposed unchanged, so a repeated vector is identical bit for bit. The
 realization index is part of the key because a memo keyed on the variables alone
 gives the wrong value for a problem with more than one realization.</p>
 <p>The dictionary is reachable only because the outer evaluations run on threads,
-in this process. With a process pool or an HPC pool the function is
+in the current process. With a process pool or an HPC pool the function is
 copied into a worker, which starts from an empty dictionary and discards it when
-it finishes, without raising. See
-<a href="../parallel/#which-pool">Which pool should I use?</a>.</p>
+it finishes, without raising. See <a href="../parallel/#which-pool">Which pool should I
+use?</a>.</p>
 <p>Two outer evaluations run at the same time, so both can find the same key
 missing and both compute it. The stored value is the same either way, so the
 cost is one repeated evaluation. A lock would close that window and serialize
@@ -2817,10 +2817,15 @@ rows of one inner optimization keep the order in which they arrived, which is
 the order of its batches. Without it, polars may reorder rows with equal keys.
 Calculations that do not use the row order, such as finding the best objective,
 do not need the sort.</p>
+<p>With the pandas engine, use
+<code>frame = tables["inner"].sort_values(["Outer-batch", "Outer-eval"])</code> instead.</p>
 <p>Reading the answer takes one more step than usual:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">best</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">"Objective"</span><span class="p">)</span><span class="o">.</span><span class="n">row</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">named</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">variables</span> <span class="o">=</span> <span class="p">[</span><span class="n">best</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Variable,</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span><span class="p">)]</span>
 </span></code></pre></div>
+<p>For pandas, select the best row with
+<code>best = frame.sort_values("Objective").iloc[0]</code>; the variable extraction is
+unchanged.</p>
 <p>The outer result is not the place to look. The outer layer only ever sees its
 own variables and holds the inner ones at their initial values, so the optimum
 over <em>all</em> variables exists only in the collected inner results.</p>
@@ -2859,7 +2864,7 @@ over <em>all</em> variables exists only in the collected inner results.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../programs/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Running External Programs">
+          <a href="../initial_values/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Reusing Results at the Starting Point">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2869,20 +2874,20 @@ over <em>all</em> variables exists only in the collected inner results.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Running External Programs
+                Reusing Results at the Starting Point
               </div>
             </div>
           </a>
         
         
           
-          <a href="../restart/" class="md-footer__link md-footer__link--next" aria-label="Next: Restarting from the Best Point">
+          <a href="../logging/" class="md-footer__link md-footer__link--next" aria-label="Next: Logging">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Restarting from the Best Point
+                Logging
               </div>
             </div>
             <div class="md-footer__button md-icon">
