@@ -2889,7 +2889,8 @@ additional options.</p>
   counted from 0.</li>
 <li><code>context.metadata</code> — the metadata for this batch, including any
   changes made by <a href="#passing-values-to-evaluations-from-event-handlers"><code>START_EVALUATION</code> handlers</a>,
-  or <code>None</code> when none was supplied (see <a href="#attaching-metadata">Attaching metadata</a>).</li>
+  or an empty dictionary when none was supplied (see
+  <a href="#attaching-metadata">Attaching metadata</a>).</li>
 </ul>
 </li>
 </ul>
@@ -3174,9 +3175,8 @@ order they run.</p>
 </span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="sd">    Returns:</span>
 </span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="sd">        The objective value for this realization.</span>
 </span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="sd">    """</span>
-</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>    <span class="k">assert</span> <span class="n">context</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>    <span class="n">noise</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"noise"</span><span class="p">][</span><span class="n">context</span><span class="o">.</span><span class="n">realization</span><span class="p">]</span>
-</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">variables</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">noise</span><span class="p">)</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>    <span class="n">noise</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"noise"</span><span class="p">][</span><span class="n">context</span><span class="o">.</span><span class="n">realization</span><span class="p">]</span>
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">variables</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">noise</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Treat this dictionary as input; evaluations in the same process may share it.
 Return per-realization information through

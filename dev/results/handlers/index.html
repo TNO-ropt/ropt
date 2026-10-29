@@ -3540,8 +3540,6 @@ for a runnable example.</p>
   changes to it are ignored. The metadata of a finished batch is available
   on each result's <code>metadata</code> field.</li>
 </ul>
-<p>If no defaults were supplied and the dictionary is empty when the handlers
-finish, the evaluation function receives <code>context.metadata=None</code>.</p>
 <p><code>START_EVALUATION</code> is emitted once per batch, not before each realization. It
 is emitted before the evaluation-function calls needed for a batch of function
 evaluations, gradient evaluations, or both. When initial results are supplied
