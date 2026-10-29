@@ -3707,12 +3707,14 @@ compared between optimizations.</p>
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object, identical for every result of one
-  optimization or evaluation. It is set once, at the start: pass a <code>metadata</code>
-  dict to the <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> / <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>
-  functions. Use it to tag or identify an optimization, for example
-  <code>{"run_id": 7}</code>. The evaluation function also receives this dictionary as
-  <code>context.metadata</code> on every call.</li>
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object. Pass defaults as <code>metadata=</code> to
+  <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>, or
+  <a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a>, for example <code>{"run_id": 7}</code> to
+  identify a run. An
+  <a href="../../running/running/#passing-values-to-evaluations-from-event-handlers">event handler for <code>START_EVALUATION</code></a>
+  can add or override values for one batch. The evaluation function receives
+  the effective values as <code>context.metadata</code>, and each result records an
+  independent copy. Later updates do not change earlier results.</li>
 <li><strong>Per-realization metadata</strong> — the <code>metadata</code> dict on the <code>evaluations</code> field,
   with one array entry per realization. It is produced by the objective when it
   returns an
@@ -3939,8 +3941,8 @@ elements are always columns while <code>realization</code> stays a row label:</p
 </span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>2        r0                                         0.09                               -0.02
 </span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>         r1                                         0.22                                0.05
 </span></code></pre></div>
-<p>The <strong>result metadata</strong> is supplied once per optimization and attached to
-each result. A scalar entry, such as a tag identifying the optimization,
+<p>The <strong>result metadata</strong> records the run defaults and any batch-local overrides
+on each result. A scalar entry, such as a tag identifying the optimization,
 gives one value per result. A one-dimensional array adds a dimension named
 after its key, just as array-valued per-realization metadata does. Single-result
 exports keep that dimension as a row label unless it is unstacked.

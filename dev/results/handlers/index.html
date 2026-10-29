@@ -1337,6 +1337,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="CallbackHandler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#updating-evaluation-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updating evaluation metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -2731,6 +2748,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="CallbackHandler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#updating-evaluation-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updating evaluation metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -3474,6 +3508,59 @@ not carry results. It also provides a way to
 value is ignored. Where the event provides a <code>stop</code> callable, call
 <code>event.stop()</code> to request stopping the optimization. To process evaluation
 results, subscribe to <code>FINISHED_EVALUATION</code> and iterate over <code>event.results</code>.</p>
+<h4 id="updating-evaluation-metadata">Updating evaluation metadata</h4>
+<p>During <code>START_EVALUATION</code>, any handler can read and modify
+<a class="autorefs autorefs-internal" title="            EnOptEvent
+
+
+  
+      dataclass
+  " href="../../reference/events/#ropt.events.EnOptEvent"><code>event.metadata</code></a>
+to pass values to the upcoming batch, either by modifying the dictionary in
+place or by assigning a new dictionary to <code>event.metadata</code>. See
+<a href="../../running/running/#passing-values-to-evaluations-from-event-handlers">Passing values to evaluations from event handlers</a>
+for a runnable example.</p>
+<ul>
+<li>The run takes a deep copy of its initial <code>metadata=</code> values. Before each
+  <code>START_EVALUATION</code>, it resets the batch metadata to an independent copy of
+  those defaults. The dictionary is empty if no defaults were supplied.</li>
+<li>Handlers receive the same dictionary in their listed order. Changes are
+  visible immediately to the current handler and to later handlers. Ordinary
+  dictionary operations apply, including item assignment, <code>update</code>, deletion,
+  and <code>clear</code>.</li>
+<li>Edits apply only to the current batch. Added keys disappear on the next
+  batch, while replaced or deleted defaults are restored. Runs have
+  independent metadata even when sharing a handler.</li>
+<li>After all start handlers return, <code>ropt</code> deep-copies the effective metadata
+  for the evaluation contexts and result recording. Later edits through a
+  retained event, dictionary, or nested value have no effect on that batch.
+  Values must support deep copying; those sent to separate worker processes
+  must also be serializable.</li>
+<li>For all other event types, <code>event.metadata</code> is an empty dictionary, and
+  changes to it are ignored. The metadata of a finished batch is available
+  on each result's <code>metadata</code> field.</li>
+</ul>
+<p>If no defaults were supplied and the dictionary is empty when the handlers
+finish, the evaluation function receives <code>context.metadata=None</code>.</p>
+<p><code>START_EVALUATION</code> is emitted once per batch, not before each realization. It
+is emitted before the evaluation-function calls needed for a batch of function
+evaluations, gradient evaluations, or both. When initial results are supplied
+as <a href="../../running/initial_values/"><code>f0</code> or <code>g0</code></a>, <code>START_EVALUATION</code> handlers
+still run for the initial batch, even if those results cover every row and no evaluation-function
+calls are needed. The caller is responsible for keeping the supplied results
+consistent with the inputs used by any remaining evaluations.</p>
+<div class="admonition note">
+<p class="admonition-title">Concurrent optimizations and <code>START_EVALUATION</code> handlers</p>
+<p>A handler shared by optimizations running concurrently runs its callback
+for one optimization at a time, because it
+<a href="#sharing-a-handler-across-concurrent-runs">holds its lock</a> while
+processing each event. A slow <code>START_EVALUATION</code> callback therefore delays
+the batches of all optimizations that share it. If the callback is
+thread-safe, create a separate <code>CallbackHandler</code> with the same callback for
+each optimization; the calls can then overlap. If it is not thread-safe,
+share one handler, or protect its state with a
+<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/threading.html#threading.Lock"><code>threading.Lock</code></a>.</p>
+</div>
 <h2 id="sharing-a-handler-across-concurrent-runs">Sharing a handler across optimizations</h2>
 <p>Reuse a handler across sequential optimizations to collect their results
 in one place:</p>
@@ -3671,7 +3758,7 @@ process:</p>
     subgraph worker["worker process (process / local / HPC pool)"]
         obj["objective"]
     end
-    opt --&gt;|"variables"| obj
+    opt --&gt;|"variables + batch metadata"| obj
     obj --&gt;|"result + metadata&lt;br/&gt;(copied back)"| opt</code></pre>
 <details class="info">
 <summary>How data is copied between processes</summary>

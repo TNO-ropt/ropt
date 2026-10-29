@@ -837,6 +837,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#choose-how-to-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose how to run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-evaluation-function" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -919,6 +930,17 @@
     <span class="md-ellipsis">
       
         Attaching metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#passing-values-to-evaluations-from-event-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Passing values to evaluations from event handlers
       
     </span>
   </a>
@@ -2606,6 +2628,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#choose-how-to-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose how to run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#the-evaluation-function" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2688,6 +2721,17 @@
     <span class="md-ellipsis">
       
         Attaching metadata
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#passing-values-to-evaluations-from-event-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Passing values to evaluations from event handlers
       
     </span>
   </a>
@@ -2786,9 +2830,30 @@ itself:</p>
 configuration arrays use the same positional order. You can add labels in the
 optional <code>names</code> section of the config dictionary, but they do not change that
 order; see
-<a href="../../getting_started/quickstart/#positions-and-labels">Positions and labels</a>.
-The rest of this page explains the evaluation function, results and additional
-options.</p>
+<a href="../../getting_started/quickstart/#positions-and-labels">Positions and labels</a>.</p>
+<h2 id="choose-how-to-run">Choose how to run</h2>
+<ul>
+<li>To <strong>optimize</strong>, call <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> with the configuration, a
+  start point and an evaluation function, as in the example above.</li>
+<li>To <strong>evaluate without optimizing</strong>, call <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> for one
+  variable vector or <a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> for several. See
+  <a href="#evaluating-without-optimizing">Evaluating without optimizing</a>.</li>
+<li>To <strong>run evaluations in parallel</strong> or run several optimizations at once, use
+  a pool from a <a href="../sessions/">session</a>. See
+  <a href="../parallel/">Evaluating in Parallel</a> and
+  <a href="../multiple_runs/">Running Multiple Optimizations</a>.</li>
+<li>To <strong>reuse a previous evaluation</strong> at the optimization's start point, pass
+  its function results as <code>f0</code>; pass gradient results as <code>g0</code> if available. See
+  <a href="../initial_values/">Reusing Results at the Starting Point</a>.</li>
+<li>To <strong>pass values to evaluations</strong>, subscribe an event handler to
+  <code>START_EVALUATION</code> and modify <code>event.metadata</code>. See
+  <a href="#passing-values-to-evaluations-from-event-handlers">Passing values to evaluations from event handlers</a>.</li>
+<li>To <strong>collect or inspect output</strong>, use callbacks and result handlers. See
+  <a href="../../results/output/">Getting Output</a>.</li>
+</ul>
+<p>The <a href="#the-evaluation-function">evaluation function</a> section explains what the
+function receives and returns. The rest of this page covers results and
+additional options.</p>
 <h2 id="the-evaluation-function">The evaluation function</h2>
 <p>The evaluation function is a Python function with two arguments:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationFunctionContext</span>
@@ -2822,8 +2887,9 @@ options.</p>
   start at 0 or be consecutive.</li>
 <li><code>context.row_idx</code> — the position of the evaluation within its batch,
   counted from 0.</li>
-<li><code>context.metadata</code> — the <code>metadata</code> dict the optimization was started
-  with, if any (see <a href="#attaching-metadata">Attaching metadata</a>).</li>
+<li><code>context.metadata</code> — the metadata for this batch, including any
+  changes made by <a href="#passing-values-to-evaluations-from-event-handlers"><code>START_EVALUATION</code> handlers</a>,
+  or <code>None</code> when none was supplied (see <a href="#attaching-metadata">Attaching metadata</a>).</li>
 </ul>
 </li>
 </ul>
@@ -2998,17 +3064,19 @@ best point it had reached.</p>
 <p>You can attach arbitrary <strong>metadata</strong> to an optimization or evaluation, from two
 sources:</p>
 <ul>
-<li><strong>Constant, per call</strong> — pass a <code>metadata</code> dict to <code>optimize</code>, <code>evaluate</code>, or
-  <code>evaluate_batch</code>. <code>ropt</code> copies it onto every result the call produces, which
-  is one way to tag an optimization:</li>
+<li><strong>Run defaults</strong> — pass a <code>metadata</code> dict to <code>optimize</code>, <code>evaluate</code>, or
+  <code>evaluate_batch</code>. <code>ropt</code> copies these values at run start and uses them as
+  defaults for each batch, which is one way to tag an optimization:</li>
 </ul>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">outcome</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">outcome</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>   <span class="c1"># 7</span>
 </span></code></pre></div>
-<p>The same dict also reaches the evaluation function itself, as
-  <code>context.metadata</code> — useful when the evaluation needs to know which
-  optimization it is part of. With several optimizations at once, this is how
-  they are told apart; see <a href="../multiple_runs/">Give each optimization an ID</a>.</p>
+<p>Each batch's values reach the evaluation function as <code>context.metadata</code>
+  and are copied onto its results. An
+  <a href="#passing-values-to-evaluations-from-event-handlers">event handler for <code>START_EVALUATION</code></a> can add or
+  override values for that batch. Without updates, the values stay the same
+  throughout the run. With several optimizations at once, a run identifier
+  distinguishes them; see <a href="../multiple_runs/">Give each optimization an ID</a>.</p>
 <ul>
 <li><strong>Per evaluation</strong> — return an
   <a class="autorefs autorefs-internal" title="            ropt.EvaluationFunctionResult
@@ -3053,7 +3121,7 @@ sources:</p>
   perturbed points, there is also a dimension for perturbations. The
   <a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a> example shows
   how to label and export the metadata elements.</p>
-<p>Neither kind is interpreted by <code>ropt</code>. Constant metadata ends up on
+<p>Neither kind is interpreted by <code>ropt</code>. The effective batch metadata ends up on
 <code>outcome.results.metadata</code>. Metadata returned for function evaluations is on
 <code>outcome.results.evaluations.metadata</code> (one entry per realization); metadata
 returned for perturbed evaluations is on
@@ -3063,17 +3131,98 @@ perturbation). Both kinds can be tabulated as columns by the
 Results</a> for how each appears. The full runnable
 script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py">examples/metadata.py</a>.</p>
+<h2 id="passing-values-to-evaluations-from-event-handlers">Passing values to evaluations from event handlers</h2>
+<p>An event handler subscribed to <code>START_EVALUATION</code> runs before each batch of
+function or gradient evaluations. It can compute values and pass them to the
+evaluation function by reading and modifying
+<a class="autorefs autorefs-internal" title="            EnOptEvent
+
+
+  
+      dataclass
+  " href="../../reference/events/#ropt.events.EnOptEvent"><code>event.metadata</code></a>.
+Any required evaluation-function calls start after all handlers for that event
+have returned.</p>
+<p>The runnable script
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/callback_metadata.py">examples/callback_metadata.py</a>
+optimizes a noisy objective. Before each batch, it draws one noise value per
+realization and passes them to the evaluations. The callback draws the noise
+and adds it to <code>event.metadata</code>. It reads the number of realizations from
+<code>event.context</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">draw_noise</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">realizations</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">realizations</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">size</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">event</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"noise"</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">realizations</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>event.metadata</code> is a dictionary: handlers can read, add, replace, or delete
+entries for this batch, or assign a new dictionary to <code>event.metadata</code>. Before
+the next <code>START_EVALUATION</code>, the dictionary resets to the values supplied when
+the run started. Handlers for the same event see each other's changes in the
+order they run.</p>
+<p>The evaluation function reads the noise for its realization from
+<code>context.metadata</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationFunctionContext</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="sd">"""Evaluate one realization with the noise drawn for this batch.</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="sd">    Args:</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="sd">        variables: The variable vector to evaluate.</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="sd">        context:   Identifies the realization and provides the batch noise.</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="sd">    Returns:</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="sd">        The objective value for this realization.</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="sd">    """</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>    <span class="k">assert</span> <span class="n">context</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>    <span class="n">noise</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"noise"</span><span class="p">][</span><span class="n">context</span><span class="o">.</span><span class="n">realization</span><span class="p">]</span>
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">variables</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">noise</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Treat this dictionary as input; evaluations in the same process may share it.
+Return per-realization information through
+<a class="autorefs autorefs-internal" title="            ropt.EvaluationFunctionResult
+
+
+  
+      dataclass
+  " href="../../reference/api/#ropt.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a> instead, as
+described under <a href="#attaching-metadata">Attaching metadata</a>.</p>
+<p>To run the callback before each batch, subscribe a
+<a class="autorefs autorefs-internal" title="            ropt.CallbackHandler" href="../../reference/api/#ropt.CallbackHandler"><code>CallbackHandler</code></a> to <code>START_EVALUATION</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">handler</span> <span class="o">=</span> <span class="n">CallbackHandler</span><span class="p">(</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">START_EVALUATION</span><span class="p">},</span> <span class="n">callback</span><span class="o">=</span><span class="n">draw_noise</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="p">)</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">],</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">handler</span><span class="p">])</span>
+</span></code></pre></div>
+<p>All evaluations in a batch, including those at perturbed points, use the same
+noise for a given realization. Each result records the noise of its batch in
+<code>result.metadata["noise"]</code>.</p>
+<p>The same handler works with <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a>, and when using a pool. With workers in
+other processes, metadata must be serializable. See the <a href="../../results/handlers/#updating-evaluation-metadata">event metadata
+rules</a> for ordering,
+lifetime, and result reuse.</p>
+<div class="admonition note">
+<p class="admonition-title">Optimizations running at once</p>
+<p>A handler shared by <a href="../multiple_runs/">optimizations running at once</a> runs
+its callback for one of them at a time. The callback in the example is not
+thread-safe, because all calls use the same random number generator: share
+one handler between such optimizations, or give each optimization its own
+handler and generator. A thread-safe callback can be used by a separate
+handler for each optimization, so its calls can overlap; see
+<a href="../../results/handlers/#updating-evaluation-metadata">Updating evaluation metadata</a>.</p>
+</div>
 <h2 id="evaluating-without-optimizing">Evaluating without optimizing</h2>
 <p>Sometimes you only want the objective value for a point, without running an
 optimizer. Use <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a> for one point and
 <a class="autorefs autorefs-internal" title="            ropt.evaluate_batch" href="../../reference/api/#ropt.evaluate_batch"><code>evaluate_batch</code></a> for several:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">evaluate_batch</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_batch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">single</span><span class="o">.</span><span class="n">results</span>  <span class="c1"># one FunctionResults</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">batch</span><span class="o">.</span><span class="n">results</span>   <span class="c1"># one per row of the matrix</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">evaluate_batch</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_batch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">single</span><span class="o">.</span><span class="n">results</span>  <span class="c1"># one FunctionResults</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="n">batch</span><span class="o">.</span><span class="n">results</span>   <span class="c1"># one per row of the matrix</span>
 </span></code></pre></div>
 <p>Both return an <a class="autorefs autorefs-internal" title="            ropt.EvaluationResult
 
@@ -3144,7 +3293,7 @@ reached before that. The evaluations it did make reach the
 </ul>
 <p>The <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> types above are imported from
 <code>ropt</code> itself, and catching the base class catches all of them at once:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoptError</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoptError</span>
 </span></code></pre></div>
 <p>It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
@@ -3158,7 +3307,7 @@ exception is raised in the code that made the call.
 <p>A few config values and result fields use enumerations.
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>, the type of <code>outcome.exit_code</code>, is imported
 from <code>ropt</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
 </span></code></pre></div>
 <p>The enumerations that name configuration values —
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a>,
@@ -3166,9 +3315,9 @@ from <code>ropt</code>:</p>
 <a class="autorefs autorefs-internal" title="            PerturbationType" href="../../reference/enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a> — are in
 <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>. Their members are strings, so a configuration
 accepts either the member or the value it equals:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">VariableType</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"types"</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">}}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">VariableType</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">"types"</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">}}</span>
 </span></code></pre></div>
 <p>Writing <code>"integer"</code> instead gives the same configuration. A validated
 configuration reports these fields as enum members, whichever form was written.</p>

@@ -2588,8 +2588,8 @@
       dataclass
   " href="#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> carries the event type, the
 configuration in use, and any results produced. Event handlers consume these
-to track progress, store results, or stop the optimization. See
-<a class="autorefs autorefs-internal" title="            EnOptEventType" href="../enums/#ropt.enums.EnOptEventType"><code>EnOptEventType</code></a> for the available types, and
+to prepare evaluations, track progress, store results, or stop the optimization.
+See <a class="autorefs autorefs-internal" title="            EnOptEventType" href="../enums/#ropt.enums.EnOptEventType"><code>EnOptEventType</code></a> for the available types, and
 <a href="../../results/handlers/#writing-your-own-handler">Handling Results</a> for usage.</p>
 
 
@@ -2699,6 +2699,17 @@ to track progress, store results, or stop the optimization. See
             <td>
               <div class="doc-md-description">
                 <p>Stops the optimization that emitted the event.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.EnOptEvent.metadata">metadata</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#object">object</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Metadata for the upcoming batch; used only for <code>START_EVALUATION</code>.</p>
               </div>
             </td>
           </tr>
