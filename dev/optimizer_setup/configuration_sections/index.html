@@ -3340,12 +3340,14 @@ error), the total function and gradient values can still be calculated by
 excluding the missing values. The <code>realization_min_success</code> field specifies the
 minimum number of successful realizations required (default: equal to the number
 of realizations, meaning no failures are allowed).</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Setting <code>realization_min_success</code> to zero allows the optimization to proceed
-even if all realizations fail. While some optimizers can handle this, most
-will treat it as if the value were one, requiring at least one successful
-realization.</p>
+<div class="admonition warning">
+<p class="admonition-title">Setting <code>realization_min_success</code> to zero</p>
+<p>With <code>realization_min_success</code> set to zero, the optimization continues even
+when all realizations of an evaluation fail. The objective, constraint, and
+gradient values of that evaluation are then <code>NaN</code>, and <code>ropt</code> passes them to
+the optimizer unchanged. <code>ropt</code> does not check whether the optimizer can
+handle <code>NaN</code> values: before setting zero, make sure that the chosen
+optimizer supports them.</p>
 </div>
 <h2 id="optimizer"><code>optimizer</code></h2>
 <p>Validated into <a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../../reference/config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a>.</p>
