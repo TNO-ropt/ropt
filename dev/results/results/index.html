@@ -1193,12 +1193,12 @@
   <a href="#what-each-field-holds" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What each field holds
+        Fields of function and gradient results
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What each field holds">
+    <nav class="md-nav" aria-label="Fields of function and gradient results">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1306,22 +1306,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#exporting-to-pandas" class="md-nav__link">
+  <a href="#exporting-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Exporting to pandas
+        Exporting results
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Exporting to pandas">
+    <nav class="md-nav" aria-label="Exporting results">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#exporting-selected-fields" class="md-nav__link">
+  <a href="#selecting-fields-and-labels" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Exporting selected fields
+        Selecting fields and labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#moving-dimensions-into-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moving dimensions into columns
       
     </span>
   </a>
@@ -1351,10 +1362,33 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#labels-and-the-index" class="md-nav__link">
+  <a href="#pandas-and-polars-layout-differences" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Labels and the index
+        pandas and Polars layout differences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="pandas and Polars layout differences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exporting-to-pandas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exporting to pandas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exporting-to-polars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exporting to polars
       
     </span>
   </a>
@@ -1365,15 +1399,9 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#exporting-to-polars" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Exporting to polars
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2643,12 +2671,12 @@
   <a href="#what-each-field-holds" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What each field holds
+        Fields of function and gradient results
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="What each field holds">
+    <nav class="md-nav" aria-label="Fields of function and gradient results">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2756,22 +2784,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#exporting-to-pandas" class="md-nav__link">
+  <a href="#exporting-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Exporting to pandas
+        Exporting results
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Exporting to pandas">
+    <nav class="md-nav" aria-label="Exporting results">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#exporting-selected-fields" class="md-nav__link">
+  <a href="#selecting-fields-and-labels" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Exporting selected fields
+        Selecting fields and labels
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#moving-dimensions-into-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Moving dimensions into columns
       
     </span>
   </a>
@@ -2801,10 +2840,33 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#labels-and-the-index" class="md-nav__link">
+  <a href="#pandas-and-polars-layout-differences" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Labels and the index
+        pandas and Polars layout differences
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="pandas and Polars layout differences">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#exporting-to-pandas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exporting to pandas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exporting-to-polars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exporting to polars
       
     </span>
   </a>
@@ -2815,15 +2877,9 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#exporting-to-polars" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Exporting to polars
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2860,28 +2916,32 @@ classes and how to inspect them; see
 delivered to your code.</p>
 <div class="admonition note">
 <p class="admonition-title">One kind of result object</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.results.Results
+<p>Evaluation data uses the same <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> is the record every part of <code>ropt</code>
-returns: one object per variable vector evaluated, carrying every field
-described below. Result handlers receive these, a result callback is given
-one per evaluation, and both
-<a href="../../running/running/"><code>optimize</code></a> and
-<a href="../../running/running/#evaluating-without-optimizing"><code>evaluate</code></a> put them
-on the <code>results</code> field of the result object they return. Whichever way you
-reach a result, it reads the same.</p>
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> classes
+throughout <code>ropt</code>. Handlers and result callbacks receive these objects,
+and the return values of <a href="../../running/running/"><code>optimize</code></a> and
+<a href="../../running/running/#evaluating-without-optimizing"><code>evaluate</code></a> expose
+them through their <code>results</code> field. Each object describes one evaluated
+variable vector. Its fields have the same meaning regardless of how you
+obtain it.</p>
 </div>
 <h2 id="the-result-hierarchy">The result hierarchy</h2>
-<p>During optimization, function and gradient evaluations generate data that is
-reported via <a class="autorefs autorefs-internal" title="            EnOptEvent
+<p>Result handlers receive <a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-  " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> objects passed to callbacks.</p>
+  " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> objects:
+notifications that identify an optimization or evaluation event and carry
+the configuration and any associated results. When an evaluation finishes,
+the event's <code>results</code> field contains the function or gradient results
+produced. A result callback receives the individual result objects rather
+than the event itself. See <a href="../handlers/#writing-your-own-handler">Writing your own handler</a>
+for the event types and how to handle them.</p>
 <p>Each <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
@@ -2911,76 +2971,17 @@ objects, one per variable vector evaluated in that batch.</p>
   " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> — gradient estimates for
   the objective and constraints.</li>
 </ul>
-<p>Each carries nested <a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+<h3 id="what-each-field-holds">Fields of function and gradient results</h3>
+<p>The fields below describe the data stored in <code>FunctionResults</code> and
+<code>GradientResults</code>. Some fields hold arrays directly; others group related
+data in <a class="autorefs autorefs-internal" title="            ropt.results.ResultField
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.ResultField"><code>ResultField</code></a> objects:</p>
-<table>
-<thead>
-<tr>
-<th>Result</th>
-<th>Fields</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>FunctionResults</code></td>
-<td><code>variables</code>, <code>target_objective</code>, <code>evaluations</code> (<a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.FunctionEvaluations"><code>FunctionEvaluations</code></a>), <code>functions</code> (<a class="autorefs autorefs-internal" title="            ropt.results.Functions
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.Functions"><code>Functions</code></a>), <code>realizations</code> (<a class="autorefs autorefs-internal" title="            ropt.results.Realizations
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.Realizations"><code>Realizations</code></a>), <code>constraint_info</code> (<a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a>), <code>scaled</code> (<a class="autorefs autorefs-internal" title="            ropt.results.ScaledFunctionResults
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.ScaledFunctionResults"><code>ScaledFunctionResults</code></a>).</td>
-</tr>
-<tr>
-<td><code>GradientResults</code></td>
-<td><code>variables</code>, <code>perturbed_variables</code>, <code>target_gradient</code>, <code>evaluations</code> (<a class="autorefs autorefs-internal" title="            ropt.results.GradientEvaluations
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.GradientEvaluations"><code>GradientEvaluations</code></a>), <code>gradients</code> (<a class="autorefs autorefs-internal" title="            ropt.results.Gradients
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.Gradients"><code>Gradients</code></a>), <code>realizations</code> (<a class="autorefs autorefs-internal" title="            ropt.results.Realizations
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.Realizations"><code>Realizations</code></a>), <code>scaled</code> (<a class="autorefs autorefs-internal" title="            ropt.results.ScaledGradientResults
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.ScaledGradientResults"><code>ScaledGradientResults</code></a>).</td>
-</tr>
-</tbody>
-</table>
-<h3 id="what-each-field-holds">What each field holds</h3>
+  " href="../../reference/results/#ropt.results.ResultField"><code>ResultField</code></a> objects. For example, a
+<code>FunctionResults</code> object stores per-realization objective values in
+<code>evaluations.objectives</code> and their aggregates in <code>functions.objectives</code>.</p>
 <h4 id="functionresults-fields"><code>FunctionResults</code> fields</h4>
 <ul>
 <li><strong><code>variables</code></strong> — the variable vector that was evaluated.</li>
@@ -3629,11 +3630,7 @@ same pair for the aggregates.</p>
 <li><code>target_objective</code> and <code>target_gradient</code> exist only in the domain the
   optimizer works in. Each is a weighted total over objectives that may differ
   in both scale and direction, so there is no single factor to undo. The
-  gradient is differentiated with respect to the <em>scaled</em> variables. A combined
-  objective in configured terms is built from <code>functions.objectives</code>, which
-  already holds the configured values, using the <code>weights</code> and <code>maximize</code>
-  entries of the
-  <a href="../../optimizer_setup/configuration_sections/#objectives">objectives</a> section.</li>
+  gradient is differentiated with respect to the <em>scaled</em> variables.</li>
 </ul>
 <p>Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
@@ -3658,7 +3655,8 @@ compared between optimizations.</p>
   optimization or evaluation. It is set once, at the start: pass a <code>metadata</code>
   dict to the <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> / <a class="autorefs autorefs-internal" title="            ropt.evaluate" href="../../reference/api/#ropt.evaluate"><code>evaluate</code></a>
   functions. Use it to tag or identify an optimization, for example
-  <code>{"run_id": 7}</code>.</li>
+  <code>{"run_id": 7}</code>. The evaluation function also receives this dictionary as
+  <code>context.metadata</code> on every call.</li>
 <li><strong>Per-realization metadata</strong> — the <code>metadata</code> dict on the <code>evaluations</code> field,
   with one array entry per realization. It is produced by the objective when it
   returns an
@@ -3686,9 +3684,19 @@ compared between optimizations.</p>
 </span></code></pre></div>
 <p>The full runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py">examples/metadata.py</a>.</p>
-<h2 id="exporting-to-pandas">Exporting to pandas</h2>
-<p><code>ropt</code> can export results to <code>pandas</code> DataFrames for analysis and reporting.
-This requires the <code>pandas</code> optional extra (see <a href="../../getting_started/installation/">Installation</a>).</p>
+<h2 id="exporting-results">Exporting results</h2>
+<p>Results can be exported to pandas or Polars DataFrames. The two formats use
+the same field selection and unstacking options, but represent row labels
+differently. Install the corresponding <code>pandas</code> or <code>polars</code> optional extra;
+see <a href="../../getting_started/installation/">Installation</a>.</p>
+<p>Use <a class="autorefs autorefs-internal" title="            to_pandas" href="../../reference/results/#ropt.results.Results.to_pandas"><code>to_pandas</code></a> or
+<a class="autorefs autorefs-internal" title="            to_polars" href="../../reference/results/#ropt.results.Results.to_polars"><code>to_polars</code></a> for a single result, and
+<a class="autorefs autorefs-internal" title="            ropt.results.results_to_pandas" href="../../reference/results/#ropt.results.results_to_pandas"><code>results_to_pandas</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.results.results_to_polars" href="../../reference/results/#ropt.results.results_to_polars"><code>results_to_polars</code></a> for a sequence of results.</p>
+<p>The runnable script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/export.py">examples/export.py</a>.
+It uses Polars by default and pandas with <code>--pandas</code>, so only one of the two
+needs to be installed.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>These functions turn results into DataFrames. The
@@ -3696,14 +3704,22 @@ This requires the <code>pandas</code> optional extra (see <a href="../../getting
 update such tables for you as an optimization runs; see
 <a href="../handlers/">Result Handlers</a>.</p>
 </div>
-<p>The row index and the unstacked column labels come from the
+<h3 id="selecting-fields-and-labels">Selecting fields and labels</h3>
+<p>Row-label dimensions use their <a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> names,
+such as <code>"variable"</code>, <code>"realization"</code> and <code>"objective"</code>. The export also
+includes <code>batch_id</code> to distinguish results from different batches.</p>
+<p>The row labels and the unstacked column labels come from the
 <a href="../../optimizer_setup/configuration_sections/#names"><code>names</code></a> mapping in the
 configuration. If a dimension is not named, its labels fall back to 0-based
 integer indices. For example, exporting the objectives of a single result
 <strong>without</strong> any <code>names</code> gives plain numbers for both the realizations and
 objectives:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"evaluations.objectives"</span><span class="p">])</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">pandas_frame</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"evaluations.objectives"</span><span class="p">])</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">polars_frame</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_polars</span><span class="p">([</span><span class="s2">"evaluations.objectives"</span><span class="p">])</span>
 </span></code></pre></div>
+<p>For compactness, the shared examples below show the pandas representation.
+Polars contains the same selected values; the
+<a href="#exporting-to-polars">format differences</a> are described after the shared options.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>                               evaluations.objectives
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>batch_id realization objective
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>1        0           0                           2.10
@@ -3711,19 +3727,22 @@ objectives:</p>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>         1           0                           2.35
 </span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>                     1                           1.02
 </span></code></pre></div>
-<p>Adding a <code>names</code> entry replaces those numbers with meaningful labels. The
-examples below assume the realizations are named <code>"r0"</code>/<code>"r1"</code> and the objectives
-<code>"val"</code>/<code>"cost"</code>.</p>
-<h3 id="exporting-selected-fields">Exporting selected fields</h3>
-<p>The <a class="autorefs autorefs-internal" title="            to_pandas" href="../../reference/results/#ropt.results.Results.to_pandas"><code>to_pandas</code></a> method on an individual
-result exports a list of fields, each named by a dotted path from the result:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"variables"</span><span class="p">,</span> <span class="s2">"evaluations.objectives"</span><span class="p">])</span>
+<p>Adding a <code>names</code> entry replaces those numbers with meaningful labels:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="o">...</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>        <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x0"</span><span class="p">,</span> <span class="s2">"x1"</span><span class="p">,</span> <span class="s2">"x2"</span><span class="p">),</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>        <span class="s2">"realization"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"r0"</span><span class="p">,</span> <span class="s2">"r1"</span><span class="p">),</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>        <span class="s2">"objective"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"val"</span><span class="p">,</span> <span class="s2">"cost"</span><span class="p">),</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="p">},</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The runnable script for this section is
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/export.py">examples/export.py</a>,
-which exports one result stacked, the same result unstacked, and then every
-result of the optimization in one frame. It uses polars by default and pandas
-with <code>--pandas</code>, so only one of the two needs to be installed.</p>
+<p>The examples below use these labels.</p>
+<p>Both single-result methods export a list of fields, each named by a dotted
+path from the result:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">pandas_frame</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"variables"</span><span class="p">,</span> <span class="s2">"evaluations.objectives"</span><span class="p">])</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">polars_frame</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_polars</span><span class="p">([</span><span class="s2">"variables"</span><span class="p">,</span> <span class="s2">"evaluations.objectives"</span><span class="p">])</span>
+</span></code></pre></div>
 <p>A path may name a field of the result itself (<code>"variables"</code>,
 <code>"target_objective"</code>), a field of one of its sub-objects
 (<code>"functions.objectives"</code>, <code>"scaled.variables"</code>), or an entry of a dict-valued
@@ -3737,8 +3756,9 @@ follow the order you give. Passing a set raises a <code>TypeError</code>, becaus
 set has no order to follow, and naming the same path twice raises a
 <code>ValueError</code>, because one column cannot appear twice.</p>
 </div>
-<p>By default, each dimension of an exported field becomes a level in a
-multi-index. For example, <code>objectives</code> in
+<h3 id="moving-dimensions-into-columns">Moving dimensions into columns</h3>
+<p>By default, each dimension of an exported field becomes a row label.
+For example, <code>objectives</code> in
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
 
 
@@ -3746,40 +3766,40 @@ multi-index. For example, <code>objectives</code> in
       dataclass
   " href="../../reference/results/#ropt.results.FunctionEvaluations"><code>FunctionEvaluations</code></a> has dimensions
 identified by <code>REALIZATION</code> and <code>OBJECTIVE</code>, so exporting it keeps both in the
-index — now with the configured names:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"evaluations.objectives"</span><span class="p">])</span>
+row labels — now with the configured names:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"evaluations.objectives"</span><span class="p">])</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>                               evaluations.objectives
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>batch_id realization objective
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>1        r0          val                         2.10
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>                     cost                        0.94
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>         r1          val                         2.35
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>                     cost                        1.02
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>                               evaluations.objectives
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>batch_id realization objective
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>1        r0          val                         2.10
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>                     cost                        0.94
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>         r1          val                         2.35
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>                     cost                        1.02
 </span></code></pre></div>
-<p>Passing <code>unstack</code> moves selected dimensions out of the index and into columns.
+<p>Passing <code>unstack</code> moves selected dimensions from row labels into columns.
 Here the <code>OBJECTIVE</code> dimension is unstacked:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">AxisName</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="p">[</span><span class="s2">"evaluations.objectives"</span><span class="p">],</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">unstack</span><span class="o">=</span><span class="p">[</span><span class="n">AxisName</span><span class="o">.</span><span class="n">OBJECTIVE</span><span class="p">],</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">AxisName</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="p">[</span><span class="s2">"evaluations.objectives"</span><span class="p">],</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="n">unstack</span><span class="o">=</span><span class="p">[</span><span class="n">AxisName</span><span class="o">.</span><span class="n">OBJECTIVE</span><span class="p">],</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="p">)</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># Use result.to_polars(...) with the same arguments for Polars.</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>                     (evaluations.objectives, val)  (evaluations.objectives, cost)
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>batch_id realization
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>1        r0                                   2.10                            0.94
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>         r1                                   2.35                            1.02
+<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>                     (evaluations.objectives, val)  (evaluations.objectives, cost)
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>batch_id realization
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>1        r0                                   2.10                            0.94
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>         r1                                   2.35                            1.02
 </span></code></pre></div>
-<p>The unstacked dimension is flattened into the column labels, so each new column
-is a tuple of the full field path and the corresponding label — here
-<code>("evaluations.objectives", "val")</code> and <code>("evaluations.objectives", "cost")</code>.
-Unstacking more dimensions adds more elements to these tuples. Unstacking every
+<p>Each new column identifies the full field path and the labels of its
+unstacked dimensions. Pandas uses tuple column labels; Polars joins the field
+path and dimension labels into a string, as described below. Unstacking every
 dimension of every selected field leaves one row per result, which makes
 results from different batches comparable row by row.</p>
 <h3 id="aggregating-multiple-results">Aggregating multiple results</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.results.results_to_pandas" href="../../reference/results/#ropt.results.results_to_pandas"><code>results_to_pandas</code></a> builds on <code>to_pandas</code> to
-convert a <em>sequence</em> of results into a single DataFrame. It takes no <code>unstack</code>
-argument, because an aggregated frame always pivots the same way:</p>
+<p><code>results_to_pandas</code> and <code>results_to_polars</code> convert a <em>sequence</em> of results
+into a single DataFrame. Neither takes an <code>unstack</code> argument, because both
+always pivot the same way:</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Every dimension becomes columns <strong>except those for realizations and
@@ -3787,23 +3807,24 @@ perturbations</strong>, which stay as row labels next to <code>batch_id</code>.<
 </div>
 <p>A field with neither of those dimensions therefore gives exactly one row per
 result:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">results_to_pandas</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_pandas</span><span class="p">(</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="n">all_results</span><span class="p">,</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"variables"</span><span class="p">],</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">result_type</span><span class="o">=</span><span class="s2">"functions"</span><span class="p">,</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">results_to_pandas</span><span class="p">,</span> <span class="n">results_to_polars</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_pandas</span><span class="p">(</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">all_results</span><span class="p">,</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"variables"</span><span class="p">],</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">result_type</span><span class="o">=</span><span class="s2">"functions"</span><span class="p">,</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">)</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="c1"># Use results_to_polars(...) with the same arguments for Polars.</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>          (variables, x0)  (variables, x1)  (variables, x2)
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>batch_id
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>1                    0.30             0.42            -0.11
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>2                    0.55             0.48             0.02
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>3                    0.61             0.50             0.10
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>          (variables, x0)  (variables, x1)  (variables, x2)
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>batch_id
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>1                    0.30             0.42            -0.11
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>2                    0.55             0.48             0.02
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>3                    0.61             0.50             0.10
 </span></code></pre></div>
-<p>Each column is a <code>(field, label)</code> pair, and here each row is one result
-identified by its <code>batch_id</code>; selecting a field that keeps the <code>realization</code>
-axis adds a level to the index and one row per realization. Field names use dot
+<p>Here each row is one result identified by its <code>batch_id</code>; selecting a field
+that keeps the <code>realization</code> dimension adds a row label and one row per
+realization. Field names use dot
 notation for nested sub-fields (for example, <code>variables</code>, <code>target_objective</code>),
 and the fields appear in the order you list them. The <code>result_type</code>
 argument selects which results to process: <code>"functions"</code> for
@@ -3825,83 +3846,74 @@ a path may end in one or more dict keys.</p>
 <p>The <strong>per-realization metadata</strong> attached by the evaluator lives on the
 evaluations, so it has one entry for each realization. For example, if the
 objective attached a per-realization <code>shift</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"evaluations.metadata.shift"</span><span class="p">])</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"evaluations.metadata.shift"</span><span class="p">])</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>                     evaluations.metadata.shift
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>batch_id realization
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>1        r0                                 0.9
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>         r1                                 1.1
+<div class="language-text highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>                     evaluations.metadata.shift
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>batch_id realization
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>1        r0                                 0.9
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>         r1                                 1.1
 </span></code></pre></div>
 <p>If the value a realization returns is an array rather than a scalar, the
 metadata also has a dimension for its elements, named after the key. This
 <a href="#user-defined-axes">user-defined dimension</a> is exported like the built-in
-dimensions. Exporting a single result keeps it in the index, here for a
+dimensions. Exporting a single result keeps it as a row label, here for a
 two-element <code>residual</code> labelled <code>"x"</code>/<code>"y"</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"evaluations.metadata.residual"</span><span class="p">])</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">([</span><span class="s2">"evaluations.metadata.residual"</span><span class="p">])</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>                               evaluations.metadata.residual
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>batch_id realization residual
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>1        r0          x                                  0.12
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>                     y                                 -0.04
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>         r1          x                                  0.31
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>                     y                                  0.08
+<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>                               evaluations.metadata.residual
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>batch_id realization residual
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>1        r0          x                                  0.12
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>                     y                                 -0.04
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>         r1          x                                  0.31
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>                     y                                  0.08
 </span></code></pre></div>
 <p>Passing <code>unstack=["residual"]</code> moves it into columns, just like a built-in
 dimension. In an aggregated frame the rule above applies, so the metadata
 elements are always columns while <code>realization</code> stays a row label:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_pandas</span><span class="p">(</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="n">all_results</span><span class="p">,</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"evaluations.metadata.residual"</span><span class="p">],</span>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>    <span class="n">result_type</span><span class="o">=</span><span class="s2">"functions"</span><span class="p">,</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_pandas</span><span class="p">(</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">all_results</span><span class="p">,</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"evaluations.metadata.residual"</span><span class="p">],</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="n">result_type</span><span class="o">=</span><span class="s2">"functions"</span><span class="p">,</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>                      (evaluations.metadata.residual, x)  (evaluations.metadata.residual, y)
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>batch_id realization
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>1        r0                                         0.12                               -0.04
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>         r1                                         0.31                                0.08
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>2        r0                                         0.09                               -0.02
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>         r1                                         0.22                                0.05
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>                      (evaluations.metadata.residual, x)  (evaluations.metadata.residual, y)
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>batch_id realization
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>1        r0                                         0.12                               -0.04
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>         r1                                         0.31                                0.08
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>2        r0                                         0.09                               -0.02
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>         r1                                         0.22                                0.05
 </span></code></pre></div>
-<p>The <strong>result metadata</strong>, set once per optimization, sits directly on the result,
-so it has no array dimensions and gives one value per result. It can hold a tag
-that identifies the optimization. It may be nested to any depth, and is
-reachable from <code>to_pandas</code> and <code>results_to_pandas</code> alike:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_pandas</span><span class="p">(</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="n">all_results</span><span class="p">,</span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"metadata.run_id"</span><span class="p">,</span> <span class="s2">"target_objective"</span><span class="p">],</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="n">result_type</span><span class="o">=</span><span class="s2">"functions"</span><span class="p">,</span>
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="p">)</span>
+<p>The <strong>result metadata</strong> is supplied once per optimization and attached to
+each result. A scalar entry, such as a tag identifying the optimization,
+gives one value per result. A one-dimensional array adds a dimension named
+after its key, just as array-valued per-realization metadata does. Single-result
+exports keep that dimension as a row label unless it is unstacked.
+When exporting several results with <code>results_to_pandas</code> or <code>results_to_polars</code>,
+each array position becomes a separate column. For example,
+<code>metadata.scores = [10, 20]</code> produces two columns containing <code>10</code> and <code>20</code>
+on the row for that result.</p>
+<p>Result metadata can contain dictionaries nested to any depth. Their entries
+are selected using dotted paths in both the single-result and sequence export
+functions:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_pandas</span><span class="p">(</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>    <span class="n">all_results</span><span class="p">,</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"metadata.run_id"</span><span class="p">,</span> <span class="s2">"target_objective"</span><span class="p">],</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>    <span class="n">result_type</span><span class="o">=</span><span class="s2">"functions"</span><span class="p">,</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="p">)</span>
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>          metadata.run_id  target_objective
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>batch_id
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>1                       0              1.83
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>2                       1              0.42
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>3                       2              0.11
+<div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>          metadata.run_id  target_objective
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>batch_id
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>1                       0              1.83
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>2                       1              0.42
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>3                       2              0.11
 </span></code></pre></div>
-<h3 id="labels-and-the-index">Labels and the index</h3>
-<p>Every axis of an exported field becomes an index level, named after its
-<a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> value (for example <code>"variable"</code>, <code>"realization"</code>,
-<code>"objective"</code>), and <code>batch_id</code> is always prepended so results from different
-batches stay distinct. The label on each level — and on each unstacked column —
-comes from the <a href="../../optimizer_setup/configuration_sections/#names"><code>names</code></a> mapping in the configuration, a
-dict from axis name to a tuple of labels:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="o">...</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>        <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x0"</span><span class="p">,</span> <span class="s2">"x1"</span><span class="p">,</span> <span class="s2">"x2"</span><span class="p">),</span>
-</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>        <span class="s2">"objective"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"val"</span><span class="p">,</span> <span class="s2">"cost"</span><span class="p">),</span>
-</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>    <span class="p">},</span>
-</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>An axis without a <code>names</code> entry falls back to 0-based integer indices, as in the
-first example of this section.</p>
-<h2 id="exporting-to-polars">Exporting to polars</h2>
-<p>Every pandas export has a <code>polars</code> counterpart:
-<a class="autorefs autorefs-internal" title="            to_polars" href="../../reference/results/#ropt.results.Results.to_polars"><code>to_polars</code></a> and
-<a class="autorefs autorefs-internal" title="            ropt.results.results_to_polars" href="../../reference/results/#ropt.results.results_to_polars"><code>results_to_polars</code></a>. They accept the same
-arguments and select and unstack exactly the same fields, so everything in the
-previous section carries over. This requires the <code>polars</code> optional extra (see
-<a href="../../getting_started/installation/">Installation</a>).</p>
+<h3 id="pandas-and-polars-layout-differences">pandas and Polars layout differences</h3>
+<h4 id="exporting-to-pandas">Exporting to pandas</h4>
+<p>Pandas stores row labels in an index, with one level per retained dimension.
+Unstacked column labels are tuples of the field path and dimension labels,
+such as <code>("evaluations.objectives", "val")</code>. Each additional unstacked
+dimension adds an element to the tuple.</p>
+<h4 id="exporting-to-polars">Exporting to polars</h4>
 <p>Polars has no index and its column names must be strings, which leads to the two
 differences you need to know about. The frames below are shown without the
 borders polars draws around them in a terminal.</p>
@@ -3929,33 +3941,6 @@ argument, which defaults to <code>","</code>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>batch_id  realization  evaluations.objectives,val  evaluations.objectives,cost
 </span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>1         r0           2.10                        0.94
 </span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>1         r1           2.35                        1.02
-</span></code></pre></div>
-<p>Aggregating a sequence of results works the same way:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">results_to_polars</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_polars</span><span class="p">(</span>
-</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>    <span class="n">all_results</span><span class="p">,</span>
-</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"variables"</span><span class="p">],</span>
-</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>    <span class="n">result_type</span><span class="o">=</span><span class="s2">"functions"</span><span class="p">,</span>
-</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a><span class="p">)</span>
-</span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>batch_id  variables,x0  variables,x1  variables,x2
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>1         0.30          0.42          -0.11
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>2         0.55          0.48          0.02
-</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>3         0.61          0.50          0.10
-</span></code></pre></div>
-<p>Metadata behaves exactly as described <a href="#metadata-columns">above</a>, and both kinds
-are reachable from either function:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_polars</span><span class="p">(</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>    <span class="n">all_results</span><span class="p">,</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"metadata.run_id"</span><span class="p">,</span> <span class="s2">"target_objective"</span><span class="p">],</span>
-</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>    <span class="n">result_type</span><span class="o">=</span><span class="s2">"functions"</span><span class="p">,</span>
-</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="p">)</span>
-</span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>batch_id  metadata.run_id  target_objective
-</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>1         0                1.83
-</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>2         1                0.42
-</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>3         2                0.11
 </span></code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
