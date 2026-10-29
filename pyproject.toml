@@ -53,6 +53,7 @@ filterwarnings = [
     "error",
     'ignore:numpy.ndarray size changed, may indicate binary incompatibility.*:RuntimeWarning',
 ]
+addopts = ["--disable-plugin-autoload", "-p pytest_timeout"]
 
 [tool.ruff.format]
 exclude = ["src/ropt/version.py", "build", "docs/**/*.md"]
@@ -60,12 +61,7 @@ exclude = ["src/ropt/version.py", "build", "docs/**/*.md"]
 [tool.ruff.lint]
 preview = true
 select = ["ALL"]
-ignore = [
-    "missing-trailing-comma",
-    "CPY",
-    "line-too-long",
-    "assert",
-]
+ignore = ["missing-trailing-comma", "CPY", "line-too-long", "assert"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
