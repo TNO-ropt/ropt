@@ -286,7 +286,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../results/results/" class="md-tabs__link">
+        <a href="../../results/output/" class="md-tabs__link">
           
   
   
@@ -1215,6 +1215,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../results/output/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Output
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../results/results/" class="md-nav__link">
         
   
@@ -1368,6 +1396,34 @@
     
   
     Key Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/choices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Choices
   
 
     
@@ -2592,8 +2648,10 @@ easy to reach but slow to follow.</p>
 <li><strong>A config dictionary</strong> — it describes the problem. Here we set only the
    minimum: how many variables there are, and a small <code>perturbation_magnitudes</code>
    value that <code>ropt</code> uses to estimate gradients. See
-   <a href="../../optimizer_setup/configuration_sections/">Configuration Sections</a> for the
-   full list of settings.</li>
+   <a href="../../optimizer_setup/choices/">Optimization Choices</a> surveys the main
+   decisions, including scaling, constraints, ensemble treatment and methods.
+   See <a href="../../optimizer_setup/configuration_sections/">Configuration Sections</a>
+   for the full list of settings.</li>
 <li><strong>An evaluation function</strong> — a Python function that takes a set of variable
    values and returns the number to minimize. See
    <a href="../../running/running/#the-evaluation-function">Running Optimizations</a>.</li>

@@ -284,7 +284,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../results/results/" class="md-tabs__link">
+        <a href="../../results/output/" class="md-tabs__link">
           
   
   
@@ -1115,6 +1115,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../results/output/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Output
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../results/results/" class="md-nav__link">
         
   
@@ -1271,6 +1299,34 @@
     
   
     Key Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../choices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Choices
   
 
     
@@ -2607,7 +2663,10 @@ evaluation function. See
 <a href="../configuration_sections/#nonlinear_constraints"><code>nonlinear_constraints</code></a> and
 <a href="../configuration_sections/#variables"><code>variables</code></a> for the full field reference.
 Constraint values can also be rescaled before the optimizer sees them; see
-<a href="../configuration_sections/#constraint-scales">Scaling constraints</a>.</p>
+<a href="../configuration_sections/#constraint-scales">Scaling constraints</a>. For
+nonlinear constraints, you can also choose the scales yourself from a
+preliminary evaluation instead of using <code>auto_scale</code>; see
+<a href="../choices/#choose-scales-from-a-preliminary-evaluation">Choose scales from a preliminary evaluation</a>.</p>
 <h2 id="returning-a-constraint-from-the-evaluation-function">Returning a constraint from the evaluation function</h2>
 <p>An evaluation function that has constraints returns a sequence instead of a
 single number: <strong>the objectives first, then the constraints</strong>. With one
