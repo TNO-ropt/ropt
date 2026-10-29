@@ -43,8 +43,27 @@ configuration arrays use the same positional order. You can add labels in the
 optional `names` section of the config dictionary, but they do not change that
 order; see
 [Positions and labels](../getting_started/quickstart.md#positions-and-labels).
-The rest of this page explains the evaluation function, results and additional
-options.
+
+## Choose how to run
+
+- To **optimize**, call [`optimize`][ropt.optimize] with the configuration, a
+  start point and an evaluation function, as in the example above.
+- To **evaluate without optimizing**, call [`evaluate`][ropt.evaluate] for one
+  variable vector or [`evaluate_batch`][ropt.evaluate_batch] for several. See
+  [Evaluating without optimizing](#evaluating-without-optimizing).
+- To **run evaluations in parallel** or run several optimizations at once, use
+  a pool from a [session](sessions.md). See
+  [Evaluating in Parallel](parallel.md) and
+  [Running Multiple Optimizations](multiple_runs.md).
+- To **reuse a previous evaluation** at the optimization's start point, pass
+  its function results as `f0`; pass gradient results as `g0` if available. See
+  [Reusing Results at the Starting Point](initial_values.md).
+- To **collect or inspect output**, use callbacks and result handlers. See
+  [Getting Output](../results/output.md).
+
+The [evaluation function](#the-evaluation-function) section explains what the
+function receives and returns. The rest of this page covers results and
+additional options.
 
 ## The evaluation function
 

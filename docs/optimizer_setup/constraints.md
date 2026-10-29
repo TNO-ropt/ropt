@@ -45,7 +45,10 @@ evaluation function. See
 [`nonlinear_constraints`](configuration_sections.md#nonlinear_constraints) and
 [`variables`](configuration_sections.md#variables) for the full field reference.
 Constraint values can also be rescaled before the optimizer sees them; see
-[Scaling constraints](configuration_sections.md#constraint-scales).
+[Scaling constraints](configuration_sections.md#constraint-scales). For
+nonlinear constraints, you can also choose the scales yourself from a
+preliminary evaluation instead of using `auto_scale`; see
+[Choose scales from a preliminary evaluation](choices.md#choose-scales-from-a-preliminary-evaluation).
 
 ## Returning a constraint from the evaluation function
 

@@ -1,5 +1,8 @@
 # Collecting Results
 
+For an overview of the ways to access optimization output, see
+[Getting Output](../results/output.md).
+
 ## Using a result callback
 
 Pass a function as `result_callback` to receive results as evaluations finish.

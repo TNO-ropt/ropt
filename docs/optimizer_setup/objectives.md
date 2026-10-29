@@ -106,7 +106,9 @@ its tolerances, which matters for an objective that is large and
 varies little. See [Scaling
 objectives](configuration_sections.md#objective-scales) and
 [Offsetting objectives](configuration_sections.md#objective-offsets) for the
-full field descriptions.
+full field descriptions. To choose scales and offsets from your own preliminary
+evaluation, see [Choose scales from a preliminary
+evaluation](choices.md#choose-scales-from-a-preliminary-evaluation).
 
 ## See also
 

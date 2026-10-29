@@ -125,11 +125,13 @@ nav:
       - "Nested Optimization": running/nested.md
       - "Logging": running/logging.md
   - "Results":
+      - "Getting Output": results/output.md
       - "Working with Results": results/results.md
       - "Result Handlers": results/handlers.md
       - "Exit Codes": results/exit_codes.md
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
+      - "Optimization Choices": optimizer_setup/choices.md
       - "Configuration": optimizer_setup/configuration.md
       - "Configuration Sections": optimizer_setup/configuration_sections.md
       - "Variables": optimizer_setup/variables.md
