@@ -58,7 +58,6 @@ def _objective(
 def _record_metadata(
     variables: NDArray[np.float64], context: EvaluationFunctionContext
 ) -> EvaluationFunctionResult:
-    assert context.metadata is not None
     return EvaluationFunctionResult(
         objectives=_objective(variables, context),
         metadata={
@@ -159,7 +158,7 @@ def test_callback_metadata_shares_changes_between_handlers() -> None:
         assert event.metadata["first"] is True
         event.metadata.update({"replace": 2, "second": True})
 
-    seen: list[dict[str, object] | None] = []
+    seen: list[dict[str, object]] = []
 
     def objective(
         variables: NDArray[np.float64], context: EvaluationFunctionContext
@@ -204,10 +203,8 @@ def test_callback_metadata_resets_between_batches(
         if with_metadata
         else None
     )
-    baseline = (
-        {"nested": [1], "replace": "baseline", "removed": True}
-        if with_metadata
-        else None
+    baseline: dict[str, object] = (
+        {"nested": [1], "replace": "baseline", "removed": True} if with_metadata else {}
     )
     starts = 0
     seen: list[EvaluationFunctionContext] = []
@@ -215,7 +212,7 @@ def test_callback_metadata_resets_between_batches(
     def prepare(event: EnOptEvent) -> None:
         nonlocal starts
         starts += 1
-        assert event.metadata == (baseline or {})
+        assert event.metadata == baseline
         if starts == 1:
             event.metadata.update(
                 {"nested": [2], "replace": "batch", "temporary": True}
@@ -258,14 +255,14 @@ def test_callback_metadata_resets_between_batches(
     expected = [
         {"nested": [2], "replace": "batch", "temporary": True},
         baseline,
-        {**(baseline or {}), "combined": True},
+        {**baseline, "combined": True},
     ]
     batch_ids = list(dict.fromkeys(context.batch_id for context in seen))
     assert len(batch_ids) == 3
     for context in seen:
         assert context.metadata == expected[batch_ids.index(context.batch_id)]
     for result in results:
-        assert result.metadata == (expected[batch_ids.index(result.batch_id)] or {})
+        assert result.metadata == expected[batch_ids.index(result.batch_id)]
 
 
 def test_callback_metadata_snapshots_are_independent() -> None:
@@ -278,7 +275,6 @@ def test_callback_metadata_snapshots_are_independent() -> None:
     def objective(
         variables: NDArray[np.float64], context: EvaluationFunctionContext
     ) -> float:
-        assert context.metadata is not None
         context.metadata["supplied"].append(99)
         context.metadata["updated"].append(99)
         return _objective(variables, context)
@@ -302,7 +298,7 @@ def test_callback_metadata_snapshots_are_independent() -> None:
 @pytest.mark.parametrize("with_metadata", [False, True])
 def test_callback_metadata_can_clear_defaults(*, with_metadata: bool) -> None:
     original: dict[str, object] | None = {"run": 3} if with_metadata else None
-    seen: list[dict[str, object] | None] = []
+    seen: list[dict[str, object]] = []
 
     def prepare(event: EnOptEvent) -> None:
         assert event.metadata == (original or {})
@@ -318,8 +314,7 @@ def test_callback_metadata_can_clear_defaults(*, with_metadata: bool) -> None:
     results = _run_with_metadata(
         "evaluate", objective, [_handler(prepare)], metadata=original
     )
-    expected: dict[str, object] | None = {} if with_metadata else None
-    assert seen == [expected, expected]
+    assert seen == [{}, {}]
     assert results[0].metadata == {}
     assert original == ({"run": 3} if with_metadata else None)
 
@@ -331,7 +326,7 @@ def test_callback_metadata_can_clear_defaults(*, with_metadata: bool) -> None:
 def test_callback_metadata_ignores_other_event_types(
     event_type: EnOptEventType,
 ) -> None:
-    seen: list[dict[str, object] | None] = []
+    seen: list[dict[str, object]] = []
 
     def prepare(event: EnOptEvent) -> None:
         assert event.metadata == {}
@@ -352,7 +347,7 @@ def test_callback_metadata_ignores_other_event_types(
     )
     results = _run_with_metadata(method, objective, [handler])
     assert seen
-    assert all(metadata is None for metadata in seen)
+    assert all(metadata == {} for metadata in seen)
     assert all(result.metadata == {} for result in results)
 
 
@@ -371,7 +366,6 @@ def test_callback_metadata_later_edits_have_no_effect() -> None:
     ) -> float:
         events[-1].metadata["valid"] = False
         nested_values[-1].append(99)
-        assert context.metadata is not None
         assert context.metadata["valid"] is True
         assert context.metadata["nested"] == [len(events)]
         return _objective(variables, context)

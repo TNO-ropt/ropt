@@ -50,7 +50,7 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
-SignalStartCallback = Callable[[], dict[str, Any] | None]
+SignalStartCallback = Callable[[], dict[str, Any]]
 """Called before each evaluated batch; returns the metadata for that batch."""
 
 SignalFinishedCallback = Callable[[tuple[Results, ...]], None]
@@ -182,17 +182,16 @@ class EnsembleEvaluator:
         self._cached_results = function_results
         return function_results, gradient_results
 
-    def _signal_start(self) -> dict[str, Any] | None:
+    def _signal_start(self) -> dict[str, Any]:
         if self._signal_start_callback is None:
-            return None
+            return {}
         return self._signal_start_callback()
 
     def _signal_finished(
-        self, results: tuple[Results, ...], metadata: dict[str, Any] | None
+        self, results: tuple[Results, ...], metadata: dict[str, Any]
     ) -> None:
-        if metadata is not None:
-            for result in results:
-                result.metadata = deepcopy(metadata)
+        for result in results:
+            result.metadata = deepcopy(metadata)
         if self._signal_finished_callback is not None:
             self._signal_finished_callback(results)
 

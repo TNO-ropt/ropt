@@ -99,7 +99,7 @@ def _get_function_results(
     evaluator: EvaluationBatchCallback,
     variables: NDArray[np.float64],
     realizations_to_evaluate: NDArray[np.bool_],
-    metadata: dict[str, Any] | None,
+    metadata: dict[str, Any],
 ) -> Generator[tuple[int, _FunctionEvaluatorResults], None, None]:
     realization_num = context.realizations.weights.size
     realizations = np.tile(
@@ -151,7 +151,7 @@ def _get_gradient_results(
     evaluator: EvaluationBatchCallback,
     perturbed_variables: NDArray[np.float64],
     realizations_to_evaluate: NDArray[np.bool_],
-    metadata: dict[str, Any] | None,
+    metadata: dict[str, Any],
 ) -> _GradientEvaluatorResults:
     realization_num = context.realizations.weights.size
     perturbation_num = context.gradient.number_of_perturbations
@@ -192,7 +192,7 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     realizations_to_evaluate: NDArray[np.bool_],
-    metadata: dict[str, Any] | None,
+    metadata: dict[str, Any],
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
     realization_num = context.realizations.weights.size
     perturbation_num = context.gradient.number_of_perturbations

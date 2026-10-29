@@ -39,7 +39,7 @@ class EvaluationBatchContext:
     perturbations: NDArray[np.intc]
     function_ids: NDArray[np.intc]
     batch_id: int = 0
-    metadata: dict[str, Any] | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def get_active_evaluations[T: np.generic](self, array: NDArray[T]) -> NDArray[T]:
         """Return only the rows of `array` where `active` is `True`.
@@ -133,7 +133,7 @@ class EvaluationFunctionContext:
     function_id: int
     batch_id: int
     row_idx: int
-    metadata: dict[str, Any] | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -143,12 +143,12 @@ class EvaluationFunctionResult:
     Attributes:
         objectives:  The objective values as an array.
         constraints: Optional constraint values as an array.
-        metadata:    Optional dictionary with extra information.
+        metadata:    Extra information for this evaluation (default: empty).
     """
 
     objectives: NDArray[np.float64] | float
     constraints: NDArray[np.float64] | float | None = None
-    metadata: dict[str, Any] | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 class EvaluationFunctionCallback(Protocol):

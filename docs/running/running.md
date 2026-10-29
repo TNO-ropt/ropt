@@ -101,7 +101,8 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
       counted from 0.
     - `context.metadata` — the metadata for this batch, including any
       changes made by [`START_EVALUATION` handlers](#passing-values-to-evaluations-from-event-handlers),
-      or `None` when none was supplied (see [Attaching metadata](#attaching-metadata)).
+      or an empty dictionary when none was supplied (see
+      [Attaching metadata](#attaching-metadata)).
 
 The function returns the objective value(s), followed by any constraint values.
 There are three ways to return them:

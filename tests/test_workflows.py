@@ -120,7 +120,7 @@ def test_function_evaluator_with_info(
 def _run_with_metadata(
     config: dict[str, Any],
     test_functions: Any,
-    metadata: Callable[[EvaluationFunctionContext], dict[str, Any] | None],
+    metadata: Callable[[EvaluationFunctionContext], dict[str, Any]],
 ) -> dict[str, NDArray[Any]]:
     config["realizations"] = {"weights": [1.0, 1.0, 1.0]}
 
@@ -155,7 +155,7 @@ def test_unset_numeric_metadata_is_nan(
     metadata = _run_with_metadata(
         config,
         test_functions,
-        lambda context: {"shift": 3} if context.realization == 1 else None,
+        lambda context: {"shift": 3} if context.realization == 1 else {},
     )
     assert np.array_equal(metadata["shift"], [np.nan, 3.0, np.nan], equal_nan=True)
 
@@ -166,7 +166,7 @@ def test_unset_string_metadata_is_none(
     metadata = _run_with_metadata(
         config,
         test_functions,
-        lambda context: {"tag": "hello"} if context.realization == 0 else None,
+        lambda context: {"tag": "hello"} if context.realization == 0 else {},
     )
     assert metadata["tag"].tolist() == ["hello", None, None]
 

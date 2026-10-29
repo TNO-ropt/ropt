@@ -35,8 +35,9 @@ class _Signals:
         self.starts = 0
         self.reported: list[tuple[Results, ...]] = []
 
-    def start(self) -> None:
+    def start(self) -> dict[str, Any]:
         self.starts += 1
+        return {}
 
     def finish(self, results: tuple[Results, ...]) -> None:
         self.reported.append(results)

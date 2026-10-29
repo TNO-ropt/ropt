@@ -56,9 +56,8 @@ def _scatter_result(
     results[row_idx, :objective_count] = result.objectives
     if result.constraints is not None:
         results[row_idx, objective_count:] = result.constraints
-    if result.metadata is not None:
-        for key, value in result.metadata.items():
-            metadata.setdefault(key, {})[row_idx] = value
+    for key, value in result.metadata.items():
+        metadata.setdefault(key, {})[row_idx] = value
 
 
 def _build_metadata(

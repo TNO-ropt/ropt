@@ -684,14 +684,14 @@ def test_metadata_reaches_the_evaluation_function(config: Any) -> None:
     assert all(item == {"run": 7} for item in seen)
 
 
-def test_metadata_is_none_in_the_evaluation_function_when_not_given(
+def test_metadata_is_empty_in_the_evaluation_function_when_not_given(
     config: Any,
 ) -> None:
     seen: list[Any] = []
     lock = threading.Lock()
     optimize(config, initial_values, _record_metadata(seen, lock))
     assert seen
-    assert all(item is None for item in seen)
+    assert all(item == {} for item in seen)
 
 
 def test_metadata_reaches_the_evaluation_function_with_a_pool(

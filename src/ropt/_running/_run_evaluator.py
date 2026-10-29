@@ -64,7 +64,7 @@ def run_evaluation(
     def stop() -> None:
         pass
 
-    default_metadata = None if metadata is None else deepcopy(metadata)
+    default_metadata = {} if metadata is None else deepcopy(metadata)
 
     _logger.info("Starting evaluation")
     emit_event(

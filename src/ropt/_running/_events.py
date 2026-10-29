@@ -38,16 +38,14 @@ def emit_start_evaluation(
     context: EnOptContext,
     handlers: Sequence[EventHandler],
     stop: Callable[[], None],
-    default_metadata: dict[str, object] | None,
-) -> dict[str, object] | None:
+    default_metadata: dict[str, object],
+) -> dict[str, object]:
     event = EnOptEvent(
         event_type=EnOptEventType.START_EVALUATION,
         context=context,
-        metadata={} if default_metadata is None else deepcopy(default_metadata),
+        metadata=deepcopy(default_metadata),
     )
     emit_event(event, handlers, stop)
-    if default_metadata is None and not event.metadata:
-        return None
     return deepcopy(event.metadata)
 
 

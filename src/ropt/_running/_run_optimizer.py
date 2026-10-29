@@ -76,7 +76,7 @@ def run_optimization(  # ruff: ignore[too-many-arguments]
         nonlocal stop_requested
         stop_requested = True
 
-    default_metadata = None if metadata is None else deepcopy(metadata)
+    default_metadata = {} if metadata is None else deepcopy(metadata)
 
     def check_stop() -> None:
         if stop_requested:
@@ -84,7 +84,7 @@ def run_optimization(  # ruff: ignore[too-many-arguments]
         if abort_scope is not None and abort_scope.aborting:
             raise AbortedError(abort_scope.exit_code)
 
-    def start_evaluation() -> dict[str, object] | None:
+    def start_evaluation() -> dict[str, object]:
         batch_metadata = emit_start_evaluation(
             context, handlers, stop, default_metadata
         )

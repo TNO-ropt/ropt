@@ -457,9 +457,6 @@ for a runnable example.
   changes to it are ignored. The metadata of a finished batch is available
   on each result's `metadata` field.
 
-If no defaults were supplied and the dictionary is empty when the handlers
-finish, the evaluation function receives `context.metadata=None`.
-
 `START_EVALUATION` is emitted once per batch, not before each realization. It
 is emitted before the evaluation-function calls needed for a batch of function
 evaluations, gradient evaluations, or both. When initial results are supplied

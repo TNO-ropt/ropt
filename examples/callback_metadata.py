@@ -38,7 +38,6 @@ def objective(
     Returns:
         The objective value for this realization.
     """
-    assert context.metadata is not None
     noise = context.metadata["noise"][context.realization]
     return float(np.sum((variables - 1.0) ** 2) + noise)
 
