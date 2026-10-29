@@ -17,6 +17,7 @@ import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
 import tempfile
 import threading
+import time
 import weakref
 from concurrent.futures import Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
@@ -2716,27 +2717,25 @@ def test_job_executor_failed_query_spends_one_retry_per_interval(
     monkeypatch.setattr(state._condition, "wait", _wait)
     with state._lock:
         state._query_failures = 1
-        state._last_query = 100.0
-    monkeypatch.setattr("ropt._executors._job_executor.time.monotonic", lambda: 100.0)
+        state._last_query = time.monotonic()
     executor._launch_and_collect(caller)
-    assert waits == [10.0]
+    assert len(waits) == 1
+    assert waits[0] is not None
+    assert 9.0 < waits[0] <= 10.0
     assert executor.passes == 0
     assert state._query_failures == 1
 
 
-def test_job_executor_launch_only_claim_spends_no_retry(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_job_executor_launch_only_claim_spends_no_retry(tmp_path: Path) -> None:
     # When a retry grace period is active, a claim that only launches new jobs
     # must not count as another scheduler query.
     executor = _ControlledJobExecutor(tmp_path, interval=10.0)
     state = executor._state
     executor.release_pass.set()
-    clock = 100.0
-    monkeypatch.setattr("ropt._executors._job_executor.time.monotonic", lambda: clock)
+    last_query = time.monotonic()
     with state._lock:
         state._query_failures = 1
-        state._last_query = clock
+        state._last_query = last_query
     results: list[Any] = [None]
 
     def _store(index: int, result: Any) -> None:
@@ -2744,5 +2743,5 @@ def test_job_executor_launch_only_claim_spends_no_retry(
 
     executor._run_items([WorkItem(function=_function, args=(0,))], _store, None)
     assert results == [1]
-    assert state._last_query == clock
+    assert state._last_query == last_query
     assert state._query_failures == 1
