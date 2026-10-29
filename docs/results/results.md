@@ -438,12 +438,14 @@ compared between optimizations.
 Results carry two independent kinds of metadata, neither interpreted by `ropt`:
 
 - **Result metadata** — the `metadata` dict on every
-  [`Results`][ropt.results.Results] object, identical for every result of one
-  optimization or evaluation. It is set once, at the start: pass a `metadata`
-  dict to the [`optimize`][ropt.optimize] / [`evaluate`][ropt.evaluate]
-  functions. Use it to tag or identify an optimization, for example
-  `{"run_id": 7}`. The evaluation function also receives this dictionary as
-  `context.metadata` on every call.
+  [`Results`][ropt.results.Results] object. Pass defaults as `metadata=` to
+  [`optimize`][ropt.optimize], [`evaluate`][ropt.evaluate], or
+  [`evaluate_batch`][ropt.evaluate_batch], for example `{"run_id": 7}` to
+  identify a run. An
+  [event handler for `START_EVALUATION`](../running/running.md#passing-values-to-evaluations-from-event-handlers)
+  can add or override values for one batch. The evaluation function receives
+  the effective values as `context.metadata`, and each result records an
+  independent copy. Later updates do not change earlier results.
 - **Per-realization metadata** — the `metadata` dict on the `evaluations` field,
   with one array entry per realization. It is produced by the objective when it
   returns an
@@ -713,8 +715,8 @@ batch_id realization
          r1                                         0.22                                0.05
 ```
 
-The **result metadata** is supplied once per optimization and attached to
-each result. A scalar entry, such as a tag identifying the optimization,
+The **result metadata** records the run defaults and any batch-local overrides
+on each result. A scalar entry, such as a tag identifying the optimization,
 gives one value per result. A one-dimensional array adds a dimension named
 after its key, just as array-valued per-realization metadata does. Single-result
 exports keep that dimension as a row label unless it is unstacked.

@@ -6,11 +6,16 @@ per-realization function calls of one evaluation, and
 backend.
 """
 
-from ._evaluator import EnsembleEvaluator, SignalEvaluationCallback
+from ._evaluator import (
+    EnsembleEvaluator,
+    SignalFinishedCallback,
+    SignalStartCallback,
+)
 from ._optimizer import EnsembleOptimizer
 
 __all__ = [
     "EnsembleEvaluator",
     "EnsembleOptimizer",
-    "SignalEvaluationCallback",
+    "SignalFinishedCallback",
+    "SignalStartCallback",
 ]

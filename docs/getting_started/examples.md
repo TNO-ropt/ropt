@@ -19,6 +19,7 @@ read that page with the script open beside it.
 | [`function_estimator.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/function_estimator.py) | A custom estimator that aggregates realizations | [Function Estimators](../optimizer_setup/function_estimators.md) |
 | [`sampler.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/sampler.py) | A custom sampler that perturbs one variable at a time | [Samplers](../optimizer_setup/samplers.md) |
 | [`metadata.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py) | Tagging an optimization, and recording per-realization data | [Working with Results](../results/results.md) |
+| [`callback_metadata.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/callback_metadata.py) | Drawing noise per batch in an event handler and passing it through event metadata | [Running Optimizations](../running/running.md#passing-values-to-evaluations-from-event-handlers) |
 | [`export.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py) | Exporting results to a pandas or polars frame | [Working with Results](../results/results.md) |
 | [`scaling.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py) | Reading results in the configured and the optimizer's units | [Working with Results](../results/results.md) |
 | [`handlers.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py) | Collecting results from optimizations that overlap in time | [Result Handlers](../results/handlers.md) |

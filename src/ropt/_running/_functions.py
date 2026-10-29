@@ -57,7 +57,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         handlers:             Optional handlers, called in the order listed.
         result_callback:      Optional callback invoked per evaluation.
         constraint_tolerance: The tolerance within which a constraint holds.
-        metadata:             Optional dictionary attached to every result.
+        metadata:             Default metadata passed to evaluations and attached to results.
         f0:                   Optional function results at `x0`.
         g0:                   Optional gradient results at `x0`.
         report_gradients:     Whether `result_callback` also receives gradient results.
@@ -109,7 +109,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         pool:            The pool to evaluate on, or `None` to evaluate in-process.
         handlers:        Optional handlers, called in the order listed.
         result_callback: Optional callback invoked with the results.
-        metadata:        Optional dictionary attached to the results.
+        metadata:        Default metadata passed to evaluations and attached to results.
 
     Returns:
         An evaluation result.
@@ -156,7 +156,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         pool:            The pool to evaluate on, or `None` to evaluate in-process.
         handlers:        Optional handlers, called in the order listed.
         result_callback: Optional callback invoked with each evaluation.
-        metadata:        Optional dictionary attached to every result.
+        metadata:        Default metadata passed to evaluations and attached to results.
 
     Returns:
         An evaluation result.

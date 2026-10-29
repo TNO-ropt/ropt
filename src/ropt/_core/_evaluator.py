@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Protocol
+from collections.abc import Callable
+from copy import deepcopy
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.random import default_rng
@@ -48,26 +50,14 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
-class SignalEvaluationCallback(Protocol):
-    """Protocol for a callback to signal the start and end of an evaluation.
+SignalStartCallback = Callable[[], dict[str, Any] | None]
+"""Called before each evaluated batch; returns the metadata for that batch."""
 
-    This callback is invoked around each evaluation that is actually performed,
-    allowing for custom handling or tracking of evaluation events.
-    """
+SignalFinishedCallback = Callable[[tuple[Results, ...]], None]
+"""Called with the results after each evaluated batch.
 
-    def __call__(self, results: tuple[Results, ...] | None = None, /) -> None:
-        """Callback protocol for signaling the start and end of evaluations.
-
-        Before the evaluation starts, the callback is called with `results` set
-        to `None`. After the evaluation completes, the callback is called again,
-        this time with `results` containing the output of the evaluation.
-
-        Results that are returned from the cache are not evaluated, and the
-        callback is not invoked for them.
-
-        Args:
-            results: The evaluation results, or `None` before it starts.
-        """
+Cached results are not evaluated, so neither callback runs for them.
+"""
 
 
 class EnsembleEvaluator:
@@ -83,27 +73,28 @@ class EnsembleEvaluator:
         self,
         context: EnOptContext,
         evaluator: EvaluationBatchCallback,
-        metadata: dict[str, Any] | None = None,
         *,
         f0: FunctionResults | None = None,
         g0: GradientResults | None = None,
-        signal_evaluation: SignalEvaluationCallback | None = None,
+        signal_start: SignalStartCallback | None = None,
+        signal_finished: SignalFinishedCallback | None = None,
     ) -> None:
         """Initialize the EnsembleEvaluator.
 
         Args:
             context:           The optimization context object.
             evaluator:         The callable for evaluating individual functions.
-            metadata:          Optional metadata to pass to the evaluator.
             f0:                Optional function results at the initial variables.
             g0:                Optional gradient results at the initial variables.
-            signal_evaluation: Optional callback, invoked around each evaluation.
+            signal_start:      Optional callback, invoked before each evaluation.
+            signal_finished:   Optional callback, invoked after each evaluation.
 
         Raises:
             ValueError: If `f0` or `g0` does not fit the configuration.
         """  # ruff: ignore[docstring-extraneous-exception]
         self._context = context
-        self._signal_evaluation = signal_evaluation
+        self._signal_start_callback = signal_start
+        self._signal_finished_callback = signal_finished
         self._initial_values = (
             None
             if f0 is None and g0 is None
@@ -112,7 +103,6 @@ class EnsembleEvaluator:
         self._evaluator = (
             evaluator if self._initial_values is None else self._initial_values
         )
-        self._metadata = metadata
         self._realization_filters: dict[str, RealizationFilter] = (
             context.realization_filters
         )
@@ -192,13 +182,19 @@ class EnsembleEvaluator:
         self._cached_results = function_results
         return function_results, gradient_results
 
-    def _signal_start(self) -> None:
-        if self._signal_evaluation is not None:
-            self._signal_evaluation()
+    def _signal_start(self) -> dict[str, Any] | None:
+        if self._signal_start_callback is None:
+            return None
+        return self._signal_start_callback()
 
-    def _signal_finished(self, results: tuple[Results, ...]) -> None:
-        if self._signal_evaluation is not None:
-            self._signal_evaluation(results)
+    def _signal_finished(
+        self, results: tuple[Results, ...], metadata: dict[str, Any] | None
+    ) -> None:
+        if metadata is not None:
+            for result in results:
+                result.metadata = deepcopy(metadata)
+        if self._signal_finished_callback is not None:
+            self._signal_finished_callback(results)
 
     def _calculate_functions(
         self, variables: NDArray[np.float64]
@@ -206,7 +202,7 @@ class EnsembleEvaluator:
         if variables.ndim == 1:
             variables = variables[np.newaxis, :]
         realizations_to_evaluate = _get_realizations_to_evaluate(self._context)
-        self._signal_start()
+        metadata = self._signal_start()
         results = tuple(
             self._calculate_one_set_of_functions(
                 idx, f_eval_results, variables[idx, :], realizations_to_evaluate
@@ -216,10 +212,10 @@ class EnsembleEvaluator:
                 self._evaluator,
                 variables,
                 realizations_to_evaluate,
-                self._metadata,
+                deepcopy(metadata),
             )
         )
-        self._signal_finished(results)
+        self._signal_finished(results, metadata)
         return results
 
     def _calculate_one_set_of_functions(
@@ -301,7 +297,7 @@ class EnsembleEvaluator:
         mask: NDArray[np.bool_] | None,
         cached_function: FunctionResults,
     ) -> tuple[GradientResults]:
-        self._signal_start()
+        metadata = self._signal_start()
         perturbed_variables = self._perturb(variables)
 
         # No functions are computed in this case, instead they must have been
@@ -323,7 +319,7 @@ class EnsembleEvaluator:
             self._evaluator,
             perturbed_variables,
             realizations_to_evaluate,
-            self._metadata,
+            deepcopy(metadata),
         )
 
         assert self._context.gradient.perturbation_min_success is not None
@@ -386,7 +382,7 @@ class EnsembleEvaluator:
                 ),
             ),
         )
-        self._signal_finished(results)
+        self._signal_finished(results, metadata)
         return results
 
     def _perturb(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -404,7 +400,7 @@ class EnsembleEvaluator:
         variables: NDArray[np.float64],
         mask: NDArray[np.bool_] | None,
     ) -> tuple[FunctionResults, GradientResults]:
-        self._signal_start()
+        metadata = self._signal_start()
         perturbed_variables = self._perturb(variables)
         realizations_to_evaluate = _get_realizations_to_evaluate(self._context)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
@@ -413,13 +409,7 @@ class EnsembleEvaluator:
             variables,
             perturbed_variables,
             realizations_to_evaluate,
-            self._metadata,
-        )
-
-        evaluations = FunctionEvaluations.create(
-            objectives=f_eval_results.objectives,
-            constraints=f_eval_results.constraints,
-            metadata=f_eval_results.metadata,
+            deepcopy(metadata),
         )
 
         objective_weights, constraint_weights = (
@@ -462,7 +452,11 @@ class EnsembleEvaluator:
             metadata={},
             names=self._context.names,
             variables=self._unscale_variables(variables),
-            evaluations=evaluations,
+            evaluations=FunctionEvaluations.create(
+                objectives=f_eval_results.objectives,
+                constraints=f_eval_results.constraints,
+                metadata=f_eval_results.metadata,
+            ),
             realizations=Realizations(
                 evaluated_realizations=realizations_to_evaluate,
                 objective_weights=objective_weights,
@@ -536,7 +530,7 @@ class EnsembleEvaluator:
             ),
         )
 
-        self._signal_finished((function_results, gradient_results))
+        self._signal_finished((function_results, gradient_results), metadata)
         return function_results, gradient_results
 
     def _unscale_variables(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:

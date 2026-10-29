@@ -429,6 +429,56 @@ value is ignored. Where the event provides a `stop` callable, call
 `event.stop()` to request stopping the optimization. To process evaluation
 results, subscribe to `FINISHED_EVALUATION` and iterate over `event.results`.
 
+#### Updating evaluation metadata
+
+During `START_EVALUATION`, any handler can read and modify
+[`event.metadata`][ropt.events.EnOptEvent]
+to pass values to the upcoming batch, either by modifying the dictionary in
+place or by assigning a new dictionary to `event.metadata`. See
+[Passing values to evaluations from event handlers](../running/running.md#passing-values-to-evaluations-from-event-handlers)
+for a runnable example.
+
+- The run takes a deep copy of its initial `metadata=` values. Before each
+  `START_EVALUATION`, it resets the batch metadata to an independent copy of
+  those defaults. The dictionary is empty if no defaults were supplied.
+- Handlers receive the same dictionary in their listed order. Changes are
+  visible immediately to the current handler and to later handlers. Ordinary
+  dictionary operations apply, including item assignment, `update`, deletion,
+  and `clear`.
+- Edits apply only to the current batch. Added keys disappear on the next
+  batch, while replaced or deleted defaults are restored. Runs have
+  independent metadata even when sharing a handler.
+- After all start handlers return, `ropt` deep-copies the effective metadata
+  for the evaluation contexts and result recording. Later edits through a
+  retained event, dictionary, or nested value have no effect on that batch.
+  Values must support deep copying; those sent to separate worker processes
+  must also be serializable.
+- For all other event types, `event.metadata` is an empty dictionary, and
+  changes to it are ignored. The metadata of a finished batch is available
+  on each result's `metadata` field.
+
+If no defaults were supplied and the dictionary is empty when the handlers
+finish, the evaluation function receives `context.metadata=None`.
+
+`START_EVALUATION` is emitted once per batch, not before each realization. It
+is emitted before the evaluation-function calls needed for a batch of function
+evaluations, gradient evaluations, or both. When initial results are supplied
+as [`f0` or `g0`](../running/initial_values.md), `START_EVALUATION` handlers
+still run for the initial batch, even if those results cover every row and no evaluation-function
+calls are needed. The caller is responsible for keeping the supplied results
+consistent with the inputs used by any remaining evaluations.
+
+!!! note "Concurrent optimizations and `START_EVALUATION` handlers"
+    A handler shared by optimizations running concurrently runs its callback
+    for one optimization at a time, because it
+    [holds its lock](#sharing-a-handler-across-concurrent-runs) while
+    processing each event. A slow `START_EVALUATION` callback therefore delays
+    the batches of all optimizations that share it. If the callback is
+    thread-safe, create a separate `CallbackHandler` with the same callback for
+    each optimization; the calls can then overlap. If it is not thread-safe,
+    share one handler, or protect its state with a
+    [`threading.Lock`][threading.Lock].
+
 ## Sharing a handler across optimizations { #sharing-a-handler-across-concurrent-runs }
 
 Reuse a handler across sequential optimizations to collect their results
@@ -604,7 +654,7 @@ flowchart LR
     subgraph worker["worker process (process / local / HPC pool)"]
         obj["objective"]
     end
-    opt -->|"variables"| obj
+    opt -->|"variables + batch metadata"| obj
     obj -->|"result + metadata<br/>(copied back)"| opt
 ```
 

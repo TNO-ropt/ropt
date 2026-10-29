@@ -30,7 +30,7 @@ class EvaluationBatchContext:
         function_ids:  Function evaluation index for each row (< 0 means the row
                        is not a function evaluation).
         batch_id:      Integer identifying the current evaluation batch.
-        metadata:      The metadata the run was started with, if any.
+        metadata:      Metadata for this batch, including any event-handler updates.
     """
 
     context: EnOptContext
@@ -125,7 +125,7 @@ class EvaluationFunctionContext:
                       the row is not a function evaluation).
         batch_id:     Integer identifying the current evaluation batch.
         row_idx:      Row index within the batch.
-        metadata:     The metadata the run was started with, if any.
+        metadata:     Metadata for this batch, including any event-handler updates.
     """
 
     realization: int

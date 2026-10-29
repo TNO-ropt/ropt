@@ -32,18 +32,14 @@ def config_fixture() -> dict[str, Any]:
 
 class _Signals:
     def __init__(self) -> None:
-        self.calls: list[tuple[Results, ...] | None] = []
+        self.starts = 0
+        self.reported: list[tuple[Results, ...]] = []
 
-    def __call__(self, results: tuple[Results, ...] | None = None) -> None:
-        self.calls.append(results)
+    def start(self) -> None:
+        self.starts += 1
 
-    @property
-    def starts(self) -> int:
-        return sum(item is None for item in self.calls)
-
-    @property
-    def reported(self) -> list[tuple[Results, ...]]:
-        return [item for item in self.calls if item is not None]
+    def finish(self, results: tuple[Results, ...]) -> None:
+        self.reported.append(results)
 
 
 def _make(config: dict[str, Any], evaluator: Any) -> tuple[EnsembleEvaluator, _Signals]:
@@ -51,7 +47,8 @@ def _make(config: dict[str, Any], evaluator: Any) -> tuple[EnsembleEvaluator, _S
     ensemble = EnsembleEvaluator(
         EnOptContext.model_validate(config),
         evaluator(),
-        signal_evaluation=signals,
+        signal_start=signals.start,
+        signal_finished=signals.finish,
     )
     return ensemble, signals
 

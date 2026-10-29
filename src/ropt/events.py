@@ -2,8 +2,8 @@
 
 An [`EnOptEvent`][ropt.events.EnOptEvent] carries the event type, the
 configuration in use, and any results produced. Event handlers consume these
-to track progress, store results, or stop the optimization. See
-[`EnOptEventType`][ropt.enums.EnOptEventType] for the available types, and
+to prepare evaluations, track progress, store results, or stop the optimization.
+See [`EnOptEventType`][ropt.enums.EnOptEventType] for the available types, and
 [Handling Results](../results/handlers.md#writing-your-own-handler) for usage.
 """
 
@@ -29,6 +29,7 @@ class EnOptEvent:
         context:    The validated configuration in use.
         results:    Tuple of result objects associated with the event.
         stop:       Stops the optimization that emitted the event.
+        metadata:   Metadata for the upcoming batch; used only for `START_EVALUATION`.
 
     See [Handling Results](../results/handlers.md#writing-your-own-handler) for
     when each event fires and what it carries.
@@ -38,3 +39,4 @@ class EnOptEvent:
     context: EnOptContext
     results: tuple[Results, ...] = field(default_factory=tuple)
     stop: Callable[[], None] | None = None
+    metadata: dict[str, object] = field(default_factory=dict)

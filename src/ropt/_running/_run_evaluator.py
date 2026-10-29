@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -14,7 +15,12 @@ from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
 
-from ._events import emit_event, validate_handlers
+from ._events import (
+    emit_event,
+    emit_finished_evaluation,
+    emit_start_evaluation,
+    validate_handlers,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -24,7 +30,6 @@ if TYPE_CHECKING:
     from ropt._evaluation import EvaluationBatchCallback
     from ropt._handlers import EventHandler
     from ropt.context import EnOptContext
-    from ropt.results import Results
 
 _logger = get_logger(__name__)
 
@@ -44,7 +49,7 @@ def run_evaluation(
         variables: A vector or matrix of variable vectors.
         evaluator: The callable that evaluates batches.
         handlers:  Event handlers in delivery order.
-        metadata:  Optional metadata attached to emitted results.
+        metadata:  Default metadata passed to evaluations and attached to results.
 
     Raises:
         ValueError: If the input variables have the wrong shape.
@@ -56,39 +61,25 @@ def run_evaluation(
         raise ValueError(msg)
     context.lock()
 
-    def send(event: EnOptEvent) -> None:
-        emit_event(event, handlers, stop)
-
     def stop() -> None:
         pass
 
-    def signal_evaluation(results: tuple[Results, ...] | None = None) -> None:
-        if results is None:
-            send(
-                EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
-            )
-        else:
-            if metadata is not None:
-                for item in results:
-                    item.metadata = deepcopy(metadata)
-            send(
-                EnOptEvent(
-                    event_type=EnOptEventType.FINISHED_EVALUATION,
-                    context=context,
-                    results=results,
-                )
-            )
+    default_metadata = None if metadata is None else deepcopy(metadata)
 
     _logger.info("Starting evaluation")
-    send(
-        EnOptEvent(event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, context=context)
+    emit_event(
+        EnOptEvent(event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, context=context),
+        handlers,
+        stop,
     )
     variables = scale(variables, context.variables.scales, context.variables.offsets)
     ensemble_evaluator = EnsembleEvaluator(
         context,
         evaluator,
-        metadata,
-        signal_evaluation=signal_evaluation,
+        signal_start=partial(
+            emit_start_evaluation, context, handlers, stop, default_metadata
+        ),
+        signal_finished=partial(emit_finished_evaluation, context, handlers, stop),
     )
     results = ensemble_evaluator.calculate(
         variables, compute_functions=True, compute_gradients=False
@@ -96,10 +87,12 @@ def run_evaluation(
     assert results
     assert isinstance(results[0], FunctionResults)
     _logger.info("Evaluation finished")
-    send(
+    emit_event(
         EnOptEvent(
             event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
             context=context,
             results=results,
-        )
+        ),
+        handlers,
+        stop,
     )

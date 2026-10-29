@@ -41,6 +41,11 @@ def test_example_metadata(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("metadata").main()
 
 
+def test_example_callback_metadata(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("callback_metadata").main()
+
+
 def test_example_export_polars(tmp_path: Path, monkeypatch: Any) -> None:
     pytest.importorskip("polars")
     monkeypatch.chdir(tmp_path)

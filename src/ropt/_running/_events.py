@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import TYPE_CHECKING
 
 from ropt._handlers import EventHandler
+from ropt.enums import EnOptEventType
+from ropt.events import EnOptEvent
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from ropt.events import EnOptEvent
+    from ropt.context import EnOptContext
+    from ropt.results import Results
 
 
 def validate_handlers(handlers: Sequence[EventHandler]) -> None:
@@ -28,3 +32,34 @@ def emit_event(
     for handler in handlers:
         if event.event_type in handler.event_types:
             handler.handle_event(event)
+
+
+def emit_start_evaluation(
+    context: EnOptContext,
+    handlers: Sequence[EventHandler],
+    stop: Callable[[], None],
+    default_metadata: dict[str, object] | None,
+) -> dict[str, object] | None:
+    event = EnOptEvent(
+        event_type=EnOptEventType.START_EVALUATION,
+        context=context,
+        metadata={} if default_metadata is None else deepcopy(default_metadata),
+    )
+    emit_event(event, handlers, stop)
+    if default_metadata is None and not event.metadata:
+        return None
+    return deepcopy(event.metadata)
+
+
+def emit_finished_evaluation(
+    context: EnOptContext,
+    handlers: Sequence[EventHandler],
+    stop: Callable[[], None],
+    results: tuple[Results, ...],
+) -> None:
+    event = EnOptEvent(
+        event_type=EnOptEventType.FINISHED_EVALUATION,
+        context=context,
+        results=results,
+    )
+    emit_event(event, handlers, stop)

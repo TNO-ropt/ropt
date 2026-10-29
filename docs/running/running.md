@@ -58,6 +58,9 @@ order; see
 - To **reuse a previous evaluation** at the optimization's start point, pass
   its function results as `f0`; pass gradient results as `g0` if available. See
   [Reusing Results at the Starting Point](initial_values.md).
+- To **pass values to evaluations**, subscribe an event handler to
+  `START_EVALUATION` and modify `event.metadata`. See
+  [Passing values to evaluations from event handlers](#passing-values-to-evaluations-from-event-handlers).
 - To **collect or inspect output**, use callbacks and result handlers. See
   [Getting Output](../results/output.md).
 
@@ -96,8 +99,9 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
       start at 0 or be consecutive.
     - `context.row_idx` — the position of the evaluation within its batch,
       counted from 0.
-    - `context.metadata` — the `metadata` dict the optimization was started
-      with, if any (see [Attaching metadata](#attaching-metadata)).
+    - `context.metadata` — the metadata for this batch, including any
+      changes made by [`START_EVALUATION` handlers](#passing-values-to-evaluations-from-event-handlers),
+      or `None` when none was supplied (see [Attaching metadata](#attaching-metadata)).
 
 The function returns the objective value(s), followed by any constraint values.
 There are three ways to return them:
@@ -261,25 +265,26 @@ The runnable script is
 which stops an optimization after a fixed number of results and then reads the
 best point it had reached.
 
-
 ## Attaching metadata
 
 You can attach arbitrary **metadata** to an optimization or evaluation, from two
 sources:
 
-- **Constant, per call** — pass a `metadata` dict to `optimize`, `evaluate`, or
-  `evaluate_batch`. `ropt` copies it onto every result the call produces, which
-  is one way to tag an optimization:
+- **Run defaults** — pass a `metadata` dict to `optimize`, `evaluate`, or
+  `evaluate_batch`. `ropt` copies these values at run start and uses them as
+  defaults for each batch, which is one way to tag an optimization:
 
   ```python
   outcome = optimize(config, x0, objective, metadata={"id": 7})
   print(outcome.results.metadata["id"])   # 7
   ```
 
-  The same dict also reaches the evaluation function itself, as
-  `context.metadata` — useful when the evaluation needs to know which
-  optimization it is part of. With several optimizations at once, this is how
-  they are told apart; see [Give each optimization an ID](multiple_runs.md).
+  Each batch's values reach the evaluation function as `context.metadata`
+  and are copied onto its results. An
+  [event handler for `START_EVALUATION`](#passing-values-to-evaluations-from-event-handlers) can add or
+  override values for that batch. Without updates, the values stay the same
+  throughout the run. With several optimizations at once, a run identifier
+  distinguishes them; see [Give each optimization an ID](multiple_runs.md).
 
 - **Per evaluation** — return an
   [`EvaluationFunctionResult`][ropt.EvaluationFunctionResult]
@@ -325,7 +330,7 @@ sources:
   [`DataFrameHandler`](../results/handlers.md#dataframehandler) example shows
   how to label and export the metadata elements.
 
-Neither kind is interpreted by `ropt`. Constant metadata ends up on
+Neither kind is interpreted by `ropt`. The effective batch metadata ends up on
 `outcome.results.metadata`. Metadata returned for function evaluations is on
 `outcome.results.evaluations.metadata` (one entry per realization); metadata
 returned for perturbed evaluations is on
@@ -335,6 +340,70 @@ perturbation). Both kinds can be tabulated as columns by the
 Results](../results/results.md#metadata) for how each appears. The full runnable
 script is
 [examples/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py).
+
+## Passing values to evaluations from event handlers
+
+An event handler subscribed to `START_EVALUATION` runs before each batch of
+function or gradient evaluations. It can compute values and pass them to the
+evaluation function by reading and modifying
+[`event.metadata`][ropt.events.EnOptEvent].
+Any required evaluation-function calls start after all handlers for that event
+have returned.
+
+The runnable script
+[examples/callback_metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/callback_metadata.py)
+optimizes a noisy objective. Before each batch, it draws one noise value per
+realization and passes them to the evaluations. The callback draws the noise
+and adds it to `event.metadata`. It reads the number of realizations from
+`event.context`:
+
+```python
+--8<-- "examples/callback_metadata.py:draw_noise"
+```
+
+`event.metadata` is a dictionary: handlers can read, add, replace, or delete
+entries for this batch, or assign a new dictionary to `event.metadata`. Before
+the next `START_EVALUATION`, the dictionary resets to the values supplied when
+the run started. Handlers for the same event see each other's changes in the
+order they run.
+
+The evaluation function reads the noise for its realization from
+`context.metadata`:
+
+```python
+--8<-- "examples/callback_metadata.py:objective"
+```
+
+Treat this dictionary as input; evaluations in the same process may share it.
+Return per-realization information through
+[`EvaluationFunctionResult`][ropt.EvaluationFunctionResult] instead, as
+described under [Attaching metadata](#attaching-metadata).
+
+To run the callback before each batch, subscribe a
+[`CallbackHandler`][ropt.CallbackHandler] to `START_EVALUATION`:
+
+```python
+--8<-- "examples/callback_metadata.py:run"
+```
+
+All evaluations in a batch, including those at perturbed points, use the same
+noise for a given realization. Each result records the noise of its batch in
+`result.metadata["noise"]`.
+
+The same handler works with [`evaluate`][ropt.evaluate] and
+[`evaluate_batch`][ropt.evaluate_batch], and when using a pool. With workers in
+other processes, metadata must be serializable. See the [event metadata
+rules](../results/handlers.md#updating-evaluation-metadata) for ordering,
+lifetime, and result reuse.
+
+!!! note "Optimizations running at once"
+    A handler shared by [optimizations running at once](multiple_runs.md) runs
+    its callback for one of them at a time. The callback in the example is not
+    thread-safe, because all calls use the same random number generator: share
+    one handler between such optimizations, or give each optimization its own
+    handler and generator. A thread-safe callback can be used by a separate
+    handler for each optimization, so its calls can overlap; see
+    [Updating evaluation metadata](../results/handlers.md#updating-evaluation-metadata).
 
 ## Evaluating without optimizing
 

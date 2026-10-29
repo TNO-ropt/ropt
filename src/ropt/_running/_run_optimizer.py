@@ -14,7 +14,12 @@ from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import AbortedError, OptimizerStop
 
-from ._events import emit_event, validate_handlers
+from ._events import (
+    emit_event,
+    emit_finished_evaluation,
+    emit_start_evaluation,
+    validate_handlers,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -49,7 +54,7 @@ def run_optimization(  # ruff: ignore[too-many-arguments]
         evaluator:   The callable that evaluates batches.
         handlers:    Event handlers in delivery order.
         abort_scope: An optional scope that cuts this run off.
-        metadata:    Optional metadata attached to emitted results.
+        metadata:    Default metadata passed to evaluations and attached to results.
         f0:          Optional function results at the initial variables.
         g0:          Optional gradient results at the initial variables.
 
@@ -71,29 +76,24 @@ def run_optimization(  # ruff: ignore[too-many-arguments]
         nonlocal stop_requested
         stop_requested = True
 
-    def send(event: EnOptEvent) -> None:
-        emit_event(event, handlers, stop)
+    default_metadata = None if metadata is None else deepcopy(metadata)
 
-    def signal_evaluation(results: tuple[Results, ...] | None = None) -> None:
-        if results is None:
-            send(
-                EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
-            )
-        else:
-            if metadata is not None:
-                for item in results:
-                    item.metadata = deepcopy(metadata)
-            send(
-                EnOptEvent(
-                    event_type=EnOptEventType.FINISHED_EVALUATION,
-                    context=context,
-                    results=results,
-                )
-            )
+    def check_stop() -> None:
         if stop_requested:
             raise OptimizerStop(ExitCode.STOPPED)
         if abort_scope is not None and abort_scope.aborting:
             raise AbortedError(abort_scope.exit_code)
+
+    def start_evaluation() -> dict[str, object] | None:
+        batch_metadata = emit_start_evaluation(
+            context, handlers, stop, default_metadata
+        )
+        check_stop()
+        return batch_metadata
+
+    def finish_evaluation(results: tuple[Results, ...]) -> None:
+        emit_finished_evaluation(context, handlers, stop, results)
+        check_stop()
 
     _logger.debug(
         "Configuration: %d variable(s), %d realization(s), %d objective(s)",
@@ -102,16 +102,20 @@ def run_optimization(  # ruff: ignore[too-many-arguments]
         context.objectives.weights.size,
     )
     _logger.info("Starting optimization")
-    send(EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context))
+    emit_event(
+        EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context),
+        handlers,
+        stop,
+    )
 
     variables = scale(variables, context.variables.scales, context.variables.offsets)
     ensemble_evaluator = EnsembleEvaluator(
         context,
         evaluator,
-        metadata,
         f0=f0,
         g0=g0,
-        signal_evaluation=signal_evaluation,
+        signal_start=start_evaluation,
+        signal_finished=finish_evaluation,
     )
     ensemble_optimizer = EnsembleOptimizer(
         context=context,
@@ -120,5 +124,9 @@ def run_optimization(  # ruff: ignore[too-many-arguments]
     exit_code = ensemble_optimizer.start(variables)
 
     _logger.info("Optimization finished: %s", exit_code.name)
-    send(EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context))
+    emit_event(
+        EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context),
+        handlers,
+        stop,
+    )
     return exit_code
