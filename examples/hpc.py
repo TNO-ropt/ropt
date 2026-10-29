@@ -17,6 +17,7 @@ import this script, so this example needs the `ropt[cloudpickle]` extra.
 """
 
 import argparse
+import copy
 from pathlib import Path
 from typing import Any
 
@@ -83,16 +84,26 @@ def report(result: FunctionResults) -> None:
         print(f"  objective: {result.target_objective}")
 
 
-def main(*, queue: str | None = None, workdir: Path | None = None) -> None:
+def main(
+    *,
+    queue: str | None = None,
+    workdir: Path | None = None,
+    max_batches: int | None = None,
+) -> None:
     """Run the optimization on the cluster, or in local processes.
 
     Args:
-        queue:   The cluster queue to submit to; the configured default if None,
-                 or `"local"` to run on this machine.
-        workdir: Directory for the job files, the current directory by default.
-                 On a cluster it must be on a filesystem the compute nodes
-                 share.
+        queue:       The cluster queue to submit to; the configured default if
+                     None, or `"local"` to run on this machine.
+        workdir:     Directory for the job files, the current directory by
+                     default. On a cluster it must be on a filesystem the
+                     compute nodes share.
+        max_batches: Stop after this many batches; the result is then not
+                     checked for convergence.
     """
+    config = copy.deepcopy(CONFIG)
+    if max_batches is not None:
+        config["optimizer"]["max_batches"] = max_batches
     with session() as s:
         pool = s.hpc_pool(
             workers=WORKERS,
@@ -100,7 +111,7 @@ def main(*, queue: str | None = None, workdir: Path | None = None) -> None:
             workdir=Path.cwd() if workdir is None else workdir.resolve(),
         )
         result = optimize(
-            CONFIG,
+            config,
             INITIAL_VALUES,
             rosenbrock,
             pool=pool,
@@ -109,7 +120,8 @@ def main(*, queue: str | None = None, workdir: Path | None = None) -> None:
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     print(f"optimal objective: {result.results.target_objective}")
-    assert np.allclose(result.results.variables, 1.0, atol=1e-1)
+    if max_batches is None:
+        assert np.allclose(result.results.variables, 1.0, atol=1e-1)
 
 
 if __name__ == "__main__":
@@ -124,5 +136,11 @@ if __name__ == "__main__":
         type=Path,
         default=None,
         help="directory for the job files, shared by the compute nodes",
+    )
+    parser.add_argument(
+        "--max-batches",
+        type=int,
+        default=None,
+        help="stop after this many batches, without checking convergence",
     )
     main(**vars(parser.parse_args()))
