@@ -432,11 +432,13 @@ excluding the missing values. The `realization_min_success` field specifies the
 minimum number of successful realizations required (default: equal to the number
 of realizations, meaning no failures are allowed).
 
-!!! note
-    Setting `realization_min_success` to zero allows the optimization to proceed
-    even if all realizations fail. While some optimizers can handle this, most
-    will treat it as if the value were one, requiring at least one successful
-    realization.
+!!! warning "Setting `realization_min_success` to zero"
+    With `realization_min_success` set to zero, the optimization continues even
+    when all realizations of an evaluation fail. The objective, constraint, and
+    gradient values of that evaluation are then `NaN`, and `ropt` passes them to
+    the optimizer unchanged. `ropt` does not check whether the optimizer can
+    handle `NaN` values: before setting zero, make sure that the chosen
+    optimizer supports them.
 
 ## `optimizer` { #optimizer }
 

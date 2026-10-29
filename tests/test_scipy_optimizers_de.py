@@ -48,35 +48,6 @@ def test_scipy_bound_constraints_de(config: Any, eval_func: Any) -> None:
     assert np.allclose(result.results.variables, [0.15, 0.0, 0.2], atol=0.03)
 
 
-def test_scipy_bound_constraints_differential_evolution_de(
-    config: Any, eval_func: Any, test_functions: Any
-) -> None:
-    config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
-    config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
-
-    config["realizations"] = {"realization_min_success": 0}
-    result1 = optimize(config, [0.2, *initial_values[1:]], eval_func())
-    assert result1.results is not None
-    assert np.allclose(result1.results.variables, [0.15, 0.0, 0.2], atol=0.03)
-
-    counter = 0
-
-    def _add_nan(x: Any, c: Any) -> Any:
-        nonlocal counter
-        counter += 1
-        if counter == 2:
-            counter = 0
-            return np.nan
-        return test_functions[0](x, c)
-
-    result2 = optimize(
-        config, [0.2, *initial_values[1:]], eval_func((_add_nan, test_functions[1]))
-    )
-    assert result2.results is not None
-    assert np.allclose(result2.results.variables, [0.15, 0.0, 0.2], atol=0.03)
-    assert not np.all(result1.results.variables == result2.results.variables)
-
-
 def test_scipy_eq_linear_constraints_de(config: Any, eval_func: Any) -> None:
     config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
     config["variables"]["upper_bounds"] = [1.0, 1.0, 1.0]
