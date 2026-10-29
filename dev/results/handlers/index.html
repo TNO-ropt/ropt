@@ -1206,10 +1206,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sharing-a-handler-across-concurrent-runs" class="md-nav__link">
+  <a href="#what-handlers-receive" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sharing a handler across concurrent optimizations
+        What handlers receive
       
     </span>
   </a>
@@ -1229,10 +1229,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#resultshandler" class="md-nav__link">
+  <a href="#historyhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ResultsHandler
+        HistoryHandler
       
     </span>
   </a>
@@ -1240,10 +1240,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#historyhandler" class="md-nav__link">
+  <a href="#resultshandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HistoryHandler
+        ResultsHandler
       
     </span>
   </a>
@@ -1300,8 +1300,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#callbackhandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CallbackHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharing-a-handler-across-concurrent-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sharing a handler across optimizations
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2550,10 +2572,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sharing-a-handler-across-concurrent-runs" class="md-nav__link">
+  <a href="#what-handlers-receive" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sharing a handler across concurrent optimizations
+        What handlers receive
       
     </span>
   </a>
@@ -2573,10 +2595,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#resultshandler" class="md-nav__link">
+  <a href="#historyhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ResultsHandler
+        HistoryHandler
       
     </span>
   </a>
@@ -2584,10 +2606,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#historyhandler" class="md-nav__link">
+  <a href="#resultshandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HistoryHandler
+        ResultsHandler
       
     </span>
   </a>
@@ -2644,8 +2666,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#callbackhandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CallbackHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sharing-a-handler-across-concurrent-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sharing a handler across optimizations
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2696,12 +2740,28 @@
 <strong>handler</strong> lets you collect or react to <em>every</em> result instead: it is an object
 that observes an optimization and processes its results as they arrive — keeping
 them, tabulating them, or invoking a callback.</p>
-<p>A handler is given <a class="autorefs autorefs-internal" title="            ropt.results.Results
+<p>Attach a handler to an optimization with the <code>handlers</code> argument:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">outcome</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Handlers that store results expose them through <code>handler["results"]</code> (and, for
+<code>HistoryHandler</code>, the <code>history.results</code> shortcut).</p>
+<h2 id="what-handlers-receive">What handlers receive</h2>
+<p>Handlers receive <a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects —
+  " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> objects for the event
+types they subscribe to. An event identifies what happened and carries the
+configuration and any associated results. Some events, such as the start of
+an optimization, contain no results.</p>
+<p><code>HistoryHandler</code>, <code>ResultsHandler</code> and <code>DataFrameHandler</code> subscribe to
+<code>FINISHED_EVALUATION</code> events and process the
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -2713,99 +2773,17 @@ them, tabulating them, or invoking a callback.</p>
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> — which is what every other part of
-<code>ropt</code> provides too: a result callback receives one per evaluation, and
-<code>optimize</code> puts the best one on the <code>results</code> field of what it returns.
-Everything an optimization or evaluation produces is in them, at the field paths
-described in
-<a href="../results/">Working with Results</a>, which is the vocabulary the handlers below
-are configured in.</p>
-<p>The <a href="../../running/running/#reporting-progress">result callback</a> is shorthand
-for a handler: <code>result_callback=</code> builds one for you behind the
-scenes, added to the optimization it is given to. One is built per optimization,
-each with a lock of its own, so the same callback given to optimizations that
-execute concurrently can be entered from several threads at once. A handler
-object given to those optimizations is entered by one at a time, because the
-lock belongs to the handler. A callback that accumulates across concurrent
-optimizations needs synchronization of its own.</p>
-<p>Attach handlers to an optimization with the <code>handlers</code> argument. The same
-handler can be passed to several <code>optimize</code> calls, accumulating the results of
-each in turn:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>       <span class="c1"># a single optimization</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">:</span>                                   <span class="c1"># ...or reused to</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>   <span class="c1"># accumulate in turn</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>   <span class="c1"># every result collected, across all the optimizations</span>
-</span></code></pre></div>
-<p>Handlers that store results expose them through <code>handler["results"]</code> (and, for
-<code>HistoryHandler</code>, the <code>history.results</code> shortcut).</p>
-<h2 id="sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent optimizations</h2>
-<p>The same handler may also be given to optimizations that execute
-<strong>concurrently</strong> — those started together with
-<a href="../../running/multiple_runs/"><code>run</code></a>, or ones you start on threads of your own. A handler's
-<a class="autorefs autorefs-internal" title="            handle_event" href="../../reference/api/#ropt.EventHandler.handle_event"><code>handle_event</code></a>
-takes a lock around each call, so a second optimization waits for the first to
-finish rather than interleaving with it:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">session</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">run</span><span class="p">(</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="p">[</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>            <span class="n">partial</span><span class="p">(</span><span class="n">optimize</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>            <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>        <span class="p">],</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">start_points</span><span class="p">)),</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="p">)</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
-</span></code></pre></div>
-<p>The results of the concurrent optimizations arrive interleaved, in an order that
-depends on which optimization reaches the handler first. Take the order from the
-results themselves — <code>batch_id</code>, or a <code>metadata</code> field you set per optimization —
-rather than from the order they arrive in.</p>
-<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py">examples/handlers.py</a>
-feeds two handlers from the same set of concurrent optimizations:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">job</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="n">optimize</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="n">CONFIG</span><span class="p">,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">STARTS</span><span class="p">)),</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">,</span> <span class="n">per_run</span><span class="p">],</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="p">)</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">run</span><span class="p">(</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="p">[</span><span class="n">partial</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span> <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">STARTS</span><span class="p">],</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">STARTS</span><span class="p">)),</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="p">)</span>
-</span></code></pre></div>
-<div class="admonition warning">
-<p class="admonition-title">Do not start an optimization from inside a handler that it can reach</p>
-<p>A handler is free to start an optimization of its own, but its own lock is
-held while it does. If that optimization lists the same handler, the handler
-is entered a second time. The outcome depends on the optimization the
-handler starts, not on the call that is feeding the handler. A nested
-<a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> emits on the thread that called it — the
-one already inside the handler — so this raises a
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A nested optimization
-started with <a class="autorefs autorefs-internal" title="            ropt.run" href="../../reference/api/#ropt.run"><code>run</code></a> and a pool emits on a worker of that pool,
-which waits for a lock the first thread will
-not release until the optimization ends, and both stop. The same holds for
-two handlers that each start an optimization reaching the other. Give the
-inner optimization handlers of its own.</p>
-</div>
-<p>Two handlers that write to the same external state are each serialized on their
-own, but not as a pair: one optimization can be inside the first while another
-is inside the second. Take a <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/threading.html#threading.Lock"><code>threading.Lock</code></a> of your own
-inside both <code>_handle_event</code> implementations if they must not overlap.</p>
+  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> objects in the event's
+<code>results</code> tuple. These are the same result classes used by result callbacks
+and by the return value of <code>optimize</code>. Their fields are described in
+<a href="../results/">Working with Results</a>.</p>
 <h2 id="built-in-handlers">Built-in handlers</h2>
 <p>The handlers below are exported from <code>ropt</code>, ready to use as they are.</p>
+<h3 id="historyhandler"><code>HistoryHandler</code></h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.HistoryHandler" href="../../reference/api/#ropt.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
+in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
+until the first result arrives, or with <code>handler["results"]</code>, the raw stored
+value, which is <code>None</code> until then.</p>
 <h3 id="resultshandler"><code>ResultsHandler</code></h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.ResultsHandler" href="../../reference/api/#ropt.ResultsHandler"><code>ResultsHandler</code></a> keeps a single result, read via
 <code>handler["results"]</code>:</p>
@@ -2837,11 +2815,6 @@ estimates is always at the point of the function evaluation it was constructed
 from, so for this gradient the second test always passes. <code>handler["gradient"]</code>
 is <code>None</code> while that gradient has not arrived, and stays <code>None</code> for a point
 where no gradient was computed — the best point of an optimization often is one.</p>
-<h3 id="historyhandler"><code>HistoryHandler</code></h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.HistoryHandler" href="../../reference/api/#ropt.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
-in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
-until the first result arrives, or with <code>handler["results"]</code>, the raw stored
-value, which is <code>None</code> until then.</p>
 <h3 id="dataframehandler"><code>DataFrameHandler</code></h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.DataFrameHandler" href="../../reference/api/#ropt.DataFrameHandler"><code>DataFrameHandler</code></a> collects results into named
 DataFrames, using either <code>polars</code> (the default) or <code>pandas</code> as its engine; the
@@ -2854,20 +2827,20 @@ objects, so <code>variables</code> and <code>scaled.variables</code> select diff
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/tables.py">tables example</a>
 defines tables of both types for the ensemble Rosenbrock function, and is
 explained <a href="#example-tables-of-both-types">below</a>.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s2">"summary"</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">"functions"</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="p">{</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="s2">"functions.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="p">},</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">)</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="n">df</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="s2">"summary"</span><span class="p">]</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="s2">"summary"</span><span class="p">,</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="s2">"functions"</span><span class="p">,</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="p">{</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="s2">"functions.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="p">},</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">)</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="n">df</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="s2">"summary"</span><span class="p">]</span>
 </span></code></pre></div>
 <p>Read one table with <code>tables["summary"]</code>, or all of them with <code>get_tables()</code>.
 Columns appear in the order the specification lists them. A
@@ -2885,7 +2858,7 @@ shows a per-realization array with a configured <code>names</code> entry and exp
 through <code>evaluations.metadata.residual</code>.</p>
 <p>Tables are built with polars by default. Pass <code>engine="pandas"</code> to get pandas
 DataFrames instead:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">(</span><span class="n">engine</span><span class="o">=</span><span class="s2">"pandas"</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">(</span><span class="n">engine</span><span class="o">=</span><span class="s2">"pandas"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The tables carry the same columns under the same titles. As explained in
 <a href="../results/#exporting-to-polars">Exporting to polars</a>, polars
@@ -2916,13 +2889,13 @@ works in.</p>
 its label from the <a href="../../optimizer_setup/configuration_sections/#names"><code>names</code></a>
 section, or with its index if it has no label. Each realization and each
 perturbation gets a row of its own. For example, this column dict:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="s2">"evaluations.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s2">"evaluations.constraints"</span><span class="p">:</span> <span class="s2">"Constraint"</span><span class="p">,</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s2">"evaluations.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">"evaluations.constraints"</span><span class="p">:</span> <span class="s2">"Constraint"</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>gives the following table for the problem in the
 <a href="#example-tables-of-both-types">example below</a>, with two variables named <code>x</code> and
@@ -3004,7 +2977,8 @@ exception is <code>constraint_info</code> as a whole: it exists only if all lowe
 upper variable bounds are finite, or if linear or nonlinear constraints are
 configured. Without it, a table that lists a <code>constraint_info</code> or
 <code>scaled.constraint_info</code> entry raises a <code>ValueError</code>.</p>
-<p>Fields of a <code>"functions"</code> table:</p>
+<details class="info">
+<summary>Available fields for function tables</summary>
 <table>
 <thead>
 <tr>
@@ -3155,7 +3129,9 @@ configured. Without it, a table that lists a <code>constraint_info</code> or
 </tr>
 </tbody>
 </table>
-<p>Fields of a <code>"gradients"</code> table:</p>
+</details>
+<details class="info">
+<summary>Available fields for gradient tables</summary>
 <table>
 <thead>
 <tr>
@@ -3242,6 +3218,7 @@ configured. Without it, a table that lists a <code>constraint_info</code> or
 </tr>
 </tbody>
 </table>
+</details>
 <p>The <code>names</code> and <code>source_key</code> attributes of a result are not fields of a table:
 an entry of <code>names</code> repeats the labels that are already part of the column
 titles, and <code>source_key</code> gives two rows per result.</p>
@@ -3252,135 +3229,141 @@ for each. Copy one, delete the entries you do not need, and pass it to
 from the complete dict has one row per realization, or per realization and
 perturbation. Delete the <code>constraint_info</code> and <code>scaled.constraint_info</code> entries
 for a problem without bounds or constraints.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">FUNCTION_COLUMNS</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="s2">"function_id"</span><span class="p">:</span> <span class="s2">"Function ID"</span><span class="p">,</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="s2">"target_objective"</span><span class="p">:</span> <span class="s2">"Target objective"</span><span class="p">,</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="s2">"functions.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="s2">"functions.constraints"</span><span class="p">:</span> <span class="s2">"Constraint"</span><span class="p">,</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="s2">"evaluations.objectives"</span><span class="p">:</span> <span class="s2">"Realization objective"</span><span class="p">,</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="s2">"evaluations.constraints"</span><span class="p">:</span> <span class="s2">"Realization constraint"</span><span class="p">,</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    <span class="s2">"realizations.evaluated_realizations"</span><span class="p">:</span> <span class="s2">"Evaluated"</span><span class="p">,</span>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="s2">"realizations.objective_weights"</span><span class="p">:</span> <span class="s2">"Objective weight"</span><span class="p">,</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    <span class="s2">"realizations.constraint_weights"</span><span class="p">:</span> <span class="s2">"Constraint weight"</span><span class="p">,</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="s2">"constraint_info.bound_lower"</span><span class="p">:</span> <span class="s2">"Bound lower difference"</span><span class="p">,</span>
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="s2">"constraint_info.bound_upper"</span><span class="p">:</span> <span class="s2">"Bound upper difference"</span><span class="p">,</span>
-</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="s2">"constraint_info.bound_violation"</span><span class="p">:</span> <span class="s2">"Bound violation"</span><span class="p">,</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    <span class="s2">"constraint_info.linear_lower"</span><span class="p">:</span> <span class="s2">"Linear lower difference"</span><span class="p">,</span>
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>    <span class="s2">"constraint_info.linear_upper"</span><span class="p">:</span> <span class="s2">"Linear upper difference"</span><span class="p">,</span>
-</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>    <span class="s2">"constraint_info.linear_violation"</span><span class="p">:</span> <span class="s2">"Linear violation"</span><span class="p">,</span>
-</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>    <span class="s2">"constraint_info.nonlinear_lower"</span><span class="p">:</span> <span class="s2">"Nonlinear lower difference"</span><span class="p">,</span>
-</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>    <span class="s2">"constraint_info.nonlinear_upper"</span><span class="p">:</span> <span class="s2">"Nonlinear upper difference"</span><span class="p">,</span>
-</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>    <span class="s2">"constraint_info.nonlinear_violation"</span><span class="p">:</span> <span class="s2">"Nonlinear violation"</span><span class="p">,</span>
-</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>    <span class="s2">"scaled.variables"</span><span class="p">:</span> <span class="s2">"Scaled variable"</span><span class="p">,</span>
-</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>    <span class="s2">"scaled.functions.objectives"</span><span class="p">:</span> <span class="s2">"Scaled objective"</span><span class="p">,</span>
-</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>    <span class="s2">"scaled.functions.constraints"</span><span class="p">:</span> <span class="s2">"Scaled constraint"</span><span class="p">,</span>
-</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>    <span class="s2">"scaled.constraint_info.bound_lower"</span><span class="p">:</span> <span class="s2">"Scaled bound lower difference"</span><span class="p">,</span>
-</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>    <span class="s2">"scaled.constraint_info.bound_upper"</span><span class="p">:</span> <span class="s2">"Scaled bound upper difference"</span><span class="p">,</span>
-</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>    <span class="s2">"scaled.constraint_info.bound_violation"</span><span class="p">:</span> <span class="s2">"Scaled bound violation"</span><span class="p">,</span>
-</span><span id="__span-6-29"><a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>    <span class="s2">"scaled.constraint_info.linear_lower"</span><span class="p">:</span> <span class="s2">"Scaled linear lower difference"</span><span class="p">,</span>
-</span><span id="__span-6-30"><a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a>    <span class="s2">"scaled.constraint_info.linear_upper"</span><span class="p">:</span> <span class="s2">"Scaled linear upper difference"</span><span class="p">,</span>
-</span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>    <span class="s2">"scaled.constraint_info.linear_violation"</span><span class="p">:</span> <span class="s2">"Scaled linear violation"</span><span class="p">,</span>
-</span><span id="__span-6-32"><a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a>    <span class="s2">"scaled.constraint_info.nonlinear_lower"</span><span class="p">:</span> <span class="s2">"Scaled nonlinear lower difference"</span><span class="p">,</span>
-</span><span id="__span-6-33"><a id="__codelineno-6-33" name="__codelineno-6-33" href="#__codelineno-6-33"></a>    <span class="s2">"scaled.constraint_info.nonlinear_upper"</span><span class="p">:</span> <span class="s2">"Scaled nonlinear upper difference"</span><span class="p">,</span>
-</span><span id="__span-6-34"><a id="__codelineno-6-34" name="__codelineno-6-34" href="#__codelineno-6-34"></a>    <span class="s2">"scaled.constraint_info.nonlinear_violation"</span><span class="p">:</span> <span class="s2">"Scaled nonlinear violation"</span><span class="p">,</span>
-</span><span id="__span-6-35"><a id="__codelineno-6-35" name="__codelineno-6-35" href="#__codelineno-6-35"></a>    <span class="c1"># "metadata.&lt;key&gt;": "&lt;title&gt;",</span>
-</span><span id="__span-6-36"><a id="__codelineno-6-36" name="__codelineno-6-36" href="#__codelineno-6-36"></a>    <span class="c1"># "evaluations.metadata.&lt;key&gt;": "&lt;title&gt;",</span>
-</span><span id="__span-6-37"><a id="__codelineno-6-37" name="__codelineno-6-37" href="#__codelineno-6-37"></a><span class="p">}</span>
+<details class="example">
+<summary>Column dictionary for function tables</summary>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">FUNCTION_COLUMNS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">"function_id"</span><span class="p">:</span> <span class="s2">"Function ID"</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="s2">"target_objective"</span><span class="p">:</span> <span class="s2">"Target objective"</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="s2">"functions.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="s2">"functions.constraints"</span><span class="p">:</span> <span class="s2">"Constraint"</span><span class="p">,</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    <span class="s2">"evaluations.objectives"</span><span class="p">:</span> <span class="s2">"Realization objective"</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="s2">"evaluations.constraints"</span><span class="p">:</span> <span class="s2">"Realization constraint"</span><span class="p">,</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="s2">"realizations.evaluated_realizations"</span><span class="p">:</span> <span class="s2">"Evaluated"</span><span class="p">,</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="s2">"realizations.objective_weights"</span><span class="p">:</span> <span class="s2">"Objective weight"</span><span class="p">,</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="s2">"realizations.constraint_weights"</span><span class="p">:</span> <span class="s2">"Constraint weight"</span><span class="p">,</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="s2">"constraint_info.bound_lower"</span><span class="p">:</span> <span class="s2">"Bound lower difference"</span><span class="p">,</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    <span class="s2">"constraint_info.bound_upper"</span><span class="p">:</span> <span class="s2">"Bound upper difference"</span><span class="p">,</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>    <span class="s2">"constraint_info.bound_violation"</span><span class="p">:</span> <span class="s2">"Bound violation"</span><span class="p">,</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>    <span class="s2">"constraint_info.linear_lower"</span><span class="p">:</span> <span class="s2">"Linear lower difference"</span><span class="p">,</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>    <span class="s2">"constraint_info.linear_upper"</span><span class="p">:</span> <span class="s2">"Linear upper difference"</span><span class="p">,</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>    <span class="s2">"constraint_info.linear_violation"</span><span class="p">:</span> <span class="s2">"Linear violation"</span><span class="p">,</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>    <span class="s2">"constraint_info.nonlinear_lower"</span><span class="p">:</span> <span class="s2">"Nonlinear lower difference"</span><span class="p">,</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>    <span class="s2">"constraint_info.nonlinear_upper"</span><span class="p">:</span> <span class="s2">"Nonlinear upper difference"</span><span class="p">,</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>    <span class="s2">"constraint_info.nonlinear_violation"</span><span class="p">:</span> <span class="s2">"Nonlinear violation"</span><span class="p">,</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>    <span class="s2">"scaled.variables"</span><span class="p">:</span> <span class="s2">"Scaled variable"</span><span class="p">,</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>    <span class="s2">"scaled.functions.objectives"</span><span class="p">:</span> <span class="s2">"Scaled objective"</span><span class="p">,</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>    <span class="s2">"scaled.functions.constraints"</span><span class="p">:</span> <span class="s2">"Scaled constraint"</span><span class="p">,</span>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>    <span class="s2">"scaled.constraint_info.bound_lower"</span><span class="p">:</span> <span class="s2">"Scaled bound lower difference"</span><span class="p">,</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>    <span class="s2">"scaled.constraint_info.bound_upper"</span><span class="p">:</span> <span class="s2">"Scaled bound upper difference"</span><span class="p">,</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>    <span class="s2">"scaled.constraint_info.bound_violation"</span><span class="p">:</span> <span class="s2">"Scaled bound violation"</span><span class="p">,</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>    <span class="s2">"scaled.constraint_info.linear_lower"</span><span class="p">:</span> <span class="s2">"Scaled linear lower difference"</span><span class="p">,</span>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>    <span class="s2">"scaled.constraint_info.linear_upper"</span><span class="p">:</span> <span class="s2">"Scaled linear upper difference"</span><span class="p">,</span>
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>    <span class="s2">"scaled.constraint_info.linear_violation"</span><span class="p">:</span> <span class="s2">"Scaled linear violation"</span><span class="p">,</span>
+</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>    <span class="s2">"scaled.constraint_info.nonlinear_lower"</span><span class="p">:</span> <span class="s2">"Scaled nonlinear lower difference"</span><span class="p">,</span>
+</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a>    <span class="s2">"scaled.constraint_info.nonlinear_upper"</span><span class="p">:</span> <span class="s2">"Scaled nonlinear upper difference"</span><span class="p">,</span>
+</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>    <span class="s2">"scaled.constraint_info.nonlinear_violation"</span><span class="p">:</span> <span class="s2">"Scaled nonlinear violation"</span><span class="p">,</span>
+</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a>    <span class="c1"># "metadata.&lt;key&gt;": "&lt;title&gt;",</span>
+</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>    <span class="c1"># "evaluations.metadata.&lt;key&gt;": "&lt;title&gt;",</span>
+</span><span id="__span-4-37"><a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">GRADIENT_COLUMNS</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="s2">"perturbation"</span><span class="p">:</span> <span class="s2">"Perturbation"</span><span class="p">,</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="s2">"target_gradient"</span><span class="p">:</span> <span class="s2">"Target gradient"</span><span class="p">,</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="s2">"gradients.objectives"</span><span class="p">:</span> <span class="s2">"Objective gradient"</span><span class="p">,</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="s2">"gradients.constraints"</span><span class="p">:</span> <span class="s2">"Constraint gradient"</span><span class="p">,</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="s2">"perturbed_variables"</span><span class="p">:</span> <span class="s2">"Perturbed variable"</span><span class="p">,</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="s2">"evaluations.perturbed_objectives"</span><span class="p">:</span> <span class="s2">"Perturbed objective"</span><span class="p">,</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    <span class="s2">"evaluations.perturbed_constraints"</span><span class="p">:</span> <span class="s2">"Perturbed constraint"</span><span class="p">,</span>
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    <span class="s2">"realizations.evaluated_realizations"</span><span class="p">:</span> <span class="s2">"Evaluated"</span><span class="p">,</span>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>    <span class="s2">"realizations.objective_weights"</span><span class="p">:</span> <span class="s2">"Objective weight"</span><span class="p">,</span>
-</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>    <span class="s2">"realizations.constraint_weights"</span><span class="p">:</span> <span class="s2">"Constraint weight"</span><span class="p">,</span>
-</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>    <span class="s2">"scaled.variables"</span><span class="p">:</span> <span class="s2">"Scaled variable"</span><span class="p">,</span>
-</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>    <span class="s2">"scaled.perturbed_variables"</span><span class="p">:</span> <span class="s2">"Scaled perturbed variable"</span><span class="p">,</span>
-</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>    <span class="s2">"scaled.gradients.objectives"</span><span class="p">:</span> <span class="s2">"Scaled objective gradient"</span><span class="p">,</span>
-</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>    <span class="s2">"scaled.gradients.constraints"</span><span class="p">:</span> <span class="s2">"Scaled constraint gradient"</span><span class="p">,</span>
-</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>    <span class="c1"># "metadata.&lt;key&gt;": "&lt;title&gt;",</span>
-</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>    <span class="c1"># "evaluations.metadata.&lt;key&gt;": "&lt;title&gt;",</span>
-</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="p">}</span>
+</details>
+<details class="example">
+<summary>Column dictionary for gradient tables</summary>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">GRADIENT_COLUMNS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">"perturbation"</span><span class="p">:</span> <span class="s2">"Perturbation"</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s2">"target_gradient"</span><span class="p">:</span> <span class="s2">"Target gradient"</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="s2">"gradients.objectives"</span><span class="p">:</span> <span class="s2">"Objective gradient"</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="s2">"gradients.constraints"</span><span class="p">:</span> <span class="s2">"Constraint gradient"</span><span class="p">,</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="s2">"perturbed_variables"</span><span class="p">:</span> <span class="s2">"Perturbed variable"</span><span class="p">,</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="s2">"evaluations.perturbed_objectives"</span><span class="p">:</span> <span class="s2">"Perturbed objective"</span><span class="p">,</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="s2">"evaluations.perturbed_constraints"</span><span class="p">:</span> <span class="s2">"Perturbed constraint"</span><span class="p">,</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="s2">"realizations.evaluated_realizations"</span><span class="p">:</span> <span class="s2">"Evaluated"</span><span class="p">,</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="s2">"realizations.objective_weights"</span><span class="p">:</span> <span class="s2">"Objective weight"</span><span class="p">,</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="s2">"realizations.constraint_weights"</span><span class="p">:</span> <span class="s2">"Constraint weight"</span><span class="p">,</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    <span class="s2">"scaled.variables"</span><span class="p">:</span> <span class="s2">"Scaled variable"</span><span class="p">,</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    <span class="s2">"scaled.perturbed_variables"</span><span class="p">:</span> <span class="s2">"Scaled perturbed variable"</span><span class="p">,</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="s2">"scaled.gradients.objectives"</span><span class="p">:</span> <span class="s2">"Scaled objective gradient"</span><span class="p">,</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    <span class="s2">"scaled.gradients.constraints"</span><span class="p">:</span> <span class="s2">"Scaled constraint gradient"</span><span class="p">,</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    <span class="c1"># "metadata.&lt;key&gt;": "&lt;title&gt;",</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    <span class="c1"># "evaluations.metadata.&lt;key&gt;": "&lt;title&gt;",</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="p">}</span>
 </span></code></pre></div>
+</details>
 <h4 id="example-tables-of-both-types">Example: tables of both types</h4>
 <p>The <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/tables.py">tables example</a>
 optimizes the ensemble Rosenbrock function with variable bounds and a nonlinear
 constraint. The <code>names</code> section labels the variables and the constraint, and
 these labels are used in the column titles:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">CONFIG</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="n">DIM</span><span class="p">,</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="p">},</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>        <span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">REALIZATIONS</span><span class="p">,</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="p">},</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    <span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    <span class="p">},</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>    <span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>        <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">),</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>        <span class="s2">"nonlinear_constraint"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"limit"</span><span class="p">,),</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>    <span class="p">},</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">CONFIG</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="n">DIM</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="p">},</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>        <span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">REALIZATIONS</span><span class="p">,</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="p">},</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    <span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="p">},</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>        <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">),</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>        <span class="s2">"nonlinear_constraint"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"limit"</span><span class="p">,),</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>    <span class="p">},</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Each table is defined by its own column dict, a subset of the dicts above.
 <code>FUNCTIONS</code> keeps one row per result; <code>EVALUATIONS</code> lists per-realization
 fields and keeps one row per realization. <code>PERTURBATIONS</code> has one row per
 realization and perturbation:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">FUNCTIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="s2">"target_objective"</span><span class="p">:</span> <span class="s2">"Target objective"</span><span class="p">,</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="s2">"functions.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="s2">"functions.constraints"</span><span class="p">:</span> <span class="s2">"Constraint"</span><span class="p">,</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="s2">"constraint_info.nonlinear_violation"</span><span class="p">:</span> <span class="s2">"Violation"</span><span class="p">,</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">}</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">EVALUATIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="s2">"evaluations.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    <span class="s2">"evaluations.constraints"</span><span class="p">:</span> <span class="s2">"Constraint"</span><span class="p">,</span>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="p">}</span>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="n">GRADIENTS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
-</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>    <span class="s2">"gradients.objectives"</span><span class="p">:</span> <span class="s2">"Objective gradient"</span><span class="p">,</span>
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="s2">"gradients.constraints"</span><span class="p">:</span> <span class="s2">"Constraint gradient"</span><span class="p">,</span>
-</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="p">}</span>
-</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="n">PERTURBATIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
-</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
-</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>    <span class="s2">"perturbation"</span><span class="p">:</span> <span class="s2">"Perturbation"</span><span class="p">,</span>
-</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>    <span class="s2">"perturbed_variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
-</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>    <span class="s2">"evaluations.perturbed_objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
-</span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">FUNCTIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="s2">"target_objective"</span><span class="p">:</span> <span class="s2">"Target objective"</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="s2">"functions.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="s2">"functions.constraints"</span><span class="p">:</span> <span class="s2">"Constraint"</span><span class="p">,</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="s2">"constraint_info.nonlinear_violation"</span><span class="p">:</span> <span class="s2">"Violation"</span><span class="p">,</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="n">EVALUATIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    <span class="s2">"evaluations.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>    <span class="s2">"evaluations.constraints"</span><span class="p">:</span> <span class="s2">"Constraint"</span><span class="p">,</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="p">}</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="n">GRADIENTS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>    <span class="s2">"gradients.objectives"</span><span class="p">:</span> <span class="s2">"Objective gradient"</span><span class="p">,</span>
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>    <span class="s2">"gradients.constraints"</span><span class="p">:</span> <span class="s2">"Constraint gradient"</span><span class="p">,</span>
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="p">}</span>
+</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="n">PERTURBATIONS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>    <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="s2">"Realization"</span><span class="p">,</span>
+</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>    <span class="s2">"perturbation"</span><span class="p">:</span> <span class="s2">"Perturbation"</span><span class="p">,</span>
+</span><span id="__span-7-25"><a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>    <span class="s2">"perturbed_variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
+</span><span id="__span-7-26"><a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>    <span class="s2">"evaluations.perturbed_objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
+</span><span id="__span-7-27"><a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>One handler holds all four tables. The second argument of <code>add_table</code> selects
 the results that fill the table:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="s2">"functions"</span><span class="p">,</span> <span class="s2">"functions"</span><span class="p">,</span> <span class="n">FUNCTIONS</span><span class="p">)</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="s2">"evaluations"</span><span class="p">,</span> <span class="s2">"functions"</span><span class="p">,</span> <span class="n">EVALUATIONS</span><span class="p">)</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="s2">"gradients"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">,</span> <span class="n">GRADIENTS</span><span class="p">)</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="s2">"perturbations"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">,</span> <span class="n">PERTURBATIONS</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="s2">"functions"</span><span class="p">,</span> <span class="s2">"functions"</span><span class="p">,</span> <span class="n">FUNCTIONS</span><span class="p">)</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="s2">"evaluations"</span><span class="p">,</span> <span class="s2">"functions"</span><span class="p">,</span> <span class="n">EVALUATIONS</span><span class="p">)</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="s2">"gradients"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">,</span> <span class="n">GRADIENTS</span><span class="p">)</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span><span class="s2">"perturbations"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">,</span> <span class="n">PERTURBATIONS</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The handler is passed to <code>optimize</code>, and the tables are read after it returns:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The <code>functions</code> table has the columns <code>Batch</code>, <code>Variable,x</code>, <code>Variable,y</code>,
 <code>Target objective</code>, <code>Objective,0</code>, <code>Constraint,limit</code> and <code>Violation,limit</code>. The
@@ -3398,20 +3381,110 @@ objective is not named in <code>names</code>, so its column uses the index <code
 <p><code>set_callback</code> fires on every update, so it is a convenient hook for saving
 the tables — to watch progress live or to write a final report. Pandas'
 <code>to_string()</code> gives aligned, human-readable columns with no extra
-dependencies; use <code>to_csv()</code> for machine-readable data, or <code>to_markdown()</code>
-if you have <code>tabulate</code> installed:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"progress.txt"</span><span class="p">)</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"progress.txt"</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"# </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
+dependencies; use <code>to_csv()</code> for machine-readable data:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"progress.txt"</span><span class="p">)</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"progress.txt"</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"# </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
 </span></code></pre></div>
 <p>Because this writes to disk on every update, the optimization that emitted
 the result waits for the write to finish.</p>
 </div>
+<h3 id="callbackhandler"><code>CallbackHandler</code></h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.CallbackHandler" href="../../reference/api/#ropt.CallbackHandler"><code>CallbackHandler</code></a> forwards selected events to a
+function. Usually, <code>result_callback=</code> is sufficient for reporting results
+or stopping an optimization when a criterion is met. Use <code>CallbackHandler</code>
+when the function needs the event itself, including notifications that do
+not carry results. It also provides a way to
+<a href="#sharing-a-handler-across-concurrent-runs">share a callback with a lock</a>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackHandler</span><span class="p">,</span> <span class="n">optimize</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptEventType</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptEvent</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="k">def</span><span class="w"> </span><span class="nf">report_finished</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"Optimization finished:"</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">event_type</span><span class="p">)</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="n">handler</span> <span class="o">=</span> <span class="n">CallbackHandler</span><span class="p">(</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_OPTIMIZER</span><span class="p">},</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>    <span class="n">callback</span><span class="o">=</span><span class="n">report_finished</span><span class="p">,</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="p">)</span>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="n">outcome</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">handler</span><span class="p">])</span>
+</span></code></pre></div>
+<p>Unlike a result callback, this function receives an <code>EnOptEvent</code> and its return
+value is ignored. Where the event provides a <code>stop</code> callable, call
+<code>event.stop()</code> to request stopping the optimization. To process evaluation
+results, subscribe to <code>FINISHED_EVALUATION</code> and iterate over <code>event.results</code>.</p>
+<h2 id="sharing-a-handler-across-concurrent-runs">Sharing a handler across optimizations</h2>
+<p>Reuse a handler across sequential optimizations to collect their results
+in one place:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">:</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+</span></code></pre></div>
+<p>The same handler can also be shared by optimizations running concurrently
+on threads. Pass the <strong>same handler object</strong> to each optimization:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">session</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    <span class="n">optimizations</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        <span class="n">partial</span><span class="p">(</span><span class="n">optimize</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>        <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="p">]</span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>    <span class="n">run</span><span class="p">(</span><span class="n">optimizations</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">start_points</span><span class="p">)))</span>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+</span></code></pre></div>
+<p>A handler's <a class="autorefs autorefs-internal" title="            handle_event" href="../../reference/api/#ropt.EventHandler.handle_event"><code>handle_event</code></a> holds its lock
+while processing each event. A second optimization waits for the first to
+finish, so no additional lock is needed merely because they share the
+handler. Slow work in the handler delays every optimization using it.</p>
+<p>The <a href="../../running/running/#reporting-progress">result callback</a> is implemented
+by a handler created separately for each optimization. Passing the same
+function as <code>result_callback=</code> therefore does not share a lock: the function
+can be called concurrently. If it updates shared data, provide synchronization
+yourself or use <strong>one shared <a href="#callbackhandler"><code>CallbackHandler</code></a></strong> instead.
+Its lock covers the whole callback invocation. Creating a separate
+<code>CallbackHandler</code> for each optimization does not provide a shared lock.</p>
+<p>The results arrive interleaved, in an order that depends on which
+optimization reaches the handler first. Use <code>batch_id</code> or a <code>metadata</code> field
+set per optimization to identify them, rather than their arrival order.</p>
+<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/handlers.py">examples/handlers.py</a>
+feeds two handlers from the same set of concurrent optimizations:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="n">job</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>        <span class="n">optimize</span><span class="p">,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>        <span class="n">CONFIG</span><span class="p">,</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>        <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">STARTS</span><span class="p">)),</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>        <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">,</span> <span class="n">per_run</span><span class="p">],</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="p">)</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="n">run</span><span class="p">(</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>        <span class="p">[</span><span class="n">partial</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span> <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">STARTS</span><span class="p">],</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>        <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">STARTS</span><span class="p">)),</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    <span class="p">)</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Do not start an optimization from inside a handler that it can reach</p>
+<p>A handler holds its lock while processing an event. If it starts an
+optimization that uses the same handler, that optimization tries to
+acquire the lock again. On the same thread, this raises
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. On another thread, it
+waits for the lock while the first thread waits for the optimization,
+causing a deadlock. Two handlers can cause the same problem if each starts
+an optimization using the other. Give inner optimizations their own handlers.</p>
+</div>
+<p>Two handlers that write to the same external state each have their own lock,
+so they can still run at the same time. Use a shared
+<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/threading.html#threading.Lock"><code>threading.Lock</code></a> inside both <code>_handle_event</code> implementations
+if those operations must not overlap.</p>
 <h2 id="writing-your-own-handler">Writing your own handler</h2>
 <p>The built-in handlers above, and the result callback, cover the results an
 optimization produces. A handler of your own is for everything else: reacting to
@@ -3429,27 +3502,27 @@ own, or keeping a summary that none of the built-ins keeps.</p>
       dataclass
   " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> of those types.</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptEventType</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptEvent</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventHandler</span><span class="p">,</span> <span class="n">optimize</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="k">class</span><span class="w"> </span><span class="nc">CountEvaluations</span><span class="p">(</span><span class="n">EventHandler</span><span class="p">):</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>
-</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="nd">@property</span>
-</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">event_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>        <span class="k">return</span> <span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">}</span>
-</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>
-</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-13-16"><a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
-</span><span id="__span-13-17"><a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>
-</span><span id="__span-13-18"><a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>
-</span><span id="__span-13-19"><a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="n">counter</span> <span class="o">=</span> <span class="n">CountEvaluations</span><span class="p">()</span>
-</span><span id="__span-13-20"><a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">counter</span><span class="p">])</span>
-</span><span id="__span-13-21"><a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a><span class="nb">print</span><span class="p">(</span><span class="n">counter</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptEventType</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptEvent</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventHandler</span><span class="p">,</span> <span class="n">optimize</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="k">class</span><span class="w"> </span><span class="nc">CountEvaluations</span><span class="p">(</span><span class="n">EventHandler</span><span class="p">):</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>    <span class="nd">@property</span>
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">event_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>        <span class="k">return</span> <span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">}</span>
+</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>
+</span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-15-16"><a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+</span><span id="__span-15-17"><a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>
+</span><span id="__span-15-18"><a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>
+</span><span id="__span-15-19"><a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="n">counter</span> <span class="o">=</span> <span class="n">CountEvaluations</span><span class="p">()</span>
+</span><span id="__span-15-20"><a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">counter</span><span class="p">])</span>
+</span><span id="__span-15-21"><a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="nb">print</span><span class="p">(</span><span class="n">counter</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
 </span></code></pre></div>
 <p>An <a class="autorefs autorefs-internal" title="            EnOptEvent
 
@@ -3565,14 +3638,6 @@ works over a network.</p>
 only in memory — setting a module global, appending to a shared list, updating an
 object — happened <strong>inside the worker</strong> and is discarded when it finishes; your
 handlers and your main program never see it.</p>
-<div class="admonition note">
-<p class="admonition-title">Pools stay in the main process</p>
-<p>A pool is tied to the process that opened its session, so it is not usable
-in a worker. An objective that closes over one — to run work with it, or to
-start an inner optimization with it — is stopped in the worker, which reports the
-object by name. Do that work in the objective itself, or return what you
-need and act on it in the main process.</p>
-</div>
 <p>So to get extra information from an evaluation to a handler (or to a later part
 of your program), <strong>return it</strong> instead of stashing it in shared state: attach it
 to the result's <code>metadata</code> (see <a href="../../running/running/#attaching-metadata">Attaching metadata</a>), which
