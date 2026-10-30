@@ -1,9 +1,9 @@
 # Configuration
 
-Every `ropt` optimization is described by a configuration dictionary. This
-page covers what that dictionary becomes, the rules that apply to all of it, and
-how the pieces fit together. For the field-by-field description of each section,
-see [Configuration Sections](configuration_sections.md).
+Every `ropt` optimization is described by a configuration dictionary. This page
+covers what that dictionary holds, the rules that apply to it, and how the
+pieces fit together. For the field-by-field description of each section, see
+[Configuration Sections](configuration_sections.md).
 
 ## The configuration object
 
@@ -220,9 +220,11 @@ new optimization.
 
 ## Naming things for output
 
-One section describes nothing about the problem itself. `names` attaches labels
-to the parts of an optimization — the variables, the objectives, the
-realizations, and the rest — so that results come back readable:
+The [`names`](configuration_sections.md#names) section attaches labels to
+variables, objectives, realizations and other items in
+[exported results](../results/results.md). For example,
+[examples/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py)
+uses:
 
 ```python
 "names": {
@@ -232,24 +234,23 @@ realizations, and the rest — so that results come back readable:
 },
 ```
 
-Each key selects an axis, and each value is a tuple as long as that axis, so
-three variables take three labels. Axes left unnamed keep their integer indices,
-which is what a reader sees in place of a label. A key may also be the
-name of a metadata entry holding array values, which labels the axis that
-metadata spans.
+Each key specifies what to label: `"variable"` labels the variables,
+`"objective"` labels the objectives, and `"realization"` labels the
+realizations. The tuple must contain one label per item, in the same order,
+so three variables need three labels. Items without labels are identified by
+their integer positions instead. When you export results to a table, the labels
+appear in its row index by default; you can also move a dimension into the
+column names. See [Working with Results](../results/results.md#exporting-to-pandas)
+for examples.
 
-Labels are not purely decorative. Some components use them to identify the items
-they are given instead of relying on position, which lets results be matched
-between optimizations whose ordering differs. That applies to the realization
-names; the others affect only how a printed table reads.
+You can also label the elements of an array returned as metadata. Use the
+metadata entry's name as the key and provide one label per array element, as
+shown in
+[examples/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py).
 
-[examples/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/export.py)
-names variables, objectives and realizations before exporting to a frame, and
-[examples/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/metadata.py)
-names a metadata axis. The accepted axis names are listed under
-[`names`](configuration_sections.md#names), and
-[Working with Results](../results/results.md) shows how the labels appear in an
-exported table.
+Labels do not change how the optimizer interprets values or matches reused
+evaluations: those operations depend on position, not labels. Keep the ordering
+consistent when reusing results between optimizations.
 
 ## A worked example
 

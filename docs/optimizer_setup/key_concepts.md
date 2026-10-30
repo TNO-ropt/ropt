@@ -21,20 +21,16 @@ per-realization values into a single objective number.
 
 Variables, objectives and constraints are identified by their positions in
 vectors and configuration arrays. An optional `names` section in the config
-dictionary attaches labels to them for reporting, including exported
-DataFrames; the labels do not change how the optimizer uses the values. See
-[Positions and labels](../getting_started/quickstart.md#positions-and-labels)
-for an example and the [`names`](configuration_sections.md#names) section for
-the available labels.
+dictionary attaches labels to them for reporting; the labels do not change how
+the optimizer uses the values. See [Positions and
+labels](../getting_started/quickstart.md#positions-and-labels) for an example
+and the [`names`](configuration_sections.md#names) section for the available
+labels.
 
 Most optimizers also need a **gradient evaluation**. The objective usually
 cannot be differentiated by hand, so `ropt` estimates it: it evaluates small
 **perturbations** of the variable vector and infers the gradient from the
 differences.
-
-The optimizer does not request these points one at a time. It groups them into
-**batches** that are evaluated together, and it works through the problem in
-**iterations**, where each iteration is one step of the algorithm.
 
 ## Optimization components
 

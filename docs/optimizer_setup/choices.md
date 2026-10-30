@@ -127,12 +127,10 @@ methods do not use these settings. The main choices are:
 - **Per-realization or merged estimates:** by default, a gradient is estimated
   for each realization and the results are combined. With
   `merge_realizations`, all realizations contribute to a single estimate, which
-  needs fewer perturbations. The `stddev` function estimator requires
-  per-realization gradients.
+  needs fewer perturbations.
 - **Samplers:** how perturbations are drawn, and whether all realizations use
   the same perturbed values.
-- **Seed:** the same seed reproduces the same perturbations. Concurrent or
-  nested optimizations need different seeds to draw different perturbations.
+- **Seed:** the same seed reproduces the same perturbations.
 - **Evaluation policy:** whether function and gradient evaluations follow the
   optimizer's requests, always run as separate batches, or the gradient is
   evaluated with every function evaluation. Separate evaluation allows

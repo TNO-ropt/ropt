@@ -1,10 +1,10 @@
 # Configuration Sections
 
-Every section of a configuration dictionary, field by field, with its default
-value. For what that dictionary becomes, the rules that apply across all of it,
-and a fully expanded configuration showing every default at once, see
-[Configuration](configuration.md); for the generated class
-documentation, see [Configuration Classes](../reference/config.md).
+This page documents the fields in each configuration section and their default
+values. For an overview of how the configuration dictionary is validated and
+used, and a complete example showing all defaults, see
+[Configuration](configuration.md). For the generated API reference for each
+configuration class, see [Configuration Classes](../reference/config.md).
 
 ## `variables` { #variables }
 
