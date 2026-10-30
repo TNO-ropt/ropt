@@ -2567,18 +2567,15 @@ realization is one version of the model. A <strong>function evaluation</strong> 
 per-realization values into a single objective number.</p>
 <p>Variables, objectives and constraints are identified by their positions in
 vectors and configuration arrays. An optional <code>names</code> section in the config
-dictionary attaches labels to them for reporting, including exported
-DataFrames; the labels do not change how the optimizer uses the values. See
-<a href="../../getting_started/quickstart/#positions-and-labels">Positions and labels</a>
-for an example and the <a href="../configuration_sections/#names"><code>names</code></a> section for
-the available labels.</p>
+dictionary attaches labels to them for reporting; the labels do not change how
+the optimizer uses the values. See <a href="../../getting_started/quickstart/#positions-and-labels">Positions and
+labels</a> for an example
+and the <a href="../configuration_sections/#names"><code>names</code></a> section for the available
+labels.</p>
 <p>Most optimizers also need a <strong>gradient evaluation</strong>. The objective usually
 cannot be differentiated by hand, so <code>ropt</code> estimates it: it evaluates small
 <strong>perturbations</strong> of the variable vector and infers the gradient from the
 differences.</p>
-<p>The optimizer does not request these points one at a time. It groups them into
-<strong>batches</strong> that are evaluated together, and it works through the problem in
-<strong>iterations</strong>, where each iteration is one step of the algorithm.</p>
 <h2 id="optimization-components">Optimization components</h2>
 <p>Several parts of an optimization are pluggable: you select them in the
 configuration and <code>ropt</code> configures them for you. Four kinds of component can be
