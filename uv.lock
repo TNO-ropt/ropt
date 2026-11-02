@@ -1161,16 +1161,16 @@ wheels = [
 
 [[package]]
 name = "pysqa"
-version = "1.1.1"
+version = "1.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jinja2" },
     { name = "pandas" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5a/91/f4724526c3d2676fc5a3bbc80979f6bb63495717d79255ca1aa591855a35/pysqa-1.1.1.tar.gz", hash = "sha256:ec3d103feee9eceaf36d698650e77a9b2c3f5cebf9aa3bd3c8702ce1a99d525a", size = 25658, upload-time = "2026-10-25T06:24:07.848Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/28/c4/660bdf4fb5a8bcbb518f978b684e6f70a22589bfa962607fa78828469227/pysqa-1.1.2.tar.gz", hash = "sha256:d6eafb77fdedd38259356e1e97c01bec8dc780b93728db2d50d7441b147eb6d9", size = 25526, upload-time = "2026-11-02T09:26:27.362Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d6/0f/f07311a5fab9d6e3bc6a8481d9c811a061a0c47829b65555d8bb0310f2ca/pysqa-1.1.1-py3-none-any.whl", hash = "sha256:2af0d468f81cdf3ccab3381e2dc13ae13eae48e336c581850dcd438ff3c085a5", size = 38523, upload-time = "2026-10-25T06:24:06.417Z" },
+    { url = "https://files.pythonhosted.org/packages/4c/f7/7462352de6402ac58cc10449335bd7a02b68e4df3fcc2a218f23513e3c3e/pysqa-1.1.2-py3-none-any.whl", hash = "sha256:ffb1bd0ff4019fa0e8bf17153fa657cb68abc35ebcee18e4f6f85505d9c845d5", size = 38155, upload-time = "2026-11-02T09:26:26.181Z" },
 ]
 
 [[package]]
