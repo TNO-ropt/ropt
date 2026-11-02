@@ -8,11 +8,15 @@ cluster-specific configuration that goes with them.
 
 from __future__ import annotations
 
+import math
+import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sysconfig
+from functools import partial
 from importlib.util import find_spec
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, override
 
+from ropt._logging import get_logger
 from ropt.exceptions import ExecutionError
 
 from ._job_executor import JobExecutorBase
@@ -25,6 +29,8 @@ if TYPE_CHECKING:
 _HAVE_HPC: Final = find_spec("pysqa") is not None
 
 _DEFAULT_SCHEDULER: Final = "slurm"
+_SCHEDULER_TIMEOUT: Final = 60.0
+_logger = get_logger(__name__)
 
 _RESERVED_SUBMIT_OPTIONS: Final = frozenset(
     {
@@ -56,6 +62,7 @@ class HPCExecutor(JobExecutorBase):
 
     _kind = "HPC"
     _backend_name = "HPC scheduler"
+    _stop_after_cancel_failure = True
 
     def __init__(  # ruff: ignore[too-many-arguments]
         self,
@@ -74,6 +81,7 @@ class HPCExecutor(JobExecutorBase):
         submit_options: dict[str, Any] | None = None,
         extra_polls: int = 30,
         query_retries: int = 30,
+        timeout: float = _SCHEDULER_TIMEOUT,
         cleanup: bool = True,
     ) -> None:
         """Initialize the HPC executor.
@@ -127,7 +135,8 @@ class HPCExecutor(JobExecutorBase):
             submit_options: Extra variables for the submission script.
             extra_polls:    Extra polls to wait for a work item's result.
             query_retries:  Extra attempts to query the scheduler after one fails.
-            cleanup:        Whether to remove a work item's files once it settles.
+            timeout:         Maximum seconds for each scheduler command.
+            cleanup:         Whether to remove a work item's files once it settles.
 
         Raises:
             ValueError:     If an argument is out of range or the modes are mixed.
@@ -145,8 +154,12 @@ class HPCExecutor(JobExecutorBase):
                 f"The number of HPC query retries must not be negative: {query_retries}"
             )
             raise ValueError(msg)
+        if not math.isfinite(timeout) or timeout <= 0:
+            msg = f"The HPC scheduler command timeout must be positive and finite: {timeout}"
+            raise ValueError(msg)
         # Set before the base builds its shared state, which reads it.
         self._query_retries = query_retries
+        self._scheduler_timeout = timeout
         super().__init__(
             workdir=workdir,
             workers=workers,
@@ -175,18 +188,22 @@ class HPCExecutor(JobExecutorBase):
                     "provide a config_path or a template."
                 )
                 raise ExecutionError(msg)
-            self._queue_adapter = pysqa.QueueAdapter(directory=str(resolved))
+            self._queue_adapter = pysqa.QueueAdapter(
+                directory=str(resolved),
+                execute_command=partial(_execute_command, timeout=timeout),
+            )
             _select_cluster(self._queue_adapter, cluster, queue)
         else:
             _reject_configuration_arguments(config_path, cluster, queue)
             self._queue_adapter = pysqa.QueueAdapter(
-                queue_type=_DEFAULT_SCHEDULER if scheduler is None else scheduler
+                queue_type=_DEFAULT_SCHEDULER if scheduler is None else scheduler,
+                execute_command=partial(_execute_command, timeout=timeout),
             )
 
     @override
     def _start_job(self, bundle_id: UUID, command: list[str]) -> int:
-        return int(
-            self._queue_adapter.submit_job(
+        try:
+            job_id = self._queue_adapter.submit_job(
                 job_name=str(bundle_id),
                 output=f"{bundle_id}.txt",
                 working_directory=str(self._workdir),
@@ -198,7 +215,17 @@ class HPCExecutor(JobExecutorBase):
                 run_time_max=self._run_time_max,
                 **self._submit_options,
             )
-        )
+        except subprocess.TimeoutExpired:
+            _logger.warning(
+                "The scheduler command to submit HPC job %s timed out after %s "
+                "seconds; the scheduler may have accepted it. Check for job name "
+                "%s and cancel it if it is queued.",
+                bundle_id,
+                self._scheduler_timeout,
+                bundle_id,
+            )
+            raise
+        return int(job_id)
 
     @override
     def _live_job_ids(self) -> set[int]:
@@ -210,6 +237,32 @@ class HPCExecutor(JobExecutorBase):
     @override
     def _cancel_job(self, job_id: int) -> None:
         self._queue_adapter.delete_job(job_id)
+
+
+def _execute_command(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
+    commands: str | list[str],
+    working_directory: str | None = None,
+    split_output: bool = True,  # ruff: ignore[boolean-type-hint-positional-argument, boolean-default-value-positional-argument]
+    shell: bool = False,  # ruff: ignore[boolean-type-hint-positional-argument, boolean-default-value-positional-argument]
+    error_filename: str = "pysqa.err",
+    timeout: float = _SCHEDULER_TIMEOUT,
+) -> str | list[str] | None:
+    if shell and isinstance(commands, list):
+        commands = " ".join(commands)
+    try:
+        output = subprocess.check_output(  # ruff: ignore[subprocess-without-shell-equals-true]
+            commands,
+            cwd=working_directory,
+            stderr=subprocess.STDOUT,
+            text=True,
+            shell=not isinstance(commands, list),
+            timeout=timeout,
+        )
+    except subprocess.CalledProcessError as exc:
+        error_file = Path(working_directory or ".") / error_filename
+        error_file.write_text(f"{exc.stdout}\n")
+        return None
+    return output.split("\n") if split_output else output
 
 
 def _checked_submit_options(options: dict[str, Any] | None) -> dict[str, Any]:

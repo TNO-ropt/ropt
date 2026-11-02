@@ -70,6 +70,7 @@ from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 if TYPE_CHECKING:
     from collections.abc import Callable, Generator, Sequence
     from pathlib import Path
+    from types import FrameType
 
     from numpy.typing import NDArray
 
@@ -1184,6 +1185,116 @@ else:
         raise RuntimeError((monkeypatch, adapter))
 
 
+def test_hpc_scheduler_command_timeout() -> None:
+    command = [
+        sys.executable,
+        "-c",
+        "import threading; threading.Event().wait()",
+    ]
+    with pytest.raises(subprocess.TimeoutExpired):
+        _hpc_executor._execute_command(command, timeout=0.1)
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+@pytest.mark.parametrize("configuration", ["template", "directory"])
+def test_hpc_executor_passes_timeout_to_pysqa(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, configuration: str
+) -> None:
+    adapter_arguments: dict[str, Any] = {}
+
+    class _QueueAdapter:
+        def __init__(self, *_args: Any, **kwargs: Any) -> None:
+            adapter_arguments.update(kwargs)
+
+        @staticmethod
+        def list_clusters() -> list[str]:
+            return []
+
+    monkeypatch.setattr(
+        "ropt._executors._hpc_executor.pysqa.QueueAdapter", _QueueAdapter
+    )
+    arguments: dict[str, Any] = (
+        {"config_path": tmp_path} if configuration == "directory" else {"template": ""}
+    )
+    HPCExecutor(workdir=tmp_path, timeout=0.1, **arguments)
+    execute_command = adapter_arguments["execute_command"]
+    command = [
+        sys.executable,
+        "-c",
+        "import threading; threading.Event().wait()",
+    ]
+    with pytest.raises(subprocess.TimeoutExpired):
+        execute_command(command)
+
+
+def test_hpc_scheduler_command_failure_writes_pysqa_error_file(
+    tmp_path: Path,
+) -> None:
+    command = [sys.executable, "-c", "print('refused'); raise SystemExit(1)"]
+    assert _hpc_executor._execute_command(command, str(tmp_path)) is None
+    assert (tmp_path / "pysqa.err").read_text().strip() == "refused"
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+def test_hpc_submission_timeout_warns_that_job_may_be_queued(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    class _TimedOutSubmit(MockedHPCAdapter):
+        submitted_name: str | None = None
+
+        @override
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
+            self.submitted_name = job_name
+            raise subprocess.TimeoutExpired(["sbatch"], timeout=0.1)
+
+    adapter = _TimedOutSubmit(tmp_path)
+    _mock_scheduler(monkeypatch, adapter)
+    executor = HPCExecutor(workdir=tmp_path, timeout=0.1, template="")
+    with (
+        caplog.at_level(logging.WARNING, logger="ropt.executors"),
+        pytest.raises(subprocess.TimeoutExpired),
+    ):
+        executor.run([WorkItem(function=_function, args=(0,))])
+    assert adapter.submitted_name is not None
+    assert "may have accepted it" in caplog.text
+    assert f"job name {adapter.submitted_name}" in caplog.text
+
+
+def test_job_executor_stops_cancelling_after_a_failure(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    class _FailingCancel(_ControlledJobExecutor):
+        _stop_after_cancel_failure = True
+
+        @override
+        def _cancel_job(self, job_id: int) -> None:
+            self.cancelled.append(job_id)
+            msg = "cancel command failed"
+            raise RuntimeError(msg)
+
+    executor = _FailingCancel(tmp_path)
+    with caplog.at_level(logging.WARNING, logger="ropt"):
+        executor._cancel_jobs([(uuid4(), 1), (uuid4(), 2), (uuid4(), 3)])
+    assert executor.cancelled == [1]
+    assert "Did not try to cancel the remaining" in caplog.text
+    assert "job ids: 2, 3" in caplog.text
+
+
+def test_job_executor_keeps_cancelling_after_a_failure_by_default(
+    tmp_path: Path,
+) -> None:
+    class _FailingCancel(_ControlledJobExecutor):
+        @override
+        def _cancel_job(self, job_id: int) -> None:
+            self.cancelled.append(job_id)
+            msg = "cancel command failed"
+            raise RuntimeError(msg)
+
+    executor = _FailingCancel(tmp_path)
+    executor._cancel_jobs([(uuid4(), 1), (uuid4(), 2), (uuid4(), 3)])
+    assert executor.cancelled == [1, 2, 3]
+
+
 @pytest.mark.parametrize(
     "executor_name",
     [
@@ -1760,6 +1871,9 @@ def test_unconfigured_hpc_executor_rejected(
         ({"workers": -1}, "workers must be at least one"),
         ({"interval": -1.0}, "interval must not be negative"),
         ({"extra_polls": -1}, "extra polls must not be negative"),
+        ({"timeout": 0.0}, "timeout must be positive and finite"),
+        ({"timeout": float("inf")}, "timeout must be positive and finite"),
+        ({"timeout": float("nan")}, "timeout must be positive and finite"),
     ],
 )
 def test_hpc_out_of_range_setting_rejected(
@@ -1880,6 +1994,30 @@ def test_hpc_pool_local_queue_keeps_explicit_polling_settings(tmp_path: Path) ->
         assert isinstance(executor, LocalJobExecutor)
         assert executor._state._interval == pytest.approx(0.5)
         assert executor._extra_polls_limit == 3
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+def test_hpc_pool_passes_scheduler_command_timeout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
+    with session() as opened:
+        pool = opened.hpc_pool(workdir=tmp_path, template="", timeout=3.0)
+        executor = _executor_of(pool)
+        assert isinstance(executor, HPCExecutor)
+        assert executor._scheduler_timeout == pytest.approx(3.0)
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+def test_hpc_pool_defaults_scheduler_command_timeout_to_one_minute(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
+    with session() as opened:
+        pool = opened.hpc_pool(workdir=tmp_path, template="")
+        executor = _executor_of(pool)
+        assert isinstance(executor, HPCExecutor)
+        assert executor._scheduler_timeout == pytest.approx(60.0)
 
 
 @pytest.mark.parametrize(
@@ -2745,3 +2883,68 @@ def test_job_executor_launch_only_claim_spends_no_retry(tmp_path: Path) -> None:
     assert results == [1]
     assert state._last_query == last_query
     assert state._query_failures == 1
+
+
+class _InterruptedError(Exception):
+    pass
+
+
+@pytest.mark.skipif(
+    not hasattr(signal, "pthread_kill") or not hasattr(signal, "SIGUSR1"),
+    reason="pthread_kill and SIGUSR1 are required",
+)
+def test_job_executor_cancel_thread_survives_an_interrupted_wait(
+    tmp_path: Path,
+) -> None:
+    entered = threading.Event()
+    release = threading.Event()
+    handled = threading.Event()
+    raised: list[bool] = []
+
+    class _BlockingCancel(_ControlledJobExecutor):
+        @override
+        def _cancel_job(self, job_id: int) -> None:
+            entered.set()
+            assert release.wait(timeout=5.0)
+            super()._cancel_job(job_id)
+
+    def _handler(_signum: int, frame: FrameType | None) -> None:
+        # Ignore signals until the main thread is in the cancellation wait.
+        caller = frame.f_back.f_back if frame and frame.f_back else None
+        waiting = caller is not None and caller.f_code.co_name == "_cancel_jobs"
+        raised.append(waiting)
+        handled.set()
+        if waiting:
+            raise _InterruptedError
+
+    executor = _BlockingCancel(tmp_path)
+    with executor._state._lock:
+        executor._state._jobs[uuid4()] = 1
+    main = threading.get_ident()
+
+    def _interrupt() -> None:
+        assert entered.wait(timeout=5.0)
+        while not any(raised):
+            handled.clear()
+            signal.pthread_kill(main, signal.SIGUSR1)
+            assert handled.wait(timeout=5.0)
+
+    previous = signal.signal(signal.SIGUSR1, _handler)
+    interrupter = threading.Thread(target=_interrupt)
+    interrupter.start()
+    try:
+        with pytest.raises(_InterruptedError):
+            executor._cancel_all_jobs()
+        cancelling = [
+            thread
+            for thread in threading.enumerate()
+            if thread.name == "ropt-job-cancel"
+        ]
+        assert [thread.is_alive() for thread in cancelling] == [True]
+    finally:
+        signal.signal(signal.SIGUSR1, previous)
+        release.set()
+        interrupter.join(timeout=5.0)
+    for thread in cancelling:
+        thread.join(timeout=5.0)
+    assert executor.cancelled == [1]

@@ -27,7 +27,7 @@ from ropt._executors import (
     ProcessExecutor,
     ThreadExecutor,
 )
-from ropt._executors._hpc_executor import clusters_with_queue
+from ropt._executors._hpc_executor import _SCHEDULER_TIMEOUT, clusters_with_queue
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, WorkflowError
 
@@ -220,6 +220,7 @@ class Session:
         submit_options: dict[str, Any] | None = None,
         extra_polls: int | None = None,
         query_retries: int = 30,
+        timeout: float = _SCHEDULER_TIMEOUT,
         cleanup: bool = True,
     ) -> WorkerPool:
         """Create a pool that runs evaluations on an HPC cluster.
@@ -235,9 +236,9 @@ class Session:
         The queue `"local"` without a `cluster` runs each job as a process on
         this machine instead, with the same job files and the same rule for the
         evaluation function. It needs neither `pysqa` nor a configuration, and
-        it ignores `cores`, `memory_max`, `run_time_max`, `submit_options` and
-        `query_retries`. It is an error if a configured cluster also has a
-        queue named `"local"`; pass that `cluster` to submit to it.
+        it ignores `cores`, `memory_max`, `run_time_max`, `submit_options`,
+        `query_retries` and `timeout`. It is an error if a configured cluster
+        also has a queue named `"local"`; pass that `cluster` to submit to it.
 
         A `template` is the alternative to a configuration: it cannot be
         combined with `config_path`, `cluster` or `queue`. See [Running on an
@@ -261,12 +262,15 @@ class Session:
             extra_polls:    Extra polls to wait for a work item's result
                             (default: 30, or 0 for local jobs).
             query_retries:  Times the cluster is re-polled for a result.
+            timeout:        Maximum seconds for each scheduler command
+                            (default: 60).
             cleanup:        Whether to remove the job files afterwards.
 
         Returns:
             A pool backed by an HPC cluster, or by local job processes.
 
         Raises:
+            ValueError: If `timeout` is not positive and finite.
             WorkflowError: If this session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
         if queue == _LOCAL_QUEUE and cluster is None:
@@ -298,6 +302,7 @@ class Session:
                 submit_options=submit_options,
                 extra_polls=30 if extra_polls is None else extra_polls,
                 query_retries=query_retries,
+                timeout=timeout,
                 cleanup=cleanup,
             )
         )

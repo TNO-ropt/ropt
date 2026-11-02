@@ -321,6 +321,7 @@ class JobExecutorBase(ExecutorBase):
     # Names this kind of job in log messages, and the thing that runs them.
     _kind = "job"
     _backend_name = "backend"
+    _stop_after_cancel_failure = False
 
     # Extra attempts to query the backend after one fails. A backend that can
     # have a bad moment raises this; one that cannot has nothing to wait for.
@@ -497,13 +498,14 @@ class JobExecutorBase(ExecutorBase):
     def _cancel_jobs(self, jobs: list[tuple[UUID, int]]) -> None:
         if not jobs:
             return
-        # On a thread of its own, joined: cancelling is one backend call per
+        # On a thread of its own, waited for: cancelling is one backend call per
         # job, and this runs on a thread that may have been interrupted. A
-        # second interrupt then breaks the join rather than the cancelling, and
+        # second interrupt then breaks the wait rather than the cancelling, and
         # the thread is not a daemon, so the interpreter still waits for it.
+        done = threading.Event()
         thread = threading.Thread(
-            target=self._cancel_jobs_now,
-            args=(jobs,),
+            target=self._cancel_jobs_then_set,
+            args=(jobs, done),
             name=f"ropt-{self._kind}-cancel",
             daemon=False,
         )
@@ -513,26 +515,51 @@ class JobExecutorBase(ExecutorBase):
             # No new threads at interpreter shutdown.
             self._cancel_jobs_now(jobs)
             return
-        thread.join()
+        # Not `join`: on Python 3.12 an interrupted join marks the thread as
+        # finished, and the interpreter then exits without waiting for it.
+        done.wait()
+
+    def _cancel_jobs_then_set(
+        self, jobs: list[tuple[UUID, int]], done: threading.Event
+    ) -> None:
+        try:
+            self._cancel_jobs_now(jobs)
+        finally:
+            done.set()
 
     def _cancel_jobs_now(self, jobs: list[tuple[UUID, int]]) -> None:
+        # After one failure the rest are not tried: a backend that did not
+        # answer once would make each of them wait just as long.
+        skipped: list[int] = []
+        gave_up = False
         for bundle_id, job_id in jobs:
-            try:
-                self._cancel_job(job_id)
-            except Exception as exc:  # ruff: ignore[blind-except]
-                _logger.warning(
-                    "Could not cancel %s job %s (job id: %s): %s",
-                    self._kind,
-                    bundle_id,
-                    job_id,
-                    exc,
-                )
+            if gave_up and self._stop_after_cancel_failure:
+                skipped.append(job_id)
             else:
-                _logger.debug(
-                    "Cancelled %s job %s (job id: %s)", self._kind, bundle_id, job_id
-                )
+                gave_up = not self._try_cancel_job(bundle_id, job_id) or gave_up
             if self._remove_files:
                 self._cleanup_files(bundle_id)
+        if skipped:
+            _logger.warning(
+                "Did not try to cancel the remaining %s jobs (job ids: %s)",
+                self._kind,
+                ", ".join(str(job_id) for job_id in skipped),
+            )
+
+    def _try_cancel_job(self, bundle_id: UUID, job_id: int) -> bool:
+        try:
+            self._cancel_job(job_id)
+        except Exception as exc:  # ruff: ignore[blind-except]
+            _logger.warning(
+                "Could not cancel %s job %s (job id: %s): %s",
+                self._kind,
+                bundle_id,
+                job_id,
+                exc,
+            )
+            return False
+        _logger.debug("Cancelled %s job %s (job id: %s)", self._kind, bundle_id, job_id)
+        return True
 
     def _launch_job(self, bundle_id: UUID, item: WorkItem) -> int:
         existing = any(

@@ -190,6 +190,12 @@ with session() as s:
     result = optimize(config, x0, objective, pool=pool)
 ```
 
+Each scheduler command used to submit, query, or cancel jobs has a 60-second
+timeout by default. Set `timeout` to change it. If a submission command times
+out, the scheduler may still have accepted the job; ropt warns with its job
+name, which is a UUID. Check the scheduler and cancel that job if it was
+submitted. This timeout does not apply to `pysqa`'s remote adapter.
+
 The runnable script is
 [examples/hpc.py](https://github.com/TNO-ropt/ropt/blob/main/examples/hpc.py).
 Pass it `--queue local` and it runs the identical optimization on
@@ -212,10 +218,10 @@ cluster:
 pool = s.hpc_pool(workers=4, queue="local", workdir="/scratch/my-run")
 ```
 
-The cluster settings `cores`, `memory_max`, `run_time_max`, `submit_options`
-and `query_retries` are ignored, and a `template` or a `scheduler` raises a
-`ValueError`. If a cluster in the `pysqa` configuration defines a queue named
-`local`, `queue="local"` without a `cluster` raises an
+The cluster settings `cores`, `memory_max`, `run_time_max`, `submit_options`,
+`query_retries` and `timeout` are ignored, and a `template` or a `scheduler`
+raises a `ValueError`. If a cluster in the `pysqa` configuration defines a
+queue named `local`, `queue="local"` without a `cluster` raises an
 [`ExecutionError`][ropt.exceptions.ExecutionError]; pass `cluster` to submit to
 that queue.
 

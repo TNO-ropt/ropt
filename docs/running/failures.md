@@ -106,9 +106,9 @@ An exception raised by a call that is being aborted is still raised, but
 aborts nothing further.
 
 A `KeyboardInterrupt` or `SystemExit` is not a failure. When one passes through
-a call, the calls started from its work, and for `run` its other functions, are aborted
-with `ABORTED`, and the exception is raised. Other calls in the session keep
-running if the exception is caught inside the session's `with` block.
+a call, the calls started from its work, and for `run` its other functions, are
+aborted with `ABORTED`, and the exception is raised. Other calls in the session
+keep running if the exception is caught inside the session's `with` block.
 
 If an exception raised inside the session's `with` block is not caught there,
 whether it is a failure or a `KeyboardInterrupt`, the session ends and aborts
@@ -152,7 +152,7 @@ pending work. Whether it waits for work already running depends on the pool:
 | none | runs to its end, and the call ends after it; `run` starts none of its remaining functions |
 | `thread_pool` | runs to its end unless it [stops early](#stopping-early-when-aborted), but the call does not wait for it |
 | `process_pool` | as with a thread pool, and its worker is killed if it is still running five seconds later |
-| `hpc_pool` | its cluster job is cancelled; on the local queue, the job is terminated, together with every program it started, and killed five seconds later if still running |
+| `hpc_pool` | ropt requests cancellation of its cluster job; if the scheduler command times out, the job may remain queued or running. On the local queue, the job is terminated, together with every program it started, and killed five seconds later if still running |
 
 Process workers receive the abort request, so calls made inside them
 are aborted too. Calls inside an HPC job do not receive that request; instead,
