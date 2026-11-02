@@ -28,8 +28,8 @@ class ObjectiveFunctionsConfig(BaseModel):
     `ObjectiveFunctionsConfig` defines objective function settings. It is the
     `objectives` section of the configuration.
 
-    See [Configuration Sections](../optimizer_setup/configuration_sections.md#objectives) for
-    detailed descriptions and usage examples.
+    See [Configuration Reference](../optimizer_setup/configuration_sections.md#objectives)
+    for field descriptions and defaults.
 
     The reported `target_objective` is divided by the estimated `auto_scale`
     factors, so optimizations that differ in that setting compare only through

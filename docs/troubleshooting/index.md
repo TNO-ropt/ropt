@@ -115,10 +115,18 @@ the thread that called it — even if a pool exists next to it.
 
 **Threads cannot be interrupted.** Evaluations with a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
-outside. An evaluation that checks [`aborting`][ropt.aborting], or runs its
-external programs with [`run_program`][ropt.run_program], stops early; any other
-evaluation that may run long and has to be interruptible belongs on a process
-pool or an HPC pool; see
+outside. An evaluation stops early if it:
+
+- checks [`aborting`][ropt.aborting];
+- runs its external programs with [`run_program`][ropt.run_program];
+- passes its long-running work to a process pool or an HPC pool, for example
+  with [`run`][ropt.run]. On an abort, that call raises
+  [`AbortedError`][ropt.exceptions.AbortedError] at once; a process worker
+  still running five seconds later is killed, and an HPC job is cancelled. Work
+  passed to another thread pool runs to completion.
+
+Any other evaluation that may run long and has to be interruptible belongs on a
+process pool or an HPC pool; see
 [Stopping an optimization](../running/parallel.md#stopping-a-run).
 
 **A process pool re-imports your script.** Its workers are started with

@@ -122,8 +122,11 @@ the realizations that did work.
   requested. Improves load balancing on HPC clusters when gradient evaluations
   are likely to be needed soon.
 - `"separate"` — never combine function and gradient evaluations into a single
-  batch. This applies with [realization filters](realization_filters.md) that
-  disable realizations and reduce gradient work.
+  batch. The functions are evaluated first, so a
+  [realization filter](realization_filters.md) can set the weight of some
+  realizations to zero before the gradient is evaluated. The gradient evaluation
+  then skips those realizations. In a combined batch, the weights are not yet
+  known and all realizations are evaluated.
 
 ## Samplers
 

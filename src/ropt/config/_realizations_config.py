@@ -18,8 +18,8 @@ class RealizationsConfig(BaseModel):
     `RealizationsConfig` defines realization ensemble settings. It is the
     `realizations` section of the configuration.
 
-    See [Configuration Sections](../optimizer_setup/configuration_sections.md#realizations) for
-    detailed descriptions and usage examples.
+    See [Configuration Reference](../optimizer_setup/configuration_sections.md#realizations)
+    for field descriptions and defaults.
 
     `realization_min_success` defaults to the number of realizations, so a
     single failure ends the optimization.

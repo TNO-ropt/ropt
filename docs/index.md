@@ -3,6 +3,11 @@
 `ropt` is developed by the Netherlands Organisation for Applied Scientific
 Research (TNO) and released under the GNU General Public License v3.0.
 
+!!! tip "Quick reference"
+
+    For configuration fields, API arguments and examples by task, use the
+    [Reference index](reference/index.md).
+
 ## Overview
 
 `ropt` is a module for implementing and executing robust optimization

@@ -34,15 +34,34 @@ free:
 ```
 
 A fixed variable keeps the value it had in the initial vector, is never
-perturbed, and is reported back unchanged. This is the way to explore a subset
-of a larger problem without rewriting the configuration around it.
+perturbed, and is reported back unchanged. This lets you explore a subset of a
+larger problem without rewriting the configuration around it. It is also how
+[nested optimizations](../running/nested.md#splitting-the-variables) assign
+different variables to the outer and inner optimizers.
 
 ## Integer variables
 
-The `types` field makes variables integer-valued rather than continuous. That
-choice constrains the rest of the configuration, because an integer variable
-cannot be differentiated — see
-[Discrete and Mixed-Integer Variables](discrete.md).
+The `types` field makes variables integer-valued rather than continuous. Set it
+to `"integer"` to make every variable integer-valued, or give one type per
+variable to mix integer and continuous variables:
+
+```python
+"variables": {
+    "variable_count": 4,
+    "types": ["real", "real", "integer", "integer"],
+}
+```
+
+An evaluation function receives integer variables as floats with integral
+values. In the built-in SciPy backend, only `differential_evolution` honors
+integer types; other SciPy methods silently treat them as continuous. This
+method also requires bounds on every variable. See
+[Choosing an Optimizer](optimizer.md#gradient-based-or-gradient-free) before
+selecting a method, and the runnable
+[all-integer](https://github.com/TNO-ropt/ropt/blob/main/examples/discrete.py)
+and
+[mixed-variable](https://github.com/TNO-ropt/ropt/blob/main/examples/mixed.py)
+examples.
 
 ## Scaling
 
@@ -50,10 +69,8 @@ Variables reach the optimizer as $y = (x - o)/s$, using the `scales` and
 `offsets` fields, and are reported back as $x = s\,y + o$. Both directions come
 from the same two arrays, so they cannot disagree.
 
-This matters when variables differ by orders of magnitude. An optimizer takes a
-step of the same size in every direction and judges convergence with a single
-tolerance for all of them, and neither is meaningful unless the variables are
-comparable in size. The bounds are one source of scales, and
+Whether scaling helps depends on the optimizer. It can be useful when variables
+differ greatly in magnitude, and the bounds are one possible source of scales.
 [`scales_and_offsets_from_bounds`][ropt.utils.scales_and_offsets_from_bounds]
 derives them:
 
@@ -63,24 +80,26 @@ from ropt.utils import scales_and_offsets_from_bounds
 scales, offsets = scales_and_offsets_from_bounds([0.0, 100.0], [1.0, 600.0])
 ```
 
-That maps both variables onto $[0, 1]$. Scales must be positive, since a scale
-is a change of units and nothing else. There is no `auto_scale` for variables:
-the bounds are the only information available before the optimization starts,
-and using them is a choice rather than a default.
-
-Everything describing the variables moves with them — the bounds, the absolute
-perturbation magnitudes, and the linear constraints — so scaling is not
-something that has to be applied consistently by hand. The details are under
-[Scaling the variables](configuration_sections.md#variable-scales).
+That maps both variables onto $[0, 1]$. Scales must be positive, and there is no
+`auto_scale` for variables. The bounds and linear constraints are transformed
+along with the variables. Absolute perturbation magnitudes are multiplied by
+the variable scales; relative magnitudes are dimensionless and are not changed.
+See [Scaling the variables](configuration_sections.md#variable-scales) for the
+transformation details.
 
 !!! warning "Scaling changes what an optimization reports"
 
-    Results carry both domains: `variables` in the units configured here, and
-    `scaled.variables` in the optimizer's. Only the first is comparable between
-    optimizations that scale differently. The runnable demonstration is
+    Results expose `variables` in the configured units and `scaled.variables`
+    in the optimizer's units. Compare `variables` between optimizations that use
+    different scales. The runnable demonstration is
     [examples/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py),
     and [Working with Results](../results/results.md#scaling-of-results)
     describes which fields have two domains.
+
+    [`ConstraintInfo`][ropt.results.ConstraintInfo] reports bound distances in
+    configured units. The corresponding `scaled.constraint_info` fields give
+    the distances in the optimizer's units; offsets shift variables and bounds
+    together and do not change those distances.
 
 ## Perturbations
 

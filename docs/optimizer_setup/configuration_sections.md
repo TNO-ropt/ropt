@@ -1,10 +1,150 @@
-# Configuration Sections
+# Configuration Reference
 
-This page documents the fields in each configuration section and their default
-values. For an overview of how the configuration dictionary is validated and
-used, and a complete example showing all defaults, see
-[Configuration](configuration.md). For the generated API reference for each
-configuration class, see [Configuration Classes](../reference/config.md).
+Field-by-field descriptions of the configuration sections, including defaults
+and restrictions. For explanations and examples, start with
+[Key Concepts](key_concepts.md) and follow the links to the relevant topic
+pages. For how the configuration dictionary is validated and used, see
+[Configuration](configuration.md). The generated API reference is under
+[Configuration Classes](../reference/config.md).
+
+## Full configuration schema
+
+The dictionary below lists the configuration defaults. Replace `...` with the
+required number of variables. Optional constraint and filter sections are
+shown separately.
+
+??? example "Configuration defaults"
+
+    ```python
+    CONFIG = {
+        "variables": {
+            "variable_count": ...,                            # required, no default
+            "lower_bounds": -float("inf"),                    # default: -inf
+            "upper_bounds": float("inf"),                     # default: +inf
+            "types": "real",                                  # default: continuous
+            "mask": True,                                     # default: all free
+            "scales": 1.0,                                    # default: no scaling
+            "offsets": 0.0,                                   # default: no offset
+            "perturbation_magnitudes": 0.005,
+            "perturbation_types": "absolute",
+            "boundary_types": "mirror",
+            "samplers": "0",                                  # default: use first sampler for all
+            "seed": 1,
+        },
+        "objectives": {
+            "weights": [1.0],                                 # default: single objective, weight 1.0
+            "scales": 1.0,                                    # default: no scaling
+            "offsets": 0.0,                                   # default: no offset
+            "auto_scale": False,                              # default: do not estimate scales
+            "maximize": False,                                # default: minimize
+            "realization_filters": None,                      # default: no filter
+            "function_estimators": "0",                       # default: use first estimator for all
+        },
+        "linear_constraints": None,                           # default: no linear constraints
+        "nonlinear_constraints": None,                        # default: no nonlinear constraints
+        "realizations": {
+            "weights": [1.0],                                 # default: single realization, weight 1.0
+            "realization_min_success": None,                  # default: equal to number of realizations
+        },
+        "optimizer": {
+            "max_batches": None,                              # default: no limit
+            "max_functions": None,                            # default: no limit
+            "output_dir": None,                               # default: no output directory
+            "stdout": None,                                   # default: not captured
+            "stderr": None,                                   # default: not captured
+        },
+        "backend": {
+            "method": "scipy/default",                        # default: SciPy SLSQP
+            "max_iterations": None,                           # default: backend-specific
+            "convergence_tolerance": None,                    # default: backend-specific
+            "parallel": False,                                # default: do not evaluate in parallel
+            "verbose": None,                                  # default: backend-specific
+            "options": None,                                  # default: no extra options
+        },
+        "gradient": {
+            "number_of_perturbations": 5,
+            "perturbation_min_success": None,                 # default: equal to number_of_perturbations
+            "merge_realizations": False,                      # default: estimate and average gradients
+            "evaluation_policy": "auto",                      # default: evaluate functions and perturbations
+        },                                                    #          as needed
+        "samplers": [
+            {
+                "method": "scipy/default",                    # default: standard normal N(0,1)
+                "options": {},
+                "shared": False,                             # default: each realization has its own
+                                                             #          set of perturbations
+            },
+        ],
+        "function_estimators": [
+            {
+                "method": "default/default",                  # default: weighted average
+                "options": {},
+            },
+        ],
+        "realization_filters": [],                            # default: none configured
+        "names": {},                                          # default: none configured
+    }
+    ```
+
+    `types`, `perturbation_types` and `boundary_types` are shown as strings.
+    These are the values of [`VariableType`][ropt.enums.VariableType],
+    [`PerturbationType`][ropt.enums.PerturbationType] and
+    [`BoundaryType`][ropt.enums.BoundaryType] in [`ropt.enums`][ropt.enums],
+    whose members may be written in their place.
+
+??? example "Optional constraint and filter sections"
+
+    Replace `...` with the problem-specific values. Fields with defaults may
+    be omitted.
+
+    ```python
+    # linear_constraints (coefficients and bounds are required):
+    "linear_constraints": {
+        "coefficients": ...,                      # required: 2D array (constraints x variables)
+        "lower_bounds": ...,                      # required: 1D array (one per constraint)
+        "upper_bounds": ...,                      # required: 1D array (one per constraint)
+        "scales": 1.0,                            # default: no scaling
+        "auto_scale": False,                      # default: do not estimate scales
+    }
+
+    # nonlinear_constraints (bounds are required, the rest has defaults):
+    "nonlinear_constraints": {
+        "lower_bounds": ...,                      # required: 1D array (one per constraint)
+        "upper_bounds": ...,                      # required: 1D array (one per constraint)
+        "scales": 1.0,                            # default: no scaling
+        "auto_scale": False,                      # default: do not estimate scales
+        "realization_filters": None,              # default: no filter
+        "function_estimators": "0",               # default: use first estimator
+    }
+
+    # realization_filters entries (method is required):
+    "realization_filters": [
+        {
+            "method": ...,                        # required: str ("plugin/method")
+            "options": {},
+        },
+    ]
+    ```
+
+## Built-in methods
+
+Use these strings in the `method` field of the indicated section or component.
+The [method-string rules](configuration.md#method-strings) also describe
+unqualified names. This table covers the plugins included with `ropt`;
+separately installed plugins have their own method lists.
+
+| Section | `method` values | Options and capabilities | Usage |
+| --- | --- | --- | --- |
+| `backend` | `scipy/default`, `scipy/nelder-mead`, `scipy/powell`, `scipy/cg`, `scipy/bfgs`, `scipy/newton-cg`, `scipy/l-bfgs-b`, `scipy/tnc`, `scipy/cobyla`, `scipy/cobyqa`, `scipy/slsqp`, `scipy/trust-constr`, `scipy/differential_evolution` | [`SciPyBackend`][ropt.backend.scipy.SciPyBackend] | [Choosing an Optimizer](optimizer.md) |
+| `samplers` | `scipy/default`, `scipy/norm`, `scipy/truncnorm`, `scipy/uniform`, `scipy/sobol`, `scipy/halton`, `scipy/lhs` | [`SciPySampler`][ropt.sampler.scipy.SciPySampler] | [Selecting a sampler](samplers.md#selecting-a-sampler) |
+| `function_estimators` | `default/default`, `default/mean`, `default/stddev` | [`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator] | [Selecting an estimator](function_estimators.md#selecting-an-estimator) |
+| `realization_filters` | `default/cvar-objective`, `default/cvar-constraint` | [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions], [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions] | [Selecting a filter](realization_filters.md#selecting-a-filter) |
+
+For backends, `scipy/default` selects `scipy/slsqp`; for samplers, it selects
+`scipy/norm`. The estimator `default/default` selects `default/mean`.
+There is no default realization-filter method.
+To run a backend in a separate process, see the
+[`external/` prefix](optimizer.md#external-backend).
 
 ## `variables` { #variables }
 
@@ -16,152 +156,52 @@ The `variable_count` field is required and determines the total number of
 variables, including both free and fixed variables.
 
 The `lower_bounds` and `upper_bounds` fields define the bounds for each
-variable. They are broadcasted to match the number of variables and default to
+variable. They are broadcast to match the number of variables and default to
 $-\infty$ and $+\infty$, respectively. Use an infinity to leave a variable
 unbounded on that side.
 
 The optional `types` field assigns a type to each variable, `"real"` for
 continuous or `"integer"` for discrete. If not provided, all variables default
-to continuous. Integer variables are
-only honored by methods that support them; in the SciPy backend that is
-`differential_evolution` (see
+to continuous. Integer variables are used only by methods that support them;
+in the SciPy backend, that is `differential_evolution` (see
 [`SciPyBackend`][ropt.backend.scipy.SciPyBackend]). The two strings are the
-values of [`VariableType`][ropt.enums.VariableType], whose members may be
-written in their place.
+values of [`VariableType`][ropt.enums.VariableType]; its members can be used
+instead of the strings.
 
 The optional `mask` field is a boolean array that indicates which variables are
 free to change during optimization (default: all `True`, meaning all variables
 are free). `True` means the variable is free; `False` means it is fixed.
 
-```python
-"variables": {
-    "variable_count": 3,
-    "lower_bounds": -1,
-    "upper_bounds": [1, 2, 3],
-    "types": "real",              # default; or "integer" for discrete variables
-    "mask": [True, True, False],  # third variable is fixed
-    "perturbation_magnitudes": 1e-5,
-}
-```
-
 ### Variable perturbations { #variable-perturbations }
 
-The `variables` section also stores information needed to generate perturbed
-variables for stochastic gradient estimation (see [Stochastic
-Gradients](gradients.md)).
+These fields configure the perturbations used for gradient estimation; see
+[Stochastic Gradients](gradients.md) and [Samplers](samplers.md):
 
-Perturbations are generated by [`Sampler`][ropt.sampler.Sampler] instances
-configured in the
-[`samplers`](#samplers)
-section. The `samplers` field of `variables` assigns each variable to a sampler
-by key (default: `"0"`, which is the first sampler when they are given as a
-list). Unless explicitly configured otherwise, the default sampler method is
-`"scipy/default"`, which draws perturbations from a standard normal distribution
-$N(0, 1)$.
-
-The generated perturbation values are scaled by `perturbation_magnitudes`
-(default: `0.005`) and can be modified based on `perturbation_types` (the
-values of [`PerturbationType`][ropt.enums.PerturbationType]):
-
-- `"absolute"` (default): the perturbation magnitude is added directly to the
-  variable value.
-- `"relative"`: the magnitude is scaled based on the variable's bounds.
-
-Perturbed variables may violate the defined bounds. The `boundary_types` field
-specifies how to handle such violations (the values of
-[`BoundaryType`][ropt.enums.BoundaryType]). The default, `"mirror"`, mirrors
-perturbations back into the valid range. As with `types`, the enumeration
-members may be written in place of the strings.
-
-The `seed` value (default: `1`) ensures consistent results across repeated
-optimizations. To obtain unique results for each optimization, modify the seed.
-A common
-approach is to use a tuple with a unique ID as the first
-element, ensuring reproducibility across optimizations.
-
-!!! tip "Named constants"
-
-    The defaults above are defined as named constants in
-    [`ropt.config.constants`][ropt.config.constants]:
-    [`DEFAULT_SEED`][ropt.config.constants.DEFAULT_SEED],
-    [`DEFAULT_PERTURBATION_MAGNITUDE`][ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE],
-    [`DEFAULT_PERTURBATION_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_TYPE], and
-    [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE].
+- `perturbation_magnitudes`: positive step magnitudes (default: `0.005`).
+- `perturbation_types`: `"absolute"` or `"relative"` per variable (default:
+  `"absolute"`; values of [`PerturbationType`][ropt.enums.PerturbationType]).
+- `boundary_types`: how perturbations outside the bounds are handled (default:
+  `"mirror"`; values of [`BoundaryType`][ropt.enums.BoundaryType]).
+- `samplers`: sampler key per variable (default: `"0"`).
+- `seed`: random seed (default: `1`).
 
 ### Scaling the variables { #variable-scales }
 
-Variables reach the optimizer as $y = (x - o)/s$, using the `scales` and
-`offsets` fields, and are reported back to you as $x = s\,y + o$. Both
-directions come from the same two arrays, so they cannot disagree.
-
-```python
-"variables": {
-    "variable_count": 2,
-    "lower_bounds": [0.0, 100.0],
-    "upper_bounds": [1.0, 600.0],
-    "scales": [1.0, 500.0],
-    "offsets": [0.0, 100.0],
-}
-```
-
-Scaling matters when variables differ by orders of magnitude. An optimizer takes
-a step of the same size in every direction, and judges convergence with one
-tolerance for all of them; both of those are only meaningful if the variables
-are comparable in size. The example above puts both variables in the range
-$[0, 1]$.
-
-Deriving the scales and offsets from the bounds like that is the common case,
-and [`scales_and_offsets_from_bounds`][ropt.utils.scales_and_offsets_from_bounds]
-does it for you:
-
-```python
-from ropt.utils import scales_and_offsets_from_bounds
-
-scales, offsets = scales_and_offsets_from_bounds([0.0, 100.0], [1.0, 600.0])
-```
-
-Scales must be positive: a scale is a change of units, and nothing else. The
-default is a scale of 1 and an offset of 0, which is the identity. There is no
-`auto_scale` for variables, because there is nothing to estimate one from: the
-bounds are the only information available before the optimization starts, and
-using them is a choice, not a default.
-
-Everything that describes the variables moves with them. The bounds are mapped,
-and so are the [perturbation magnitudes](#variable-perturbations) of type
-`ABSOLUTE`; a magnitude is a distance rather than a position, so only the scale
-applies to it, not the offset. `RELATIVE` magnitudes are a fraction of the bound
-range and are already dimensionless, so they are left alone. Linear constraints
-follow the variables too, as described [below](#linear-constraint-scales).
-
-The scales and offsets apply to every variable, including the ones fixed by
-`mask`. This keeps the scaling uniform, and a fixed variable maps back
-to exactly the value you gave it.
-
-What you see in the results follows from that:
-
-- Variables and perturbed variables are reported unscaled.
-- Distances to the variable bounds, in
-  [`ConstraintInfo`][ropt.results.ConstraintInfo], are multiplied by the scale.
-  An offset is a shift shared by a value and its bound, so it cancels out of the
-  distance between them.
+The optimizer uses $y = (x-o)/s$, where `scales` $s$ must be positive and
+`offsets` $o$ default to zero. `scales` defaults to one. Both fields are
+broadcast to `variable_count`; there is no automatic scaling for variables.
+See [Scaling](variables.md#scaling) for choosing values and how they affect the
+optimization and its results.
 
 ## `objectives` { #objectives }
 
 Validated into
 [`ObjectiveFunctionsConfig`][ropt.config.ObjectiveFunctionsConfig].
 
-`ropt` supports multi-objective optimization. Multiple objectives are combined
-into a single value by summing them after weighting. The `weights` field
-determines the weight of each objective function, and its length defines the
-number of objectives (default: `[1.0]`, meaning a single objective). The weights
-are automatically normalized to sum to 1 (for example, `[1, 1]` becomes `[0.5, 0.5]`).
-
-```python
-"objectives": {"weights": [0.6, 0.4]}
-```
-
-Weights must not be negative, and must not all be zero. A zero weight is
-allowed, and disables its objective.
+`weights` has one entry per objective and therefore sets the number of
+objectives. It defaults to `[1.0]`; weights are normalized to sum to one, must
+be non-negative, and must not all be zero. A zero weight disables an objective.
+See [Objectives](objectives.md) for how weights combine.
 
 Objective functions can optionally be processed using
 [realization filters](realization_filters.md) and
@@ -181,108 +221,28 @@ key](configuration.md#sharing-optimizer-components-by-key).
 
 ### Scaling objectives { #objective-scales }
 
-Objectives are passed to the optimizer divided by the `scales` field, and
-reported back to you multiplied by it again. This changes the numbers the
-optimizer sees, which matters when objectives differ by orders of magnitude or
-when a method has absolute tolerances.
-
-With a single objective that is all it changes: dividing by a positive constant
-leaves the optimum where it was. With several objectives it does more. The
-optimizer minimizes $\sum_j w_j f_j / s_j$, so the effective weight of an
-objective is $w_j / s_j$, and changing one scale changes the trade-off between
-the objectives and moves the optimum with it. Scales and weights multiply, so
-setting both means deciding what their product should be.
-
-```python
-"objectives": {"weights": [0.6, 0.4], "scales": [1e6, 1.0]}
-```
-
-Scales must be positive: a scale is a change of units, and nothing else. Which
-direction an objective is optimized in is a separate setting, described
-[below](#objective-direction).
-
-Set `auto_scale` to estimate a scale from the first batch of evaluations
-instead of stating one:
-
-```python
-"objectives": {"auto_scale": True}
-```
-
-The estimate is the weighted average of the objectives over the realizations,
-combined into a single factor using the objective weights, so that the weighted
-sum of the objectives starts out at a magnitude of one. It is a *single* factor
-for all objectives, which preserves their relative magnitudes and therefore both
-the meaning of `weights` and, unlike a per-objective scale, the location of the
-optimum. Realizations that fail do not contribute.
-
-The estimate is computed once, from the first batch, and then fixed for the rest
-of the optimization. It *multiplies* `scales` rather than replacing it, so a
-configured scale still applies on top of an estimated one. An `offsets` entry is
-subtracted before the estimate is taken, so the estimate measures what is left
-after it.
-
-Because the estimate divides the objective the optimizer reports, switching
-`auto_scale` on lowers `target_objective` without changing the solution. Two
-optimizations that differ in this setting can only be compared through
-`functions.objectives` or their variables; see
-[Scaling of results](../results/results.md#scaling-of-results).
+`scales` is positive and defaults to `1.0` per objective. The optimizer uses
+each objective divided by its scale; reported objective values are converted
+back to the configured units. With `auto_scale` (default: `False`), `ropt`
+estimates one additional factor from the first batch and multiplies it by the
+configured scales. The estimate uses the weighted objective values after
+subtracting any configured offsets. See
+[Weights and scales](objectives.md#weights-and-scales-determine-the-trade-off-together)
+for the effect on the optimization.
 
 ### Offsetting objectives { #objective-offsets }
 
-An objective reaches the optimizer as $(f_j - o_j)/s_j$, using the `offsets`
-field, and is reported back to you as $f_j = s_j\,y_j + o_j$. The default is
-zero, which is the identity.
-
-```python
-"objectives": {"weights": [1.0], "scales": [1e5], "offsets": [1e9]}
-```
-
-An offset does not move the optimum and does not change the gradient: it shifts
-the weighted total by a constant. What it changes is the *magnitude* the
-optimizer works with, and that matters when an objective is large but varies
-little. An NPV around $10^9$ that varies by $10^5$ becomes, after dividing by
-$10^9$, a quantity near one that varies by $10^{-4}$ — below the convergence
-tolerance of many methods. Subtracting a baseline of $10^9$ first and then
-dividing by $10^5$ leaves the variation at order one.
-
-Because it changes the value the optimizer tests against its tolerances, an
-offset can change where an optimization stops, even though it cannot change
-where the optimum is.
-
-An aggregate that measures dispersion rather than central tendency has its
-offset subtracted too. A standard deviation is unchanged by shifting the values
-it summarizes, so the offset applies to the aggregate itself; the map is undone
-on the way out, so what you are reported is unaffected.
+The optimizer uses $(f_j-o_j)/s_j$, where `offsets` $o_j$ defaults to zero per
+objective. The reported objective value has the offset restored. Offsets are
+subtracted before the `auto_scale` estimate; see
+[Offsetting objectives](objectives.md#offsetting-objectives) for their effect
+on the optimization.
 
 ### Choosing the direction of an objective { #objective-direction }
 
-`ropt` minimizes. To maximize an objective, mark it in the `maximize` field,
-which is a boolean per objective and defaults to all-false:
-
-```python
-"objectives": {"weights": [0.6, 0.4], "maximize": [False, True]}
-```
-
-The sign is flipped *after* the values of the individual realizations have been
-combined, and never on the values themselves. This matters when a
-[function estimator](function_estimators.md) produces a measure of dispersion
-rather than an average: negating the inputs of a standard deviation leaves it
-unchanged, so asking to maximize it would silently have minimized it instead.
-Negating the combined value is correct whatever produced it.
-
-What you see in the results follows from that:
-
-- Per-realization values (`evaluations.objectives`) are scaled, never flipped.
-- Combined values (`functions.objectives`) and their gradients are reported with
-  the flip undone, so that they agree in sign with the values they summarize.
-- `target_objective` exists only as the optimizer sees it, because it mixes
-  objectives of different scales and directions and there is no single factor
-  to undo. It is always a value being minimized, which is what lets results be
-  compared by "lowest is best".
-
-!!! note
-    Objective and realization weights must not be negative. A negative weight
-    used to act as a way to maximize; mark the objective in `maximize` instead.
+`maximize` is a boolean per objective and defaults to `False`. `ropt` applies
+the direction after combining per-realization values; see
+[Maximizing instead of minimizing](objectives.md#maximizing-instead-of-minimizing).
 
 ## `linear_constraints` { #linear_constraints }
 
@@ -293,9 +253,8 @@ optimization variables. The `coefficients` field is a 2D array where each row
 represents a constraint and each column corresponds to a variable. The number of
 rows determines the number of constraints.
 
-The `lower_bounds` and `upper_bounds` fields specify the bounds on the
-right-hand side of each constraint equation. They are broadcasted to match the
-number of constraints.
+The `lower_bounds` and `upper_bounds` fields specify bounds on the value of
+each linear expression. They are broadcast to match the number of constraints.
 
 - Less-than inequalities: set `lower_bounds` to $-\infty$.
 - Greater-than inequalities: set `upper_bounds` to $+\infty$.
@@ -315,45 +274,14 @@ constant that violates its bounds is reported in every result through
 
 ### Scaling the equations { #linear-constraint-scales }
 
-Two separate things happen to the linear constraints, in this order.
-
-First, the variable `scales` and `offsets` are substituted into the equations.
-Writing $x = s\,y + o$ turns $A$ into $A\,\mathrm{diag}(s)$ and the bounds $b$
-into $b - A\,o$. This is a change of variables rather than a rescaling: it
-shifts every equation and every bound by the same amount, so the distance
-between them, and therefore the feasible set, is unchanged. It happens whenever
-the variables are scaled, and needs no configuration.
-
-Second, each equation is divided by its entry in the `scales` field, together
-with its bounds:
-
-```python
-"linear_constraints": {..., "scales": [1e3, 1.0]}
-```
-
-Dividing an equation by a positive number leaves its solutions alone; what it
-changes is the size of the numbers the optimizer works with, in the same way
-that scaling the variables does. Set `auto_scale` to estimate those divisors
-instead of stating them:
-
-```python
-"linear_constraints": {..., "auto_scale": True}
-```
-
-The estimate for an equation is the largest absolute value among its
-coefficients, so that the largest coefficient the optimizer sees is one. Only
-the columns of variables that are free count towards it, since the fixed ones
-are eliminated before the optimizer sees the problem. An equation with nothing
-left to measure is divided by one rather than by zero. The estimate
-*multiplies* `scales`, so a configured scale still applies on top of an
-estimated one.
-
-Unlike `auto_scale` for nonlinear constraints, this is a single boolean rather
-than one per equation: the rows form one matrix equation and are scaled together
-or not at all.
-
-Distances to the constraint bounds are reported unscaled, with both
-steps undone.
+`scales` is a positive per-equation divisor (default: `1.0`) applied to the
+equation and its bounds. `auto_scale` is one boolean for the whole section
+(default: `False`); when enabled, it estimates an additional divisor per
+equation from the largest absolute coefficient among its free variables after
+variable scaling. The estimate multiplies any configured scale. Variable scales
+and offsets are substituted into the equations automatically. See
+[Scaling constraints](constraints.md#scaling-constraints) for how these
+transformations work.
 
 ## `nonlinear_constraints` { #nonlinear_constraints }
 
@@ -385,176 +313,69 @@ Like objectives, nonlinear constraints can optionally be processed using
 
 ### Scaling constraints { #constraint-scales }
 
-Constraints support `scales` and `auto_scale` just as
-[objectives](#objective-scales) do, with two differences.
-
-The bounds are scaled together with the constraint values, so the constraint
-you configured is the constraint that is solved. Scales are positive, so the
-bounds keep their order.
-
-Constraints have no `maximize` field: a constraint is a bound to satisfy, not a
-quantity to optimize.
-
-Auto-scaling estimates a *separate* factor for each constraint, rather than the
-single shared factor used for objectives, because constraints are independent
-conditions rather than terms of one weighted sum. For the same reason
-`auto_scale` is a boolean *per constraint*, so that constraints can be scaled
-independently:
-
-```python
-"nonlinear_constraints": {..., "auto_scale": [True, False]}
-```
-
-There is no `offsets` entry for constraints. An objective needs an offset
-because it has no natural reference point, but a constraint already has one: the
-optimizer only ever sees the difference between a constraint and its bound, so
-the value is centred on the bound already and an offset would cancel out.
+`scales` is a positive divisor per constraint (default: `1.0`), applied to
+both its value and bounds. `auto_scale` is a boolean per constraint (default:
+`False`); when enabled, it estimates an additional scale from the first batch
+and multiplies the configured scale. Constraints have no `offsets` field.
+See [Scaling constraints](constraints.md#scaling-constraints) for the behavior
+and its effect.
 
 ## `realizations` { #realizations }
 
 Validated into [`RealizationsConfig`][ropt.config.RealizationsConfig].
 
-To optimize an ensemble of functions, a set of realizations is defined. When the
-optimizer requests a function value or a gradient, these are calculated for each
-realization and then combined into a single value. Typically, this combination is
-a weighted sum, but other methods are possible (see
-[function estimators](function_estimators.md)).
-
-The `weights` field determines the weight of each realization, and its length
-defines the ensemble size (default: `[1.0]`, meaning a single realization). The
-weights are automatically normalized to sum to 1 (for example, `[1, 1]` becomes
-`[0.5, 0.5]`). As with the objective weights, they must not be negative and must
-not all be zero.
-
-If function evaluations for some realizations fail (for example, due to a simulation
-error), the total function and gradient values can still be calculated by
-excluding the missing values. The `realization_min_success` field specifies the
-minimum number of successful realizations required (default: equal to the number
-of realizations, meaning no failures are allowed).
-
-!!! warning "Setting `realization_min_success` to zero"
-    With `realization_min_success` set to zero, the optimization continues even
-    when all realizations of an evaluation fail. The objective, constraint, and
-    gradient values of that evaluation are then `NaN`, and `ropt` passes them to
-    the optimizer unchanged. `ropt` does not check whether the optimizer can
-    handle `NaN` values: before setting zero, make sure that the chosen
-    optimizer supports them.
+`weights` has one entry per realization and determines the ensemble size.
+Weights default to `[1.0]`, are normalized to sum to one, must be non-negative,
+and must not all be zero. `realization_min_success` defaults to the ensemble
+size, so every realization must succeed. Setting it to zero allows all-failed
+evaluations to produce `NaN` values, which are passed to the optimizer; use this
+only with an optimizer that accepts `NaN`. See [Ensemble-Based
+Optimization](../getting_started/ensemble.md) and [Failures and
+Aborts](../running/failures.md).
 
 ## `optimizer` { #optimizer }
 
 Validated into [`OptimizerConfig`][ropt.config.OptimizerConfig].
 
-Settings that control how the optimization is managed. All
-fields are optional and default to `None` (no limit) or `None` (no
-redirection):
+All fields are optional. `max_batches` and `max_functions` default to `None`
+(no limit); `output_dir`, `stdout` and `stderr` default to `None` (no output
+directory or stream capture).
 
-- **`max_batches`**: Limits the total number of *calls* made to the evaluation
-  function. An optimizer might request a batch containing multiple function
-  and/or gradient evaluations within a single call. Where batches are evaluated
-  in parallel (for example, on
-  an HPC cluster), this bounds the number of sequential submission steps. The
-  number of batches does not necessarily correspond directly to the number of
-  optimizer iterations.
+- `max_batches`: Maximum number of calls to the evaluation function. A call may
+  contain multiple function or gradient evaluations.
+- `max_functions`: Maximum number of function evaluations across calls. The
+  final batch may cause the completed count to exceed this limit.
+- `output_dir`: Directory for optimizer output files. Relative `stdout` and
+  `stderr` paths are resolved against it.
+- `stdout`: File for the optimizer's standard output. If `stderr` is unset,
+  standard error is captured there too.
+- `stderr`: Optional file for the optimizer's standard error.
 
-- **`max_functions`**: Limits the total *number* of function evaluations
-  performed across all batches. A single batch can contain several function
-  evaluations, so this bounds the computational effort more directly than
-  `max_batches`. The limit is not exact: when it is reached, the optimization
-  stops only after the batch in progress is finalized, so the number of
-  completed function evaluations may exceed `max_functions`.
-
-- **`output_dir`** (default: `None`): An optional output directory where the
-  optimizer can store files. When `None`, no output directory is used. A
-  relative `stdout` or `stderr` path is resolved against it.
-- **`stdout`** (default: `None`): Capture the optimizer's standard output into
-  the given file. When `None`, the optimizer's output is not captured. Unless
-  `stderr` is also set, the optimizer's error output goes to this file too.
-- **`stderr`** (default: `None`): Capture the optimizer's standard error into
-  the given file. May be set on its own, in which case standard output is left
-  alone.
-
-These settings determine **where** the optimizer's output goes, not whether there
-is any: that is [`verbose`](#backend). The evaluation callback is excluded
-either way — anything your objective function or your result handlers print goes
-to the terminal as usual.
-
-!!! warning "Capture is for one optimization at a time"
-    Capturing rewires process-global state, so only one optimization at a time
-    can do it. A second optimization that tries while another holds it raises
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. Leave `stdout` and
-    `stderr` unset on optimizations that overlap.
-
-    Whether an optimizer reports at all is decided by [`verbose`](#backend),
-    independently of capture. To silence one, set `verbose=False`; to discard
-    output you cannot switch off, capture to `os.devnull` — but this
-    discards anything *else* the process writes during the optimization, which
-    a throwaway file would not.
-
-!!! note "What else lands in the file"
-    Capture is scoped to a period of time, not to a source, so anything the
-    process writes through `sys.stdout` or `sys.stderr` while the optimizer is
-    working is captured with it. In practice that means Python warnings raised
-    by the optimizer, which belong there, and output from your own threads,
-    which does not. Log records are normally left alone, because a handler
-    writes to the stream it was given when it was created; see
-    [Logging](../running/logging.md#logging-during-an-optimization).
+See [Choosing an Optimizer](optimizer.md#limiting-the-length-of-a-run)
+for how the limits affect a run, and [Getting Output](../results/output.md) for
+capturing optimizer output.
 
 ## `backend` { #backend }
 
 Validated into [`BackendConfig`][ropt.config.BackendConfig].
 
-Selects the optimizer algorithm and provides a standardized set of common
-settings that are forwarded to the backend:
+Selects the optimization method and provides common settings passed to the
+backend:
 
 - **`method`** (default: `"scipy/default"`): Selects the algorithm using a
-  `"plugin/method"` string. The default uses SciPy's SLSQP optimizer.
-- **`max_iterations`** (default: `None`): Maximum number of iterations. The
-  exact definition depends on the optimizer backend, and not all backends
-  support this setting.
-- **`convergence_tolerance`** (default: `None`): Convergence tolerance used as a
-  stopping criterion. The exact definition depends on the optimizer, and not all
-  backends support this setting. It is compared against the quantities the
-  optimizer works with, which are scaled; see [Scaling
-  objectives](#objective-scales). Setting `auto_scale` there brings the weighted
-  objective sum to a magnitude of one at the start of the optimization, which is
-  what makes a fixed tolerance mean the same thing across problems.
-- **`parallel`** (default: `False`): If `True`, allows the optimizer to use
-  parallelized function evaluations. Typically applies to gradient-free methods;
-  not all backends support this setting.
-- **`verbose`** (default: `None`): How much the optimizer reports about its own
-  progress. `False` or `0` is silent, `True` selects the optimizer's own default
-  level, and a positive integer selects a level explicitly, clamped to what the
-  optimizer offers. `None` is silent. Backends map this onto whatever their
-  library provides, so the levels are not directly comparable between them: as a
-  guide, `1` is normal progress, `2` is detailed and `3` is everything.
+  `"plugin/method"` string; the default is SciPy's SLSQP method.
+- **`max_iterations`** (default: `None`): Maximum iterations, if supported by
+  the backend.
+- **`convergence_tolerance`** (default: `None`): Backend-defined stopping
+  tolerance, if supported. Its meaning depends on the method.
+- **`parallel`** (default: `False`): Whether the backend may parallelize
+  function evaluations, if supported.
+- **`verbose`** (default: `None`): Backend-specific progress output level.
+- **`options`** (default: `None`): Backend-specific options passed through.
 
-    Where that output ends up is a separate question, decided by
-    [`stdout` and `stderr`](#optimizer). With neither set it goes to the
-    terminal. A backend option that names the same setting, such as SciPy's
-    `disp`, takes precedence over `verbose`.
-- **`options`** (default: `None`): A dictionary or list of strings for generic
-  optimizer options. The format and interpretation depend on the specific
-  optimization method. These are passed straight to the backend.
-
-```python
-"backend": {
-    "method": "scipy/default",
-    "max_iterations": 200,
-    "options": {"maxiter": 200},
-}
-```
-
-Which methods a backend supports, which kinds of constraint and variable each
-of them accepts, and which `options` they take, is documented by the backend
-itself. For the built-in SciPy backend, see
-[`SciPyBackend`][ropt.backend.scipy.SciPyBackend]. A method configured with a
-constraint it cannot handle is only rejected when the optimization starts, with
-[`UnsupportedError`][ropt.exceptions.UnsupportedError], after the rest of the
-configuration has already been written.
-
-A backend can also be run in a process of its own, by prefixing the method with
-`external/`; see [Running the optimizer in a separate
-process](optimizer.md#external-backend).
+See [Choosing an Optimizer](optimizer.md) for method selection, supported
+settings, and the behavior of these options. The built-in SciPy methods are
+listed in [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
 
 ## `gradient` { #gradient }
 
@@ -563,35 +384,19 @@ Validated into [`GradientConfig`][ropt.config.GradientConfig].
 Controls how stochastic gradients are estimated (see also [Stochastic
 Gradients](gradients.md) for a deeper discussion).
 
-Gradients are estimated using function values calculated from perturbed and
-unperturbed variables. The `number_of_perturbations` field determines how many
-perturbed variable sets are used (default:
-[`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS]
-= `5`, must be at least 1).
+The `gradient` section has four fields:
 
-If function evaluations for some perturbations fail, the gradient can still be
-estimated as long as a minimum number succeed. The `perturbation_min_success`
-field specifies this minimum (default: equal to `number_of_perturbations`).
+- `number_of_perturbations`: positive number of perturbed variable sets
+  (default: [`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS]).
+- `perturbation_min_success`: minimum successful perturbations (default:
+  `number_of_perturbations`).
+- `merge_realizations`: whether realizations are combined before estimating
+  the gradient (default: `False`).
+- `evaluation_policy`: when functions and gradients are evaluated (default:
+  `"auto"`; also `"speculative"` or `"separate"`).
 
-Gradients are calculated for each realization individually and then combined. If
-`number_of_perturbations` is low (or just 1), individual gradient calculations
-may be unreliable. Setting `merge_realizations` to `True` (default: `False`)
-directs the optimizer to combine the results of all realizations directly into a
-single gradient estimate.
-
-The `evaluation_policy` option (default: `"auto"`) controls how and when
-objective functions and gradients are calculated:
-
-- **`"auto"`**: Evaluate functions and/or gradients strictly according to the
-  optimizer's requests.
-- **`"speculative"`**: Evaluate the gradient whenever the objective function is
-  requested, even if the optimizer hasn't explicitly asked for it. This can
-  improve load balancing on HPC clusters by initiating gradient work earlier.
-- **`"separate"`**: Always launch function and gradient evaluations as distinct
-  operations, even if the optimizer requests both simultaneously. This applies
-  with [realization filters](realization_filters.md) that might disable
-  certain realizations, as it can reduce the number of gradient evaluations
-  needed based on information obtained from the function evaluations.
+See [Stochastic Gradients](gradients.md) for how these settings affect the
+estimates and evaluation work.
 
 ## `function_estimators` { #function-estimators }
 
@@ -603,16 +408,13 @@ field and an optional `options` dict, referenced by key from the sections that
 use it (see [Sharing optimizer components by
 key](configuration.md#sharing-optimizer-components-by-key)).
 
-[Function estimators](function_estimators.md) control how objective and
-constraint function values (and their gradients) are combined across
-realizations. By default, a weighted average over realizations is used; function
-estimators allow replacing that with a different combination method (for example,
-standard deviation).
-
 Fields:
 
 - `method` (default: `"default/default"`): Selects the estimator plugin.
 - `options` (default: `{}`): Plugin-specific options.
+
+See [Function Estimators](function_estimators.md) for the available methods
+and how to select one.
 
 ## `realization_filters` { #realization-filters }
 
@@ -624,15 +426,13 @@ field and an optional `options` dict, referenced by key from the sections that
 use it (see [Sharing optimizer components by
 key](configuration.md#sharing-optimizer-components-by-key)).
 
-[Realization filters](realization_filters.md) modify the weights of individual
-realizations. For example, they can select a subset of realizations by setting
-the weights of the others to zero, which is how a risk-aware objective is
-constructed.
-
 Fields:
 
 - `method` (required, no default): Selects the filter plugin.
 - `options` (default: `{}`): Plugin-specific options.
+
+See [Realization Filters](realization_filters.md) for available filters and
+how to select one.
 
 ## `samplers` { #samplers }
 
@@ -643,9 +443,6 @@ field and an optional `options` dict, referenced by key from
 [`variables.samplers`](#variables) (see [Sharing optimizer components by
 key](configuration.md#sharing-optimizer-components-by-key)).
 
-[Samplers](samplers.md) generate perturbations added to variables for gradient
-calculations. These perturbations can be deterministic or stochastic.
-
 Fields:
 
 - `method` (default: `"scipy/default"`): Selects the sampler plugin. The default
@@ -653,6 +450,9 @@ Fields:
 - `options` (default: `{}`): Plugin-specific options.
 - `shared` (default: `False`): If `True`, the same set of perturbed values is
   used for all realizations.
+
+See [Samplers](samplers.md) for available sampling methods and their use in
+gradient estimation.
 
 ## `names`
 

@@ -3,7 +3,7 @@
 Every `ropt` optimization is described by a configuration dictionary. This page
 covers what that dictionary holds, the rules that apply to it, and how the
 pieces fit together. For the field-by-field description of each section, see
-[Configuration Sections](configuration_sections.md).
+[Configuration Reference](configuration_sections.md).
 
 ## The configuration object
 
@@ -195,7 +195,8 @@ and supports methods like `"default"`, `"SLSQP"`, and `"L-BFGS-B"`.
 
 Both the plugin name and the method name are case-insensitive, so
 `"SciPy/SLSQP"`, `"scipy/slsqp"`, and `"SCIPY/Slsqp"` all resolve to the
-same backend.
+same backend. The [built-in method table](configuration_sections.md#built-in-methods)
+lists the supported strings and links to their options.
 
 The `backend` field accepts one further form, `"external/..."`, which runs the
 named backend in a separate process; see [Running the optimizer in a separate
@@ -279,122 +280,5 @@ SciPy's default optimizer, and a limit of 50 batches.
 
 ## Full configuration schema
 
-Expand the block below to see every field and its default value.
-
-??? example "Fully expanded configuration (all defaults shown)"
-
-    The example below shows every top-level section of the configuration with
-    all fields set to their default values. In practice you only need to
-    specify the fields you want to override — everything else is filled in
-    automatically.
-
-    ```python
-    CONFIG = {
-        "variables": {
-            "variable_count": ...,                            # required, no default
-            "lower_bounds": -float("inf"),                    # default: -inf
-            "upper_bounds": float("inf"),                     # default: +inf
-            "types": "real",                                  # default: continuous
-            "mask": True,                                     # default: all free
-            "scales": 1.0,                                    # default: no scaling
-            "offsets": 0.0,                                   # default: no offset
-            "perturbation_magnitudes": 0.005,
-            "perturbation_types": "absolute",
-            "boundary_types": "mirror",
-            "samplers": "0",                                  # default: use first sampler for all
-            "seed": 1,
-        },
-        "objectives": {
-            "weights": [1.0],                                 # default: single objective, weight 1.0
-            "scales": 1.0,                                    # default: no scaling
-            "offsets": 0.0,                                   # default: no offset
-            "auto_scale": False,                              # default: do not estimate scales
-            "maximize": False,                                # default: minimize
-            "realization_filters": None,                       # default: no filter
-            "function_estimators": "0",                       # default: use first estimator for all
-        },
-        "linear_constraints": None,                           # No linear constraints
-        "nonlinear_constraints": None,                        # No non-linear constraints
-        "realizations": {
-            "weights": [1.0],                                 # default: single realization, weight 1.0
-            "realization_min_success": None,                  # default: equal to number of realizations
-        },
-        "optimizer": {
-            "max_batches": None,                              # default: no limit
-            "max_functions": None,                            # default: no limit
-            "output_dir": None,                               # default: no output directory
-            "stdout": None,                                   # default: not captured
-            "stderr": None,                                   # default: not captured
-        },
-        "backend": {
-            "method": "scipy/default",                        # default: SciPy SLSQP
-            "max_iterations": None,                           # default: backend-specific
-            "convergence_tolerance": None,                    # default: backend-specific
-            "parallel": False,                                # default: Do not evaluate in parallel
-            "verbose": None,                                  # default: silent
-            "options": None,                                  # default: no extra options
-        },
-        "gradient": {
-            "number_of_perturbations": 5,
-            "perturbation_min_success": None,                 # default: equal to number_of_perturbations
-            "merge_realizations": False,                      # default: estimate and average gradients
-            "evaluation_policy": "auto",                      # default: evaluate functions and perturbations
-        },                                                    #          as needed
-        "samplers": [
-            {
-                "method": "scipy/default",                    # default: standard normal N(0,1)
-                "options": {},
-                "shared": False,                              # default: Each realizations has its own
-                                                              #          set of perturbations
-            },
-        ],
-        "function_estimators": [
-            {
-                "method": "default/default",                  # default: weighted average
-                "options": {},
-            },
-        ],
-        "realization_filters": [],                            # default: none configured
-        "names": {},                                          # default: none configured
-    }
-    ```
-
-    `types`, `perturbation_types` and `boundary_types` are shown as strings.
-    These are the values of [`VariableType`][ropt.enums.VariableType],
-    [`PerturbationType`][ropt.enums.PerturbationType] and
-    [`BoundaryType`][ropt.enums.BoundaryType] in [`ropt.enums`][ropt.enums],
-    whose members may be written in their place.
-
-    Some sections above are set to `None` or `[]` because they are optional
-    and problem-specific. When configured, their internal structure is as
-    follows:
-
-    ```python
-    # linear_constraints (all fields required, no defaults):
-    "linear_constraints": {
-        "coefficients": ...,                      # required: 2D array (constraints × variables)
-        "lower_bounds": ...,                      # required: 1D array (one per constraint)
-        "upper_bounds": ...,                      # required: 1D array (one per constraint)
-        "scales": 1.0,                            # default: no scaling
-        "auto_scale": False,                      # default: do not estimate scales
-    }
-
-    # nonlinear_constraints (bounds are required, the rest has defaults):
-    "nonlinear_constraints": {
-        "lower_bounds": ...,                      # required: 1D array (one per constraint)
-        "upper_bounds": ...,                      # required: 1D array (one per constraint)
-        "scales": 1.0,                            # default: no scaling
-        "auto_scale": False,                      # default: do not estimate scales
-        "realization_filters": None,               # default: no filter
-        "function_estimators": "0",                # default: use first estimator
-    }
-
-    # realization_filters entries (method is required):
-    "realization_filters": [
-        {
-            "method": ...,                        # required: str ("plugin/method")
-            "options": {},
-        },
-    ]
-
-    ```
+See the [full configuration schema](configuration_sections.md#full-configuration-schema)
+in Configuration Reference for all fields and their defaults.

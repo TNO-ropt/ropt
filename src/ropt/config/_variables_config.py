@@ -37,8 +37,8 @@ class VariablesConfig(BaseModel):
     mask, and perturbation settings. It is the `variables` section of the
     configuration.
 
-    See [Configuration Sections](../optimizer_setup/configuration_sections.md#variables) for
-    detailed descriptions and usage examples.
+    See [Configuration Reference](../optimizer_setup/configuration_sections.md#variables)
+    for field descriptions and defaults.
 
     The perturbation defaults are
     [`DEFAULT_PERTURBATION_MAGNITUDE`][ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE],

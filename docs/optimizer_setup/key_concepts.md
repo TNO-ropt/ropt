@@ -63,7 +63,7 @@ installing extra packages.
 Each of the four kinds has its own place in the configuration. The
 exact syntax, the `method` naming convention (see
 [method strings](configuration.md#method-strings)), and the available options are
-described in [Configuration Sections](configuration_sections.md); the dedicated
+described in [Configuration Reference](configuration_sections.md); the dedicated
 pages [Choosing an Optimizer](optimizer.md), [Samplers](samplers.md),
 [Realization Filters](realization_filters.md) and
 [Function Estimators](function_estimators.md) cover each kind in depth.
@@ -82,8 +82,8 @@ optimization as implemented by `ropt`.
 
 **Variable vector**
 :   A single point $\mathbf{x}$ in the optimization space — the set of values
-    the optimizer is trying to improve. See [Variables](variables.md), and
-    [Discrete and Mixed-Integer Variables](discrete.md) for integer-valued ones.
+    the optimizer is trying to improve. See [Variables](variables.md) for
+    continuous and integer-valued variables.
 
 **Realization**
 :   One member $f_i$ of the function ensemble. Each realization represents a

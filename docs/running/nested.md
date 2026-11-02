@@ -72,7 +72,7 @@ configured completely differently — here the outer is integer-valued and
 gradient-free, while the inner is continuous and uses an ensemble of five
 realizations. See [`variables`](../optimizer_setup/configuration_sections.md#variables)
 for the field, and
-[Discrete and Mixed-Integer Variables](../optimizer_setup/discrete.md) for the
+[Integer variables](../optimizer_setup/variables.md#integer-variables) for the
 outer method.
 
 ## The outer evaluation function

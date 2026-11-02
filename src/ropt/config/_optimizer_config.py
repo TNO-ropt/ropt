@@ -13,8 +13,8 @@ class OptimizerConfig(BaseModel):
     `OptimizerConfig` defines the settings that control how an optimization is
     managed. It is the `optimizer` section of the configuration.
 
-    See [Configuration Sections](../optimizer_setup/configuration_sections.md#optimizer) for
-    detailed descriptions and usage examples.
+    See [Configuration Reference](../optimizer_setup/configuration_sections.md#optimizer)
+    for field descriptions and defaults.
 
     Warning:
         Capturing output rewires process-global state, so one optimization at a

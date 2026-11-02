@@ -24,7 +24,7 @@ already evaluated at the starting point, see
 [Reusing Results at the Starting Point](../running/initial_values.md).
 
 See [Variables](variables.md) and
-[Discrete and Mixed-Integer Variables](discrete.md).
+[Integer variables](variables.md#integer-variables).
 
 ## What should the optimizer improve?
 
@@ -169,4 +169,4 @@ See [Choosing an Optimizer](optimizer.md) and the
 [backend capability reference](../reference/backend.md).
 
 For the names, defaults, and types of every configuration field, see
-[Configuration Sections](configuration_sections.md).
+[Configuration Reference](configuration_sections.md).

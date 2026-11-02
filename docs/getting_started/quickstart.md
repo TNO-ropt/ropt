@@ -58,7 +58,7 @@ Every `ropt` optimization needs three things:
    value that `ropt` uses to estimate gradients. See
    [Optimization Choices](../optimizer_setup/choices.md) surveys the main
    decisions, including scaling, constraints, ensemble treatment and methods.
-   See [Configuration Sections](../optimizer_setup/configuration_sections.md)
+   See [Configuration Reference](../optimizer_setup/configuration_sections.md)
    for the full list of settings.
 2. **An evaluation function** — a Python function that takes a set of variable
    values and returns the number to minimize. See

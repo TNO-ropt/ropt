@@ -100,15 +100,24 @@ optimum.
     `functions.objectives` or their variables. The runnable demonstration is
     [examples/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py).
 
-An `offsets` entry is subtracted before the division. It cannot move the optimum
-or change the gradient, but it changes the magnitude the optimizer tests against
-its tolerances, which matters for an objective that is large and
-varies little. See [Scaling
-objectives](configuration_sections.md#objective-scales) and
-[Offsetting objectives](configuration_sections.md#objective-offsets) for the
-full field descriptions. To choose scales and offsets from your own preliminary
-evaluation, see [Choose scales from a preliminary
-evaluation](choices.md#choose-scales-from-a-preliminary-evaluation).
+See [Scaling objectives](configuration_sections.md#objective-scales) for the
+field defaults and automatic scaling behavior. To choose scales and offsets
+from your own preliminary evaluation, see
+[Choose scales from a preliminary evaluation](choices.md#choose-scales-from-a-preliminary-evaluation).
+
+### Offsetting objectives { #offsetting-objectives }
+
+The `offsets` field subtracts a baseline before dividing by the scale:
+$y_j = (f_j-o_j)/s_j$. The offset defaults to zero. It does not change the
+optimum or gradient, but it changes the magnitude of the objective values the
+optimizer sees, which can affect when a stopping tolerance is met. For example,
+subtracting a baseline near $10^9$ before scaling variations of about $10^5$
+can bring those variations to order one.
+
+With an estimator that measures dispersion, such as standard deviation, the
+offset is also subtracted from the estimated value and restored in the reported
+result. See [Offsetting objectives](configuration_sections.md#objective-offsets)
+for the field reference.
 
 ## See also
 

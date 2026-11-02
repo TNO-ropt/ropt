@@ -22,8 +22,8 @@ class GradientConfig(BaseModel):
     `GradientConfig` specifies how gradients are estimated in gradient-based
     optimizers. It is the `gradient` section of the configuration.
 
-    See [Configuration Sections](../optimizer_setup/configuration_sections.md#gradient) for
-    detailed descriptions and usage examples.
+    See [Configuration Reference](../optimizer_setup/configuration_sections.md#gradient)
+    for field descriptions and defaults.
 
     `number_of_perturbations` defaults to
     [`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS],

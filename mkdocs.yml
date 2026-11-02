@@ -5,6 +5,7 @@ theme:
   features:
     - navigation.tabs
     - navigation.tabs.sticky
+    - navigation.indexes
     - navigation.top
     - navigation.expand
     - navigation.footer
@@ -133,16 +134,15 @@ nav:
       - "Key Concepts": optimizer_setup/key_concepts.md
       - "Optimization Choices": optimizer_setup/choices.md
       - "Configuration": optimizer_setup/configuration.md
-      - "Configuration Sections": optimizer_setup/configuration_sections.md
       - "Variables": optimizer_setup/variables.md
       - "Objectives": optimizer_setup/objectives.md
       - "Constraints": optimizer_setup/constraints.md
-      - "Discrete and Mixed-Integer Variables": optimizer_setup/discrete.md
       - "Choosing an Optimizer": optimizer_setup/optimizer.md
       - "Stochastic Gradients": optimizer_setup/gradients.md
       - "Samplers": optimizer_setup/samplers.md
       - "Realization Filters": optimizer_setup/realization_filters.md
       - "Function Estimators": optimizer_setup/function_estimators.md
+      - "Configuration Reference": optimizer_setup/configuration_sections.md
   - "Troubleshooting":
       - "Troubleshooting": troubleshooting/index.md
       - "Keyboard Interrupts": troubleshooting/keyboard_interrupt.md
@@ -150,6 +150,7 @@ nav:
       - "Plugin Discovery": advanced/plugin_discovery.md
       - "Writing a Plugin": advanced/writing_plugins.md
   - "Reference":
+      - reference/index.md
       - "Optimization API": reference/api.md
       - "Configuration Classes": reference/config.md
       - "Results & Events":

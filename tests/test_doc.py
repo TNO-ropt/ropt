@@ -10,10 +10,17 @@ import pytest
 
 import ropt.results
 from ropt import DataFrameHandler, optimize
-from ropt.backend.scipy import SCIPY_OPTIONS_SCHEMA, _gen_capability_table
+from ropt.backend.scipy import (
+    SCIPY_OPTIONS_SCHEMA,
+    SUPPORTED_SCIPY_METHODS,
+    _gen_capability_table,
+)
 from ropt.config.options import gen_options_table
 from ropt.enums import ExitCode
+from ropt.function_estimator.default import DEFAULT_FUNCTION_ESTIMATOR_METHODS
+from ropt.realization_filter.default import DEFAULT_REALIZATION_FILTER_METHODS
 from ropt.results import FunctionResults, GradientResults
+from ropt.sampler.scipy import SCIPY_SAMPLER_SUPPORTED_METHODS
 
 _ROOT = Path(__file__).parent.parent
 _SNIPPET_DIR = _ROOT / "docs" / "snippets"
@@ -21,6 +28,9 @@ _QUICKSTART = _ROOT / "docs" / "getting_started" / "quickstart.md"
 _EXIT_CODES = _ROOT / "docs" / "results" / "exit_codes.md"
 _EXAMPLES_PAGE = _ROOT / "docs" / "getting_started" / "examples.md"
 _HANDLERS = _ROOT / "docs" / "results" / "handlers.md"
+_CONFIGURATION_REFERENCE = (
+    _ROOT / "docs" / "optimizer_setup" / "configuration_sections.md"
+)
 
 # Misplaced backticks render as a code span, so no reference reaches
 # mkdocs-autorefs and `mkdocs build --strict` stays silent.
@@ -54,6 +64,30 @@ def test_scipy_options_table() -> None:
 
 def test_scipy_capability_table() -> None:
     _check_snippet("scipy_capabilities.md", _gen_capability_table())
+
+
+@pytest.mark.parametrize(
+    ("section", "plugin", "methods"),
+    [
+        ("backend", "scipy", SUPPORTED_SCIPY_METHODS | {"default"}),
+        ("samplers", "scipy", SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"}),
+        ("function_estimators", "default", DEFAULT_FUNCTION_ESTIMATOR_METHODS),
+        ("realization_filters", "default", DEFAULT_REALIZATION_FILTER_METHODS),
+    ],
+)
+def test_configuration_reference_lists_builtin_methods(
+    section: str, plugin: str, methods: set[str]
+) -> None:
+    rows = [
+        line
+        for line in _CONFIGURATION_REFERENCE.read_text().splitlines()
+        if line.startswith(f"| `{section}` |")
+    ]
+    assert len(rows) == 1, f"expected one method-table row for {section}, got {rows}"
+    listed = set(re.findall(r"`([\w-]+/[\w-]+)`", rows[0]))
+    expected = {f"{plugin}/{method}" for method in methods}
+    assert sorted(expected - listed) == [], "missing from the method table"
+    assert sorted(listed - expected) == [], "unsupported method in the table"
 
 
 def test_no_malformed_cross_references() -> None:

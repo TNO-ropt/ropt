@@ -1,9 +1,10 @@
 """Default values used by the configuration classes.
 
-See [Configuration Sections][config-perturbations] for detailed explanations
-of these defaults and their interactions.
+See [Configuration Reference][config-perturbations] for these field defaults.
+See [Stochastic Gradients][gradient-settings] for how they are used.
 
 [config-perturbations]: ../optimizer_setup/configuration_sections.md#variable-perturbations
+[gradient-settings]: ../optimizer_setup/gradients.md
 """
 
 from typing import Final

@@ -73,8 +73,12 @@ Because the constraint is computed per realization and uses `A[r]`, it is
 ## Deciding when a constraint is satisfied
 
 A constraint is rarely met exactly, so [`optimize`][ropt.optimize] takes a
-`constraint_tolerance`: a result counts as feasible when no constraint is
-violated by more than that amount.
+`constraint_tolerance`. It compares violations in the scaled domain used by the
+optimizer: a result counts as feasible when no scaled bound, linear, or
+nonlinear constraint violation is greater than the tolerance. Constraint scales
+therefore affect the meaning of this value. This check selects the result
+returned by `optimize`; it does not set the optimizer's own convergence
+tolerance.
 
 ```python
 --8<-- "examples/constrained.py:run"
@@ -89,7 +93,9 @@ that is too tight is a common reason for an empty result — see
 To watch feasibility as the optimization proceeds, read `constraint_info` from
 the result the result callback receives. Its `nonlinear_violation` is zero
 where a constraint is met, positive by the amount it is exceeded, and `NaN` where
-the constraint value is `NaN`:
+the constraint value is `NaN`. These are the unscaled constraint violations.
+To inspect the scaled violations used by `constraint_tolerance`, read
+`result.scaled.constraint_info`:
 
 ```python
 --8<-- "examples/constrained.py:report"
@@ -109,6 +115,30 @@ fifth variables to be equal:
 The script adds it when run with `--linear`. One row per constraint, one
 coefficient per variable; see
 [`linear_constraints`](configuration_sections.md#linear_constraints) for the field
-reference, and [Scaling the
-equations](configuration_sections.md#linear-constraint-scales) for rescaling a
-row before it reaches the optimizer.
+reference.
+
+## Scaling constraints { #scaling-constraints }
+
+Scaling changes the units used by the optimizer, not the configured feasible
+region. Variable scales and offsets are substituted into linear equations
+automatically. If $x=s\,y+o$, then $A x=b$ becomes
+$A\,\mathrm{diag}(s)y=b-Ao$.
+
+The `linear_constraints.scales` field then divides each equation and its bounds
+by a positive per-equation scale (default: `1.0`). Set
+`linear_constraints.auto_scale` (one boolean for the whole section) to estimate
+an additional scale for each equation from its largest absolute coefficient
+among the free variables after variable scaling. This estimate multiplies any
+configured scale. See
+[Scaling the equations](configuration_sections.md#linear-constraint-scales)
+for the exact rule.
+
+For nonlinear constraints, `nonlinear_constraints.scales` divides each
+constraint value and its bounds by a positive scale (default: `1.0`). The
+per-constraint `auto_scale` option estimates an additional scale for each
+constraint from the first evaluation batch and multiplies the configured
+scale. Constraints have no offsets: the optimizer works with the difference
+between a constraint and its bound. See
+[Scaling constraints](configuration_sections.md#constraint-scales) for the
+field details. For the effects of scales on objectives, see
+[Objectives](objectives.md#weights-and-scales-determine-the-trade-off-together).

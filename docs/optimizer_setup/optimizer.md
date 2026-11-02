@@ -38,9 +38,8 @@ Options that belong to the algorithm itself, rather than to `ropt`, go in
 
     Not every method supports every kind of constraint, and a mismatch is
     rejected when the optimization starts rather than ignored; see
-    [`backend`](configuration_sections.md#backend) for what that error is. The
-    one case that *is* ignored silently is integer variables; see
-    [Discrete and Mixed-Integer Variables](discrete.md).
+    [`backend`](configuration_sections.md#backend) for the supported
+    constraints.
 
 ## Running the method in a separate process { #external-backend }
 
@@ -54,8 +53,8 @@ process of its own:
 This SciPy example shows the syntax; the built-in SciPy backend does not need
 process isolation. Some backend plugins may need it to run concurrently with
 other optimizations. Starting a child process and passing evaluation requests
-and results between processes adds overhead, so use `external/` when isolation
-is required.
+and results between processes adds overhead, so only use `external/` when
+isolation is required.
 
 `ropt` spawns a child process, creates the named backend there, and lets it
 drive the optimization. The function and gradient evaluations still happen in
@@ -110,8 +109,15 @@ perturbed points on every iteration.
 
 A gradient-free method such as `differential_evolution` avoids that entirely: it
 evaluates many candidate points instead of following a gradient. It needs bounds
-on every variable, ignores `perturbation_magnitudes`, and is the only choice
-when any variable is an integer.
+on every variable and ignores `perturbation_magnitudes`. In the built-in SciPy
+backend, it is the only method that honors integer variables. Other SciPy
+methods silently treat them as continuous. For these variables, set
+`variables.types` to `"integer"` or provide a type for each variable; see
+[Integer variables](variables.md#integer-variables).
+
+For reproducible results with `differential_evolution`, set its random
+generator seed in `backend.options`, for example `{"rng": 4}` as in the
+[integer-variable example](https://github.com/TNO-ropt/ropt/blob/main/examples/discrete.py).
 
 ## Limiting the length of an optimization { #limiting-the-length-of-a-run }
 
