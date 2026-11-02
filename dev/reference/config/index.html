@@ -1372,34 +1372,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Sections
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../optimizer_setup/variables/" class="md-nav__link">
         
   
@@ -1484,14 +1456,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/discrete/" class="md-nav__link">
+      <a href="../../optimizer_setup/optimizer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Discrete and Mixed-Integer Variables
+    Choosing an Optimizer
   
 
     
@@ -1512,14 +1484,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/optimizer/" class="md-nav__link">
+      <a href="../../optimizer_setup/discrete/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Choosing an Optimizer
+    Discrete and Mixed-Integer Optimization
   
 
     
@@ -1632,6 +1604,34 @@
     
   
     Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
   
 
     
@@ -3082,8 +3082,8 @@
 <p>Pydantic models that together define a complete optimization setup. Each
 corresponds to a top-level section of the configuration dictionary that
 describes a single optimization. See
-<a href="../../optimizer_setup/configuration_sections/">Configuration Sections</a> for the
-fields, their defaults and worked examples.</p>
+<a href="../../optimizer_setup/configuration_sections/">Configuration Reference</a> for the
+fields and their defaults.</p>
 
 
 
@@ -3121,8 +3121,8 @@ fields, their defaults and worked examples.</p>
 <p><code>VariablesConfig</code> defines optimization variable settings: bounds, types,
 mask, and perturbation settings. It is the <code>variables</code> section of the
 configuration.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#variables">Configuration Sections</a> for
-detailed descriptions and usage examples.</p>
+<p>See <a href="../../optimizer_setup/configuration_sections/#variables">Configuration Reference</a>
+for field descriptions and defaults.</p>
 <p>The perturbation defaults are
 <a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_MAGNITUDE
 
@@ -3341,8 +3341,8 @@ derives scales from the bounds when that is what is wanted.</p>
         <p>Configuration class for objective functions.</p>
 <p><code>ObjectiveFunctionsConfig</code> defines objective function settings. It is the
 <code>objectives</code> section of the configuration.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#objectives">Configuration Sections</a> for
-detailed descriptions and usage examples.</p>
+<p>See <a href="../../optimizer_setup/configuration_sections/#objectives">Configuration Reference</a>
+for field descriptions and defaults.</p>
 <p>The reported <code>target_objective</code> is divided by the estimated <code>auto_scale</code>
 factors, so optimizations that differ in that setting compare only through
 <code>functions.objectives</code> or their variables.</p>
@@ -3730,8 +3730,8 @@ descriptions and usage examples.</p>
         <p>Configuration class for realizations.</p>
 <p><code>RealizationsConfig</code> defines realization ensemble settings. It is the
 <code>realizations</code> section of the configuration.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#realizations">Configuration Sections</a> for
-detailed descriptions and usage examples.</p>
+<p>See <a href="../../optimizer_setup/configuration_sections/#realizations">Configuration Reference</a>
+for field descriptions and defaults.</p>
 <p><code>realization_min_success</code> defaults to the number of realizations, so a
 single failure ends the optimization.</p>
 
@@ -3816,8 +3816,8 @@ single failure ends the optimization.</p>
         <p>Configuration class for the optimization algorithm.</p>
 <p><code>OptimizerConfig</code> defines the settings that control how an optimization is
 managed. It is the <code>optimizer</code> section of the configuration.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#optimizer">Configuration Sections</a> for
-detailed descriptions and usage examples.</p>
+<p>See <a href="../../optimizer_setup/configuration_sections/#optimizer">Configuration Reference</a>
+for field descriptions and defaults.</p>
 
 
 <details class="warning" open>
@@ -3941,8 +3941,8 @@ while another holds the capture raises
         <p>Configuration class for the optimization backend.</p>
 <p><code>BackendConfig</code> defines the configuration for the optimization algorithm
 used by an optimization backend plugin.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#backend">Configuration Sections</a> for
-detailed descriptions and usage examples.</p>
+<p>See <a href="../../optimizer_setup/configuration_sections/#backend">Configuration Reference</a>
+for field descriptions and defaults.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4069,8 +4069,8 @@ detailed descriptions and usage examples.</p>
         <p>Configuration class for gradient calculations.</p>
 <p><code>GradientConfig</code> specifies how gradients are estimated in gradient-based
 optimizers. It is the <code>gradient</code> section of the configuration.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#gradient">Configuration Sections</a> for
-detailed descriptions and usage examples.</p>
+<p>See <a href="../../optimizer_setup/configuration_sections/#gradient">Configuration Reference</a>
+for field descriptions and defaults.</p>
 <p><code>number_of_perturbations</code> defaults to
 <a class="autorefs autorefs-internal" title="            DEFAULT_NUMBER_OF_PERTURBATIONS
 
@@ -4355,8 +4355,8 @@ descriptions and usage examples.</p>
         <p>Configuration class for samplers.</p>
 <p><code>SamplerConfig</code> configures a <a class="autorefs autorefs-internal" title="            ropt.sampler.Sampler" href="../sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> plugin that
 generates variable perturbations for gradient estimation.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#samplers">Configuration Sections</a> for
-detailed descriptions and usage examples.</p>
+<p>See <a href="../../optimizer_setup/configuration_sections/#samplers">Configuration Reference</a>
+for field descriptions and defaults.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4449,8 +4449,8 @@ detailed descriptions and usage examples.</p>
     <div class="doc doc-contents first">
 
         <p>Default values used by the configuration classes.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#variable-perturbations">Configuration Sections</a> for detailed explanations
-of these defaults and their interactions.</p>
+<p>See <a href="../../optimizer_setup/configuration_sections/#variable-perturbations">Configuration Reference</a> for these field defaults.
+See <a href="../../optimizer_setup/gradients/">Stochastic Gradients</a> for how they are used.</p>
 
 
 

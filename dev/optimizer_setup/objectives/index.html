@@ -1375,34 +1375,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration_sections/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Sections
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../variables/" class="md-nav__link">
         
   
@@ -1521,6 +1493,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Weights and scales determine the trade-off together">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#offsetting-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offsetting objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1578,14 +1567,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../discrete/" class="md-nav__link">
+      <a href="../optimizer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Discrete and Mixed-Integer Variables
+    Choosing an Optimizer
   
 
     
@@ -1606,14 +1595,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimizer/" class="md-nav__link">
+      <a href="../discrete/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Choosing an Optimizer
+    Discrete and Mixed-Integer Optimization
   
 
     
@@ -1726,6 +1715,34 @@
     
   
     Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
   
 
     
@@ -2558,6 +2575,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Weights and scales determine the trade-off together">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#offsetting-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offsetting objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2667,15 +2701,21 @@ that differ in this setting can only be compared through
 <code>functions.objectives</code> or their variables. The runnable demonstration is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py">examples/scaling.py</a>.</p>
 </div>
-<p>An <code>offsets</code> entry is subtracted before the division. It cannot move the optimum
-or change the gradient, but it changes the magnitude the optimizer tests against
-its tolerances, which matters for an objective that is large and
-varies little. See <a href="../configuration_sections/#objective-scales">Scaling
-objectives</a> and
-<a href="../configuration_sections/#objective-offsets">Offsetting objectives</a> for the
-full field descriptions. To choose scales and offsets from your own preliminary
-evaluation, see <a href="../choices/#choose-scales-from-a-preliminary-evaluation">Choose scales from a preliminary
-evaluation</a>.</p>
+<p>See <a href="../configuration_sections/#objective-scales">Scaling objectives</a> for the
+field defaults and automatic scaling behavior. To choose scales and offsets
+from your own preliminary evaluation, see
+<a href="../choices/#choose-scales-from-a-preliminary-evaluation">Choose scales from a preliminary evaluation</a>.</p>
+<h3 id="offsetting-objectives">Offsetting objectives</h3>
+<p>The <code>offsets</code> field subtracts a baseline before dividing by the scale:
+<span class="arithmatex">\(y_j = (f_j-o_j)/s_j\)</span>. The offset defaults to zero. It does not change the
+optimum or gradient, but it changes the magnitude of the objective values the
+optimizer sees, which can affect when a stopping tolerance is met. For example,
+subtracting a baseline near <span class="arithmatex">\(10^9\)</span> before scaling variations of about <span class="arithmatex">\(10^5\)</span>
+can bring those variations to order one.</p>
+<p>With an estimator that measures dispersion, such as standard deviation, the
+offset is also subtracted from the estimated value and restored in the reported
+result. See <a href="../configuration_sections/#objective-offsets">Offsetting objectives</a>
+for the field reference.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li>What an optimization reports in each domain, and which fields are comparable

@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../configuration_sections/">
+        <link rel="prev" href="../configuration/">
       
       
         <link rel="next" href="../objectives/">
@@ -1372,34 +1372,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration_sections/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Sections
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -1578,14 +1550,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../discrete/" class="md-nav__link">
+      <a href="../optimizer/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Discrete and Mixed-Integer Variables
+    Choosing an Optimizer
   
 
     
@@ -1606,14 +1578,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimizer/" class="md-nav__link">
+      <a href="../discrete/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Choosing an Optimizer
+    Discrete and Mixed-Integer Optimization
   
 
     
@@ -1726,6 +1698,34 @@
     
   
     Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
   
 
     
@@ -2618,43 +2618,50 @@ free:</p>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>A fixed variable keeps the value it had in the initial vector, is never
-perturbed, and is reported back unchanged. This is the way to explore a subset
-of a larger problem without rewriting the configuration around it.</p>
+perturbed, and is reported back unchanged. This lets you explore a subset of a
+larger problem without rewriting the configuration around it. It is also how
+<a href="../../running/nested/#splitting-the-variables">nested optimizations</a> assign
+different variables to the outer and inner optimizers.</p>
 <h2 id="integer-variables">Integer variables</h2>
 <p>The <code>types</code> field makes variables integer-valued rather than continuous. That
 choice constrains the rest of the configuration, because an integer variable
 cannot be differentiated — see
-<a href="../discrete/">Discrete and Mixed-Integer Variables</a>.</p>
+<a href="../discrete/">Discrete and Mixed-Integer Optimization</a>.</p>
 <h2 id="scaling">Scaling</h2>
 <p>Variables reach the optimizer as <span class="arithmatex">\(y = (x - o)/s\)</span>, using the <code>scales</code> and
 <code>offsets</code> fields, and are reported back as <span class="arithmatex">\(x = s\,y + o\)</span>. Both directions come
 from the same two arrays, so they cannot disagree.</p>
-<p>This matters when variables differ by orders of magnitude. An optimizer takes a
-step of the same size in every direction and judges convergence with a single
-tolerance for all of them, and neither is meaningful unless the variables are
-comparable in size. The bounds are one source of scales, and
+<p>Whether scaling helps depends on the optimizer. It can be useful when variables
+differ greatly in magnitude, and the bounds are one possible source of scales.
 <a class="autorefs autorefs-internal" title="            scales_and_offsets_from_bounds" href="../../reference/utils/#ropt.utils.scales_and_offsets_from_bounds"><code>scales_and_offsets_from_bounds</code></a>
 derives them:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">scales_and_offsets_from_bounds</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">scales</span><span class="p">,</span> <span class="n">offsets</span> <span class="o">=</span> <span class="n">scales_and_offsets_from_bounds</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">])</span>
 </span></code></pre></div>
-<p>That maps both variables onto <span class="arithmatex">\([0, 1]\)</span>. Scales must be positive, since a scale
-is a change of units and nothing else. There is no <code>auto_scale</code> for variables:
-the bounds are the only information available before the optimization starts,
-and using them is a choice rather than a default.</p>
-<p>Everything describing the variables moves with them — the bounds, the absolute
-perturbation magnitudes, and the linear constraints — so scaling is not
-something that has to be applied consistently by hand. The details are under
-<a href="../configuration_sections/#variable-scales">Scaling the variables</a>.</p>
+<p>That maps both variables onto <span class="arithmatex">\([0, 1]\)</span>. Scales must be positive, and there is no
+<code>auto_scale</code> for variables. The bounds and linear constraints are transformed
+along with the variables. Absolute perturbation magnitudes are multiplied by
+the variable scales; relative magnitudes are dimensionless and are not changed.
+See <a href="../configuration_sections/#variable-scales">Scaling the variables</a> for the
+transformation details.</p>
 <div class="admonition warning">
 <p class="admonition-title">Scaling changes what an optimization reports</p>
-<p>Results carry both domains: <code>variables</code> in the units configured here, and
-<code>scaled.variables</code> in the optimizer's. Only the first is comparable between
-optimizations that scale differently. The runnable demonstration is
+<p>Results expose <code>variables</code> in the configured units and <code>scaled.variables</code>
+in the optimizer's units. Compare <code>variables</code> between optimizations that use
+different scales. The runnable demonstration is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py">examples/scaling.py</a>,
 and <a href="../../results/results/#scaling-of-results">Working with Results</a>
 describes which fields have two domains.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a> reports bound distances in
+configured units. The corresponding <code>scaled.constraint_info</code> fields give
+the distances in the optimizer's units; offsets shift variables and bounds
+together and do not change those distances.</p>
 </div>
 <h2 id="perturbations">Perturbations</h2>
 <p>The remaining fields of the section — <code>perturbation_magnitudes</code>,
@@ -2697,7 +2704,7 @@ themselves. They are covered in
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../configuration_sections/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration Sections">
+          <a href="../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2707,7 +2714,7 @@ themselves. They are covered in
                 Previous
               </span>
               <div class="md-ellipsis">
-                Configuration Sections
+                Configuration
               </div>
             </div>
           </a>

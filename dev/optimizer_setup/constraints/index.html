@@ -12,7 +12,7 @@
         <link rel="prev" href="../objectives/">
       
       
-        <link rel="next" href="../discrete/">
+        <link rel="next" href="../optimizer/">
       
       
         
@@ -1375,34 +1375,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration_sections/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Sections
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../variables/" class="md-nav__link">
         
   
@@ -1562,38 +1534,21 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#scaling-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../discrete/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Discrete and Mixed-Integer Variables
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1614,6 +1569,34 @@
     
   
     Choosing an Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../discrete/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discrete and Mixed-Integer Optimization
   
 
     
@@ -1726,6 +1709,34 @@
     
   
     Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
   
 
     
@@ -2571,6 +2582,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#scaling-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2750,9 +2772,29 @@ fifth variables to be equal:</p>
 <p>The script adds it when run with <code>--linear</code>. One row per constraint, one
 coefficient per variable; see
 <a href="../configuration_sections/#linear_constraints"><code>linear_constraints</code></a> for the field
-reference, and <a href="../configuration_sections/#linear-constraint-scales">Scaling the
-equations</a> for rescaling a
-row before it reaches the optimizer.</p>
+reference.</p>
+<h2 id="scaling-constraints">Scaling constraints</h2>
+<p>Scaling changes the units used by the optimizer, not the configured feasible
+region. Variable scales and offsets are substituted into linear equations
+automatically. If <span class="arithmatex">\(x=s\,y+o\)</span>, then <span class="arithmatex">\(A x=b\)</span> becomes
+<span class="arithmatex">\(A\,\mathrm{diag}(s)y=b-Ao\)</span>.</p>
+<p>The <code>linear_constraints.scales</code> field then divides each equation and its bounds
+by a positive per-equation scale (default: <code>1.0</code>). Set
+<code>linear_constraints.auto_scale</code> (one boolean for the whole section) to estimate
+an additional scale for each equation from its largest absolute coefficient
+among the free variables after variable scaling. This estimate multiplies any
+configured scale. See
+<a href="../configuration_sections/#linear-constraint-scales">Scaling the equations</a>
+for the exact rule.</p>
+<p>For nonlinear constraints, <code>nonlinear_constraints.scales</code> divides each
+constraint value and its bounds by a positive scale (default: <code>1.0</code>). The
+per-constraint <code>auto_scale</code> option estimates an additional scale for each
+constraint from the first evaluation batch and multiplies the configured
+scale. Constraints have no offsets: the optimizer works with the difference
+between a constraint and its bound. See
+<a href="../configuration_sections/#constraint-scales">Scaling constraints</a> for the
+field details. For the effects of scales on objectives, see
+<a href="../objectives/#weights-and-scales-determine-the-trade-off-together">Objectives</a>.</p>
 
 
 
@@ -2805,13 +2847,13 @@ row before it reaches the optimizer.</p>
         
         
           
-          <a href="../discrete/" class="md-footer__link md-footer__link--next" aria-label="Next: Discrete and Mixed-Integer Variables">
+          <a href="../optimizer/" class="md-footer__link md-footer__link--next" aria-label="Next: Choosing an Optimizer">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Discrete and Mixed-Integer Variables
+                Choosing an Optimizer
               </div>
             </div>
             <div class="md-footer__button md-icon">
