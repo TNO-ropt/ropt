@@ -5705,8 +5705,9 @@ are killed.</p>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">submit_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">extra_polls</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">query_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">cleanup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">_SCHEDULER_TIMEOUT</span><span class="p">,</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">cleanup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5722,9 +5723,9 @@ to be explicit.</p>
 <p>The queue <code>"local"</code> without a <code>cluster</code> runs each job as a process on
 this machine instead, with the same job files and the same rule for the
 evaluation function. It needs neither <code>pysqa</code> nor a configuration, and
-it ignores <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code>, <code>submit_options</code> and
-<code>query_retries</code>. It is an error if a configured cluster also has a
-queue named <code>"local"</code>; pass that <code>cluster</code> to submit to it.</p>
+it ignores <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code>, <code>submit_options</code>,
+<code>query_retries</code> and <code>timeout</code>. It is an error if a configured cluster
+also has a queue named <code>"local"</code>; pass that <code>cluster</code> to submit to it.</p>
 <p>A <code>template</code> is the alternative to a configuration: it cannot be
 combined with <code>config_path</code>, <code>cluster</code> or <code>queue</code>. See <a href="../../running/parallel/#running-on-an-hpc-cluster">Running on an
 HPC cluster</a> for the
@@ -5970,6 +5971,23 @@ configuration layout and Slurm examples.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
+                <code>timeout</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum seconds for each scheduler command
+            (default: 60).</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="ropt._executors._hpc_executor._SCHEDULER_TIMEOUT">_SCHEDULER_TIMEOUT</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                 <code>cleanup</code>
             </td>
             <td>
@@ -6020,6 +6038,16 @@ configuration layout and Slurm examples.</p>
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>timeout</code> is not positive and finite.</p>
+              </div>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td>
                   <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>

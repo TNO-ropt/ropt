@@ -3080,6 +3080,11 @@ configuration of your <code>ropt</code> installation:</p>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
 </span></code></pre></div>
+<p>Each scheduler command used to submit, query, or cancel jobs has a 60-second
+timeout by default. Set <code>timeout</code> to change it. If a submission command times
+out, the scheduler may still have accepted the job; ropt warns with its job
+name, which is a UUID. Check the scheduler and cancel that job if it was
+submitted. This timeout does not apply to <code>pysqa</code>'s remote adapter.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/hpc.py">examples/hpc.py</a>.
 Pass it <code>--queue local</code> and it runs the identical optimization on
@@ -3096,10 +3101,10 @@ configuration, so an objective can be tested on it before it is run on a
 cluster:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s2">"local"</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The cluster settings <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code>, <code>submit_options</code>
-and <code>query_retries</code> are ignored, and a <code>template</code> or a <code>scheduler</code> raises a
-<code>ValueError</code>. If a cluster in the <code>pysqa</code> configuration defines a queue named
-<code>local</code>, <code>queue="local"</code> without a <code>cluster</code> raises an
+<p>The cluster settings <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code>, <code>submit_options</code>,
+<code>query_retries</code> and <code>timeout</code> are ignored, and a <code>template</code> or a <code>scheduler</code>
+raises a <code>ValueError</code>. If a cluster in the <code>pysqa</code> configuration defines a
+queue named <code>local</code>, <code>queue="local"</code> without a <code>cluster</code> raises an
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>; pass <code>cluster</code> to submit to
 that queue.</p>
 <h3 id="which-pool">Which pool should I use?</h3>

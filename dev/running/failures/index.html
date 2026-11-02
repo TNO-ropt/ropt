@@ -2734,9 +2734,9 @@ block, that session ends and aborts its remaining work with <code>ABORTED</code>
 <p>An exception raised by a call that is being aborted is still raised, but
 aborts nothing further.</p>
 <p>A <code>KeyboardInterrupt</code> or <code>SystemExit</code> is not a failure. When one passes through
-a call, the calls started from its work, and for <code>run</code> its other functions, are aborted
-with <code>ABORTED</code>, and the exception is raised. Other calls in the session keep
-running if the exception is caught inside the session's <code>with</code> block.</p>
+a call, the calls started from its work, and for <code>run</code> its other functions, are
+aborted with <code>ABORTED</code>, and the exception is raised. Other calls in the session
+keep running if the exception is caught inside the session's <code>with</code> block.</p>
 <p>If an exception raised inside the session's <code>with</code> block is not caught there,
 whether it is a failure or a <code>KeyboardInterrupt</code>, the session ends and aborts
 the calls that are still running with <code>ABORTED</code>.</p>
@@ -2789,7 +2789,7 @@ pending work. Whether it waits for work already running depends on the pool:</p>
 </tr>
 <tr>
 <td><code>hpc_pool</code></td>
-<td>its cluster job is cancelled; on the local queue, the job is terminated, together with every program it started, and killed five seconds later if still running</td>
+<td>ropt requests cancellation of its cluster job; if the scheduler command times out, the job may remain queued or running. On the local queue, the job is terminated, together with every program it started, and killed five seconds later if still running</td>
 </tr>
 </tbody>
 </table>
