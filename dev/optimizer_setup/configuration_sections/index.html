@@ -3075,10 +3075,10 @@ directions come from the same two arrays, so they cannot disagree.</p>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="s2">"offsets"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">],</span>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Scaling matters when variables differ by orders of magnitude. An optimizer takes
-a step of the same size in every direction, and judges convergence with one
-tolerance for all of them; both of those are only meaningful if the variables
-are comparable in size. The example above puts both variables in the range
+<p>Scaling can help when variables differ by orders of magnitude. For example, some
+optimizers use a convergence tolerance that is the same for all variables, which
+works best when the variables are comparable in size. Whether scaling helps
+depends on the optimizer. The example above puts both variables in the range
 <span class="arithmatex">\([0, 1]\)</span>.</p>
 <p>Deriving the scales and offsets from the bounds like that is the common case,
 and <a class="autorefs autorefs-internal" title="            scales_and_offsets_from_bounds" href="../../reference/utils/#ropt.utils.scales_and_offsets_from_bounds"><code>scales_and_offsets_from_bounds</code></a>
@@ -3104,15 +3104,17 @@ to exactly the value you gave it.</p>
 <p>What you see in the results follows from that:</p>
 <ul>
 <li>Variables and perturbed variables are reported unscaled.</li>
-<li>Distances to the variable bounds, in
-  <a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+<li><a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a>, are multiplied by the scale.
-  An offset is a shift shared by a value and its bound, so it cancels out of the
-  distance between them.</li>
+  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a> reports distances to the
+  variable bounds in the configured units. For example,
+  <code>constraint_info.bound_lower</code> is <code>variables - lower_bounds</code>. The matching
+  <code>scaled.constraint_info</code> field gives the distance in the optimizer's units.
+  Offsets do not change distances because they shift the variable and its
+  bounds together.</li>
 </ul>
 <h2 id="objectives"><code>objectives</code></h2>
 <p>Validated into
@@ -3440,18 +3442,20 @@ settings that are forwarded to the backend:</p>
 <p>Where that output ends up is a separate question, decided by
 <a href="#optimizer"><code>stdout</code> and <code>stderr</code></a>. With neither set it goes to the
 terminal. A backend option that names the same setting, such as SciPy's
-<code>disp</code>, takes precedence over <code>verbose</code>.
-- <strong><code>options</code></strong> (default: <code>None</code>): A dictionary or list of strings for generic
+<code>disp</code>, takes precedence over <code>verbose</code>.</p>
+</li>
+<li>
+<p><strong><code>options</code></strong> (default: <code>None</code>): A dictionary or list of strings for generic
   optimizer options. The format and interpretation depend on the specific
   optimization method. These are passed straight to the backend.</p>
-</li>
-</ul>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="s2">"max_iterations"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
 </span></code></pre></div>
+</li>
+</ul>
 <p>Which methods a backend supports, which kinds of constraint and variable each
 of them accepts, and which <code>options</code> they take, is documented by the backend
 itself. For the built-in SciPy backend, see
@@ -3493,10 +3497,11 @@ objective functions and gradients are calculated:</p>
   requested, even if the optimizer hasn't explicitly asked for it. This can
   improve load balancing on HPC clusters by initiating gradient work earlier.</li>
 <li><strong><code>"separate"</code></strong>: Always launch function and gradient evaluations as distinct
-  operations, even if the optimizer requests both simultaneously. This applies
-  with <a href="../realization_filters/">realization filters</a> that might disable
-  certain realizations, as it can reduce the number of gradient evaluations
-  needed based on information obtained from the function evaluations.</li>
+  operations, even if the optimizer requests both simultaneously. This lets
+  <a href="../realization_filters/">realization filters</a> use the function values to
+  exclude realizations before gradient evaluations begin. Perturbation
+  evaluations can then be skipped for realizations excluded from all objectives
+  and constraints.</li>
 </ul>
 <h2 id="function-estimators"><code>function_estimators</code></h2>
 <p>Validated into
