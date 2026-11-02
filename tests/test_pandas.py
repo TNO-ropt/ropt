@@ -244,7 +244,7 @@ def test_to_pandas_join(function_result: FunctionResults) -> None:
         "_".join(column) if isinstance(column, tuple) else column
         for column in frame2.columns.to_numpy()
     )
-    frame = frame1.join(frame2, how="inner", lsuffix="_eval", rsuffix="_func")
+    frame = frame1.join(frame2, how="inner")
     assert not frame.empty
     assert len(frame.columns) == len(frame1.columns) + len(frame2.columns)
 
