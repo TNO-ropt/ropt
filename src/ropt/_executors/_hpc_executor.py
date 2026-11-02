@@ -236,7 +236,9 @@ class HPCExecutor(JobExecutorBase):
 
     @override
     def _cancel_job(self, job_id: int) -> None:
-        self._queue_adapter.delete_job(job_id)
+        if self._queue_adapter.delete_job(job_id) is None:
+            msg = f"The HPC scheduler did not confirm cancellation of job {job_id}."
+            raise ExecutionError(msg)
 
 
 def _execute_command(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
@@ -244,9 +246,11 @@ def _execute_command(  # ruff: ignore[too-many-arguments, too-many-positional-ar
     working_directory: str | None = None,
     split_output: bool = True,  # ruff: ignore[boolean-type-hint-positional-argument, boolean-default-value-positional-argument]
     shell: bool = False,  # ruff: ignore[boolean-type-hint-positional-argument, boolean-default-value-positional-argument]
-    error_filename: str = "pysqa.err",
+    # Keep pysqa's callback signature. Command failures now raise instead of
+    # being written to a file.
+    error_filename: str = "pysqa.err",  # ruff: ignore[unused-function-argument]
     timeout: float = _SCHEDULER_TIMEOUT,
-) -> str | list[str] | None:
+) -> str | list[str]:
     if shell and isinstance(commands, list):
         commands = " ".join(commands)
     try:
@@ -259,9 +263,14 @@ def _execute_command(  # ruff: ignore[too-many-arguments, too-many-positional-ar
             timeout=timeout,
         )
     except subprocess.CalledProcessError as exc:
-        error_file = Path(working_directory or ".") / error_filename
-        error_file.write_text(f"{exc.stdout}\n")
-        return None
+        command_output = exc.stdout
+        if isinstance(command_output, bytes):
+            command_output = command_output.decode(errors="replace")
+        details = command_output.strip() if isinstance(command_output, str) else ""
+        msg = f"HPC scheduler command failed with exit status {exc.returncode}"
+        if details:
+            msg = f"{msg}: {details}"
+        raise ExecutionError(msg) from exc
     return output.split("\n") if split_output else output
 
 

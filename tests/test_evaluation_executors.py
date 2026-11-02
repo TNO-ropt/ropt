@@ -662,7 +662,7 @@ def test_hpc_batch_leaving_cancels_the_jobs_it_started(
             return self._job_id
 
         @override
-        def delete_job(self, process_id: int) -> str:
+        def delete_job(self, process_id: int) -> str | None:
             deleted = super().delete_job(process_id)
             cancelled.set()
             return deleted
@@ -1148,7 +1148,7 @@ if _TEST_HPC:
             self._jobs[self._job_id] = job_name
             return self._job_id
 
-        def delete_job(self, process_id: int) -> str:
+        def delete_job(self, process_id: int) -> str | None:
             self.deleted.append(process_id)
             self._jobs.pop(process_id, None)
             return ""
@@ -1227,12 +1227,13 @@ def test_hpc_executor_passes_timeout_to_pysqa(
         execute_command(command)
 
 
-def test_hpc_scheduler_command_failure_writes_pysqa_error_file(
+def test_hpc_scheduler_command_failure_raises_with_scheduler_output(
     tmp_path: Path,
 ) -> None:
     command = [sys.executable, "-c", "print('refused'); raise SystemExit(1)"]
-    assert _hpc_executor._execute_command(command, str(tmp_path)) is None
-    assert (tmp_path / "pysqa.err").read_text().strip() == "refused"
+    with pytest.raises(ExecutionError, match="exit status 1: refused"):
+        _hpc_executor._execute_command(command, str(tmp_path))
+    assert not (tmp_path / "pysqa.err").exists()
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1293,6 +1294,54 @@ def test_job_executor_keeps_cancelling_after_a_failure_by_default(
     executor = _FailingCancel(tmp_path)
     executor._cancel_jobs([(uuid4(), 1), (uuid4(), 2), (uuid4(), 3)])
     assert executor.cancelled == [1, 2, 3]
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+def test_hpc_cancel_scheduler_error_is_reported_with_job_id(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    class _FailingCancel(MockedHPCAdapter):
+        @override
+        def delete_job(self, process_id: int) -> str:
+            command = [
+                sys.executable,
+                "-c",
+                "print('scancel: scheduler unavailable'); raise SystemExit(1)",
+            ]
+            _hpc_executor._execute_command(command, timeout=1.0)
+            return ""
+
+    adapter = _FailingCancel(tmp_path)
+    _mock_scheduler(monkeypatch, adapter)
+    executor = HPCExecutor(workdir=tmp_path, timeout=1.0, template="")
+    bundle_id = uuid4()
+    with caplog.at_level(logging.WARNING, logger="ropt"):
+        executor._cancel_jobs([(bundle_id, 42)])
+    assert f"Could not cancel HPC job {bundle_id} (job id: 42)" in caplog.text
+    assert "exit status 1: scancel: scheduler unavailable" in caplog.text
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+def test_hpc_cancel_without_confirmation_is_reported(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    class _NoConfirmation(MockedHPCAdapter):
+        @override
+        def delete_job(self, process_id: int) -> None:
+            return None
+
+    adapter = _NoConfirmation(tmp_path)
+    _mock_scheduler(monkeypatch, adapter)
+    executor = HPCExecutor(workdir=tmp_path, timeout=1.0, template="")
+    bundle_id = uuid4()
+    with caplog.at_level(logging.WARNING, logger="ropt"):
+        executor._cancel_jobs([(bundle_id, 42)])
+    assert f"Could not cancel HPC job {bundle_id} (job id: 42)" in caplog.text
+    assert "did not confirm cancellation of job 42" in caplog.text
 
 
 @pytest.mark.parametrize(
