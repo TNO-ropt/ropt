@@ -1161,16 +1161,16 @@ wheels = [
 
 [[package]]
 name = "pysqa"
-version = "1.0.1"
+version = "1.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jinja2" },
     { name = "pandas" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3c/6e/9d1585b34d1e8287173af2c766bcd74ceeb816dd39d75fcd9c88bcf73b82/pysqa-1.0.1.tar.gz", hash = "sha256:df06ebf225be73e3920d01e07a9bd763ad8acec1711e5700ca2cdfa62a8fa18c", size = 25657, upload-time = "2026-09-22T11:30:56.98Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/91/f4724526c3d2676fc5a3bbc80979f6bb63495717d79255ca1aa591855a35/pysqa-1.1.1.tar.gz", hash = "sha256:ec3d103feee9eceaf36d698650e77a9b2c3f5cebf9aa3bd3c8702ce1a99d525a", size = 25658, upload-time = "2026-10-25T06:24:07.848Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b6/b5/32057b9262861b1de1b6da4c68b3c30c8720ac038d844e855968be4a4dc3/pysqa-1.0.1-py3-none-any.whl", hash = "sha256:e9254ec016e44465aed6d8632d298d2a9052832b6ffa2fb6aadc1c38fc039bbc", size = 38533, upload-time = "2026-09-22T11:30:55.621Z" },
+    { url = "https://files.pythonhosted.org/packages/d6/0f/f07311a5fab9d6e3bc6a8481d9c811a061a0c47829b65555d8bb0310f2ca/pysqa-1.1.1-py3-none-any.whl", hash = "sha256:2af0d468f81cdf3ccab3381e2dc13ae13eae48e336c581850dcd438ff3c085a5", size = 38523, upload-time = "2026-10-25T06:24:06.417Z" },
 ]
 
 [[package]]
@@ -1330,7 +1330,7 @@ requires-dist = [
     { name = "pandas", marker = "extra == 'pandas'" },
     { name = "polars", marker = "extra == 'polars'" },
     { name = "pydantic" },
-    { name = "pysqa", marker = "extra == 'hpc'" },
+    { name = "pysqa", marker = "extra == 'hpc'", specifier = ">=1.1" },
     { name = "scipy", specifier = ">=1.15" },
 ]
 provides-extras = ["pandas", "polars", "cloudpickle", "hpc"]
