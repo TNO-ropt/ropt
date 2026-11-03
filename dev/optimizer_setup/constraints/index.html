@@ -1324,8 +1324,6 @@
       
         
       
-        
-      
     
     
     
@@ -1659,34 +1657,6 @@
     
   
     Choosing an Optimizer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../discrete/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Discrete and Mixed-Integer Optimization
   
 
     
@@ -2856,8 +2826,12 @@ the other shapes the return value can take.</p>
 <code>ropt</code> combines them the same way it combines the objectives.</p>
 <h2 id="deciding-when-a-constraint-is-satisfied">Deciding when a constraint is satisfied</h2>
 <p>A constraint is rarely met exactly, so <a class="autorefs autorefs-internal" title="            ropt.optimize" href="../../reference/api/#ropt.optimize"><code>optimize</code></a> takes a
-<code>constraint_tolerance</code>: a result counts as feasible when no constraint is
-violated by more than that amount.</p>
+<code>constraint_tolerance</code>. It compares violations in the scaled domain used by the
+optimizer: a result counts as feasible when no scaled bound, linear, or
+nonlinear constraint violation is greater than the tolerance. Constraint scales
+therefore affect the meaning of this value. This check selects the result
+returned by <code>optimize</code>; it does not set the optimizer's own convergence
+tolerance.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">config</span><span class="p">,</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">INITIAL_VALUES</span><span class="p">,</span>
@@ -2874,7 +2848,9 @@ that is too tight is a common reason for an empty result — see
 <p>To watch feasibility as the optimization proceeds, read <code>constraint_info</code> from
 the result the result callback receives. Its <code>nonlinear_violation</code> is zero
 where a constraint is met, positive by the amount it is exceeded, and <code>NaN</code> where
-the constraint value is <code>NaN</code>:</p>
+the constraint value is <code>NaN</code>. These are the unscaled constraint violations.
+To inspect the scaled violations used by <code>constraint_tolerance</code>, read
+<code>result.scaled.constraint_info</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">FunctionResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""Print any constraint violation, and the point that caused it.</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>

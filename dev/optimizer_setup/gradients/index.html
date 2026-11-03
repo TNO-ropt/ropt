@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../discrete/">
+        <link rel="prev" href="../optimizer/">
       
       
         <link rel="next" href="../samplers/">
@@ -1324,8 +1324,6 @@
       
         
       
-        
-      
     
     
     
@@ -1557,34 +1555,6 @@
     
   
     Choosing an Optimizer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../discrete/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Discrete and Mixed-Integer Optimization
   
 
     
@@ -2976,8 +2946,11 @@ the realizations that did work.</p>
   requested. Improves load balancing on HPC clusters when gradient evaluations
   are likely to be needed soon.</li>
 <li><code>"separate"</code> — never combine function and gradient evaluations into a single
-  batch. This applies with <a href="../realization_filters/">realization filters</a> that
-  disable realizations and reduce gradient work.</li>
+  batch. The functions are evaluated first, so a
+  <a href="../realization_filters/">realization filter</a> can set the weight of some
+  realizations to zero before the gradient is evaluated. The gradient evaluation
+  then skips those realizations. In a combined batch, the weights are not yet
+  known and all realizations are evaluated.</li>
 </ul>
 <h2 id="samplers">Samplers</h2>
 <p>A sampler determines <em>where</em> the perturbed points are placed, while
@@ -3034,7 +3007,7 @@ average, are covered in <a href="../function_estimators/">Function Estimators</a
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../discrete/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Discrete and Mixed-Integer Optimization">
+          <a href="../optimizer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Choosing an Optimizer">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3044,7 +3017,7 @@ average, are covered in <a href="../function_estimators/">Function Estimators</a
                 Previous
               </span>
               <div class="md-ellipsis">
-                Discrete and Mixed-Integer Optimization
+                Choosing an Optimizer
               </div>
             </div>
           </a>

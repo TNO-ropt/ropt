@@ -1322,8 +1322,6 @@
       
         
       
-        
-      
     
     
     
@@ -1554,34 +1552,6 @@
     
   
     Choosing an Optimizer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../optimizer_setup/discrete/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Discrete and Mixed-Integer Optimization
   
 
     
@@ -2781,10 +2751,18 @@ Nothing is picked up from the surrounding code. An optimization started with
 the thread that called it — even if a pool exists next to it.</p>
 <p><strong>Threads cannot be interrupted.</strong> Evaluations with a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
-outside. An evaluation that checks <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../reference/api/#ropt.aborting"><code>aborting</code></a>, or runs its
-external programs with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../reference/api/#ropt.run_program"><code>run_program</code></a>, stops early; any other
-evaluation that may run long and has to be interruptible belongs on a process
-pool or an HPC pool; see
+outside. An evaluation stops early if it:</p>
+<ul>
+<li>checks <a class="autorefs autorefs-internal" title="            ropt.aborting" href="../reference/api/#ropt.aborting"><code>aborting</code></a>;</li>
+<li>runs its external programs with <a class="autorefs autorefs-internal" title="            ropt.run_program" href="../reference/api/#ropt.run_program"><code>run_program</code></a>;</li>
+<li>passes its long-running work to a process pool or an HPC pool, for example
+  with <a class="autorefs autorefs-internal" title="            ropt.run" href="../reference/api/#ropt.run"><code>run</code></a>. On an abort, that call raises
+  <a class="autorefs autorefs-internal" title="            AbortedError" href="../reference/exceptions/#ropt.exceptions.AbortedError"><code>AbortedError</code></a> at once; a process worker
+  still running five seconds later is killed, and an HPC job is cancelled. Work
+  passed to another thread pool runs to completion.</li>
+</ul>
+<p>Any other evaluation that may run long and has to be interruptible belongs on a
+process pool or an HPC pool; see
 <a href="../running/parallel/#stopping-a-run">Stopping an optimization</a>.</p>
 <p><strong>A process pool re-imports your script.</strong> Its workers are started with
 <code>spawn</code>, so each of them imports the file your program was started from, and

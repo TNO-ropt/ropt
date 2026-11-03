@@ -1324,8 +1324,6 @@
       
         
       
-        
-      
     
     
     
@@ -1648,34 +1646,6 @@
     
   
     Choosing an Optimizer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../discrete/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Discrete and Mixed-Integer Optimization
   
 
     
@@ -2755,10 +2725,24 @@ larger problem without rewriting the configuration around it. It is also how
 <a href="../../running/nested/#splitting-the-variables">nested optimizations</a> assign
 different variables to the outer and inner optimizers.</p>
 <h2 id="integer-variables">Integer variables</h2>
-<p>The <code>types</code> field makes variables integer-valued rather than continuous. That
-choice constrains the rest of the configuration, because an integer variable
-cannot be differentiated — see
-<a href="../discrete/">Discrete and Mixed-Integer Optimization</a>.</p>
+<p>The <code>types</code> field makes variables integer-valued rather than continuous. Set it
+to <code>"integer"</code> to make every variable integer-valued, or give one type per
+variable to mix integer and continuous variables:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">"types"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"real"</span><span class="p">,</span> <span class="s2">"real"</span><span class="p">,</span> <span class="s2">"integer"</span><span class="p">,</span> <span class="s2">"integer"</span><span class="p">],</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>An evaluation function receives integer variables as floats with integral
+values. In the built-in SciPy backend, only <code>differential_evolution</code> honors
+integer types; other SciPy methods silently treat them as continuous. This
+method also requires bounds on every variable. See
+<a href="../optimizer/#gradient-based-or-gradient-free">Choosing an Optimizer</a> before
+selecting a method, and the runnable
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/discrete.py">all-integer</a>
+and
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/mixed.py">mixed-variable</a>
+examples.</p>
 <h2 id="scaling">Scaling</h2>
 <p>Variables reach the optimizer as <span class="arithmatex">\(y = (x - o)/s\)</span>, using the <code>scales</code> and
 <code>offsets</code> fields, and are reported back as <span class="arithmatex">\(x = s\,y + o\)</span>. Both directions come
@@ -2767,9 +2751,9 @@ from the same two arrays, so they cannot disagree.</p>
 differ greatly in magnitude, and the bounds are one possible source of scales.
 <a class="autorefs autorefs-internal" title="            scales_and_offsets_from_bounds" href="../../reference/utils/#ropt.utils.scales_and_offsets_from_bounds"><code>scales_and_offsets_from_bounds</code></a>
 derives them:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">scales_and_offsets_from_bounds</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">scales</span><span class="p">,</span> <span class="n">offsets</span> <span class="o">=</span> <span class="n">scales_and_offsets_from_bounds</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">])</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">scales_and_offsets_from_bounds</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">scales</span><span class="p">,</span> <span class="n">offsets</span> <span class="o">=</span> <span class="n">scales_and_offsets_from_bounds</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">])</span>
 </span></code></pre></div>
 <p>That maps both variables onto <span class="arithmatex">\([0, 1]\)</span>. Scales must be positive, and there is no
 <code>auto_scale</code> for variables. The bounds and linear constraints are transformed

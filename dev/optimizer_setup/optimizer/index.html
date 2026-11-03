@@ -12,7 +12,7 @@
         <link rel="prev" href="../constraints/">
       
       
-        <link rel="next" href="../discrete/">
+        <link rel="next" href="../gradients/">
       
       
         
@@ -1324,8 +1324,6 @@
       
         
       
-        
-      
     
     
     
@@ -1678,34 +1676,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../discrete/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Discrete and Mixed-Integer Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -2796,9 +2766,8 @@ backend supports.</p>
 <p class="admonition-title">Note</p>
 <p>Not every method supports every kind of constraint, and a mismatch is
 rejected when the optimization starts rather than ignored; see
-<a href="../configuration_sections/#backend"><code>backend</code></a> for what that error is. The
-one case that <em>is</em> ignored silently is integer variables; see
-<a href="../discrete/">Discrete and Mixed-Integer Optimization</a>.</p>
+<a href="../configuration_sections/#backend"><code>backend</code></a> for the supported
+constraints.</p>
 </div>
 <h2 id="external-backend">Running the method in a separate process</h2>
 <p>Prefix the method with <code>external/</code> to run the optimization algorithm in a
@@ -2808,8 +2777,8 @@ process of its own:</p>
 <p>This SciPy example shows the syntax; the built-in SciPy backend does not need
 process isolation. Some backend plugins may need it to run concurrently with
 other optimizations. Starting a child process and passing evaluation requests
-and results between processes adds overhead, so use <code>external/</code> when isolation
-is required.</p>
+and results between processes adds overhead, so only use <code>external/</code> when
+isolation is required.</p>
 <p><code>ropt</code> spawns a child process, creates the named backend there, and lets it
 drive the optimization. The function and gradient evaluations still happen in
 the original process: the child sends each set of variables back, the parent
@@ -2858,8 +2827,14 @@ analytic derivative, they rely on the estimated gradients described in
 perturbed points on every iteration.</p>
 <p>A gradient-free method such as <code>differential_evolution</code> avoids that entirely: it
 evaluates many candidate points instead of following a gradient. It needs bounds
-on every variable, ignores <code>perturbation_magnitudes</code>, and is the only choice
-when any variable is an integer.</p>
+on every variable and ignores <code>perturbation_magnitudes</code>. In the built-in SciPy
+backend, it is the only method that honors integer variables. Other SciPy
+methods silently treat them as continuous. For these variables, set
+<code>variables.types</code> to <code>"integer"</code> or provide a type for each variable; see
+<a href="../variables/#integer-variables">Integer variables</a>.</p>
+<p>For reproducible results with <code>differential_evolution</code>, set its random
+generator seed in <code>backend.options</code>, for example <code>{"rng": 4}</code> as in the
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/discrete.py">integer-variable example</a>.</p>
 <h2 id="limiting-the-length-of-a-run">Limiting the length of an optimization</h2>
 <p>Four settings can stop an optimization, and they are <strong>split across the two
 sections</strong>:</p>
@@ -2988,13 +2963,13 @@ overlap. See
         
         
           
-          <a href="../discrete/" class="md-footer__link md-footer__link--next" aria-label="Next: Discrete and Mixed-Integer Optimization">
+          <a href="../gradients/" class="md-footer__link md-footer__link--next" aria-label="Next: Stochastic Gradients">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Discrete and Mixed-Integer Optimization
+                Stochastic Gradients
               </div>
             </div>
             <div class="md-footer__button md-icon">
