@@ -15,7 +15,7 @@ from pydantic import (
 )
 
 from ropt._scaling import scale
-from ropt._utils import enum_mask, immutable_array, update_fields
+from ropt._utils import immutable_array, update_fields
 from ropt.config import (
     FunctionEstimatorConfig,
     GradientConfig,
@@ -27,7 +27,6 @@ from ropt.config import (
     SamplerConfig,
     VariablesConfig,
 )
-from ropt.enums import PerturbationType
 from ropt.exceptions import WorkflowError
 from ropt.plugins import get_plugin
 
@@ -294,18 +293,6 @@ class EnOptContext(BaseModel):
         scales = self.variables.scales
         offsets = self.variables.offsets
 
-        # The bounds and the absolute perturbation magnitudes describe the
-        # variables, so they are scaled with them. A relative
-        # magnitude is a fraction of the bound range, which the affine map
-        # leaves alone.
-        absolute = enum_mask(
-            self.variables.perturbation_types, PerturbationType.ABSOLUTE
-        )
-        magnitudes = np.where(
-            absolute,
-            self.variables.perturbation_magnitudes / scales,
-            self.variables.perturbation_magnitudes,
-        )
         updated_variables = self.variables.model_copy(
             update={
                 "lower_bounds": immutable_array(
@@ -314,7 +301,9 @@ class EnOptContext(BaseModel):
                 "upper_bounds": immutable_array(
                     scale(self.variables.upper_bounds, scales, offsets)
                 ),
-                "perturbation_magnitudes": immutable_array(magnitudes),
+                "perturbation_magnitudes": immutable_array(
+                    self.variables.perturbation_magnitudes / scales
+                ),
             }
         )
         update_fields(self, variables=updated_variables)

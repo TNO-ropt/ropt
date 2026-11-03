@@ -23,7 +23,6 @@ from ropt._scaling import unscale_value
 from ropt.backend import OptimizationProblem
 from ropt.config import VariablesConfig
 from ropt.context import EnOptContext
-from ropt.enums import PerturbationType
 from ropt.results import (
     ConstraintInfo,
     FunctionResults,
@@ -89,7 +88,6 @@ def test_absolute_perturbation_magnitudes_are_scaled() -> None:
         variables={
             "variable_count": 3,
             "perturbation_magnitudes": [0.1, 0.2, 0.4],
-            "perturbation_types": [PerturbationType.ABSOLUTE] * 3,
             "scales": [1.0, 2.0, 4.0],
             "offsets": [10.0, 20.0, 40.0],
         }

@@ -82,8 +82,8 @@ scales, offsets = scales_and_offsets_from_bounds([0.0, 100.0], [1.0, 600.0])
 
 That maps both variables onto $[0, 1]$. Scales must be positive, and there is no
 `auto_scale` for variables. The bounds and linear constraints are transformed
-along with the variables. Absolute perturbation magnitudes are multiplied by
-the variable scales; relative magnitudes are dimensionless and are not changed.
+along with the variables. Perturbation magnitudes are specified in the configured
+variable units and divided by the variable scales.
 See [Scaling the variables](configuration_sections.md#variable-scales) for the
 transformation details.
 
@@ -104,7 +104,6 @@ transformation details.
 ## Perturbations
 
 The remaining fields of the section — `perturbation_magnitudes`,
-`perturbation_types`, `boundary_types`, `samplers` and `seed` — describe how
-variables are perturbed when a gradient is estimated, rather than the variables
-themselves. They are covered in
-[Stochastic Gradients](gradients.md) and [Samplers](samplers.md).
+`boundary_types`, `samplers` and `seed` — describe how variables are perturbed
+when a gradient is estimated, rather than the variables themselves. They are
+covered in [Stochastic Gradients](gradients.md) and [Samplers](samplers.md).

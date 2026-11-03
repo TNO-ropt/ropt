@@ -3,7 +3,7 @@ from numpy.typing import NDArray
 
 from ropt._utils import enum_mask
 from ropt.context import EnOptContext
-from ropt.enums import BoundaryType, PerturbationType
+from ropt.enums import BoundaryType
 from ropt.function_estimator import FunctionEstimator
 from ropt.sampler import Sampler
 
@@ -76,14 +76,8 @@ def _perturb_variables(
     samples = samplers[keys[0]].generate_samples()
     for key in keys[1:]:
         samples += samplers[key].generate_samples()
-    magnitudes = np.where(
-        enum_mask(context.variables.perturbation_types, PerturbationType.RELATIVE),
-        (context.variables.upper_bounds - context.variables.lower_bounds)
-        * context.variables.perturbation_magnitudes,
-        context.variables.perturbation_magnitudes,
-    )
     return _apply_bounds(
-        variables + magnitudes * samples,
+        variables + context.variables.perturbation_magnitudes * samples,
         context.variables.lower_bounds,
         context.variables.upper_bounds,
         context.variables.boundary_types,

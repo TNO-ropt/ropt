@@ -3,8 +3,7 @@
 A member of a string-valued enumeration is a `str`, so wherever one is accepted
 its value may be written instead:
 [`VariableType`][ropt.enums.VariableType],
-[`BoundaryType`][ropt.enums.BoundaryType],
-[`PerturbationType`][ropt.enums.PerturbationType] and
+[`BoundaryType`][ropt.enums.BoundaryType] and
 [`AxisName`][ropt.enums.AxisName].
 """
 
@@ -61,26 +60,6 @@ class BoundaryType(StrEnum):
         v_i        & \text{otherwise}
     \end{cases}
     $$
-    """
-
-
-class PerturbationType(StrEnum):
-    """Enumerates methods for scaling perturbation samples.
-
-    Before a generated perturbation sample is added to a variable's current
-    value (during gradient estimation, for example), it can be scaled. This
-    enumeration defines the available scaling methods, configured in the
-    [`GradientConfig`][ropt.config.GradientConfig].
-    """
-
-    ABSOLUTE = "absolute"
-    "Use the perturbation value as is."
-
-    RELATIVE = "relative"
-    r"""Multiply the perturbation value $p_i$ by the range defined by the bounds
-    of the variables $c_i$: $\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
-    \times p_i$. The bounds will generally be defined in the configuration for
-    the variables (see [`VariablesConfig`][ropt.config.VariablesConfig]).
     """
 
 

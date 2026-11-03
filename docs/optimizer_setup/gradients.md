@@ -19,7 +19,7 @@ gradient settings at their defaults.
 | Piece                                                                 | Purpose                                                                       |
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | [`GradientConfig`][ropt.config.GradientConfig]                        | Number of perturbations, success thresholds, evaluation policy.               |
-| [`VariablesConfig`][ropt.config.VariablesConfig] perturbation fields  | Magnitudes, scaling type, boundary handling, sampler indices.                 |
+| [`VariablesConfig`][ropt.config.VariablesConfig] perturbation fields  | Magnitudes, boundary handling, sampler indices.                               |
 | [`SamplerConfig`][ropt.config.SamplerConfig] + samplers tuple         | How perturbation samples are drawn (uniform, normal, Sobol, ...).             |
 | [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]      | How per-realization gradients combine into the final estimate.                |
 
@@ -35,7 +35,6 @@ CONFIG = {
     "variables": {
         "variable_count": 5,
         "perturbation_magnitudes": 1e-5,
-        "perturbation_types": "absolute",  # or "relative"
         "boundary_types": "truncate",      # or "none", "mirror"
         "samplers": [0, 0, 1, 1, 1],       # per-variable sampler index
     },
@@ -52,16 +51,33 @@ CONFIG = {
 
 ## Perturbation magnitude and scaling
 
-`perturbation_magnitudes` sets the scale of the sample applied to each
-variable. The `perturbation_types` field sets how that scale is interpreted:
+`perturbation_magnitudes` sets the absolute scale of the sample applied to
+each variable, in the configured variable units. Each sampler value is
+multiplied by its magnitude before being added to the variable. For the default
+standard normal sampler, the magnitude is the standard deviation before
+boundary correction. [Variable scaling](variables.md#scaling) divides these
+magnitudes by `variables.scales`.
 
-- `"absolute"` — the magnitude is added directly to the variable value.
-- `"relative"` — the magnitude is multiplied by `upper_bound - lower_bound`
-  before being applied. Requires finite bounds.
+To express magnitudes as a fraction of finite bound widths, calculate the
+absolute sizes explicitly:
 
-These are the values of [`PerturbationType`][ropt.enums.PerturbationType],
-whose members, imported from [`ropt.enums`][ropt.enums], may be written in
-their place.
+```python
+import numpy as np
+
+lower = np.array([0.0, 10.0])
+upper = np.array([100.0, 30.0])
+
+config = {
+    "variables": {
+        "variable_count": 2,
+        "lower_bounds": lower,
+        "upper_bounds": upper,
+        "perturbation_magnitudes": 0.05 * (upper - lower),
+    },
+}
+```
+
+This sets the magnitudes to `[5.0, 1.0]`, or 5% of each variable's bound width.
 
 After a perturbed value is computed, it may fall outside the variable bounds.
 `boundary_types` controls the correction strategy:

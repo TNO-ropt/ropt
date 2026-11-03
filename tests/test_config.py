@@ -14,7 +14,7 @@ from ropt.config import (
     VariablesConfig,
 )
 from ropt.context import EnOptContext
-from ropt.enums import BoundaryType, PerturbationType, VariableType
+from ropt.enums import BoundaryType, VariableType
 
 initial_values = np.array([1, 2])
 
@@ -245,7 +245,6 @@ def test_check_config_perturbations(config: Any) -> None:
         {
             "perturbation_magnitudes": [1] * 2,
             "boundary_types": [BoundaryType.TRUNCATE] * 2,
-            "perturbation_types": [PerturbationType.ABSOLUTE] * 2,
         }
     )
     EnOptContext.model_validate(config)
@@ -265,13 +264,6 @@ def test_check_config_perturbations(config: Any) -> None:
     ):
         EnOptContext.model_validate(config_copy)
 
-    config_copy = copy.deepcopy(config)
-    config_copy["variables"]["perturbation_types"] = [PerturbationType.ABSOLUTE] * 3
-    with pytest.raises(
-        ValueError, match="perturbation_types cannot be broadcasted to a length of 2"
-    ):
-        EnOptContext.model_validate(config_copy)
-
 
 def test_variable_enums_accept_their_string_values(config: Any) -> None:
     config["variables"].update(
@@ -279,16 +271,11 @@ def test_variable_enums_accept_their_string_values(config: Any) -> None:
             "lower_bounds": [0.0, 0.0],
             "upper_bounds": [1.0, 1.0],
             "types": ["integer", "real"],
-            "perturbation_types": ["relative", "absolute"],
             "boundary_types": ["truncate", "mirror"],
         }
     )
     variables = EnOptContext.model_validate(config).variables
     assert variables.types == (VariableType.INTEGER, VariableType.REAL)
-    assert variables.perturbation_types == (
-        PerturbationType.RELATIVE,
-        PerturbationType.ABSOLUTE,
-    )
     assert variables.boundary_types == (BoundaryType.TRUNCATE, BoundaryType.MIRROR)
 
 
@@ -354,76 +341,19 @@ def test_check_config_min_success(config: Any) -> None:
         assert real_test_map[real_in] == context.realizations.realization_min_success
 
 
-def test_perturbation_types(config: Any) -> None:
-    config["variables"].update(
-        {
-            "perturbation_magnitudes": [0.1, 0.01],
-            "perturbation_types": [
-                PerturbationType.ABSOLUTE,
-                PerturbationType.RELATIVE,
-            ],
-        }
-    )
-    config["variables"]["lower_bounds"] = [0.0, 600]
-    config["variables"]["upper_bounds"] = [1.0, np.inf]
+@pytest.mark.parametrize("perturbation_type", ["absolute", "relative"])
+def test_variables_reject_perturbation_types(perturbation_type: str) -> None:
     with pytest.raises(
-        ValueError,
-        match="The variable bounds must be finite to use relative perturbations",
+        ValidationError, match=r"perturbation_types\s+Extra inputs are not permitted"
     ):
-        context = EnOptContext.model_validate(config)
-
-    config["variables"]["variable_count"] = 3
-    config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
-    config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
-    config["variables"].update(
-        {
-            "perturbation_magnitudes": [0.1, 0.01, 1.0],
-            "perturbation_types": [
-                PerturbationType.ABSOLUTE,
-                PerturbationType.RELATIVE,
-                PerturbationType.ABSOLUTE,
-            ],
-        }
-    )
-    context = EnOptContext.model_validate(config)
-    assert np.allclose(context.variables.perturbation_magnitudes, [0.1, 0.01, 1.0])
-
-
-def test_perturbation_types_with_scaled_variables(config: Any) -> None:
-    config["variables"].update(
-        {
-            "perturbation_magnitudes": [0.1, 0.01],
-            "perturbation_types": [
-                PerturbationType.ABSOLUTE,
-                PerturbationType.RELATIVE,
-            ],
-        }
-    )
-    config["variables"]["lower_bounds"] = [0.0, 600]
-    config["variables"]["upper_bounds"] = [1.0, np.inf]
-    with pytest.raises(
-        ValueError,
-        match="The variable bounds must be finite to use relative perturbations",
-    ):
-        context = EnOptContext.model_validate(config)
-
-    config["variables"]["variable_count"] = 3
-    config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
-    config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
-    config["variables"]["scales"] = [1.0, 1.0, 50.0]
-
-    config["variables"].update(
-        {
-            "perturbation_magnitudes": [0.1, 0.01, 1.0],
-            "perturbation_types": [
-                PerturbationType.ABSOLUTE,
-                PerturbationType.RELATIVE,
-                PerturbationType.ABSOLUTE,
-            ],
-        }
-    )
-    context = EnOptContext.model_validate(config)
-    assert np.allclose(context.variables.perturbation_magnitudes, [0.1, 0.01, 0.02])
+        VariablesConfig.model_validate(
+            {
+                "variable_count": 1,
+                "lower_bounds": 0.0,
+                "upper_bounds": 1.0,
+                "perturbation_types": perturbation_type,
+            }
+        )
 
 
 @pytest.mark.parametrize(

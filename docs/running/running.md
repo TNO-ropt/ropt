@@ -17,8 +17,8 @@ from ropt import optimize
 You give [`optimize`][ropt.optimize] three things:
 
 - a **config** dictionary that describes the problem — its variables,
-  objectives, constraints and components, covered in
-  [Optimizer Setup](../optimizer_setup/key_concepts.md),
+  objectives, constraints and components, covered in [Optimizer
+  Setup](../optimizer_setup/key_concepts.md),
 - a **start point** (the first set of variable values),
 - an **evaluation function** that returns the objective value(s) to minimize,
   followed by any constraint values.
@@ -506,9 +506,8 @@ from ropt import ExitCode
 ```
 
 The enumerations that name configuration values —
-[`VariableType`][ropt.enums.VariableType],
-[`BoundaryType`][ropt.enums.BoundaryType] and
-[`PerturbationType`][ropt.enums.PerturbationType] — are in
+[`VariableType`][ropt.enums.VariableType] and
+[`BoundaryType`][ropt.enums.BoundaryType] — are in
 [`ropt.enums`][ropt.enums]. Their members are strings, so a configuration
 accepts either the member or the value it equals:
 

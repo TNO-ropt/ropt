@@ -133,6 +133,38 @@ def test_sampler_simple(config: Any) -> None:
     assert np.allclose(perturbed_variables, 0.01 * np.eye(3))
 
 
+@pytest.mark.parametrize("scales", [(1.0, 1.0, 1.0), (1.0, 500.0, 50.0)])
+def test_sampler_applies_absolute_magnitudes_with_variable_scaling(
+    scales: tuple[float, float, float],
+) -> None:
+    sampler = MockedSampler(SamplerConfig.model_validate({"method": "test"}))
+    offsets = np.array([0.0, 100.0, -10.0])
+    context = EnOptContext.model_validate(
+        {
+            "variables": {
+                "variable_count": 3,
+                "lower_bounds": [0.0, 100.0, -np.inf],
+                "upper_bounds": [1.0, 600.0, np.inf],
+                "perturbation_magnitudes": [0.1, 5.0, 1.0],
+                "scales": scales,
+                "offsets": offsets,
+            },
+            "gradient": {"number_of_perturbations": 3},
+            "samplers": [sampler],
+        }
+    )
+    _init(sampler, context, None, default_rng(123))
+    variables = np.array([0.5, 350.0, 0.0])
+    perturbed_variables = _perturb_variables(
+        context, (variables - offsets) / scales, context.samplers
+    )
+    assert perturbed_variables.shape == (1, 3, 3)
+    np.testing.assert_allclose(
+        perturbed_variables[0] * scales + offsets,
+        [[0.6, 350.0, 0.0], [0.5, 355.0, 0.0], [0.5, 350.0, 1.0]],
+    )
+
+
 def test_sampler_use_options(config: Any) -> None:
     sampler_config = SamplerConfig.model_validate(
         {"method": "test", "options": {"scale": 100.0}}

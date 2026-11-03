@@ -26,7 +26,6 @@ shown separately.
             "scales": 1.0,                                    # default: no scaling
             "offsets": 0.0,                                   # default: no offset
             "perturbation_magnitudes": 0.005,
-            "perturbation_types": "absolute",
             "boundary_types": "mirror",
             "samplers": "0",                                  # default: use first sampler for all
             "seed": 1,
@@ -86,9 +85,8 @@ shown separately.
     }
     ```
 
-    `types`, `perturbation_types` and `boundary_types` are shown as strings.
-    These are the values of [`VariableType`][ropt.enums.VariableType],
-    [`PerturbationType`][ropt.enums.PerturbationType] and
+    `types` and `boundary_types` are shown as strings.
+    These are the values of [`VariableType`][ropt.enums.VariableType] and
     [`BoundaryType`][ropt.enums.BoundaryType] in [`ropt.enums`][ropt.enums],
     whose members may be written in their place.
 
@@ -177,9 +175,8 @@ are free). `True` means the variable is free; `False` means it is fixed.
 These fields configure the perturbations used for gradient estimation; see
 [Stochastic Gradients](gradients.md) and [Samplers](samplers.md):
 
-- `perturbation_magnitudes`: positive step magnitudes (default: `0.005`).
-- `perturbation_types`: `"absolute"` or `"relative"` per variable (default:
-  `"absolute"`; values of [`PerturbationType`][ropt.enums.PerturbationType]).
+- `perturbation_magnitudes`: absolute step magnitudes in the configured variable
+  units (default: `0.005`).
 - `boundary_types`: how perturbations outside the bounds are handled (default:
   `"mirror"`; values of [`BoundaryType`][ropt.enums.BoundaryType]).
 - `samplers`: sampler key per variable (default: `"0"`).

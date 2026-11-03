@@ -7,14 +7,8 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt._utils import (
-    broadcast_1d_array,
-    broadcast_tuple,
-    check_scales,
-    enum_mask,
-    update_fields,
-)
-from ropt.enums import BoundaryType, PerturbationType, VariableType
+from ropt._utils import broadcast_1d_array, broadcast_tuple, check_scales, update_fields
+from ropt.enums import BoundaryType, VariableType
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
@@ -25,7 +19,6 @@ from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
 from .constants import (
     DEFAULT_PERTURBATION_BOUNDARY_TYPE,
     DEFAULT_PERTURBATION_MAGNITUDE,
-    DEFAULT_PERTURBATION_TYPE,
     DEFAULT_SEED,
 )
 
@@ -41,9 +34,7 @@ class VariablesConfig(BaseModel):
     for field descriptions and defaults.
 
     The perturbation defaults are
-    [`DEFAULT_PERTURBATION_MAGNITUDE`][ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE],
-    [`DEFAULT_PERTURBATION_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_TYPE]
-    (one of [`PerturbationType`][ropt.enums.PerturbationType]) and
+    [`DEFAULT_PERTURBATION_MAGNITUDE`][ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE] and
     [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE]
     (one of [`BoundaryType`][ropt.enums.BoundaryType]).
 
@@ -54,18 +45,17 @@ class VariablesConfig(BaseModel):
     derives scales from the bounds when that is what is wanted.
 
     Attributes:
-        variable_count:           Number of variables.
-        lower_bounds:             Lower bounds for the variables (default: $-\infty$).
-        upper_bounds:             Upper bounds for the variables (default: $+\infty$).
-        types:                    The type of each variable (default: continuous).
-        mask:                     Which variables are free (default: all free).
-        scales:                   Scale factors for the variables (default: 1.0).
-        offsets:                  Offsets for the variables (default: 0.0).
-        perturbation_magnitudes:  Magnitude of the perturbation of each variable.
-        perturbation_types:       Type of perturbation for each variable.
-        boundary_types:           Handling of perturbations that violate a bound.
-        samplers:                 Sampler for each variable, by key (default: `"0"`).
-        seed:                     Seed for the random number generator used by the samplers.
+        variable_count:          Number of variables.
+        lower_bounds:            Lower bounds for the variables (default: $-\infty$).
+        upper_bounds:            Upper bounds for the variables (default: $+\infty$).
+        types:                   The type of each variable (default: continuous).
+        mask:                    Which variables are free (default: all free).
+        scales:                  Scale factors for the variables (default: 1.0).
+        offsets:                 Offsets for the variables (default: 0.0).
+        perturbation_magnitudes: Magnitude of each variable's perturbations, in configured units.
+        boundary_types:          Handling of perturbations that violate a bound.
+        samplers:                Sampler for each variable, by key (default: `"0"`).
+        seed:                    Seed for the random number generator used by the samplers.
     """
 
     variable_count: int
@@ -76,7 +66,6 @@ class VariablesConfig(BaseModel):
     scales: Array1D = np.array(1.0)
     offsets: Array1D = np.array(0.0)
     perturbation_magnitudes: Array1D = np.array(DEFAULT_PERTURBATION_MAGNITUDE)
-    perturbation_types: ItemOrTuple[PerturbationType] = (DEFAULT_PERTURBATION_TYPE,)
     boundary_types: ItemOrTuple[BoundaryType] = (DEFAULT_PERTURBATION_BOUNDARY_TYPE,)
     samplers: Keys = ("0",)
     seed: ItemOrTuple[int] = (DEFAULT_SEED,)
@@ -100,23 +89,11 @@ class VariablesConfig(BaseModel):
         perturbation_magnitudes = broadcast_1d_array(
             self.perturbation_magnitudes, "perturbation_magnitudes", dim
         )
-        perturbation_types = broadcast_tuple(
-            self.perturbation_types, "perturbation_types", dim
-        )
         boundary_types = broadcast_tuple(self.boundary_types, "boundary_types", dim)
         samplers = broadcast_tuple(self.samplers, "samplers", dim)
 
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."
-            raise ValueError(msg)
-
-        relative = enum_mask(perturbation_types, PerturbationType.RELATIVE)
-        if not np.all(
-            np.logical_and(
-                np.isfinite(lower_bounds[relative]), np.isfinite(upper_bounds[relative])
-            ),
-        ):
-            msg = "The variable bounds must be finite to use relative perturbations"
             raise ValueError(msg)
 
         update_fields(
@@ -128,7 +105,6 @@ class VariablesConfig(BaseModel):
             scales=scales,
             offsets=offsets,
             perturbation_magnitudes=perturbation_magnitudes,
-            perturbation_types=perturbation_types,
             boundary_types=boundary_types,
             samplers=samplers,
         )
