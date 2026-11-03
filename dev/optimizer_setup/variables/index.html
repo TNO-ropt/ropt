@@ -2757,8 +2757,8 @@ derives them:</p>
 </span></code></pre></div>
 <p>That maps both variables onto <span class="arithmatex">\([0, 1]\)</span>. Scales must be positive, and there is no
 <code>auto_scale</code> for variables. The bounds and linear constraints are transformed
-along with the variables. Absolute perturbation magnitudes are multiplied by
-the variable scales; relative magnitudes are dimensionless and are not changed.
+along with the variables. Perturbation magnitudes are specified in the configured
+variable units and divided by the variable scales.
 See <a href="../configuration_sections/#variable-scales">Scaling the variables</a> for the
 transformation details.</p>
 <div class="admonition warning">
@@ -2781,10 +2781,9 @@ together and do not change those distances.</p>
 </div>
 <h2 id="perturbations">Perturbations</h2>
 <p>The remaining fields of the section — <code>perturbation_magnitudes</code>,
-<code>perturbation_types</code>, <code>boundary_types</code>, <code>samplers</code> and <code>seed</code> — describe how
-variables are perturbed when a gradient is estimated, rather than the variables
-themselves. They are covered in
-<a href="../gradients/">Stochastic Gradients</a> and <a href="../samplers/">Samplers</a>.</p>
+<code>boundary_types</code>, <code>samplers</code> and <code>seed</code> — describe how variables are perturbed
+when a gradient is estimated, rather than the variables themselves. They are
+covered in <a href="../gradients/">Stochastic Gradients</a> and <a href="../samplers/">Samplers</a>.</p>
 
 
 

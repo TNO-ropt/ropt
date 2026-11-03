@@ -2317,17 +2317,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.config.constants.DEFAULT_PERTURBATION_TYPE" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DEFAULT_PERTURBATION_TYPE
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -3062,17 +3051,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.config.constants.DEFAULT_PERTURBATION_TYPE" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DEFAULT_PERTURBATION_TYPE
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -3231,14 +3209,7 @@ for field descriptions and defaults.</p>
 
   
       module-attribute
-  " href="#ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE"><code>DEFAULT_PERTURBATION_MAGNITUDE</code></a>,
-<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_TYPE
-
-
-  
-      module-attribute
-  " href="#ropt.config.constants.DEFAULT_PERTURBATION_TYPE"><code>DEFAULT_PERTURBATION_TYPE</code></a>
-(one of <a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>) and
+  " href="#ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE"><code>DEFAULT_PERTURBATION_MAGNITUDE</code></a> and
 <a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_BOUNDARY_TYPE
 
 
@@ -3347,18 +3318,7 @@ derives scales from the bounds when that is what is wanted.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Magnitude of the perturbation of each variable.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.VariablesConfig.perturbation_types">perturbation_types</span></code></td>
-            <td>
-                  <code><span title="ropt.config._validated_types.ItemOrTuple">ItemOrTuple</span>[<a class="autorefs autorefs-internal" title="            PerturbationType (ropt.enums.PerturbationType)" href="../enums/#ropt.enums.PerturbationType">PerturbationType</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Type of perturbation for each variable.</p>
+                <p>Magnitude of each variable's perturbations, in configured units.</p>
               </div>
             </td>
           </tr>
@@ -4575,10 +4535,6 @@ See <a href="../../optimizer_setup/gradients/">Stochastic Gradients</a> for how 
 
 
 
-
-
-
-
 <div class="doc doc-object doc-attribute">
 
 
@@ -4655,7 +4611,7 @@ See <a href="../../optimizer_setup/gradients/">Stochastic Gradients</a> for how 
 
     <div class="doc doc-contents ">
 
-        <p>Default scaling factor applied to sampler-generated perturbation values.</p>
+        <p>Default perturbation magnitude in the configured variable units.</p>
 
     </div>
 
@@ -4687,35 +4643,6 @@ See <a href="../../optimizer_setup/gradients/">Stochastic Gradients</a> for how 
     <div class="doc doc-contents ">
 
         <p>Default boundary handling for perturbations that violate variable bounds.</p>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.config.constants.DEFAULT_PERTURBATION_TYPE" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_PERTURBATION_TYPE</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_PERTURBATION_TYPE</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Default interpretation of perturbation magnitudes.</p>
 
     </div>
 

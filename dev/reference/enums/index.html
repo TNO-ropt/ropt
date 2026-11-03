@@ -2623,45 +2623,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.PerturbationType" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        PerturbationType
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="PerturbationType">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.enums.PerturbationType.ABSOLUTE" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ABSOLUTE
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.enums.PerturbationType.RELATIVE" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        RELATIVE
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.enums.EnOptEventType" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3142,45 +3103,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.PerturbationType" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        PerturbationType
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="PerturbationType">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.enums.PerturbationType.ABSOLUTE" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ABSOLUTE
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.enums.PerturbationType.RELATIVE" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        RELATIVE
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.enums.EnOptEventType" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3528,8 +3450,7 @@
 <p>A member of a string-valued enumeration is a <code>str</code>, so wherever one is accepted
 its value may be written instead:
 <a class="autorefs autorefs-internal" title="            VariableType" href="#ropt.enums.VariableType"><code>VariableType</code></a>,
-<a class="autorefs autorefs-internal" title="            BoundaryType" href="#ropt.enums.BoundaryType"><code>BoundaryType</code></a>,
-<a class="autorefs autorefs-internal" title="            PerturbationType" href="#ropt.enums.PerturbationType"><code>PerturbationType</code></a> and
+<a class="autorefs autorefs-internal" title="            BoundaryType" href="#ropt.enums.BoundaryType"><code>BoundaryType</code></a> and
 <a class="autorefs autorefs-internal" title="            AxisName" href="#ropt.enums.AxisName"><code>AxisName</code></a>.</p>
 
 
@@ -3793,119 +3714,6 @@ range. The chosen strategy is configured in the
     v_i        &amp; \text{otherwise}
 \end{cases}
 \]</div>
-
-    </div>
-
-</div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.enums.PerturbationType" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PerturbationType</span>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="enum.StrEnum" href="https://docs.python.org/3/library/enum.html#enum.StrEnum">StrEnum</a></code></p>
-
-
-
-        <p>Enumerates methods for scaling perturbation samples.</p>
-<p>Before a generated perturbation sample is added to a variable's current
-value (during gradient estimation, for example), it can be scaled. This
-enumeration defines the available scaling methods, configured in the
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../config/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="ropt.enums.PerturbationType.ABSOLUTE" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ABSOLUTE</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ABSOLUTE</span> <span class="o">=</span> <span class="s1">'absolute'</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Use the perturbation value as is.</p>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="ropt.enums.PerturbationType.RELATIVE" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">RELATIVE</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">RELATIVE</span> <span class="o">=</span> <span class="s1">'relative'</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Multiply the perturbation value <span class="arithmatex">\(p_i\)</span> by the range defined by the bounds
-of the variables <span class="arithmatex">\(c_i\)</span>: <span class="arithmatex">\(\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
-\times p_i\)</span>. The bounds will generally be defined in the configuration for
-the variables (see <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>).</p>
 
     </div>
 
