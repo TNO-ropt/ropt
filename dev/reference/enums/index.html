@@ -2706,6 +2706,78 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationStatus
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvaluationStatus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.SUBMITTED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SUBMITTED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.RUNNING" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RUNNING
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.DONE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DONE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.ERROR" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ERROR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.ABORTED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ABORTED
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.enums.ExitCode" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3174,6 +3246,78 @@
     <span class="md-ellipsis">
       
         FINISHED_ENSEMBLE_EVALUATOR
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluationStatus
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvaluationStatus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.SUBMITTED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SUBMITTED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.RUNNING" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RUNNING
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.DONE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DONE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.ERROR" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ERROR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.EvaluationStatus.ABORTED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ABORTED
       
     </span>
   </a>
@@ -3942,6 +4086,209 @@ when each event type fires and what data it carries.</p>
     <div class="doc doc-contents ">
 
         <p>Emitted after an evaluation without an optimizer finishes.</p>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.enums.EvaluationStatus" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EvaluationStatus</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="enum.IntEnum" href="https://docs.python.org/3/library/enum.html#enum.IntEnum">IntEnum</a></code></p>
+
+
+
+        <p>Enumerates the states of a single evaluation.</p>
+<p>An evaluation starts out pending, which is not reported. The states are
+ordered: an evaluation passes through them in the order listed, ends in
+exactly one of <code>DONE</code>, <code>ERROR</code> or <code>ABORTED</code>, and may skip any state before
+that. See <a href="../../running/running/#reporting-the-status-of-evaluations">Reporting the status of evaluations</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.EvaluationStatus.SUBMITTED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">SUBMITTED</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">SUBMITTED</span> <span class="o">=</span> <span class="mi">1</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Handed to the workers, but not yet known to be running.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.EvaluationStatus.RUNNING" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">RUNNING</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">RUNNING</span> <span class="o">=</span> <span class="mi">2</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The evaluation function is running.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.EvaluationStatus.DONE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DONE</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DONE</span> <span class="o">=</span> <span class="mi">3</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The evaluation function returned a valid result.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.EvaluationStatus.ERROR" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ERROR</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ERROR</span> <span class="o">=</span> <span class="mi">4</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The evaluation function raised, or its result was invalid.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.EvaluationStatus.ABORTED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ABORTED</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ABORTED</span> <span class="o">=</span> <span class="mi">5</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The evaluation was not run, or its result is not used.</p>
+<p>Assigned to every evaluation that had not finished when its batch ended
+early, for example after an abort or after another evaluation raised. An
+evaluation that was already running may continue in the background.</p>
 
     </div>
 
