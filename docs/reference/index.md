@@ -22,6 +22,7 @@ For runnable programs by task, see the [Examples index](../getting_started/examp
 | Sessions and worker pools | [`session`][ropt.session], [`Session`][ropt.Session], [`WorkerPool`][ropt.WorkerPool] | [Sessions](../running/sessions.md), [parallel evaluation](../running/parallel.md) |
 | Running other work or an external program | [`run`][ropt.run], [`run_program`][ropt.run_program] | [Running External Programs](../running/programs.md) |
 | Progress callbacks and stopping early | [`ResultCallback`][ropt.ResultCallback], [`aborting`][ropt.aborting] | [Stopping from a callback](../running/running.md#stopping-early-from-the-callback), [aborting from outside](../running/multiple_runs.md#stopping-from-outside) |
+| Status of individual evaluations | [`StatusCallback`][ropt.StatusCallback], [`EvaluationStatus`][ropt.enums.EvaluationStatus] | [Reporting the status of evaluations](../running/running.md#reporting-the-status-of-evaluations) |
 | Reusing starting-point evaluations | [`optimize` arguments][ropt.optimize] | [Reusing Results at the Starting Point](../running/initial_values.md) |
 
 ## Results and failures

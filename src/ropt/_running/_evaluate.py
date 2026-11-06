@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from ._function import EvaluationFunction
     from ._result_callback import ResultCallback
     from ._session import Session
+    from ._status_callback import StatusCallback
 
 _ONE_VECTOR = "evaluate() takes a single vector; use evaluate_batch() for a batch."
 
@@ -65,6 +66,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler] | None,
     result_callback: ResultCallback | None,
+    status_callback: StatusCallback | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[FunctionResults]:
     array = _as_vector(variables)
@@ -76,6 +78,7 @@ def _evaluate(  # ruff: ignore[too-many-arguments]
         function,
         handlers=handlers,
         result_callback=result_callback,
+        status_callback=status_callback,
         metadata=metadata,
     )
     return EvaluationResult(results=outcome.results[0])
@@ -90,6 +93,7 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler] | None,
     result_callback: ResultCallback | None,
+    status_callback: StatusCallback | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     array = _as_matrix(variables)
@@ -101,6 +105,7 @@ def _evaluate_batch(  # ruff: ignore[too-many-arguments]
         function,
         handlers=handlers,
         result_callback=result_callback,
+        status_callback=status_callback,
         metadata=metadata,
     )
 
@@ -114,11 +119,12 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler] | None,
     result_callback: ResultCallback | None,
+    status_callback: StatusCallback | None,
     metadata: dict[str, Any] | None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     with linked_abort_scope(session) as scope:
         context = EnOptContext.model_validate(config)
-        evaluator = make_evaluator(context, function, executor, scope)
+        evaluator = make_evaluator(context, function, executor, scope, status_callback)
         # The results are collected by this run's own handler, in the order the
         # vectors were given, which is the order they are returned in.
         history = HistoryHandler()

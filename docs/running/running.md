@@ -266,6 +266,53 @@ The runnable script is
 which stops an optimization after a fixed number of results and then reads the
 best point it had reached.
 
+## Reporting the status of evaluations
+
+Pass a **status callback** to follow the individual evaluations of the
+evaluation function. It is called each time an evaluation changes state, with
+the [`EvaluationFunctionContext`][ropt.EvaluationFunctionContext] of that
+evaluation and its new [`EvaluationStatus`][ropt.enums.EvaluationStatus]:
+
+```python
+from ropt import EvaluationStatus
+
+
+def status(context, state):
+    if state is EvaluationStatus.ERROR:
+        print("failed:", context.realization, context.perturbation)
+
+
+optimize(config, x0, objective, status_callback=status)
+```
+
+The context is the one passed to the evaluation function, including its
+`metadata`. The callback must not modify it. To tell several optimizations
+apart, give each its own `metadata` (see [Attaching metadata](#attaching-metadata)).
+
+An evaluation starts out pending, which is not reported, and then passes through
+these states in order:
+
+| State | Meaning |
+| --- | --- |
+| `SUBMITTED` | Handed to the workers, but not yet known to be running. |
+| `RUNNING` | The evaluation function is running. |
+| `DONE` | The evaluation function returned a valid result. |
+| `ERROR` | The evaluation function raised an exception, or returned an invalid result. |
+| `ABORTED` | The batch ended before the evaluation finished, for example after an abort or an error in another evaluation. Its result, if any, is not used. |
+
+Each evaluation ends in exactly one of `DONE`, `ERROR` or `ABORTED`. States can
+be skipped: without a pool, evaluations go directly from pending to `RUNNING`.
+A state is never reported after a later one. Evaluations that are not run, such
+as those of inactive realizations, are not reported.
+
+The callback is called on the thread that called `optimize`, `evaluate` or
+`evaluate_batch`, so it does not have to be thread-safe. An exception raised by
+the callback ends the run.
+
+!!! note
+    In this version, the status is only reported for evaluations that run
+    without a `pool`.
+
 ## Attaching metadata
 
 You can attach arbitrary **metadata** to an optimization or evaluation, from two

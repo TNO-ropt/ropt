@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from ropt.context import EnOptContext
 
     from ._function import EvaluationFunction
+    from ._status_callback import StatusCallback
 
 
 def make_evaluator(
@@ -22,6 +23,7 @@ def make_evaluator(
     function: EvaluationFunction,
     executor: Executor | None,
     abort_scope: AbortScope | None = None,
+    status_callback: StatusCallback | None = None,
 ) -> EvaluationBatchCallback:
     n_obj = context.objectives.weights.size
     n_con = (
@@ -35,4 +37,5 @@ def make_evaluator(
         executor=executor,
         batch_id_callback=next_batch_id,
         abort_scope=abort_scope,
+        status_callback=status_callback,
     )

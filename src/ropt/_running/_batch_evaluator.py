@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -14,19 +15,23 @@ from ropt._evaluation import (
 )
 from ropt._executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt._logging import get_logger
+from ropt.enums import EvaluationStatus
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
 
 from ._batch_ids import BatchIdCounter
 from ._evaluation_helpers import _active_evaluations, _build_metadata, _scatter_result
+from ._status_callback import make_status_reporter
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
+    from collections.abc import Callable
 
     from numpy.typing import NDArray
 
     from ropt._concurrency import AbortScope
     from ropt._evaluation import EvaluationBatchCallback, EvaluationFunctionCallback
     from ropt._executors import Executor
+
+    from ._status_callback import StatusCallback
 
 _logger = get_logger(__name__)
 
@@ -37,6 +42,7 @@ def make_batch_evaluator(
     executor: Executor | None = None,
     batch_id_callback: Callable[[], int] | None = None,
     abort_scope: AbortScope | None = None,
+    status_callback: StatusCallback | None = None,
 ) -> EvaluationBatchCallback:
     """Build a batch evaluation callable that calls a function once per row.
 
@@ -50,6 +56,7 @@ def make_batch_evaluator(
         executor:          An optional executor to dispatch the rows to.
         batch_id_callback: Callable that returns the next batch ID each time it is called.
         abort_scope:       An optional scope that aborts a running batch.
+        status_callback:   An optional callback for the status of each evaluation.
 
     Returns:
         A callable following the
@@ -75,8 +82,13 @@ def make_batch_evaluator(
 
         active = list(_active_evaluations(evaluator_context, batch_id))
         if executor is None:
-            for row_idx, result in _run_rows(function, variables, active, abort_scope):
-                _handle_result(row_idx, result, results, metadata, no)
+            handle = partial(
+                _handle_result, results=results, metadata=metadata, objective_count=no
+            )
+            report = make_status_reporter(status_callback)
+            _run_rows(
+                function, variables, active, abort_scope, handle=handle, report=report
+            )
         else:
             values = _dispatch_rows(function, variables, active, executor, abort_scope)
             for (row_idx, _), value in zip(active, values, strict=True):
@@ -92,19 +104,38 @@ def make_batch_evaluator(
     return _evaluate
 
 
-def _run_rows(
+def _run_rows(  # ruff: ignore[too-many-arguments]
     function: EvaluationFunctionCallback,
     variables: NDArray[np.float64],
     active: list[tuple[int, EvaluationFunctionContext]],
     abort_scope: AbortScope | None,
-) -> Iterator[tuple[int, EvaluationFunctionResult]]:
-    for row_idx, function_context in active:
-        if abort_scope is not None and abort_scope.aborting:
-            raise AbortedError(abort_scope.exit_code)
-        result = function(variables[row_idx, :], function_context)
-        if abort_scope is not None and abort_scope.aborting:
-            raise AbortedError(abort_scope.exit_code)
-        yield row_idx, result
+    *,
+    handle: Callable[[int, object], None],
+    report: StatusCallback,
+) -> None:
+    try:
+        for row_idx, function_context in active:
+            _raise_if_aborting(abort_scope)
+            report(function_context, EvaluationStatus.RUNNING)
+            try:
+                result = function(variables[row_idx, :], function_context)
+                _raise_if_aborting(abort_scope)
+                handle(row_idx, result)
+            except AbortedError:
+                raise
+            except Exception:
+                report(function_context, EvaluationStatus.ERROR)
+                raise
+            report(function_context, EvaluationStatus.DONE)
+    finally:
+        # Rows that already finished are dropped by the reporter.
+        for _, function_context in active:
+            report(function_context, EvaluationStatus.ABORTED)
+
+
+def _raise_if_aborting(abort_scope: AbortScope | None) -> None:
+    if abort_scope is not None and abort_scope.aborting:
+        raise AbortedError(abort_scope.exit_code)
 
 
 def _dispatch_rows(

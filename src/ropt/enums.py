@@ -89,6 +89,36 @@ class EnOptEventType(IntEnum):
     """Emitted after an evaluation without an optimizer finishes."""
 
 
+class EvaluationStatus(IntEnum):
+    """Enumerates the states of a single evaluation.
+
+    An evaluation starts out pending, which is not reported. The states are
+    ordered: an evaluation passes through them in the order listed, ends in
+    exactly one of `DONE`, `ERROR` or `ABORTED`, and may skip any state before
+    that. See [Reporting the status of evaluations](../running/running.md#reporting-the-status-of-evaluations).
+    """
+
+    SUBMITTED = 1
+    """Handed to the workers, but not yet known to be running."""
+
+    RUNNING = 2
+    """The evaluation function is running."""
+
+    DONE = 3
+    """The evaluation function returned a valid result."""
+
+    ERROR = 4
+    """The evaluation function raised, or its result was invalid."""
+
+    ABORTED = 5
+    """The evaluation was not run, or its result is not used.
+
+    Assigned to every evaluation that had not finished when its batch ended
+    early, for example after an abort or after another evaluation raised. An
+    evaluation that was already running may continue in the background.
+    """
+
+
 class ExitCode(IntEnum):
     """Enumerates the reasons a task ends.
 

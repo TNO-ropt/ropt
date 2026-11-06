@@ -52,6 +52,7 @@ from ropt._running import (
     OptimizationResult,
     ResultCallback,
     Session,
+    StatusCallback,
     WorkerPool,
     evaluate,
     evaluate_batch,
@@ -59,7 +60,7 @@ from ropt._running import (
     run,
     session,
 )
-from ropt.enums import ExitCode
+from ropt.enums import EvaluationStatus, ExitCode
 from ropt.exceptions import (
     AbortedError,
     ExecutionError,
@@ -85,6 +86,7 @@ __all__ = [
     "EvaluationFunctionContext",
     "EvaluationFunctionResult",
     "EvaluationResult",
+    "EvaluationStatus",
     "EventHandler",
     "ExecutionError",
     "ExitCode",
@@ -97,6 +99,7 @@ __all__ = [
     "ResultsHandler",
     "RoptError",
     "Session",
+    "StatusCallback",
     "UnsupportedError",
     "WorkerPool",
     "WorkflowError",

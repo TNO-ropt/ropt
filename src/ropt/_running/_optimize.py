@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from ._function import EvaluationFunction
     from ._result_callback import ResultCallback
     from ._session import Session
+    from ._status_callback import StatusCallback
 
 
 def _optimize(  # ruff: ignore[too-many-arguments]
@@ -44,6 +45,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler] | None,
     result_callback: ResultCallback | None,
+    status_callback: StatusCallback | None,
     constraint_tolerance: float,
     metadata: dict[str, Any] | None,
     f0: FunctionResults | None = None,
@@ -52,7 +54,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
 ) -> OptimizationResult:
     with linked_abort_scope(session) as scope:
         context = EnOptContext.model_validate(config)
-        evaluator = make_evaluator(context, function, executor, scope)
+        evaluator = make_evaluator(context, function, executor, scope, status_callback)
         # This run's own handler, tracking the result the call returns; it is added
         # directly, so it stays out of the handlers the caller manages.
         result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)

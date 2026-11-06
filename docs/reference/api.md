@@ -5,7 +5,8 @@
         members: []
 
 The remaining names imported from `ropt` are documented on their own pages:
-[`ExitCode`][ropt.enums.ExitCode];
+[`ExitCode`][ropt.enums.ExitCode] and
+[`EvaluationStatus`][ropt.enums.EvaluationStatus];
 [`Results`][ropt.results.Results],
 [`FunctionResults`][ropt.results.FunctionResults],
 [`GradientResults`][ropt.results.GradientResults],
@@ -60,3 +61,4 @@ and [`RoptError`][ropt.exceptions.RoptError] with
 
 ::: ropt.EvaluationFunction
 ::: ropt.ResultCallback
+::: ropt.StatusCallback

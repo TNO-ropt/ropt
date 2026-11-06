@@ -12,6 +12,7 @@ from ._pool import WorkerPool
 from ._result import EvaluationResult, OptimizationResult
 from ._result_callback import ResultCallback
 from ._session import Session, session
+from ._status_callback import StatusCallback
 
 __all__ = [
     "EvaluationFunction",
@@ -19,6 +20,7 @@ __all__ = [
     "OptimizationResult",
     "ResultCallback",
     "Session",
+    "StatusCallback",
     "WorkerPool",
     "evaluate",
     "evaluate_batch",

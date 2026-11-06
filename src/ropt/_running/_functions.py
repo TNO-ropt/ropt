@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from ._pool import WorkerPool
     from ._result import EvaluationResult, OptimizationResult
     from ._result_callback import ResultCallback
+    from ._status_callback import StatusCallback
 
 
 def optimize(  # ruff: ignore[too-many-arguments]
@@ -36,6 +37,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
     result_callback: ResultCallback | None = None,
+    status_callback: StatusCallback | None = None,
     constraint_tolerance: float = 1e-10,
     metadata: dict[str, Any] | None = None,
     f0: FunctionResults | None = None,
@@ -56,6 +58,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
                               in-process.
         handlers:             Optional handlers, called in the order listed.
         result_callback:      Optional callback invoked per evaluation.
+        status_callback:      Optional callback invoked when an evaluation changes status.
         constraint_tolerance: The tolerance within which a constraint holds.
         metadata:             Default metadata passed to evaluations and attached to results.
         f0:                   Optional function results at `x0`.
@@ -78,6 +81,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         function,
         handlers=handlers,
         result_callback=result_callback,
+        status_callback=status_callback,
         constraint_tolerance=constraint_tolerance,
         metadata=metadata,
         f0=f0,
@@ -94,6 +98,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
     result_callback: ResultCallback | None = None,
+    status_callback: StatusCallback | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> EvaluationResult[FunctionResults]:
     """Evaluate a single variable vector, without optimizing.
@@ -109,6 +114,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         pool:            The pool to evaluate on, or `None` to evaluate in-process.
         handlers:        Optional handlers, called in the order listed.
         result_callback: Optional callback invoked with the results.
+        status_callback: Optional callback invoked when an evaluation changes status.
         metadata:        Default metadata passed to evaluations and attached to results.
 
     Returns:
@@ -128,6 +134,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         function,
         handlers=handlers,
         result_callback=result_callback,
+        status_callback=status_callback,
         metadata=metadata,
     )
 
@@ -140,6 +147,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
     pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
     result_callback: ResultCallback | None = None,
+    status_callback: StatusCallback | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> EvaluationResult[tuple[FunctionResults, ...]]:
     """Evaluate a batch of variable vectors, without optimizing.
@@ -156,6 +164,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         pool:            The pool to evaluate on, or `None` to evaluate in-process.
         handlers:        Optional handlers, called in the order listed.
         result_callback: Optional callback invoked with each evaluation.
+        status_callback: Optional callback invoked when an evaluation changes status.
         metadata:        Default metadata passed to evaluations and attached to results.
 
     Returns:
@@ -175,6 +184,7 @@ def evaluate_batch(  # ruff: ignore[too-many-arguments]
         function,
         handlers=handlers,
         result_callback=result_callback,
+        status_callback=status_callback,
         metadata=metadata,
     )
 
