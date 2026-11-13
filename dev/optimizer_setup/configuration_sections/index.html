@@ -3343,7 +3343,11 @@ each objective divided by its scale; reported objective values are converted
 back to the configured units. With <code>auto_scale</code> (default: <code>False</code>), <code>ropt</code>
 estimates one additional factor from the first batch and multiplies it by the
 configured scales. The estimate uses the weighted objective values after
-subtracting any configured offsets. See
+subtracting any configured offsets, and leaves out <code>NaN</code> values. A batch in
+which an objective is <code>NaN</code> for every realization is not used for the estimate:
+the optimization then stops with <code>TOO_FEW_REALIZATIONS</code>, unless
+<a href="#realizations"><code>realization_min_success</code></a> is zero, in which case the factor is
+estimated from a later batch. See
 <a href="../objectives/#weights-and-scales-determine-the-trade-off-together">Weights and scales</a>
 for the effect on the optimization.</p>
 <h3 id="objective-offsets">Offsetting objectives</h3>
@@ -3419,7 +3423,10 @@ backend, see the table in <a class="autorefs autorefs-internal" title="         
 <p><code>scales</code> is a positive divisor per constraint (default: <code>1.0</code>), applied to
 both its value and bounds. <code>auto_scale</code> is a boolean per constraint (default:
 <code>False</code>); when enabled, it estimates an additional scale from the first batch
-and multiplies the configured scale. Constraints have no <code>offsets</code> field.
+and multiplies the configured scale. As for
+<a href="#objective-scales">objectives</a>, the estimate leaves out <code>NaN</code> values, and a
+batch in which a constraint is <code>NaN</code> for every realization is not used.
+Constraints have no <code>offsets</code> field.
 See <a href="../constraints/#scaling-constraints">Scaling constraints</a> for the behavior
 and its effect.</p>
 <h2 id="realizations"><code>realizations</code></h2>
