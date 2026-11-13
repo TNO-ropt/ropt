@@ -152,27 +152,57 @@ def test_max_functions_not_exceeded(config: Any, eval_func: Any, external: str) 
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
 
 
-def test_failed_realizations(config: Any, eval_func: Any, external: str) -> None:
+@pytest.mark.parametrize("auto_scale", [False, True])
+@pytest.mark.parametrize("evaluation_policy", ["auto", "separate", "speculative"])
+@pytest.mark.parametrize("all_objectives_failed", [False, True])
+def test_failed_realizations(
+    config: Any,
+    eval_func: Any,
+    external: str,
+    evaluation_policy: str,
+    *,
+    auto_scale: bool,
+    all_objectives_failed: bool,
+) -> None:
+    reported: list[FunctionResults] = []
+
     def _observer(item: FunctionResults) -> None:
         assert item.target_objective is None
+        reported.append(item)
 
     config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["gradient"] = {"evaluation_policy": evaluation_policy}
+    config["objectives"]["auto_scale"] = auto_scale
+    if all_objectives_failed:
+        config["realizations"] = {"weights": [1.0, 3.0]}
 
-    functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
+    first_value = np.nan if all_objectives_failed else 1.0
+    functions = [lambda _0, _1: np.array(first_value), lambda _0, _1: np.array(np.nan)]
     result = optimize(config, initial_values, eval_func(functions), report=_observer)
     assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+    assert reported
 
 
+@pytest.mark.parametrize("auto_scale", [False, True])
 def test_failed_realizations_constraints(
-    config: Any, eval_func: Any, test_functions: Any, external: str
+    config: Any,
+    eval_func: Any,
+    test_functions: Any,
+    external: str,
+    *,
+    auto_scale: bool,
 ) -> None:
+    reported: list[FunctionResults] = []
+
     def _observer(item: FunctionResults) -> None:
         assert item.target_objective is None
+        reported.append(item)
 
     config["backend"]["method"] = f"{external}{_SLSQP}"
     config["nonlinear_constraints"] = {
         "lower_bounds": 0.0,
         "upper_bounds": 0.4,
+        "auto_scale": auto_scale,
     }
 
     result = optimize(
@@ -182,6 +212,7 @@ def test_failed_realizations_constraints(
         report=_observer,
     )
     assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+    assert reported
 
 
 def test_single_perturbation(config: Any, eval_func: Any, external: str) -> None:

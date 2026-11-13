@@ -364,10 +364,39 @@ def test_auto_scale_rejects_a_vanishing_estimate() -> None:
         _estimate(context, np.zeros((2, 1)))
 
 
-def test_auto_scale_rejects_a_batch_without_results() -> None:
+def test_auto_scale_waits_for_a_batch_with_results() -> None:
     context = _auto_scale_context(objectives={"weights": [1.0], "auto_scale": True})
-    with pytest.raises(RuntimeError, match="no realizations to average"):
-        _estimate(context, np.full((2, 1), np.nan))
+    _estimate(context, np.full((2, 1), np.nan))
+    assert np.allclose(context.get_objective_scales(), 1.0)
+    _estimate(context, np.array([[4.0], [8.0]]))
+    assert np.allclose(context.get_objective_scales(), (4.0 + 3 * 8.0) / 4)
+
+
+@pytest.mark.parametrize("auto_scale_objectives", [False, True])
+def test_auto_scale_waits_for_constraint_results(
+    *, auto_scale_objectives: bool
+) -> None:
+    context = _auto_scale_context(
+        objectives={"weights": [1.0], "auto_scale": auto_scale_objectives},
+        nonlinear_constraints={
+            "lower_bounds": [0.0],
+            "upper_bounds": [10.0],
+            "auto_scale": True,
+        },
+    )
+    objectives = np.array([[4.0], [8.0]])
+    _estimate(context, objectives, constraints=np.full((2, 1), np.nan))
+    assert np.allclose(context.get_objective_scales(), 1.0)
+    constraint_scales = context.get_constraint_scales()
+    assert constraint_scales is not None
+    assert np.allclose(constraint_scales, 1.0)
+
+    _estimate(context, objectives, constraints=np.array([[5.0], [9.0]]))
+    expected_objective_scale = 7.0 if auto_scale_objectives else 1.0
+    assert np.allclose(context.get_objective_scales(), expected_objective_scale)
+    constraint_scales = context.get_constraint_scales()
+    assert constraint_scales is not None
+    assert np.allclose(constraint_scales, 8.0)
 
 
 def test_auto_scale_is_skipped_when_it_is_not_configured() -> None:
