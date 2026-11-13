@@ -223,7 +223,11 @@ each objective divided by its scale; reported objective values are converted
 back to the configured units. With `auto_scale` (default: `False`), `ropt`
 estimates one additional factor from the first batch and multiplies it by the
 configured scales. The estimate uses the weighted objective values after
-subtracting any configured offsets. See
+subtracting any configured offsets, and leaves out `NaN` values. A batch in
+which an objective is `NaN` for every realization is not used for the estimate:
+the optimization then stops with `TOO_FEW_REALIZATIONS`, unless
+[`realization_min_success`](#realizations) is zero, in which case the factor is
+estimated from a later batch. See
 [Weights and scales](objectives.md#weights-and-scales-determine-the-trade-off-together)
 for the effect on the optimization.
 
@@ -313,7 +317,10 @@ Like objectives, nonlinear constraints can optionally be processed using
 `scales` is a positive divisor per constraint (default: `1.0`), applied to
 both its value and bounds. `auto_scale` is a boolean per constraint (default:
 `False`); when enabled, it estimates an additional scale from the first batch
-and multiplies the configured scale. Constraints have no `offsets` field.
+and multiplies the configured scale. As for
+[objectives](#objective-scales), the estimate leaves out `NaN` values, and a
+batch in which a constraint is `NaN` for every realization is not used.
+Constraints have no `offsets` field.
 See [Scaling constraints](constraints.md#scaling-constraints) for the behavior
 and its effect.
 

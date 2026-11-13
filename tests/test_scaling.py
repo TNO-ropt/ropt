@@ -387,10 +387,12 @@ def test_auto_scale_rejects_a_vanishing_estimate() -> None:
         _estimate(context, np.zeros((2, 1)))
 
 
-def test_auto_scale_rejects_a_batch_without_results() -> None:
+def test_auto_scale_waits_for_a_batch_with_results() -> None:
     context = _auto_scale_context(objectives={"weights": [1.0], "auto_scale": True})
-    with pytest.raises(RuntimeError, match="no realizations to average"):
-        _estimate(context, np.full((2, 1), np.nan))
+    _estimate(context, np.full((2, 1), np.nan))
+    assert np.allclose(context.get_objective_scales(), 1.0)
+    _estimate(context, np.array([[4.0], [8.0]]))
+    assert np.allclose(context.get_objective_scales(), (4.0 + 3 * 8.0) / 4)
 
 
 def test_auto_scale_is_skipped_when_it_is_not_configured() -> None:

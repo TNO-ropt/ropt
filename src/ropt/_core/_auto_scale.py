@@ -21,8 +21,9 @@ def set_auto_scales(
     """Estimate the scales of a run from a batch of evaluations.
 
     Does nothing unless auto-scaling is configured and the scales are still
-    missing, so that only the first batch is used and every later batch is
-    scaled the same way.
+    missing, so that only one batch is used and every later batch is scaled the
+    same way. If a function to be averaged failed in every realization of the
+    batch, the scales stay missing and are estimated from a later batch.
 
     Args:
         context:           The context of the run.
@@ -46,8 +47,10 @@ def set_auto_scales(
     objectives = None
     if context.objectives.auto_scale:
         averages = _weighted_average(
-            evaluator_result.objectives[rows, :], realizations, weights, "objectives"
+            evaluator_result.objectives[rows, :], realizations, weights
         )
+        if averages is None:
+            return
         averages -= context.objectives.offsets
         # One factor for all objectives, so that their relative magnitudes, and
         # hence the meaning of their weights, are left alone.
@@ -63,8 +66,10 @@ def set_auto_scales(
         assert evaluator_result.constraints is not None
         auto_scale = context.nonlinear_constraints.auto_scale
         averages = _weighted_average(
-            evaluator_result.constraints[rows, :], realizations, weights, "constraints"
+            evaluator_result.constraints[rows, :], realizations, weights
         )
+        if averages is None:
+            return
         # A constraint that is not auto-scaled keeps a factor of one, and its
         # estimate is never inspected: it may legitimately be zero.
         constraints = np.where(
@@ -78,16 +83,14 @@ def _weighted_average(
     functions: NDArray[np.float64],
     realizations: NDArray[np.intc],
     weights: NDArray[np.float64],
-    what: str,
-) -> NDArray[np.float64]:
+) -> NDArray[np.float64] | None:
     weights = np.tile(weights[realizations, np.newaxis], functions.shape[1])
     # A failed realization has nothing to contribute to the estimate.
     failed = np.isnan(functions)
     weights = np.where(failed, 0.0, weights)
     totals = np.sum(weights, axis=0)
     if np.any(np.abs(totals) < np.finfo(np.float64).eps):
-        msg = f"Auto-scaling of the {what} found no realizations to average"
-        raise RuntimeError(msg)
+        return None
     return np.sum(np.where(failed, 0.0, functions) * weights / totals, axis=0)
 
 

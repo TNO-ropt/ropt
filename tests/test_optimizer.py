@@ -152,11 +152,15 @@ def test_max_functions_not_exceeded(config: Any, eval_func: Any, external: str) 
     assert result.exit_code == ExitCode.FINISHED
 
 
-def test_failed_realizations(config: Any, eval_func: Any, external: str) -> None:
+@pytest.mark.parametrize("auto_scale", [False, True])
+def test_failed_realizations(
+    config: Any, eval_func: Any, external: str, *, auto_scale: bool
+) -> None:
     def _observer(item: FunctionResults) -> None:
         assert item.target_objective is None
 
     config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["objectives"]["auto_scale"] = auto_scale
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
     result = optimize(
@@ -165,8 +169,14 @@ def test_failed_realizations(config: Any, eval_func: Any, external: str) -> None
     assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
+@pytest.mark.parametrize("auto_scale", [False, True])
 def test_failed_realizations_constraints(
-    config: Any, eval_func: Any, test_functions: Any, external: str
+    config: Any,
+    eval_func: Any,
+    test_functions: Any,
+    external: str,
+    *,
+    auto_scale: bool,
 ) -> None:
     def _observer(item: FunctionResults) -> None:
         assert item.target_objective is None
@@ -175,6 +185,7 @@ def test_failed_realizations_constraints(
     config["nonlinear_constraints"] = {
         "lower_bounds": 0.0,
         "upper_bounds": 0.4,
+        "auto_scale": auto_scale,
     }
 
     result = optimize(
