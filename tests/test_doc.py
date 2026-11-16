@@ -33,7 +33,7 @@ _CONFIGURATION_REFERENCE = (
 )
 
 # Misplaced backticks render as a code span, so no reference reaches
-# mkdocs-autorefs and `mkdocs build --strict` stays silent.
+# automatic reference resolution and `zensical build --strict` stays silent.
 _MALFORMED_REF = re.compile(r"\[`[^`\n]*\]\[[^`\n]*`\]")
 _PYTHON_BLOCK = re.compile(r"```python\n(.*?)```", re.DOTALL)
 _EXAMPLE_LINK = re.compile(r"examples/\w+\.py")
@@ -128,7 +128,7 @@ def test_examples_page_list_every_script() -> None:
 
 
 def test_examples_page_have_no_dead_entries() -> None:
-    # The scripts are linked by their GitHub URL, which mkdocs never resolves.
+    # The scripts are linked by their GitHub URL, which Zensical never resolves.
     missing = sorted(
         {
             name

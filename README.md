@@ -50,13 +50,20 @@ The `ropt` package uses [ruff](https://docs.astral.sh/ruff/) (for formatting and
 linting), [mypy](https://www.mypy-lang.org/) (for static typing), and
 [pytest](https://docs.pytest.org/en/stable/) (for running the test suite).
 
-The documentation is written using [MkDocs](https://www.mkdocs.org/) and
+The documentation is built using [Zensical](https://zensical.org/) and
 [mkdocstrings](https://mkdocstrings.github.io/). To view the documentation
 locally, start the built-in server within the `ropt` distribution directory:
 
 ```bash
-mkdocs serve
+uv run zensical serve
 ```
+
+The preview is available at <http://127.0.0.1:8000>. To validate the documentation,
+run `uv run zensical build --clean --strict`.
+
+Versioned documentation is published with the
+[Zensical-compatible mike fork](https://zensical.org/docs/compatibility/mkdocs/mike/),
+pinned to a Git revision in the development dependencies.
 
 All development and documentation tools are declared in `pyproject.toml` as `uv`
 development dependencies and are installed by default by `uv`. To be able to run

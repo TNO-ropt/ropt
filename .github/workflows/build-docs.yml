@@ -16,6 +16,8 @@ concurrency:
 jobs:
   build-docs:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -35,7 +37,7 @@ jobs:
       run: uv sync --all-extras --dev
     - name: Build docs
       if: always()
-      run: uv run mkdocs build --strict
+      run: uv run zensical build --clean --strict
     - name: Deploy docs
       if: github.event_name == 'push'
       run: |
