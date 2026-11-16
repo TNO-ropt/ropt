@@ -9,6 +9,7 @@
       
       
       
+      
         <link rel="prev" href="../realization_filter/">
       
       
@@ -19,7 +20,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+      <meta name="generator" content="zensical-0.1.1">
     
     
       
@@ -27,10 +28,15 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      <link rel="stylesheet" href="../../assets/stylesheets/classic/main.0006804e.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/classic/palette.813d4b3f.min.css">
       
       
 
@@ -44,16 +50,14 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
         <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
-    
       <link rel="stylesheet" href="../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
     
       
 
@@ -74,14 +78,11 @@
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
+    <label class="md-overlay" for="__drawer" aria-hidden="true"></label>
     <div data-md-component="skip">
-      
-        
-        <a href="#optimizer-backends" class="md-skip">
-          Skip to content
-        </a>
-      
+      <a href="#__skip" class="md-skip">
+        Skip to content
+      </a>
     </div>
     <div data-md-component="announce">
       
@@ -107,6 +108,7 @@
     <label class="md-header__button md-icon" for="__drawer">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+      <span class="md-visually-hidden">Navigation</span>
     </label>
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
@@ -161,54 +163,28 @@
         <label class="md-header__button md-icon" for="__search">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+          <span class="md-visually-hidden">Search</span>
         </label>
-        <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
-      <label class="md-search__icon md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-      </label>
-      <nav class="md-search__options" aria-label="Search">
-        
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </nav>
-      
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
-            Initializing search
-          </div>
-          <ol class="md-search-result__list" role="presentation"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
 </div>
       
     
-    
-      <div class="md-header__source">
+    <div class="md-header__source">
+      
         <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     TNO-ropt/ropt
   </div>
 </a>
-      </div>
-    
+      
+    </div>
   </nav>
   
     
@@ -226,9 +202,6 @@
       <a href="../.." class="md-tabs__link">
         
   
-  
-    
-  
   About
 
       </a>
@@ -242,13 +215,29 @@
   
   
     
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
     
       <li class="md-tabs__item">
         <a href="../../getting_started/background/" class="md-tabs__link">
           
-  
-  
-    
   
   Getting Started
 
@@ -264,13 +253,35 @@
   
   
     
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
     
       <li class="md-tabs__item">
         <a href="../../running/running/" class="md-tabs__link">
           
-  
-  
-    
   
   Running
 
@@ -286,13 +297,23 @@
   
   
     
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
     
       <li class="md-tabs__item">
         <a href="../../results/output/" class="md-tabs__link">
           
-  
-  
-    
   
   Results
 
@@ -308,13 +329,39 @@
   
   
     
+      
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
     
       <li class="md-tabs__item">
         <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
           
-  
-  
-    
   
   Optimizer Setup
 
@@ -330,13 +377,21 @@
   
   
     
+      
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
     
       <li class="md-tabs__item">
         <a href="../../troubleshooting/" class="md-tabs__link">
           
-  
-  
-    
   
   Troubleshooting
 
@@ -352,13 +407,19 @@
   
   
     
+      
+      
+        
+      
+        
+      
+    
+    
+    
     
       <li class="md-tabs__item">
         <a href="../../advanced/plugin_discovery/" class="md-tabs__link">
           
-  
-  
-    
   
   Plugins
 
@@ -376,13 +437,35 @@
   
   
     
+      
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
     
       <li class="md-tabs__item md-tabs__item--active">
         <a href="../" class="md-tabs__link">
           
-  
-  
-    
   
   Reference
 
@@ -433,7 +516,7 @@
       <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
   </div>
   <div class="md-source__repository">
     TNO-ropt/ropt
@@ -457,8 +540,7 @@
   <span class="md-ellipsis">
     
   
-    About
-  
+  About
 
     
   </span>
@@ -518,8 +600,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
-  
+  Getting Started
 
     
   </span>
@@ -529,19 +610,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_2">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Getting Started
-  
+  Getting Started
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -554,8 +635,7 @@
   <span class="md-ellipsis">
     
   
-    Background
-  
+  Background
 
     
   </span>
@@ -566,10 +646,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -582,8 +662,7 @@
   <span class="md-ellipsis">
     
   
-    Installation
-  
+  Installation
 
     
   </span>
@@ -594,10 +673,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -610,8 +689,7 @@
   <span class="md-ellipsis">
     
   
-    Quickstart
-  
+  Quickstart
 
     
   </span>
@@ -622,10 +700,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -638,8 +716,7 @@
   <span class="md-ellipsis">
     
   
-    Ensemble-Based Optimization
-  
+  Ensemble-Based Optimization
 
     
   </span>
@@ -650,10 +727,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -666,8 +743,7 @@
   <span class="md-ellipsis">
     
   
-    Collecting Results
-  
+  Collecting Results
 
     
   </span>
@@ -678,10 +754,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -694,8 +770,7 @@
   <span class="md-ellipsis">
     
   
-    Running in Parallel
-  
+  Running in Parallel
 
     
   </span>
@@ -706,10 +781,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -722,8 +797,7 @@
   <span class="md-ellipsis">
     
   
-    Examples
-  
+  Examples
 
     
   </span>
@@ -734,10 +808,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -797,8 +872,7 @@
   <span class="md-ellipsis">
     
   
-    Running
-  
+  Running
 
     
   </span>
@@ -808,19 +882,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_3">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Running
-  
+  Running
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -833,8 +907,7 @@
   <span class="md-ellipsis">
     
   
-    Running Optimizations
-  
+  Running Optimizations
 
     
   </span>
@@ -845,10 +918,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -861,8 +934,7 @@
   <span class="md-ellipsis">
     
   
-    Sessions
-  
+  Sessions
 
     
   </span>
@@ -873,10 +945,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -889,8 +961,7 @@
   <span class="md-ellipsis">
     
   
-    Evaluating in Parallel
-  
+  Evaluating in Parallel
 
     
   </span>
@@ -901,10 +972,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -917,8 +988,7 @@
   <span class="md-ellipsis">
     
   
-    Running Multiple Optimizations
-  
+  Running Multiple Optimizations
 
     
   </span>
@@ -929,10 +999,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -945,8 +1015,7 @@
   <span class="md-ellipsis">
     
   
-    Failures and Aborts
-  
+  Failures and Aborts
 
     
   </span>
@@ -957,10 +1026,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -973,8 +1042,7 @@
   <span class="md-ellipsis">
     
   
-    Running External Programs
-  
+  Running External Programs
 
     
   </span>
@@ -985,10 +1053,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1001,8 +1069,7 @@
   <span class="md-ellipsis">
     
   
-    Restarting from the Best Point
-  
+  Restarting from the Best Point
 
     
   </span>
@@ -1013,10 +1080,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1029,8 +1096,7 @@
   <span class="md-ellipsis">
     
   
-    Reusing Results at the Starting Point
-  
+  Reusing Results at the Starting Point
 
     
   </span>
@@ -1041,10 +1107,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1057,8 +1123,7 @@
   <span class="md-ellipsis">
     
   
-    Nested Optimization
-  
+  Nested Optimization
 
     
   </span>
@@ -1069,10 +1134,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1085,8 +1150,7 @@
   <span class="md-ellipsis">
     
   
-    Logging
-  
+  Logging
 
     
   </span>
@@ -1097,10 +1161,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -1148,8 +1213,7 @@
   <span class="md-ellipsis">
     
   
-    Results
-  
+  Results
 
     
   </span>
@@ -1159,19 +1223,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_4">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Results
-  
+  Results
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -1184,8 +1248,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Output
-  
+  Getting Output
 
     
   </span>
@@ -1196,10 +1259,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1212,8 +1275,7 @@
   <span class="md-ellipsis">
     
   
-    Working with Results
-  
+  Working with Results
 
     
   </span>
@@ -1224,10 +1286,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1240,8 +1302,7 @@
   <span class="md-ellipsis">
     
   
-    Result Handlers
-  
+  Result Handlers
 
     
   </span>
@@ -1252,10 +1313,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1268,8 +1329,7 @@
   <span class="md-ellipsis">
     
   
-    Exit Codes
-  
+  Exit Codes
 
     
   </span>
@@ -1280,10 +1340,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -1347,8 +1408,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Setup
-  
+  Optimizer Setup
 
     
   </span>
@@ -1358,19 +1418,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Optimizer Setup
-  
+  Optimizer Setup
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -1383,8 +1443,7 @@
   <span class="md-ellipsis">
     
   
-    Key Concepts
-  
+  Key Concepts
 
     
   </span>
@@ -1395,10 +1454,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1411,8 +1470,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Choices
-  
+  Optimization Choices
 
     
   </span>
@@ -1423,10 +1481,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1439,8 +1497,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration
-  
+  Configuration
 
     
   </span>
@@ -1451,10 +1508,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1467,8 +1524,7 @@
   <span class="md-ellipsis">
     
   
-    Variables
-  
+  Variables
 
     
   </span>
@@ -1479,10 +1535,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1495,8 +1551,7 @@
   <span class="md-ellipsis">
     
   
-    Objectives
-  
+  Objectives
 
     
   </span>
@@ -1507,10 +1562,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1523,8 +1578,7 @@
   <span class="md-ellipsis">
     
   
-    Constraints
-  
+  Constraints
 
     
   </span>
@@ -1535,10 +1589,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1551,8 +1605,7 @@
   <span class="md-ellipsis">
     
   
-    Choosing an Optimizer
-  
+  Choosing an Optimizer
 
     
   </span>
@@ -1563,10 +1616,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1579,8 +1632,7 @@
   <span class="md-ellipsis">
     
   
-    Stochastic Gradients
-  
+  Stochastic Gradients
 
     
   </span>
@@ -1591,10 +1643,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1607,8 +1659,7 @@
   <span class="md-ellipsis">
     
   
-    Samplers
-  
+  Samplers
 
     
   </span>
@@ -1619,10 +1670,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1635,8 +1686,7 @@
   <span class="md-ellipsis">
     
   
-    Realization Filters
-  
+  Realization Filters
 
     
   </span>
@@ -1647,10 +1697,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1663,8 +1713,7 @@
   <span class="md-ellipsis">
     
   
-    Function Estimators
-  
+  Function Estimators
 
     
   </span>
@@ -1675,10 +1724,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1691,8 +1740,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration Reference
-  
+  Configuration Reference
 
     
   </span>
@@ -1703,10 +1751,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -1753,8 +1802,7 @@
   <span class="md-ellipsis">
     
   
-    Troubleshooting
-  
+  Troubleshooting
 
     
   </span>
@@ -1770,21 +1818,21 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Troubleshooting
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_6">
+              <span class="md-nav__icon md-icon"></span>
               
-            
+  
+  Troubleshooting
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+              
+                
+                  
   
   
   
@@ -1797,8 +1845,7 @@
   <span class="md-ellipsis">
     
   
-    Keyboard Interrupts
-  
+  Keyboard Interrupts
 
     
   </span>
@@ -1809,10 +1856,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -1856,8 +1904,7 @@
   <span class="md-ellipsis">
     
   
-    Plugins
-  
+  Plugins
 
     
   </span>
@@ -1867,19 +1914,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_7">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Plugins
-  
+  Plugins
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -1892,8 +1939,7 @@
   <span class="md-ellipsis">
     
   
-    Plugin Discovery
-  
+  Plugin Discovery
 
     
   </span>
@@ -1904,10 +1950,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -1920,8 +1966,7 @@
   <span class="md-ellipsis">
     
   
-    Writing a Plugin
-  
+  Writing a Plugin
 
     
   </span>
@@ -1932,10 +1977,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -1999,8 +2045,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
-  
+  Reference
 
     
   </span>
@@ -2016,21 +2061,21 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Reference
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+            <label class="md-nav__title" for="__nav_8">
+              <span class="md-nav__icon md-icon"></span>
               
-            
+  
+  Reference
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+              
+                
+                  
   
   
   
@@ -2043,8 +2088,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization API
-  
+  Optimization API
 
     
   </span>
@@ -2055,10 +2099,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -2071,8 +2115,7 @@
   <span class="md-ellipsis">
     
   
-    Configuration Classes
-  
+  Configuration Classes
 
     
   </span>
@@ -2083,10 +2126,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -2126,8 +2169,7 @@
   <span class="md-ellipsis">
     
   
-    Results & Events
-  
+  Results & Events
 
     
   </span>
@@ -2137,19 +2179,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_4">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_8_4">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Results & Events
-  
+  Results & Events
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -2162,8 +2204,7 @@
   <span class="md-ellipsis">
     
   
-    Evaluation Results
-  
+  Evaluation Results
 
     
   </span>
@@ -2174,10 +2215,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -2190,8 +2231,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Events
-  
+  Optimization Events
 
     
   </span>
@@ -2202,18 +2242,19 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
     
@@ -2257,8 +2298,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Components
-  
+  Optimizer Components
 
     
   </span>
@@ -2268,19 +2308,19 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_5_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_8_5">
-            <span class="md-nav__icon md-icon"></span>
-            
+        
+          <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_5_label" aria-expanded="true">
+            <label class="md-nav__title" for="__nav_8_5">
+              <span class="md-nav__icon md-icon"></span>
+              
   
-    Optimizer Components
-  
+  Optimizer Components
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
               
                 
+                  
   
   
   
@@ -2293,8 +2333,7 @@
   <span class="md-ellipsis">
     
   
-    Function Estimators
-  
+  Function Estimators
 
     
   </span>
@@ -2305,10 +2344,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -2321,8 +2360,7 @@
   <span class="md-ellipsis">
     
   
-    Realization Filters
-  
+  Realization Filters
 
     
   </span>
@@ -2333,10 +2371,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
     
@@ -2345,7 +2383,9 @@
   
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+        <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
       
       
         
@@ -2358,8 +2398,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Backends
-  
+  Optimizer Backends
 
     
   </span>
@@ -2369,15 +2408,14 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="./" class="md-nav__link md-nav__link--active">
+      <a href="././" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    Optimizer Backends
-  
+  Optimizer Backends
 
     
   </span>
@@ -2388,7 +2426,8 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
   
@@ -2397,16 +2436,16 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#ropt.backend" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         backend
-      
+      </span>
     </span>
   </a>
   
@@ -2416,9 +2455,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Backend
-      
+      </span>
     </span>
   </a>
   
@@ -2428,9 +2467,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.methods" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         methods
-      
+      </span>
     </span>
   </a>
   
@@ -2439,9 +2478,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __init__
-      
+      </span>
     </span>
   </a>
   
@@ -2450,9 +2489,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.start" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         start
-      
+      </span>
     </span>
   </a>
   
@@ -2461,9 +2500,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.bypasses_python_output" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         bypasses_python_output
-      
+      </span>
     </span>
   </a>
   
@@ -2472,9 +2511,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         validate_options
-      
+      </span>
     </span>
   </a>
   
@@ -2488,9 +2527,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallback" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizerCallback
-      
+      </span>
     </span>
   </a>
   
@@ -2500,9 +2539,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallback.__call__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __call__
-      
+      </span>
     </span>
   </a>
   
@@ -2516,9 +2555,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallbackResult" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizerCallbackResult
-      
+      </span>
     </span>
   </a>
   
@@ -2527,9 +2566,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizationProblem
-      
+      </span>
     </span>
   </a>
   
@@ -2539,9 +2578,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __init__
-      
+      </span>
     </span>
   </a>
   
@@ -2550,9 +2589,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.variable_count" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         variable_count
-      
+      </span>
     </span>
   </a>
   
@@ -2561,9 +2600,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.linear_constraints" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         linear_constraints
-      
+      </span>
     </span>
   </a>
   
@@ -2572,9 +2611,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.nonlinear_equalities" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         nonlinear_equalities
-      
+      </span>
     </span>
   </a>
   
@@ -2583,9 +2622,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.validate_supported_constraints" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         validate_supported_constraints
-      
+      </span>
     </span>
   </a>
   
@@ -2604,9 +2643,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallback" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizerCallback
-      
+      </span>
     </span>
   </a>
   
@@ -2616,9 +2655,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallback.__call__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __call__
-      
+      </span>
     </span>
   </a>
   
@@ -2632,9 +2671,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallbackResult" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizerCallbackResult
-      
+      </span>
     </span>
   </a>
   
@@ -2643,9 +2682,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         SciPyBackend
-      
+      </span>
     </span>
   </a>
   
@@ -2655,9 +2694,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __init__
-      
+      </span>
     </span>
   </a>
   
@@ -2666,9 +2705,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend.start" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         start
-      
+      </span>
     </span>
   </a>
   
@@ -2677,9 +2716,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend.bypasses_python_output" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         bypasses_python_output
-      
+      </span>
     </span>
   </a>
   
@@ -2688,9 +2727,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         validate_options
-      
+      </span>
     </span>
   </a>
   
@@ -2704,9 +2743,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         ExternalBackend
-      
+      </span>
     </span>
   </a>
   
@@ -2716,9 +2755,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __init__
-      
+      </span>
     </span>
   </a>
   
@@ -2727,9 +2766,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend.start" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         start
-      
+      </span>
     </span>
   </a>
   
@@ -2738,9 +2777,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         validate_options
-      
+      </span>
     </span>
   </a>
   
@@ -2754,9 +2793,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.utils" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         utils
-      
+      </span>
     </span>
   </a>
   
@@ -2766,9 +2805,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.resolve_verbosity" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         resolve_verbosity
-      
+      </span>
     </span>
   </a>
   
@@ -2777,9 +2816,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.collect_native_output" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         collect_native_output
-      
+      </span>
     </span>
   </a>
   
@@ -2788,9 +2827,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.create_output_path" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         create_output_path
-      
+      </span>
     </span>
   </a>
   
@@ -2799,9 +2838,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.split_linear_constraints" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         split_linear_constraints
-      
+      </span>
     </span>
   </a>
   
@@ -2819,10 +2858,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -2835,8 +2874,7 @@
   <span class="md-ellipsis">
     
   
-    Samplers
-  
+  Samplers
 
     
   </span>
@@ -2847,18 +2885,19 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -2871,8 +2910,7 @@
   <span class="md-ellipsis">
     
   
-    Plugin System
-  
+  Plugin System
 
     
   </span>
@@ -2883,10 +2921,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -2899,8 +2937,7 @@
   <span class="md-ellipsis">
     
   
-    Utility Functions
-  
+  Utility Functions
 
     
   </span>
@@ -2911,10 +2948,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -2927,8 +2964,7 @@
   <span class="md-ellipsis">
     
   
-    Enumerations
-  
+  Enumerations
 
     
   </span>
@@ -2939,10 +2975,10 @@
     </li>
   
 
-              
-            
+                
               
                 
+                  
   
   
   
@@ -2955,8 +2991,7 @@
   <span class="md-ellipsis">
     
   
-    Exceptions
-  
+  Exceptions
 
     
   </span>
@@ -2967,10 +3002,11 @@
     </li>
   
 
+                
               
-            
-          </ul>
-        </nav>
+            </ul>
+          </nav>
+        
       
     </li>
   
@@ -2986,10 +3022,12 @@
               
               <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
                 <div class="md-sidebar__scrollwrap">
+                  
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
   
   
   
@@ -2998,16 +3036,16 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      On this page
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
   <a href="#ropt.backend" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         backend
-      
+      </span>
     </span>
   </a>
   
@@ -3017,9 +3055,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         Backend
-      
+      </span>
     </span>
   </a>
   
@@ -3029,9 +3067,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.methods" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         methods
-      
+      </span>
     </span>
   </a>
   
@@ -3040,9 +3078,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __init__
-      
+      </span>
     </span>
   </a>
   
@@ -3051,9 +3089,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.start" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         start
-      
+      </span>
     </span>
   </a>
   
@@ -3062,9 +3100,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.bypasses_python_output" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         bypasses_python_output
-      
+      </span>
     </span>
   </a>
   
@@ -3073,9 +3111,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         validate_options
-      
+      </span>
     </span>
   </a>
   
@@ -3089,9 +3127,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallback" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizerCallback
-      
+      </span>
     </span>
   </a>
   
@@ -3101,9 +3139,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallback.__call__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __call__
-      
+      </span>
     </span>
   </a>
   
@@ -3117,9 +3155,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallbackResult" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizerCallbackResult
-      
+      </span>
     </span>
   </a>
   
@@ -3128,9 +3166,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizationProblem
-      
+      </span>
     </span>
   </a>
   
@@ -3140,9 +3178,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __init__
-      
+      </span>
     </span>
   </a>
   
@@ -3151,9 +3189,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.variable_count" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         variable_count
-      
+      </span>
     </span>
   </a>
   
@@ -3162,9 +3200,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.linear_constraints" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         linear_constraints
-      
+      </span>
     </span>
   </a>
   
@@ -3173,9 +3211,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.nonlinear_equalities" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         nonlinear_equalities
-      
+      </span>
     </span>
   </a>
   
@@ -3184,9 +3222,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizationProblem.validate_supported_constraints" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         validate_supported_constraints
-      
+      </span>
     </span>
   </a>
   
@@ -3205,9 +3243,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallback" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizerCallback
-      
+      </span>
     </span>
   </a>
   
@@ -3217,9 +3255,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallback.__call__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __call__
-      
+      </span>
     </span>
   </a>
   
@@ -3233,9 +3271,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.OptimizerCallbackResult" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         OptimizerCallbackResult
-      
+      </span>
     </span>
   </a>
   
@@ -3244,9 +3282,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         SciPyBackend
-      
+      </span>
     </span>
   </a>
   
@@ -3256,9 +3294,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __init__
-      
+      </span>
     </span>
   </a>
   
@@ -3267,9 +3305,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend.start" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         start
-      
+      </span>
     </span>
   </a>
   
@@ -3278,9 +3316,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend.bypasses_python_output" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         bypasses_python_output
-      
+      </span>
     </span>
   </a>
   
@@ -3289,9 +3327,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.scipy.SciPyBackend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         validate_options
-      
+      </span>
     </span>
   </a>
   
@@ -3305,9 +3343,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         ExternalBackend
-      
+      </span>
     </span>
   </a>
   
@@ -3317,9 +3355,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         __init__
-      
+      </span>
     </span>
   </a>
   
@@ -3328,9 +3366,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend.start" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         start
-      
+      </span>
     </span>
   </a>
   
@@ -3339,9 +3377,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         validate_options
-      
+      </span>
     </span>
   </a>
   
@@ -3355,9 +3393,9 @@
         <li class="md-nav__item">
   <a href="#ropt.backend.utils" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         utils
-      
+      </span>
     </span>
   </a>
   
@@ -3367,9 +3405,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.resolve_verbosity" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         resolve_verbosity
-      
+      </span>
     </span>
   </a>
   
@@ -3378,9 +3416,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.collect_native_output" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         collect_native_output
-      
+      </span>
     </span>
   </a>
   
@@ -3389,9 +3427,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.create_output_path" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         create_output_path
-      
+      </span>
     </span>
   </a>
   
@@ -3400,9 +3438,9 @@
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.split_linear_constraints" class="md-nav__link">
     <span class="md-ellipsis">
-      
+      <span class="md-typeset">
         split_linear_constraints
-      
+      </span>
     </span>
   </a>
   
@@ -3425,9 +3463,9 @@
             <div class="md-content" data-md-component="content">
               
               <article class="md-content__inner md-typeset">
+                <a id="__skip" tabindex="-1"></a>
                 
                   
-
 
   
   
@@ -3450,16 +3488,16 @@
 
         <p>Optimizer backends: the bridge to an external optimization library.</p>
 <p>A backend receives an
-<a class="autorefs autorefs-internal" title="            OptimizationProblem" href="#ropt.backend.OptimizationProblem"><code>OptimizationProblem</code></a>, requests function and
+<a class="autorefs autorefs-internal" title="            OptimizationProblem" href="./#ropt.backend.OptimizationProblem"><code>OptimizationProblem</code></a>, requests function and
 gradient values through the
-<a class="autorefs autorefs-internal" title="            OptimizerCallback" href="#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a> interface, and advances the
+<a class="autorefs autorefs-internal" title="            OptimizerCallback" href="./#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a> interface, and advances the
 optimization from an initial variable vector. It is selected through the
 <code>backend</code> section of the configuration, either as an instance or as a
 <a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> naming a method. The configuration
 itself never reaches the backend: <code>ropt</code> reduces it to an
 <code>OptimizationProblem</code> when the optimization starts.</p>
-<p><code>ropt</code> ships <a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a> and
-<a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="#ropt.backend.external.ExternalBackend"><code>ExternalBackend</code></a>, which runs an
+<p><code>ropt</code> ships <a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="./#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="./#ropt.backend.external.ExternalBackend"><code>ExternalBackend</code></a>, which runs an
 optimizer in a separate process; further backends come from plugin packages. See
 <a href="../../advanced/writing_plugins/">Writing a Plugin</a> for implementing one.</p>
 
@@ -3500,12 +3538,12 @@ optimizer in a separate process; further backends come from plugin packages. See
         <p>Abstract base class for optimizer backend implementations.</p>
 <p>A backend configures a concrete optimization algorithm, interacts with the
 <code>ropt</code> evaluation pipeline through an
-<a class="autorefs autorefs-internal" title="            OptimizerCallback" href="#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a>, and executes the main
+<a class="autorefs autorefs-internal" title="            OptimizerCallback" href="./#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a>, and executes the main
 optimization loop. See
 <a href="../../advanced/writing_plugins/">Writing plugins</a>.</p>
 <p><strong>What a backend receives</strong></p>
 <p>What a backend is asked to solve arrives as an
-<a class="autorefs autorefs-internal" title="            OptimizationProblem" href="#ropt.backend.OptimizationProblem"><code>OptimizationProblem</code></a>: already scaled,
+<a class="autorefs autorefs-internal" title="            OptimizationProblem" href="./#ropt.backend.OptimizationProblem"><code>OptimizationProblem</code></a>: already scaled,
 and already reduced to the free variables. A backend therefore neither
 scales nor masks anything; <code>ropt</code> unscales and expands results for
 reporting.</p>
@@ -3517,7 +3555,7 @@ against zero and never handles a bound. See
 
   
       dataclass
-  " href="#ropt.backend.OptimizerCallbackResult"><code>OptimizerCallbackResult</code></a>. A backend
+  " href="./#ropt.backend.OptimizerCallbackResult"><code>OptimizerCallbackResult</code></a>. A backend
 whose algorithm expects the opposite convention negates the values and
 their gradients.</p>
 <p><strong>Process-global state</strong></p>
@@ -3705,7 +3743,7 @@ the algorithm happens to need them (<code>"auto"</code>).</p>
                 <code>problem</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizationProblem (ropt.backend.OptimizationProblem)" href="#ropt.backend.OptimizationProblem">OptimizationProblem</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizationProblem (ropt.backend.OptimizationProblem)" href="./#ropt.backend.OptimizationProblem">OptimizationProblem</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3721,7 +3759,7 @@ the algorithm happens to need them (<code>"auto"</code>).</p>
                 <code>optimizer_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizerCallback (ropt.backend.OptimizerCallback)" href="#ropt.backend.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerCallback (ropt.backend.OptimizerCallback)" href="./#ropt.backend.OptimizerCallback">OptimizerCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3973,7 +4011,7 @@ vector per row) for optimizers that evaluate a batch at once.
 
   
       dataclass
-  " href="#ropt.backend.OptimizerCallbackResult"><code>OptimizerCallbackResult</code></a> computes.</p>
+  " href="./#ropt.backend.OptimizerCallbackResult"><code>OptimizerCallbackResult</code></a> computes.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4055,7 +4093,7 @@ vector per row) for optimizers that evaluate a batch at once.
 
   
       dataclass
-   (ropt.backend._callback.OptimizerCallbackResult)" href="#ropt.backend.OptimizerCallbackResult">OptimizerCallbackResult</a></code>
+   (ropt.backend._callback.OptimizerCallbackResult)" href="./#ropt.backend.OptimizerCallbackResult">OptimizerCallbackResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4106,7 +4144,7 @@ vector per row) for optimizers that evaluate a batch at once.
 
         <p>Holds the results from an optimizer callback evaluation.</p>
 <p>Bundles the objective and constraint values, and their gradients, returned
-by an <a class="autorefs autorefs-internal" title="            OptimizerCallback" href="#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a> evaluation. Both
+by an <a class="autorefs autorefs-internal" title="            OptimizerCallback" href="./#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a> evaluation. Both
 are <code>None</code> unless requested and successfully computed.</p>
 <p>Non-linear constraints arrive <strong>normalized</strong>: each is split into values that
 are non-negative when the constraint is satisfied, so a backend compares
@@ -4119,7 +4157,7 @@ for the optimization and available from
 
   
       property
-  " href="#ropt.backend.OptimizationProblem.nonlinear_equalities"><code>nonlinear_equalities</code></a>.</p>
+  " href="./#ropt.backend.OptimizationProblem.nonlinear_equalities"><code>nonlinear_equalities</code></a>.</p>
 <p><code>functions</code> and <code>gradients</code> follow a fixed shape:</p>
 <ul>
 <li><strong>Functions array:</strong> the objective followed by the constraint values. A
@@ -4217,9 +4255,9 @@ for the optimization and available from
 <p>Everything on this object is <strong>scaled</strong> and lives in <strong>free-variable
 space</strong>: the variables that <code>variables.mask</code> fixes are gone, the bounds and
 the linear constraints are reduced to the ones that remain, and the values
-delivered through the <a class="autorefs autorefs-internal" title="            OptimizerCallback" href="#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a>
+delivered through the <a class="autorefs autorefs-internal" title="            OptimizerCallback" href="./#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a>
 use the same space. A backend therefore neither scales nor masks anything.</p>
-<p>See <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> for the rest of the contract.</p>
+<p>See <a class="autorefs autorefs-internal" title="            Backend" href="./#ropt.backend.Backend"><code>Backend</code></a> for the rest of the contract.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4453,7 +4491,7 @@ the contribution those variables make is folded into the bounds.</p>
 <p>The four arrays are aligned, with one entry per surviving constraint.
 <code>equality</code> marks the constraints whose bounds coincide; it follows the
 bounds as configured, so scaling cannot change it. Pass the tuple to
-<a class="autorefs autorefs-internal" title="            split_linear_constraints" href="#ropt.backend.utils.split_linear_constraints"><code>split_linear_constraints</code></a>
+<a class="autorefs autorefs-internal" title="            split_linear_constraints" href="./#ropt.backend.utils.split_linear_constraints"><code>split_linear_constraints</code></a>
 to get the same normalized form as the non-linear constraints.</p>
 
 
@@ -4508,7 +4546,7 @@ to get the same normalized form as the non-linear constraints.</p>
 
         <p>Which non-linear constraint values are equalities.</p>
 <p>One flag per value delivered through the
-<a class="autorefs autorefs-internal" title="            OptimizerCallback" href="#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a>: a constraint with a
+<a class="autorefs autorefs-internal" title="            OptimizerCallback" href="./#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a>: a constraint with a
 finite lower and a finite upper bound delivers two values, an equality
 one, and a constraint with no finite bound none.</p>
 
@@ -4753,7 +4791,7 @@ vector per row) for optimizers that evaluate a batch at once.
 
   
       dataclass
-  " href="#ropt.backend.OptimizerCallbackResult"><code>OptimizerCallbackResult</code></a> computes.</p>
+  " href="./#ropt.backend.OptimizerCallbackResult"><code>OptimizerCallbackResult</code></a> computes.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4835,7 +4873,7 @@ vector per row) for optimizers that evaluate a batch at once.
 
   
       dataclass
-   (ropt.backend._callback.OptimizerCallbackResult)" href="#ropt.backend.OptimizerCallbackResult">OptimizerCallbackResult</a></code>
+   (ropt.backend._callback.OptimizerCallbackResult)" href="./#ropt.backend.OptimizerCallbackResult">OptimizerCallbackResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4881,7 +4919,7 @@ vector per row) for optimizers that evaluate a batch at once.
 
         <p>Holds the results from an optimizer callback evaluation.</p>
 <p>Bundles the objective and constraint values, and their gradients, returned
-by an <a class="autorefs autorefs-internal" title="            OptimizerCallback" href="#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a> evaluation. Both
+by an <a class="autorefs autorefs-internal" title="            OptimizerCallback" href="./#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a> evaluation. Both
 are <code>None</code> unless requested and successfully computed.</p>
 <p>Non-linear constraints arrive <strong>normalized</strong>: each is split into values that
 are non-negative when the constraint is satisfied, so a backend compares
@@ -4894,7 +4932,7 @@ for the optimization and available from
 
   
       property
-  " href="#ropt.backend.OptimizationProblem.nonlinear_equalities"><code>nonlinear_equalities</code></a>.</p>
+  " href="./#ropt.backend.OptimizationProblem.nonlinear_equalities"><code>nonlinear_equalities</code></a>.</p>
 <p><code>functions</code> and <code>gradients</code> follow a fixed shape:</p>
 <ul>
 <li><strong>Functions array:</strong> the objective followed by the constraint values. A
@@ -4981,12 +5019,12 @@ for the optimization and available from
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            Backend (ropt.backend._base.Backend)" href="#ropt.backend.Backend">Backend</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            Backend (ropt.backend._base.Backend)" href="./#ropt.backend.Backend">Backend</a></code></p>
 
 
 
         <p>Backend implementation using SciPy optimization algorithms.</p>
-<p>Implements the <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> interface to expose
+<p>Implements the <a class="autorefs autorefs-internal" title="            Backend" href="./#ropt.backend.Backend"><code>Backend</code></a> interface to expose
 optimization algorithms from
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
 to <code>ropt</code>.</p>
@@ -5449,12 +5487,12 @@ method.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            Backend (ropt.backend.Backend)" href="#ropt.backend.Backend">Backend</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            Backend (ropt.backend.Backend)" href="./#ropt.backend.Backend">Backend</a></code></p>
 
 
 
         <p>Backend implementation that runs an optimizer in a separate process.</p>
-<p>Implements the <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> interface by spawning a
+<p>Implements the <a class="autorefs autorefs-internal" title="            Backend" href="./#ropt.backend.Backend"><code>Backend</code></a> interface by spawning a
 child process to run a delegate backend. The child process performs the
 optimization independently and communicates back through queues to request
 function evaluations, report optimizer states, and propagate errors.</p>
@@ -5638,7 +5676,7 @@ checking what the optimizer writes below the Python level, unique output path
 construction, and splitting linear constraints into the same normalized form as
 the non-linear constraints delivered through the callback.</p>
 <p>The problem itself, including its constraints, arrives as an
-<a class="autorefs autorefs-internal" title="            OptimizationProblem" href="#ropt.backend.OptimizationProblem"><code>OptimizationProblem</code></a>. Every array these
+<a class="autorefs autorefs-internal" title="            OptimizationProblem" href="./#ropt.backend.OptimizationProblem"><code>OptimizationProblem</code></a>. Every array these
 helpers accept or return is scaled, as is everything else a backend sees.</p>
 
 
@@ -5791,7 +5829,7 @@ written without going through Python.</p>
 
   
       property
-  " href="#ropt.backend.Backend.bypasses_python_output"><code>bypasses_python_output</code></a>
+  " href="./#ropt.backend.Backend.bypasses_python_output"><code>bypasses_python_output</code></a>
 declaration from its test suite: a non-empty result means the declaration
 must be <code>True</code> for the method that was run.</p>
 
@@ -6021,7 +6059,7 @@ appended or incremented until a non-existing path is found.</p>
 
         <p>Split linear constraints into values compared against zero.</p>
 <p>Produces the same form as the non-linear constraint values delivered
-through the <a class="autorefs autorefs-internal" title="            OptimizerCallback" href="#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a>, so that a
+through the <a class="autorefs autorefs-internal" title="            OptimizerCallback" href="./#ropt.backend.OptimizerCallback"><code>OptimizerCallback</code></a>, so that a
 backend that handles both together can concatenate them. Entry <code>k</code> evaluates
 to <code>coefficients[k] @ variables - offsets[k]</code>, which is non-negative when the
 constraint is satisfied. A constraint with a finite lower and a finite upper
@@ -6032,7 +6070,7 @@ bound contributes two entries, and an equality one.</p>
 
   
       property
-  " href="#ropt.backend.OptimizationProblem.linear_constraints"><code>linear_constraints</code></a>.</p>
+  " href="./#ropt.backend.OptimizationProblem.linear_constraints"><code>linear_constraints</code></a>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6161,6 +6199,8 @@ bound contributes two entries, and an equality one.</p>
 
 
 
+
+
                 
               </article>
             </div>
@@ -6225,8 +6265,8 @@ bound contributes two entries, and an equality one.</p>
   
   
     Made with
-    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
-      Material for MkDocs
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
     </a>
   
 </div>
@@ -6236,7 +6276,7 @@ bound contributes two entries, and an equality one.</p>
 </footer>
       
     </div>
-    <div class="md-dialog" data-md-component="dialog">
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
@@ -6244,10 +6284,14 @@ bound contributes two entries, and an equality one.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":"../..","features":["navigation.tabs","navigation.tabs.sticky","navigation.indexes","navigation.top","navigation.expand","navigation.footer","navigation.sections","content.code.copy","content.code.annotate"],"redirect":null,"search":"../../assets/javascripts/workers/search.719e0d91.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":{"provider":"mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      <script src="../../assets/javascripts/bundle.3cb411a8.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       
