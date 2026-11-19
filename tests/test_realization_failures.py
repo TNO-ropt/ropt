@@ -8,10 +8,8 @@ from numpy.typing import NDArray
 
 from ropt import optimize
 from ropt._core import EnsembleEvaluator
-from ropt._core._evaluator import (
-    _get_failed_function_realizations,
-    _get_failed_gradient_realizations,
-)
+from ropt._core._evaluator import _get_failed_function_realizations
+from ropt._core._gradient import _get_failed_gradient_realizations
 from ropt._evaluation import EvaluationFunctionContext
 from ropt._handlers import EventHandler, ResultsHandler
 from ropt._running._run_evaluator import run_evaluation

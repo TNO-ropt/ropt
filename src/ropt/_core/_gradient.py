@@ -1,10 +1,12 @@
+from dataclasses import dataclass
+
 import numpy as np
 from numpy.typing import NDArray
 
 from ropt._utils import enum_mask
+from ropt.config import GradientConfig
 from ropt.context import EnOptContext
 from ropt.enums import BoundaryType
-from ropt.function_estimator import FunctionEstimator
 from ropt.sampler import Sampler
 
 _SVD_TOLERANCE = 0.999
@@ -121,64 +123,73 @@ def _estimate_merged_gradient(
     )
 
 
-def _calculate_gradient(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
+def _get_failed_gradient_realizations(
     functions: NDArray[np.float64],
-    delta_variables: NDArray[np.float64],
-    delta_functions: NDArray[np.float64],
-    failed_realizations: NDArray[np.bool_],
-    weights: NDArray[np.float64],
-    estimator: FunctionEstimator,
-    *,
-    merge_realizations: bool,
-) -> NDArray[np.float64]:
-    weights = np.where(failed_realizations, 0.0, weights)
-    weights /= weights.sum()
-    if merge_realizations:
-        gradients = _estimate_merged_gradient(delta_variables, delta_functions, weights)
-    else:
-        gradients = _estimate_gradients(delta_variables, delta_functions, weights)
-    return estimator.calculate_gradient(functions, gradients, weights)
-
-
-def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
-    function_estimators: dict[str, FunctionEstimator],
-    estimator_keys: tuple[str | None, ...] | None,
-    variables: NDArray[np.float64],
-    functions: NDArray[np.float64],
-    perturbed_variables: NDArray[np.float64],
     perturbed_functions: NDArray[np.float64],
-    realization_weights: NDArray[np.float64],
-    failed_realizations: NDArray[np.bool_],
-    *,
-    merge_realizations: bool,
-) -> NDArray[np.float64]:
-    gradients = np.full(
-        (functions.shape[-1], variables.shape[-1]), np.nan, dtype=np.float64
-    )
-    # Possible with realization_min_success = 0; as for the functions, it is NaN.
-    if np.all(failed_realizations):
-        return gradients
-    delta_variables = perturbed_variables - np.expand_dims(variables, axis=1)
-    delta_functions = perturbed_functions - np.expand_dims(functions, axis=1)
+    perturbation_min_success: int,
+) -> NDArray[np.bool_]:
+    # A failed evaluation is NaN in every function, so the first one suffices.
+    failed_realizations = np.isnan(functions[..., 0])
+    failed_perturbations = np.isnan(perturbed_functions[..., 0])
+    success_count = np.count_nonzero(~failed_perturbations, axis=-1)
+    failed_realizations |= success_count < perturbation_min_success
+    return np.array(failed_realizations)
 
-    if estimator_keys is None:
-        estimator_keys = ("0",) * functions.shape[1]
 
-    realization_weights = np.broadcast_to(
-        realization_weights, (functions.shape[1], realization_weights.shape[-1])
-    )
+@dataclass(frozen=True, slots=True)
+class _GradientData:
+    # Free variables in the optimizer's scaled domain, and the evaluated
+    # functions as returned: the objectives, followed by the constraints.
+    variables: NDArray[np.float64]
+    functions: NDArray[np.float64]
+    perturbed_variables: NDArray[np.float64]
+    perturbed_functions: NDArray[np.float64]
 
-    for key, estimator in function_estimators.items():
-        mask = np.array([item == key for item in estimator_keys])
-        for idx in np.where(mask)[0]:
-            gradients[idx, ...] = _calculate_gradient(
-                functions[..., idx],
-                delta_variables,
-                delta_functions[..., idx],
-                failed_realizations,
-                realization_weights[idx, ...],
-                estimator,
-                merge_realizations=merge_realizations,
-            )
 
-    return gradients
+class _StochasticGradient:
+    def __init__(self, gradient_config: GradientConfig) -> None:
+        self._config = gradient_config
+        self._context: EnOptContext
+
+    def init(self, context: EnOptContext) -> None:
+        self._context = context
+
+    @property
+    def perturbation_count(self) -> int:
+        return self._config.number_of_perturbations
+
+    @property
+    def merges_realizations(self) -> bool:
+        return self._config.merge_realizations
+
+    def perturbed_variables(
+        self, variables: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        return _perturb_variables(self._context, variables, self._context.samplers)
+
+    def failed_realizations(self, data: _GradientData) -> NDArray[np.bool_]:
+        assert self._config.perturbation_min_success is not None
+        return _get_failed_gradient_realizations(
+            data.functions,
+            data.perturbed_functions,
+            self._config.perturbation_min_success,
+        )
+
+    def estimate(
+        self, data: _GradientData, weights: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        delta_variables = data.perturbed_variables - data.variables
+        delta_functions = data.perturbed_functions - np.expand_dims(
+            data.functions, axis=1
+        )
+        regression = (
+            _estimate_merged_gradient
+            if self.merges_realizations
+            else _estimate_gradients
+        )
+        return np.stack(
+            [
+                regression(delta_variables, delta_functions[..., idx], weights[idx])
+                for idx in range(delta_functions.shape[-1])
+            ]
+        )

@@ -151,7 +151,7 @@ def _get_gradient_results(
     metadata: dict[str, Any],
 ) -> _GradientEvaluatorResults:
     realization_num = context.realizations.weights.size
-    perturbation_num = context.gradient.number_of_perturbations
+    perturbation_num = perturbed_variables.shape[1]
     realizations = np.repeat(
         np.arange(realization_num, dtype=np.intc), perturbation_num
     )
@@ -178,7 +178,7 @@ def _get_gradient_results(
         perturbed_constraints=evaluator_result.constraints,
         metadata=evaluator_result.metadata,
         realization_count=context.realizations.weights.size,
-        perturbation_count=context.gradient.number_of_perturbations,
+        perturbation_count=perturbation_num,
     )
 
 
@@ -191,7 +191,7 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
     metadata: dict[str, Any],
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
     realization_num = context.realizations.weights.size
-    perturbation_num = context.gradient.number_of_perturbations
+    perturbation_num = perturbed_variables.shape[1]
     realizations = np.arange(realization_num, dtype=np.intc)
     realizations = np.hstack(
         (
@@ -250,6 +250,6 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
                 for key, value in evaluator_result.metadata.items()
             },
             realization_count=context.realizations.weights.size,
-            perturbation_count=context.gradient.number_of_perturbations,
+            perturbation_count=perturbation_num,
         ),
     )

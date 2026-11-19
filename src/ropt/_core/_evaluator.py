@@ -25,8 +25,7 @@ from ropt.results import (
     ScaledGradientResults,
 )
 
-from ._function import _calculate_estimated_functions
-from ._gradient import _calculate_estimated_gradients, _perturb_variables
+from ._gradient import _GradientData, _StochasticGradient
 from ._initial_values import _InitialValueFiller
 from ._results import (
     _FunctionEvaluatorResults,
@@ -38,14 +37,12 @@ from ._results import (
 )
 
 if TYPE_CHECKING:
-    from numpy.random import Generator
     from numpy.typing import NDArray
 
     from ropt._evaluation import BatchEvaluator
     from ropt.context import EnOptContext
     from ropt.function_estimator import FunctionEstimator
     from ropt.realization_filter import RealizationFilter
-    from ropt.sampler import Sampler
 
 
 _logger = get_logger(__name__)
@@ -96,10 +93,17 @@ class EnsembleEvaluator:
         self._context = context
         self._signal_start_callback = signal_start
         self._signal_finished_callback = signal_finished
+        self._gradient = _StochasticGradient(context.gradient)
+        self._gradient.init(context)
         self._initial_values = (
             None
             if f0 is None and g0 is None
-            else _InitialValueFiller(context, evaluator, f0, g0)
+            else _InitialValueFiller(
+                context,
+                evaluator,
+                f0,
+                g0,
+            )
         )
         self._evaluator = (
             evaluator if self._initial_values is None else self._initial_values
@@ -108,8 +112,7 @@ class EnsembleEvaluator:
             context.realization_filters
         )
         self._function_estimators = self._init_function_estimators()
-        rng = default_rng(context.variables.seed)
-        self._samplers = self._init_samplers(rng)
+        self._init_samplers()
         self._cached_results: FunctionResults | None = None
 
     def calculate(
@@ -299,7 +302,7 @@ class EnsembleEvaluator:
         cached_function: FunctionResults,
     ) -> tuple[GradientResults]:
         metadata = self._signal_start()
-        perturbed_variables = self._perturb(variables)
+        perturbed_variables = self._perturbed_variables(variables)
 
         # No functions are computed in this case, instead they must have been
         # computed in a previous run, with the results stored in the
@@ -345,13 +348,19 @@ class EnsembleEvaluator:
         objective_weights = function_results.realizations.objective_weights
         constraint_weights = function_results.realizations.constraint_weights
         evaluations = function_results.evaluations
-
-        assert self._context.gradient.perturbation_min_success is not None
-        failed_realizations = _get_failed_gradient_realizations(
-            evaluations.objectives,
-            g_eval_results.perturbed_objectives,
-            self._context.gradient.perturbation_min_success,
+        data = _GradientData(
+            variables=variables if mask is None else variables[mask],
+            functions=_join_functions(evaluations.objectives, evaluations.constraints),
+            perturbed_variables=(
+                perturbed_variables if mask is None else perturbed_variables[..., mask]
+            ),
+            perturbed_functions=_join_functions(
+                g_eval_results.perturbed_objectives,
+                g_eval_results.perturbed_constraints,
+            ),
         )
+
+        failed_realizations = self._gradient.failed_realizations(data)
         _logger.info(
             "Gradient evaluation: %d/%d realizations succeeded",
             int(np.count_nonzero(~failed_realizations)),
@@ -368,16 +377,11 @@ class EnsembleEvaluator:
         ):
             try:
                 scaled_gradients, target_gradient = self._compute_gradients(
-                    variables,
+                    data,
                     mask,
-                    perturbed_variables,
-                    evaluations.objectives,
-                    evaluations.constraints,
-                    g_eval_results.perturbed_objectives,
-                    g_eval_results.perturbed_constraints,
-                    objective_weights,
-                    constraint_weights,
-                    failed_realizations,
+                    objective_weights=objective_weights,
+                    constraint_weights=constraint_weights,
+                    failed_realizations=failed_realizations,
                 )
             except TooFewRealizations:
                 # An estimator could not produce a gradient; record it as failed,
@@ -411,10 +415,10 @@ class EnsembleEvaluator:
             ),
         )
 
-    def _perturb(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:
-        perturbed_variables = _perturb_variables(
-            self._context, variables, self._samplers
-        )
+    def _perturbed_variables(
+        self, variables: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        perturbed_variables = self._gradient.perturbed_variables(variables)
         if self._initial_values is None:
             return perturbed_variables
         return self._initial_values.apply_to_perturbations(
@@ -427,7 +431,7 @@ class EnsembleEvaluator:
         mask: NDArray[np.bool_] | None,
     ) -> tuple[FunctionResults, GradientResults]:
         metadata = self._signal_start()
-        perturbed_variables = self._perturb(variables)
+        perturbed_variables = self._perturbed_variables(variables)
         realizations_to_evaluate = _get_realizations_to_evaluate(self._context)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
             self._context,
@@ -548,73 +552,30 @@ class EnsembleEvaluator:
             target_objective,
         )
 
-    def _compute_gradients(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
+    def _compute_gradients(
         self,
-        variables: NDArray[np.float64],
+        data: _GradientData,
         mask: NDArray[np.bool_] | None,
-        perturbed_variables: NDArray[np.float64],
-        objectives: NDArray[np.float64],
-        constraints: NDArray[np.float64] | None,
-        perturbed_objectives: NDArray[np.float64],
-        perturbed_constraints: NDArray[np.float64] | None,
+        *,
         objective_weights: NDArray[np.float64] | None,
         constraint_weights: NDArray[np.float64] | None,
         failed_realizations: NDArray[np.bool_],
     ) -> tuple[Gradients, NDArray[np.float64]]:
-        if mask is not None:
-            variables = variables[mask]
-        variables = np.repeat(
-            variables[np.newaxis, ...], self._context.realizations.weights.size, axis=0
+        gradients = self._aggregate_gradients(
+            data, objective_weights, constraint_weights, failed_realizations
         )
-
-        if mask is not None:
-            perturbed_variables = perturbed_variables[..., mask]
-
-        assert perturbed_objectives is not None
-        objective_gradients = _calculate_estimated_gradients(
-            self._function_estimators,
-            self._context.objectives.function_estimators,
-            variables,
-            objectives,
-            perturbed_variables,
-            perturbed_objectives,
-            (
-                self._context.realizations.weights
-                if objective_weights is None
-                else objective_weights
-            ),
-            failed_realizations,
-            merge_realizations=self._context.gradient.merge_realizations,
-        )
-        if constraints is not None:
-            assert self._context.nonlinear_constraints is not None
-            assert perturbed_constraints is not None
-            constraint_gradients = _calculate_estimated_gradients(
-                self._function_estimators,
-                self._context.nonlinear_constraints.function_estimators,
-                variables,
-                constraints,
-                perturbed_variables,
-                perturbed_constraints,
-                (
-                    self._context.realizations.weights
-                    if constraint_weights is None
-                    else constraint_weights
-                ),
-                failed_realizations,
-                merge_realizations=self._context.gradient.merge_realizations,
-            )
-        else:
-            constraint_gradients = None
+        objective_count = self._context.objectives.weights.size
 
         objective_gradients = scale(
-            objective_gradients, self._context.get_objective_scales()[:, np.newaxis]
+            gradients[:objective_count],
+            self._context.get_objective_scales()[:, np.newaxis],
         )
-        if constraint_gradients is not None:
+        constraint_gradients = None
+        if self._context.nonlinear_constraints is not None:
             constraint_scales = self._context.get_constraint_scales()
             assert constraint_scales is not None
             constraint_gradients = scale(
-                constraint_gradients, constraint_scales[:, np.newaxis]
+                gradients[objective_count:], constraint_scales[:, np.newaxis]
             )
 
         objective_gradients = apply_direction(
@@ -638,6 +599,78 @@ class EnsembleEvaluator:
             ),
             self._expand_gradients(target_objective_gradient, mask),
         )
+
+    def _aggregate_gradients(
+        self,
+        data: _GradientData,
+        objective_weights: NDArray[np.float64] | None,
+        constraint_weights: NDArray[np.float64] | None,
+        failed_realizations: NDArray[np.bool_],
+    ) -> NDArray[np.float64]:
+        gradients = np.full(
+            (data.functions.shape[-1], data.variables.shape[-1]),
+            np.nan,
+            dtype=np.float64,
+        )
+        # Possible with realization_min_success = 0; as for the functions, it is NaN.
+        if np.all(failed_realizations):
+            return gradients
+
+        weights = self._gradient_weights(
+            objective_weights, constraint_weights, failed_realizations
+        )
+        realization_gradients = self._gradient.estimate(data, weights)
+
+        objectives = slice(0, self._context.objectives.weights.size)
+        gradients[objectives] = _calculate_estimated_gradients(
+            self._function_estimators,
+            self._context.objectives.function_estimators,
+            data.functions[:, objectives],
+            realization_gradients[objectives],
+            weights[objectives],
+        )
+        if self._context.nonlinear_constraints is not None:
+            constraints = slice(objectives.stop, None)
+            gradients[constraints] = _calculate_estimated_gradients(
+                self._function_estimators,
+                self._context.nonlinear_constraints.function_estimators,
+                data.functions[:, constraints],
+                realization_gradients[constraints],
+                weights[constraints],
+            )
+        return gradients
+
+    def _gradient_weights(
+        self,
+        objective_weights: NDArray[np.float64] | None,
+        constraint_weights: NDArray[np.float64] | None,
+        failed_realizations: NDArray[np.bool_],
+    ) -> NDArray[np.float64]:
+        realization_weights = self._context.realizations.weights
+        weights = np.broadcast_to(
+            realization_weights if objective_weights is None else objective_weights,
+            (self._context.objectives.weights.size, realization_weights.size),
+        )
+        if self._context.nonlinear_constraints is not None:
+            constraint_shape = (
+                self._context.nonlinear_constraints.lower_bounds.size,
+                realization_weights.size,
+            )
+            weights = np.vstack(
+                (
+                    weights,
+                    np.broadcast_to(
+                        realization_weights
+                        if constraint_weights is None
+                        else constraint_weights,
+                        constraint_shape,
+                    ),
+                )
+            )
+        # One row per function, normalized over the realizations that succeeded.
+        weights = np.where(failed_realizations, 0.0, weights)
+        weights /= weights.sum(axis=-1, keepdims=True)
+        return weights
 
     @staticmethod
     def _expand_gradients(
@@ -731,26 +764,24 @@ class EnsembleEvaluator:
     def _init_function_estimators(self) -> dict[str, FunctionEstimator]:
         for function_estimator in self._context.function_estimators.values():
             function_estimator.init(
-                merge_realizations=self._context.gradient.merge_realizations
+                merge_realizations=self._gradient.merges_realizations
             )
         return self._context.function_estimators
 
-    def _init_samplers(self, rng: Generator) -> dict[str, Sampler]:
-        for key, item in self._context.samplers.items():
+    def _init_samplers(self) -> None:
+        rng = default_rng(self._context.variables.seed)
+        for key, sampler in self._context.samplers.items():
             mask = np.asarray(
                 self._context.variables.mask
-                & np.array(
-                    [sampler == key for sampler in self._context.variables.samplers]
-                )
+                & np.array([item == key for item in self._context.variables.samplers])
             )
-            item.init(
+            sampler.init(
                 realization_count=self._context.realizations.weights.size,
-                perturbation_count=self._context.gradient.number_of_perturbations,
+                perturbation_count=self._gradient.perturbation_count,
                 variable_count=self._context.variables.variable_count,
                 mask=mask,
                 rng=rng,
             )
-        return self._context.samplers
 
 
 def _get_failed_function_realizations(
@@ -759,13 +790,60 @@ def _get_failed_function_realizations(
     return np.isnan(objectives[..., 0])
 
 
-def _get_failed_gradient_realizations(
-    objectives: NDArray[np.float64],
-    perturbed_objectives: NDArray[np.float64],
-    perturbation_min_success: int,
-) -> NDArray[np.bool_]:
-    failed_realizations = np.isnan(objectives[..., 0])
-    failed_perturbations = np.isnan(perturbed_objectives[..., 0])
-    success_count = np.count_nonzero(~failed_perturbations, axis=-1)
-    failed_realizations |= success_count < perturbation_min_success
-    return np.array(failed_realizations)
+def _join_functions(
+    objectives: NDArray[np.float64], constraints: NDArray[np.float64] | None
+) -> NDArray[np.float64]:
+    if constraints is None:
+        return objectives
+    return np.concatenate((objectives, constraints), axis=-1)
+
+
+def _calculate_estimated_functions(
+    function_estimators: dict[str, FunctionEstimator],
+    estimator_keys: tuple[str | None, ...] | None,
+    functions: NDArray[np.float64],
+    realization_weights: NDArray[np.float64],
+    failed_realizations: NDArray[np.bool_],
+) -> NDArray[np.float64]:
+    result: NDArray[np.float64] = np.full(functions.shape[-1], np.nan, dtype=np.float64)
+
+    if estimator_keys is None:
+        estimator_keys = ("0",) * functions.shape[1]
+
+    realization_weights = np.broadcast_to(
+        realization_weights, (functions.shape[1], realization_weights.shape[-1])
+    )
+
+    for key, estimator in function_estimators.items():
+        mask = np.array([item == key for item in estimator_keys])
+        for idx in np.where(mask)[0]:
+            weights = realization_weights[idx, ...]
+            weights = np.where(failed_realizations, 0.0, weights)
+            weights /= weights.sum()
+            result[idx] = estimator.calculate_function(functions[..., idx], weights)
+
+    return result
+
+
+def _calculate_estimated_gradients(
+    function_estimators: dict[str, FunctionEstimator],
+    estimator_keys: tuple[str | None, ...] | None,
+    functions: NDArray[np.float64],
+    realization_gradients: NDArray[np.float64],
+    weights: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    gradients: NDArray[np.float64] = np.full(
+        (functions.shape[-1], realization_gradients.shape[1]), np.nan, dtype=np.float64
+    )
+
+    if estimator_keys is None:
+        estimator_keys = ("0",) * functions.shape[1]
+
+    for key, estimator in function_estimators.items():
+        mask = np.array([item == key for item in estimator_keys])
+        for idx in np.where(mask)[0]:
+            gradients[idx, ...] = estimator.calculate_gradient(
+                functions[..., idx], realization_gradients[idx, ...], weights[idx, ...]
+            )
+
+    return gradients

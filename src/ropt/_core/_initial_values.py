@@ -33,11 +33,7 @@ class _InitialValueFiller:
         self._evaluator = evaluator
         self._f0 = f0
         self._g0 = g0
-        realization_count = context.realizations.weights.size
-        self._function_covered = _function_coverage(f0, realization_count)
-        self._gradient_covered = _gradient_coverage(
-            g0, realization_count, context.gradient.number_of_perturbations
-        )
+        self._gradient_covered: NDArray[np.bool_] | None = None
         self._function_pending = False
         self._gradient_pending = False
 
@@ -56,6 +52,11 @@ class _InitialValueFiller:
         if not _same_point(unscaled, self._g0.variables):
             msg = "The initial gradient results are not at the evaluated variables"
             raise ValueError(msg)
+        self._gradient_covered = _gradient_coverage(
+            self._g0,
+            self._context.realizations.weights.size,
+            perturbed_variables.shape[1],
+        )
         # Latched here so that the dispatch and the gradient built from it agree
         # on which perturbations carry supplied values.
         self._gradient_pending = True
@@ -100,8 +101,9 @@ class _InitialValueFiller:
         if not _same_point(variables[unperturbed, :], self._f0.variables):
             msg = "The initial function results are not at the evaluated variables"
             raise ValueError(msg)
+        covered = _function_coverage(self._f0, self._context.realizations.weights.size)
         self._function_pending = True
-        rows[unperturbed] = self._function_covered[realizations[unperturbed]]
+        rows[unperturbed] = covered[realizations[unperturbed]]
         return rows
 
     def _gradient_rows(
@@ -113,6 +115,7 @@ class _InitialValueFiller:
         rows = np.zeros(realizations.shape, dtype=np.bool_)
         if not self._gradient_pending:
             return rows
+        assert self._gradient_covered is not None
         perturbed = ~unperturbed
         rows[perturbed] = self._gradient_covered[
             realizations[perturbed], perturbations[perturbed]
@@ -166,11 +169,9 @@ def _same_point(variables: NDArray[np.float64], point: NDArray[np.float64]) -> b
 
 
 def _function_coverage(
-    f0: FunctionResults | None, realization_count: int
+    f0: FunctionResults, realization_count: int
 ) -> NDArray[np.bool_]:
     covered = np.zeros(realization_count, dtype=np.bool_)
-    if f0 is None:
-        return covered
     evaluated = f0.realizations.evaluated_realizations
     overlap = min(evaluated.size, f0.evaluations.objectives.shape[0], realization_count)
     covered[:overlap] = evaluated[:overlap]
@@ -178,11 +179,9 @@ def _function_coverage(
 
 
 def _gradient_coverage(
-    g0: GradientResults | None, realization_count: int, perturbation_count: int
+    g0: GradientResults, realization_count: int, perturbation_count: int
 ) -> NDArray[np.bool_]:
     covered = np.zeros((realization_count, perturbation_count), dtype=np.bool_)
-    if g0 is None:
-        return covered
     evaluated = g0.realizations.evaluated_realizations
     stored_realizations, stored_perturbations = (
         g0.evaluations.perturbed_objectives.shape[:2]
