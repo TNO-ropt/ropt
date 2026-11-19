@@ -40,7 +40,7 @@ if TYPE_CHECKING:
     from numpy.random import Generator
     from numpy.typing import NDArray
 
-    from ropt._evaluation import EvaluationBatchCallback
+    from ropt._evaluation import BatchEvaluator
     from ropt.context import EnOptContext
     from ropt.function_estimator import FunctionEstimator
     from ropt.realization_filter import RealizationFilter
@@ -72,7 +72,7 @@ class EnsembleEvaluator:
     def __init__(  # ruff: ignore[too-many-arguments]
         self,
         context: EnOptContext,
-        evaluator: EvaluationBatchCallback,
+        evaluator: BatchEvaluator,
         *,
         f0: FunctionResults | None = None,
         g0: GradientResults | None = None,

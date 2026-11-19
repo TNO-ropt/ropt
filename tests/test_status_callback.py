@@ -18,10 +18,9 @@ from ropt import (
     optimize,
 )
 from ropt._concurrency import AbortScope
-from ropt._evaluation import EvaluationBatchContext
+from ropt._evaluation import BatchContext
 from ropt._running._batch_evaluator import make_batch_evaluator
 from ropt._running._status_callback import make_status_reporter
-from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import AbortedError, WorkflowError
 
@@ -49,10 +48,9 @@ def _sum(
     return EvaluationFunctionResult(objectives=np.array([variables.sum()]))
 
 
-def _batch_context(active: list[bool]) -> EvaluationBatchContext:
+def _batch_context(active: list[bool]) -> BatchContext:
     count = len(active)
-    return EvaluationBatchContext(
-        context=EnOptContext.model_validate(_CONFIG),
+    return BatchContext(
         active=np.array(active, dtype=np.bool_),
         realizations=np.zeros(count, dtype=np.intc),
         perturbations=np.zeros(count, dtype=np.intc),
@@ -131,7 +129,12 @@ def test_status_callback_reports_invalid_result_as_error() -> None:
     ) -> EvaluationFunctionResult:
         return cast("EvaluationFunctionResult", 1.0)
 
-    evaluator = make_batch_evaluator(function=_function, status_callback=_record(seen))
+    evaluator = make_batch_evaluator(
+        function=_function,
+        objective_count=1,
+        constraint_count=0,
+        status_callback=_record(seen),
+    )
     with pytest.raises(WorkflowError, match="must return EvaluationFunctionResult"):
         evaluator(np.zeros((2, 2)), _batch_context([True, True]))
     assert seen == [
@@ -152,7 +155,11 @@ def test_status_callback_reports_abort_during_function_as_aborted() -> None:
         return _sum(variables, context)
 
     evaluator = make_batch_evaluator(
-        function=_function, abort_scope=scope, status_callback=_record(seen)
+        function=_function,
+        objective_count=1,
+        constraint_count=0,
+        abort_scope=scope,
+        status_callback=_record(seen),
     )
     with pytest.raises(AbortedError):
         evaluator(np.zeros((2, 2)), _batch_context([True, True]))
@@ -165,7 +172,12 @@ def test_status_callback_reports_abort_during_function_as_aborted() -> None:
 
 def test_status_callback_skips_inactive_rows() -> None:
     seen: Seen = []
-    evaluator = make_batch_evaluator(function=_sum, status_callback=_record(seen))
+    evaluator = make_batch_evaluator(
+        function=_sum,
+        objective_count=1,
+        constraint_count=0,
+        status_callback=_record(seen),
+    )
     evaluator(np.zeros((3, 2)), _batch_context([True, False, True]))
     assert [row for row, _ in seen] == [0, 0, 2, 2]
 

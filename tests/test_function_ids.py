@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from ropt._core import EnsembleEvaluator
-from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
+from ropt._evaluation import BatchContext, BatchResult
 from ropt.context import EnOptContext
 
 if TYPE_CHECKING:
@@ -34,11 +34,9 @@ class _Recorder:
     def __init__(self) -> None:
         self.function_ids: list[NDArray[np.intc]] = []
 
-    def eval(
-        self, variables: NDArray[np.float64], context: EvaluationBatchContext
-    ) -> EvaluationBatchResult:
-        self.function_ids.append(context.function_ids)
-        return EvaluationBatchResult(objectives=np.ones((variables.shape[0], 2)))
+    def eval(self, variables: NDArray[np.float64], batch: BatchContext) -> BatchResult:
+        self.function_ids.append(batch.function_ids)
+        return BatchResult(objectives=np.ones((variables.shape[0], 2)))
 
 
 def _ensemble(config: dict[str, Any], recorder: _Recorder) -> EnsembleEvaluator:

@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt._concurrency import AbortScope
-    from ropt._evaluation import EvaluationBatchCallback
+    from ropt._evaluation import BatchEvaluator
     from ropt._handlers import EventHandler
     from ropt.context import EnOptContext
     from ropt.results import FunctionResults, GradientResults, Results
@@ -38,7 +38,7 @@ _logger = get_logger(__name__)
 def run_optimization(  # ruff: ignore[too-many-arguments]
     context: EnOptContext,
     variables: ArrayLike,
-    evaluator: EvaluationBatchCallback,
+    evaluator: BatchEvaluator,
     handlers: Sequence[EventHandler] = (),
     *,
     abort_scope: AbortScope | None = None,

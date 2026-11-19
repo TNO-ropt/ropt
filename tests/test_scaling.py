@@ -17,8 +17,8 @@ from numpy.typing import NDArray
 from ropt import optimize
 from ropt._core._auto_scale import set_auto_scales
 from ropt._evaluation import (
-    EvaluationBatchContext,
-    EvaluationBatchResult,
+    BatchContext,
+    BatchResult,
     EvaluationFunctionContext,
 )
 from ropt._handlers import CallbackHandler
@@ -205,14 +205,13 @@ def _estimate(
         perturbations = np.full(rows, -1, dtype=np.intc)
     set_auto_scales(
         context,
-        EvaluationBatchContext(
-            context=context,
+        BatchContext(
             active=np.ones(rows, dtype=np.bool_) if active is None else active,
             realizations=np.arange(rows, dtype=np.intc) % 2,
             perturbations=perturbations,
             function_ids=np.where(perturbations < 0, 0, -1).astype(np.intc),
         ),
-        EvaluationBatchResult(objectives=objectives, constraints=constraints),
+        BatchResult(objectives=objectives, constraints=constraints),
     )
 
 

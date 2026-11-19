@@ -8,9 +8,9 @@ from numpy.typing import NDArray
 
 from ropt import optimize
 from ropt._evaluation import (
-    EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    RowEvaluator,
 )
 from ropt._handlers import CallbackHandler
 from ropt.enums import AxisName, EnOptEventType
@@ -69,8 +69,8 @@ def _handle_results(
 
 
 def _with_pair_metadata(
-    function: EvaluationFunctionCallback,
-) -> EvaluationFunctionCallback:
+    function: RowEvaluator,
+) -> RowEvaluator:
     def _wrapped(
         variables: NDArray[np.float64], context: EvaluationFunctionContext
     ) -> EvaluationFunctionResult:

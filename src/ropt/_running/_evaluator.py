@@ -10,7 +10,7 @@ from ._function import adapt_function
 
 if TYPE_CHECKING:
     from ropt._concurrency import AbortScope
-    from ropt._evaluation import EvaluationBatchCallback
+    from ropt._evaluation import BatchEvaluator
     from ropt._executors import Executor
     from ropt.context import EnOptContext
 
@@ -24,7 +24,7 @@ def make_evaluator(
     executor: Executor | None,
     abort_scope: AbortScope | None = None,
     status_callback: StatusCallback | None = None,
-) -> EvaluationBatchCallback:
+) -> BatchEvaluator:
     n_obj = context.objectives.weights.size
     n_con = (
         0
@@ -34,6 +34,8 @@ def make_evaluator(
     callback = adapt_function(function, n_obj, n_con)
     return make_batch_evaluator(
         function=callback,
+        objective_count=n_obj,
+        constraint_count=n_con,
         executor=executor,
         batch_id_callback=next_batch_id,
         abort_scope=abort_scope,

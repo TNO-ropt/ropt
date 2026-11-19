@@ -4,13 +4,12 @@
 assembling internal evaluators, executors and workflow functions.
 """
 
-from ropt._evaluation import (
+from ._basic_optimizer import BasicOptimizer
+from ._evaluation import (
     EvaluationBatchCallback,
     EvaluationBatchContext,
     EvaluationBatchResult,
 )
-
-from ._basic_optimizer import BasicOptimizer
 
 __all__ = [
     "BasicOptimizer",

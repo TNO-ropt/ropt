@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt._evaluation import (
-    EvaluationBatchContext,
-    EvaluationBatchResult,
+    BatchContext,
+    BatchResult,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt._concurrency import AbortScope
-    from ropt._evaluation import EvaluationBatchCallback, EvaluationFunctionCallback
+    from ropt._evaluation import BatchEvaluator, RowEvaluator
     from ropt._executors import Executor
 
     from ._status_callback import StatusCallback
@@ -36,14 +36,16 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
-def make_batch_evaluator(
+def make_batch_evaluator(  # ruff: ignore[too-many-arguments]
     *,
-    function: EvaluationFunctionCallback,
+    function: RowEvaluator,
+    objective_count: int,
+    constraint_count: int,
     executor: Executor | None = None,
     batch_id_callback: Callable[[], int] | None = None,
     abort_scope: AbortScope | None = None,
     status_callback: StatusCallback | None = None,
-) -> EvaluationBatchCallback:
+) -> BatchEvaluator:
     """Build a batch evaluation callable that calls a function once per row.
 
     Without an executor the rows run one after another on the calling thread;
@@ -53,6 +55,8 @@ def make_batch_evaluator(
 
     Args:
         function:          The function used for objectives and constraints.
+        objective_count:   The number of objectives returned by the function.
+        constraint_count:  The number of nonlinear constraints returned by the function.
         executor:          An optional executor to dispatch the rows to.
         batch_id_callback: Callable that returns the next batch ID each time it is called.
         abort_scope:       An optional scope that aborts a running batch.
@@ -60,30 +64,27 @@ def make_batch_evaluator(
 
     Returns:
         A callable following the
-        [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback]
+        [`BatchEvaluator`][ropt._evaluation.BatchEvaluator]
         protocol.
     """
     next_batch_id = (
         batch_id_callback if batch_id_callback is not None else BatchIdCounter()
     )
 
-    def _evaluate(
-        variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
-    ) -> EvaluationBatchResult:
+    def _evaluate(variables: NDArray[np.float64], batch: BatchContext) -> BatchResult:
         batch_id = next_batch_id()
-        no = evaluator_context.context.objectives.weights.size
-        nc = (
-            0
-            if evaluator_context.context.nonlinear_constraints is None
-            else evaluator_context.context.nonlinear_constraints.lower_bounds.size
+        results = np.zeros(
+            (variables.shape[0], objective_count + constraint_count), dtype=np.float64
         )
-        results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
         metadata: dict[str, dict[int, Any]] = {}
 
-        active = list(_active_evaluations(evaluator_context, batch_id))
+        active = list(_active_evaluations(batch, batch_id))
         if executor is None:
             handle = partial(
-                _handle_result, results=results, metadata=metadata, objective_count=no
+                _handle_result,
+                results=results,
+                metadata=metadata,
+                objective_count=objective_count,
             )
             report = make_status_reporter(status_callback)
             _run_rows(
@@ -92,12 +93,12 @@ def make_batch_evaluator(
         else:
             values = _dispatch_rows(function, variables, active, executor, abort_scope)
             for (row_idx, _), value in zip(active, values, strict=True):
-                _handle_result(row_idx, value, results, metadata, no)
+                _handle_result(row_idx, value, results, metadata, objective_count)
 
-        return EvaluationBatchResult(
+        return BatchResult(
             batch_id=batch_id,
-            objectives=results[:, :no],
-            constraints=results[:, no:] if nc > 0 else None,
+            objectives=results[:, :objective_count],
+            constraints=results[:, objective_count:] if constraint_count > 0 else None,
             metadata=_build_metadata(metadata, variables.shape[0]),
         )
 
@@ -105,7 +106,7 @@ def make_batch_evaluator(
 
 
 def _run_rows(  # ruff: ignore[too-many-arguments]
-    function: EvaluationFunctionCallback,
+    function: RowEvaluator,
     variables: NDArray[np.float64],
     active: list[tuple[int, EvaluationFunctionContext]],
     abort_scope: AbortScope | None,
@@ -139,7 +140,7 @@ def _raise_if_aborting(abort_scope: AbortScope | None) -> None:
 
 
 def _dispatch_rows(
-    function: EvaluationFunctionCallback,
+    function: RowEvaluator,
     variables: NDArray[np.float64],
     active: list[tuple[int, EvaluationFunctionContext]],
     executor: Executor,

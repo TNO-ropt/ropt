@@ -12,11 +12,7 @@ from ropt._scaling import scale, unscale_value
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt._evaluation import (
-        EvaluationBatchCallback,
-        EvaluationBatchContext,
-        EvaluationBatchResult,
-    )
+    from ropt._evaluation import BatchContext, BatchEvaluator, BatchResult
     from ropt.context import EnOptContext
     from ropt.results import FunctionResults, GradientResults
 
@@ -28,7 +24,7 @@ class _InitialValueFiller:
     def __init__(
         self,
         context: EnOptContext,
-        evaluator: EvaluationBatchCallback,
+        evaluator: BatchEvaluator,
         f0: FunctionResults | None,
         g0: GradientResults | None,
     ) -> None:
@@ -74,16 +70,16 @@ class _InitialValueFiller:
         return perturbed_variables
 
     def __call__(
-        self, variables: NDArray[np.float64], context: EvaluationBatchContext
-    ) -> EvaluationBatchResult:
-        realizations = context.realizations
-        perturbations = context.perturbations
+        self, variables: NDArray[np.float64], batch: BatchContext
+    ) -> BatchResult:
+        realizations = batch.realizations
+        perturbations = batch.perturbations
         unperturbed = perturbations < 0
         function_rows = self._function_rows(variables, realizations, unperturbed)
         gradient_rows = self._gradient_rows(realizations, perturbations, unperturbed)
         supplied = function_rows | gradient_rows
         result = self._evaluator(
-            variables, replace(context, active=context.active & ~supplied)
+            variables, replace(batch, active=batch.active & ~supplied)
         )
         return self._fill(
             result, realizations, perturbations, function_rows, gradient_rows
@@ -125,12 +121,12 @@ class _InitialValueFiller:
 
     def _fill(
         self,
-        result: EvaluationBatchResult,
+        result: BatchResult,
         realizations: NDArray[np.intc],
         perturbations: NDArray[np.intc],
         function_rows: NDArray[np.bool_],
         gradient_rows: NDArray[np.bool_],
-    ) -> EvaluationBatchResult:
+    ) -> BatchResult:
         objectives = np.array(result.objectives, dtype=np.float64)
         constraints = (
             None

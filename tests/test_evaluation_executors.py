@@ -33,9 +33,9 @@ import pytest
 from ropt import run, session
 from ropt._concurrency import AbortScope, _program, current_abort_scope
 from ropt._evaluation import (
-    EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    RowEvaluator,
 )
 from ropt._executors import (
     ExecutorFailure,
@@ -1112,9 +1112,15 @@ def _opt_function(
 def _opt_workflow(
     executor: Executor,
     config: dict[str, Any],
-    test_function: EvaluationFunctionCallback,
+    test_function: RowEvaluator,
 ) -> FunctionResults | None:
-    evaluator = make_batch_evaluator(function=test_function, executor=executor)
+    context = EnOptContext.model_validate(config)
+    evaluator = make_batch_evaluator(
+        function=test_function,
+        objective_count=context.objectives.weights.size,
+        constraint_count=0,
+        executor=executor,
+    )
     result_handler = ResultsHandler()
     run_evaluator = evaluator
     handlers: list[EventHandler] = []
@@ -1125,7 +1131,7 @@ def _opt_workflow(
         handlers=handlers,
         abort_scope=run_scope,
         variables=initial_values,
-        context=EnOptContext.model_validate(config),
+        context=context,
     )
     return cast("FunctionResults | None", result_handler["results"])
 

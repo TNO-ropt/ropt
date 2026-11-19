@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike
 
-    from ropt._evaluation import EvaluationBatchCallback
+    from ropt._evaluation import BatchEvaluator
     from ropt._handlers import EventHandler
     from ropt.context import EnOptContext
 
@@ -37,7 +37,7 @@ _logger = get_logger(__name__)
 def run_evaluation(
     context: EnOptContext,
     variables: ArrayLike,
-    evaluator: EvaluationBatchCallback,
+    evaluator: BatchEvaluator,
     handlers: Sequence[EventHandler] = (),
     *,
     metadata: dict[str, Any] | None = None,

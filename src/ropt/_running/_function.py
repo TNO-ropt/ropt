@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING, Protocol, Union
 import numpy as np
 
 from ropt._evaluation import (
-    EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    RowEvaluator,
 )
 
 if TYPE_CHECKING:
@@ -44,7 +44,7 @@ class EvaluationFunction(Protocol):
 
 def adapt_function(
     function: EvaluationFunction, n_obj: int, n_con: int
-) -> EvaluationFunctionCallback:
+) -> RowEvaluator:
     """Wrap a user evaluation function to conform to the component protocol.
 
     Args:

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt._evaluation import EvaluationBatchContext, EvaluationFunctionResult
+    from ropt._evaluation import BatchContext, EvaluationFunctionResult
 
 # A metadata key names the axis its array values span, so it must not collide
 # with a builtin axis or with the batch column the exporters add themselves.
@@ -22,26 +22,23 @@ _RESERVED_AXIS_NAMES: Final = frozenset({"batch_id", *AxisName})
 
 
 def _active_evaluations(
-    evaluator_context: EvaluationBatchContext,
+    batch: BatchContext,
     batch_id: int,
 ) -> Iterator[tuple[int, EvaluationFunctionContext]]:
     # Yields only the rows that must be evaluated. Inactive rows keep their
     # index, so results still scatter back to the row they came from.
-    for row_idx, realization in enumerate(evaluator_context.realizations):
-        if (
-            evaluator_context.active is not None
-            and not evaluator_context.active[row_idx]
-        ):
+    for row_idx, realization in enumerate(batch.realizations):
+        if not batch.active[row_idx]:
             continue
         yield (
             row_idx,
             EvaluationFunctionContext(
                 realization=int(realization),
-                perturbation=int(evaluator_context.perturbations[row_idx]),
-                function_id=int(evaluator_context.function_ids[row_idx]),
+                perturbation=int(batch.perturbations[row_idx]),
+                function_id=int(batch.function_ids[row_idx]),
                 batch_id=batch_id,
                 row_idx=row_idx,
-                metadata=evaluator_context.metadata,
+                metadata=batch.metadata,
             ),
         )
 

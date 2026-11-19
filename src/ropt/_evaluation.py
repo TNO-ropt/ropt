@@ -1,13 +1,4 @@
-"""The data exchanged with batch and per-row evaluation functions.
-
-An [`EvaluationBatchContext`][ropt._evaluation.EvaluationBatchContext] describes
-which rows must be evaluated, an
-[`EvaluationBatchResult`][ropt._evaluation.EvaluationBatchResult] carries the
-objective and constraint values back, and
-[`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] is the
-protocol such a callable must follow. The builder that creates one from a
-per-row function is in `ropt._running._batch_evaluator`.
-"""
+"""Internal batch and row contracts, and the public per-row context and result."""
 
 from dataclasses import dataclass, field
 from typing import Any, Protocol
@@ -15,70 +6,30 @@ from typing import Any, Protocol
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.context import EnOptContext
-
 
 @dataclass(slots=True)
-class EvaluationBatchContext:
-    """Per-batch metadata passed to evaluator functions.
+class BatchContext:
+    """Row identities and metadata for an internal evaluation batch.
 
     Attributes:
-        context:       The [`EnOptContext`][ropt.context.EnOptContext] for the run.
         active:        Boolean array indicating which rows require evaluation.
         realizations:  Realization index for each row.
         perturbations: Perturbation index for each row (< 0 means unperturbed).
         function_ids:  Function evaluation index for each row (< 0 means the row
                        is not a function evaluation).
-        batch_id:      Integer identifying the current evaluation batch.
         metadata:      Metadata for this batch, including any event-handler updates.
     """
 
-    context: EnOptContext
     active: NDArray[np.bool_]
     realizations: NDArray[np.intc]
     perturbations: NDArray[np.intc]
     function_ids: NDArray[np.intc]
-    batch_id: int = 0
     metadata: dict[str, Any] = field(default_factory=dict)
-
-    def get_active_evaluations[T: np.generic](self, array: NDArray[T]) -> NDArray[T]:
-        """Return only the rows of `array` where `active` is `True`.
-
-        Args:
-            array: A 1-D or 2-D array with one entry/row per variable vector.
-
-        Returns:
-            The subset of rows corresponding to active evaluations.
-        """
-        return array[self.active, ...]
-
-    def insert_inactive_results[T: np.generic](
-        self, array: NDArray[T], *, fill_value: float = 0.0
-    ) -> NDArray[T]:
-        """Expand a filtered array back to full size, filling inactive rows.
-
-        Inserts `fill_value` at positions where `active` is `False`, restoring
-        the array to its original number of rows.
-
-        Args:
-            array:      The filtered array (output of `get_active_evaluations`).
-            fill_value: The value to insert for inactive entries.
-
-        Returns:
-            An expanded array matching the original number of rows.
-        """
-        expanded_array = np.full(
-            (self.realizations.shape[0], *array.shape[1:]),
-            fill_value=fill_value,
-            dtype=array.dtype,
-        )
-        expanded_array[self.active, ...] = array
-        return expanded_array
 
 
 @dataclass
-class EvaluationBatchResult:
-    """Results of a function evaluation batch.
+class BatchResult:
+    """Results of an internal evaluation batch.
 
     Stores objective values (and optional constraint values) for a batch of
     variable vectors. Inactive rows should be set to zero; failed active rows
@@ -97,17 +48,17 @@ class EvaluationBatchResult:
     metadata: dict[str, NDArray[Any]] = field(default_factory=dict)
 
 
-class EvaluationBatchCallback(Protocol):
-    """Defines the call signature for batch evaluation callbacks."""
+class BatchEvaluator(Protocol):
+    """The internal batch evaluation interface."""
 
     def __call__(
-        self, variables: NDArray[np.float64], context: EvaluationBatchContext, /
-    ) -> EvaluationBatchResult:
-        """Evaluate the given variables within the provided context.
+        self, variables: NDArray[np.float64], batch: BatchContext, /
+    ) -> BatchResult:
+        """Evaluate the rows of a batch.
 
         Args:
             variables: The variables to pass to the evaluation function.
-            context:   The evaluator context to pass.
+            batch:     Row identities and metadata of the batch.
 
         Returns:
             The results of the evaluation.
@@ -151,8 +102,8 @@ class EvaluationFunctionResult:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-class EvaluationFunctionCallback(Protocol):
-    """Defines the call signature for function callbacks.
+class RowEvaluator(Protocol):
+    """The internal per-row evaluation interface.
 
     A function following this protocol is called once per active row of the
     evaluation batch, receiving the variable vector for that row together with

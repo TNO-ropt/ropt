@@ -12,7 +12,7 @@ import pytest
 
 from ropt._concurrency import AbortScope, current_abort_scope
 from ropt._evaluation import (
-    EvaluationBatchContext,
+    BatchContext,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
@@ -98,7 +98,9 @@ def test_function_evaluator_with_info(
         )
 
     evaluator = make_batch_evaluator(
-        function=partial(_function, test_functions=test_functions)
+        function=partial(_function, test_functions=test_functions),
+        objective_count=len(test_functions),
+        constraint_count=0,
     )
     result_handler = ResultsHandler()
     run_evaluator = evaluator
@@ -136,7 +138,9 @@ def _run_with_metadata(
         )
 
     result_handler = ResultsHandler()
-    run_evaluator = make_batch_evaluator(function=_function)
+    run_evaluator = make_batch_evaluator(
+        function=_function, objective_count=len(test_functions), constraint_count=0
+    )
     handlers: list[EventHandler] = []
     handlers.append(result_handler)
     run_evaluation(
@@ -835,7 +839,9 @@ def test_nested_optimization(
             )
         )
 
-    outer_evaluator = make_batch_evaluator(function=_optimizer)
+    outer_evaluator = make_batch_evaluator(
+        function=_optimizer, objective_count=len(test_functions), constraint_count=0
+    )
     run_evaluator = outer_evaluator
     handlers: list[EventHandler] = []
     run_scope = None
@@ -889,7 +895,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
 
 @pytest.mark.parametrize("row_count", [1, 2])
 def test_direct_evaluator_aborts_after_function_returns(
-    config: dict[str, Any], row_count: int
+    row_count: int,
 ) -> None:
     scope = AbortScope()
     calls = 0
@@ -904,23 +910,24 @@ def test_direct_evaluator_aborts_after_function_returns(
         scope.abort(ExitCode.USER_ABORT)
         return EvaluationFunctionResult(objectives=np.array([1.0, 2.0]))
 
-    context = EvaluationBatchContext(
-        context=EnOptContext.model_validate(config),
+    batch = BatchContext(
         active=np.ones(row_count, dtype=np.bool_),
         realizations=np.zeros(row_count, dtype=np.intc),
         perturbations=np.zeros(row_count, dtype=np.intc),
         function_ids=np.zeros(row_count, dtype=np.intc),
     )
-    evaluate = make_batch_evaluator(function=_function, abort_scope=scope)
+    evaluate = make_batch_evaluator(
+        function=_function, objective_count=2, constraint_count=0, abort_scope=scope
+    )
     with pytest.raises(AbortedError) as raised:
-        evaluate(np.zeros((row_count, len(initial_values))), context)
+        evaluate(np.zeros((row_count, len(initial_values))), batch)
     assert raised.value.exit_code is ExitCode.USER_ABORT
     assert calls == 1
 
 
 @pytest.mark.parametrize("invalid_result", ["type", "shape"])
 def test_direct_evaluator_rejects_bad_result_before_next_row(
-    config: dict[str, Any], invalid_result: str
+    invalid_result: str,
 ) -> None:
     calls = 0
 
@@ -935,20 +942,21 @@ def test_direct_evaluator_rejects_bad_result_before_next_row(
             return cast("EvaluationFunctionResult", 1.0)
         return EvaluationFunctionResult(objectives=np.array([1.0, 2.0, 3.0]))
 
-    context = EvaluationBatchContext(
-        context=EnOptContext.model_validate(config),
+    batch = BatchContext(
         active=np.ones(2, dtype=np.bool_),
         realizations=np.zeros(2, dtype=np.intc),
         perturbations=np.zeros(2, dtype=np.intc),
         function_ids=np.zeros(2, dtype=np.intc),
     )
-    evaluate = make_batch_evaluator(function=_function)
+    evaluate = make_batch_evaluator(
+        function=_function, objective_count=2, constraint_count=0
+    )
     if invalid_result == "type":
         with pytest.raises(WorkflowError, match="must return EvaluationFunctionResult"):
-            evaluate(np.zeros((2, len(initial_values))), context)
+            evaluate(np.zeros((2, len(initial_values))), batch)
     else:
         with pytest.raises(ValueError, match="could not broadcast input array"):
-            evaluate(np.zeros((2, len(initial_values))), context)
+            evaluate(np.zeros((2, len(initial_values))), batch)
     assert calls == 1
 
 

@@ -9,14 +9,14 @@ import numpy as np
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt._evaluation import EvaluationBatchContext, EvaluationBatchResult
+    from ropt._evaluation import BatchContext, BatchResult
     from ropt.context import EnOptContext
 
 
 def set_auto_scales(
     context: EnOptContext,
-    evaluator_context: EvaluationBatchContext,
-    evaluator_result: EvaluationBatchResult,
+    batch: BatchContext,
+    evaluator_result: BatchResult,
 ) -> None:
     """Estimate the scales of a run from a batch of evaluations.
 
@@ -26,9 +26,9 @@ def set_auto_scales(
     batch, the scales stay missing and are estimated from a later batch.
 
     Args:
-        context:           The context of the run.
-        evaluator_context: The context the batch was evaluated with.
-        evaluator_result:  The results of the batch, unscaled.
+        context:          The context of the run.
+        batch:            The batch that was evaluated.
+        evaluator_result: The results of the batch, unscaled.
     """
     if not context._needs_auto_scales():  # ruff: ignore[private-member-access]
         return
@@ -36,12 +36,12 @@ def set_auto_scales(
     # Perturbed values are spread around the point of interest, so the scale is
     # estimated from the unperturbed values. A gradient-only batch has none, and
     # then the perturbed values are all there is to go on.
-    rows = evaluator_context.perturbations < 0
+    rows = batch.perturbations < 0
     if not rows.any():
-        rows = np.ones(evaluator_context.realizations.shape, dtype=np.bool_)
+        rows = np.ones(batch.realizations.shape, dtype=np.bool_)
     # Rows that were not evaluated hold zeros rather than results.
-    rows &= evaluator_context.active
-    realizations = evaluator_context.realizations[rows]
+    rows &= batch.active
+    realizations = batch.realizations[rows]
     weights = context.realizations.weights
 
     objectives = None

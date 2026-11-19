@@ -12,21 +12,25 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt._evaluation import EvaluationBatchResult
+from ropt._evaluation import BatchResult
 from ropt._handlers import CallbackHandler, ResultsHandler
 from ropt._running._run_optimizer import run_optimization
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
+
+from ._evaluation import EvaluationBatchContext, EvaluationBatchResult
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
     from numpy.typing import ArrayLike, NDArray
 
-    from ropt._evaluation import EvaluationBatchCallback, EvaluationBatchContext
+    from ropt._evaluation import BatchContext, BatchEvaluator
     from ropt._handlers import EventHandler
     from ropt.events import EnOptEvent
     from ropt.results import FunctionResults
+
+    from ._evaluation import EvaluationBatchCallback
 
 
 class BasicOptimizer:
@@ -38,8 +42,8 @@ class BasicOptimizer:
 
     1. validates `config` into an [`EnOptContext`][ropt.context.EnOptContext];
     2. wraps the
-       [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback] so
-       that its return type is checked;
+       [`EvaluationBatchCallback`][ropt.workflow.EvaluationBatchCallback] to
+       adapt the internal batches and check its return type;
     3. attaches a
        [`ResultsHandler`][ropt.ResultsHandler] to
        remember the best result;
@@ -85,7 +89,7 @@ class BasicOptimizer:
         Args:
             config:               The configuration for the optimization.
             evaluator:            An
-                [`EvaluationBatchCallback`][ropt._evaluation.EvaluationBatchCallback]
+                [`EvaluationBatchCallback`][ropt.workflow.EvaluationBatchCallback]
                 callable that evaluates a batch of variable vectors.
             constraint_tolerance: The constraint violation tolerance; a
                 constraint within this tolerance is considered satisfied.
@@ -127,7 +131,7 @@ class BasicOptimizer:
         exit_code = run_optimization(
             variables=np.asarray(initial_values, dtype=np.float64),
             context=self._context,
-            evaluator=_checked(self._evaluator),
+            evaluator=_adapt_evaluator(self._evaluator, self._context),
             handlers=handlers,
         )
         self._results = result_handler["results"]
@@ -165,15 +169,28 @@ def _custom_event_handlers() -> Iterator[Any]:
         yield getattr(module, class_name)
 
 
-def _checked(callback: EvaluationBatchCallback) -> EvaluationBatchCallback:
-    def _evaluate(
-        variables: NDArray[np.float64], context: EvaluationBatchContext
-    ) -> EvaluationBatchResult:
-        result = callback(variables, context)
+def _adapt_evaluator(
+    callback: EvaluationBatchCallback, context: EnOptContext
+) -> BatchEvaluator:
+    def _evaluate(variables: NDArray[np.float64], batch: BatchContext) -> BatchResult:
+        evaluator_context = EvaluationBatchContext(
+            context=context,
+            active=batch.active,
+            realizations=batch.realizations,
+            perturbations=batch.perturbations,
+            function_ids=batch.function_ids,
+            metadata=batch.metadata,
+        )
+        result = callback(variables, evaluator_context)
         # The protocol is untyped at the boundary, so a wrong return value is
         # caught here rather than deep in the ensemble code.
         assert isinstance(result, EvaluationBatchResult)
-        return result
+        return BatchResult(
+            objectives=result.objectives,
+            constraints=result.constraints,
+            batch_id=result.batch_id,
+            metadata=result.metadata,
+        )
 
     return _evaluate
 

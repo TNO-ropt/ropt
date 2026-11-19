@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt._evaluation import EvaluationBatchCallback, EvaluationBatchContext
+from ropt._evaluation import BatchContext, BatchEvaluator
 from ropt._scaling import unscale_value
 from ropt.context import EnOptContext
 
@@ -96,7 +96,7 @@ def _get_realizations_to_evaluate(
 
 def _get_function_results(
     context: EnOptContext,
-    evaluator: EvaluationBatchCallback,
+    evaluator: BatchEvaluator,
     variables: NDArray[np.float64],
     realizations_to_evaluate: NDArray[np.bool_],
     metadata: dict[str, Any],
@@ -105,8 +105,7 @@ def _get_function_results(
     realizations = np.tile(
         np.arange(realization_num, dtype=np.intc), variables.shape[0]
     )
-    evaluator_context = EvaluationBatchContext(
-        context=context,
+    batch = BatchContext(
         realizations=realizations,
         perturbations=np.full(realizations.size, -1, dtype=np.intc),
         function_ids=np.repeat(
@@ -118,10 +117,8 @@ def _get_function_results(
     variables = unscale_value(
         variables, context.variables.scales, context.variables.offsets
     )
-    evaluator_result = evaluator(
-        np.repeat(variables, realization_num, axis=0), evaluator_context
-    )
-    set_auto_scales(context, evaluator_context, evaluator_result)
+    evaluator_result = evaluator(np.repeat(variables, realization_num, axis=0), batch)
+    set_auto_scales(context, batch, evaluator_result)
     objectives = evaluator_result.objectives
     constraints = evaluator_result.constraints
     split_objectives = np.vsplit(objectives, variables.shape[0])
@@ -148,7 +145,7 @@ def _get_function_results(
 
 def _get_gradient_results(
     context: EnOptContext,
-    evaluator: EvaluationBatchCallback,
+    evaluator: BatchEvaluator,
     perturbed_variables: NDArray[np.float64],
     realizations_to_evaluate: NDArray[np.bool_],
     metadata: dict[str, Any],
@@ -158,8 +155,7 @@ def _get_gradient_results(
     realizations = np.repeat(
         np.arange(realization_num, dtype=np.intc), perturbation_num
     )
-    evaluator_context = EvaluationBatchContext(
-        context=context,
+    batch = BatchContext(
         realizations=realizations,
         perturbations=np.tile(np.arange(perturbation_num), realization_num),
         # Perturbed rows evaluate no function: the point they perturb may have
@@ -174,8 +170,8 @@ def _get_gradient_results(
     variables = unscale_value(
         variables, context.variables.scales, context.variables.offsets
     )
-    evaluator_result = evaluator(variables, evaluator_context)
-    set_auto_scales(context, evaluator_context, evaluator_result)
+    evaluator_result = evaluator(variables, batch)
+    set_auto_scales(context, batch, evaluator_result)
     return _GradientEvaluatorResults(
         batch_id=evaluator_result.batch_id,
         perturbed_objectives=evaluator_result.objectives,
@@ -188,7 +184,7 @@ def _get_gradient_results(
 
 def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-many-positional-arguments]
     context: EnOptContext,
-    evaluator: EvaluationBatchCallback,
+    evaluator: BatchEvaluator,
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     realizations_to_evaluate: NDArray[np.bool_],
@@ -203,8 +199,7 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
             np.repeat(realizations, perturbation_num),
         ),
     )
-    evaluator_context = EvaluationBatchContext(
-        context=context,
+    batch = BatchContext(
         realizations=realizations,
         perturbations=np.hstack(
             (
@@ -230,8 +225,8 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
     all_variables = unscale_value(
         all_variables, context.variables.scales, context.variables.offsets
     )
-    evaluator_result = evaluator(all_variables, evaluator_context)
-    set_auto_scales(context, evaluator_context, evaluator_result)
+    evaluator_result = evaluator(all_variables, batch)
+    set_auto_scales(context, batch, evaluator_result)
     objectives = evaluator_result.objectives
     constraints = evaluator_result.constraints
     return (

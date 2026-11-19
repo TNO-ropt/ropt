@@ -7,9 +7,9 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt._evaluation import (
-    EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    RowEvaluator,
 )
 from ropt._running._batch_evaluator import make_batch_evaluator
 
@@ -106,7 +106,7 @@ def eval_func(test_functions: Any) -> Any:
     def _eval_func(
         objective_functions: list[_Function] = test_functions,
         constraint_functions: list[_Function] | None = None,
-    ) -> EvaluationFunctionCallback:
+    ) -> RowEvaluator:
         return partial(
             _function,
             objective_functions=objective_functions,
@@ -125,7 +125,11 @@ def evaluator(
         constraint_functions: list[_Function] | None = constraint_functions,
     ) -> Any:
         return make_batch_evaluator(
-            function=eval_func(objective_functions, constraint_functions)
+            function=eval_func(objective_functions, constraint_functions),
+            objective_count=len(objective_functions),
+            constraint_count=(
+                0 if constraint_functions is None else len(constraint_functions)
+            ),
         )
 
     return _evaluator
