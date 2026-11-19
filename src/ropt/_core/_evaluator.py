@@ -34,6 +34,7 @@ from ._results import (
     _get_function_results,
     _get_gradient_results,
     _get_realizations_to_evaluate,
+    _GradientEvaluatorResults,
 )
 
 if TYPE_CHECKING:
@@ -254,7 +255,8 @@ class EnsembleEvaluator:
                 )
         except TooFewRealizations:
             # A filter or estimator could not produce a value; record this
-            # evaluation as failed so the batch continues with the others.
+            # evaluation as failed, so that it is still reported and the batch
+            # continues with the others.
             scaled_functions = None
             target_objective = None
 
@@ -305,13 +307,10 @@ class EnsembleEvaluator:
         # that have a weight equal to zero, we we pull those from the cached
         # results.
         assert cached_function.realizations is not None
-        objective_weights = cached_function.realizations.objective_weights
-        constraint_weights = cached_function.realizations.constraint_weights
-
         realizations_to_evaluate = _get_realizations_to_evaluate(
             self._context,
-            objective_weights=objective_weights,
-            constraint_weights=constraint_weights,
+            objective_weights=cached_function.realizations.objective_weights,
+            constraint_weights=cached_function.realizations.constraint_weights,
         )
         g_eval_results = _get_gradient_results(
             self._context,
@@ -320,10 +319,36 @@ class EnsembleEvaluator:
             realizations_to_evaluate,
             deepcopy(metadata),
         )
+        results = (
+            self._calculate_one_gradient(
+                variables=variables,
+                mask=mask,
+                perturbed_variables=perturbed_variables,
+                g_eval_results=g_eval_results,
+                function_results=cached_function,
+                realizations_to_evaluate=realizations_to_evaluate,
+            ),
+        )
+        self._signal_finished(results, metadata)
+        return results
+
+    def _calculate_one_gradient(  # ruff: ignore[too-many-arguments]
+        self,
+        *,
+        variables: NDArray[np.float64],
+        mask: NDArray[np.bool_] | None,
+        perturbed_variables: NDArray[np.float64],
+        g_eval_results: _GradientEvaluatorResults,
+        function_results: FunctionResults,
+        realizations_to_evaluate: NDArray[np.bool_],
+    ) -> GradientResults:
+        objective_weights = function_results.realizations.objective_weights
+        constraint_weights = function_results.realizations.constraint_weights
+        evaluations = function_results.evaluations
 
         assert self._context.gradient.perturbation_min_success is not None
         failed_realizations = _get_failed_gradient_realizations(
-            cached_function.evaluations.objectives,
+            evaluations.objectives,
             g_eval_results.perturbed_objectives,
             self._context.gradient.perturbation_min_success,
         )
@@ -337,7 +362,7 @@ class EnsembleEvaluator:
         target_gradient: NDArray[np.float64] | None = None
         # A failed function evaluation may lack the weights its gradient needs.
         if (
-            cached_function.functions is not None
+            function_results.functions is not None
             and np.count_nonzero(~failed_realizations)
             >= self._context.realizations.realization_min_success
         ):
@@ -346,8 +371,8 @@ class EnsembleEvaluator:
                     variables,
                     mask,
                     perturbed_variables,
-                    cached_function.evaluations.objectives,
-                    cached_function.evaluations.constraints,
+                    evaluations.objectives,
+                    evaluations.constraints,
                     g_eval_results.perturbed_objectives,
                     g_eval_results.perturbed_constraints,
                     objective_weights,
@@ -360,36 +385,31 @@ class EnsembleEvaluator:
                 scaled_gradients = None
                 target_gradient = None
 
-        assert g_eval_results.perturbed_objectives is not None
-        results = (
-            GradientResults(
-                batch_id=g_eval_results.batch_id,
-                source_key=(cached_function.batch_id, cached_function.function_id),
-                metadata={},
-                names=self._context.names,
-                variables=self._unscale_variables(variables),
-                perturbed_variables=self._unscale_variables(perturbed_variables),
-                evaluations=GradientEvaluations.create(
-                    perturbed_objectives=g_eval_results.perturbed_objectives,
-                    perturbed_constraints=g_eval_results.perturbed_constraints,
-                    metadata=g_eval_results.metadata,
-                ),
-                realizations=Realizations(
-                    evaluated_realizations=realizations_to_evaluate,
-                    objective_weights=objective_weights,
-                    constraint_weights=constraint_weights,
-                ),
-                gradients=self._unscale_gradients(scaled_gradients),
-                target_gradient=target_gradient,
-                scaled=ScaledGradientResults(
-                    variables=variables,
-                    perturbed_variables=perturbed_variables,
-                    gradients=scaled_gradients,
-                ),
+        return GradientResults(
+            batch_id=g_eval_results.batch_id,
+            source_key=(function_results.batch_id, function_results.function_id),
+            metadata={},
+            names=self._context.names,
+            variables=self._unscale_variables(variables),
+            perturbed_variables=self._unscale_variables(perturbed_variables),
+            evaluations=GradientEvaluations.create(
+                perturbed_objectives=g_eval_results.perturbed_objectives,
+                perturbed_constraints=g_eval_results.perturbed_constraints,
+                metadata=g_eval_results.metadata,
+            ),
+            realizations=Realizations(
+                evaluated_realizations=realizations_to_evaluate,
+                objective_weights=objective_weights,
+                constraint_weights=constraint_weights,
+            ),
+            gradients=self._unscale_gradients(scaled_gradients),
+            target_gradient=target_gradient,
+            scaled=ScaledGradientResults(
+                variables=variables,
+                perturbed_variables=perturbed_variables,
+                gradients=scaled_gradients,
             ),
         )
-        self._signal_finished(results, metadata)
-        return results
 
     def _perturb(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:
         perturbed_variables = _perturb_variables(
@@ -417,136 +437,16 @@ class EnsembleEvaluator:
             realizations_to_evaluate,
             deepcopy(metadata),
         )
-
-        failed_realizations = _get_failed_function_realizations(
-            f_eval_results.objectives
+        function_results = self._calculate_one_set_of_functions(
+            0, f_eval_results, variables, realizations_to_evaluate
         )
-        _logger.info(
-            "Function evaluation: %d/%d realizations succeeded",
-            int(np.count_nonzero(~failed_realizations)),
-            int(failed_realizations.size),
-        )
-        assert self._context.realizations.realization_min_success is not None
-        objective_weights: NDArray[np.float64] | None = None
-        constraint_weights: NDArray[np.float64] | None = None
-        scaled_functions: Functions | None = None
-        target_objective: NDArray[np.float64] | None = None
-        try:
-            objective_weights, constraint_weights = (
-                self._calculate_filtered_realization_weights(f_eval_results)
-            )
-            if (
-                np.count_nonzero(~failed_realizations)
-                >= self._context.realizations.realization_min_success
-            ):
-                scaled_functions, target_objective = self._compute_functions(
-                    f_eval_results.objectives,
-                    f_eval_results.constraints,
-                    objective_weights,
-                    constraint_weights,
-                    failed_realizations,
-                )
-        except TooFewRealizations:
-            # A filter or estimator could not produce a value; record this
-            # evaluation as failed, so that the batch is still reported.
-            scaled_functions = None
-            target_objective = None
-
-        scaled_constraint_info = ConstraintInfo.create(
-            self._context,
-            variables,
-            scaled_functions.constraints if scaled_functions is not None else None,
-        )
-
-        function_results = FunctionResults(
-            batch_id=f_eval_results.batch_id,
-            function_id=0,
-            metadata={},
-            names=self._context.names,
-            variables=self._unscale_variables(variables),
-            evaluations=FunctionEvaluations.create(
-                objectives=f_eval_results.objectives,
-                constraints=f_eval_results.constraints,
-                metadata=f_eval_results.metadata,
-            ),
-            realizations=Realizations(
-                evaluated_realizations=realizations_to_evaluate,
-                objective_weights=objective_weights,
-                constraint_weights=constraint_weights,
-            ),
-            functions=self._unscale_functions(scaled_functions),
-            target_objective=target_objective,
-            scaled=ScaledFunctionResults(
-                variables=variables,
-                functions=scaled_functions,
-                constraint_info=scaled_constraint_info,
-            ),
-            constraint_info=self._unscale_constraint_info(scaled_constraint_info),
-        )
-
-        assert self._context.gradient.perturbation_min_success is not None
-        failed_realizations = _get_failed_gradient_realizations(
-            f_eval_results.objectives,
-            g_eval_results.perturbed_objectives,
-            self._context.gradient.perturbation_min_success,
-        )
-        _logger.info(
-            "Gradient evaluation: %d/%d realizations succeeded",
-            int(np.count_nonzero(~failed_realizations)),
-            int(failed_realizations.size),
-        )
-        assert self._context.realizations.realization_min_success is not None
-        scaled_gradients: Gradients | None = None
-        target_gradient: NDArray[np.float64] | None = None
-        # A failed function evaluation may lack the weights its gradient needs.
-        if (
-            scaled_functions is not None
-            and np.count_nonzero(~failed_realizations)
-            >= self._context.realizations.realization_min_success
-        ):
-            try:
-                scaled_gradients, target_gradient = self._compute_gradients(
-                    variables,
-                    mask,
-                    perturbed_variables,
-                    f_eval_results.objectives,
-                    f_eval_results.constraints,
-                    g_eval_results.perturbed_objectives,
-                    g_eval_results.perturbed_constraints,
-                    objective_weights,
-                    constraint_weights,
-                    failed_realizations,
-                )
-            except TooFewRealizations:
-                # An estimator could not produce a gradient; record it as failed,
-                # so that the batch is still reported.
-                scaled_gradients = None
-                target_gradient = None
-
-        gradient_results = GradientResults(
-            batch_id=g_eval_results.batch_id,
-            source_key=(function_results.batch_id, function_results.function_id),
-            metadata={},
-            names=self._context.names,
-            variables=self._unscale_variables(variables),
-            perturbed_variables=self._unscale_variables(perturbed_variables),
-            evaluations=GradientEvaluations.create(
-                perturbed_objectives=g_eval_results.perturbed_objectives,
-                perturbed_constraints=g_eval_results.perturbed_constraints,
-                metadata=g_eval_results.metadata,
-            ),
-            realizations=Realizations(
-                evaluated_realizations=realizations_to_evaluate,
-                objective_weights=objective_weights,
-                constraint_weights=constraint_weights,
-            ),
-            gradients=self._unscale_gradients(scaled_gradients),
-            target_gradient=target_gradient,
-            scaled=ScaledGradientResults(
-                variables=variables,
-                perturbed_variables=perturbed_variables,
-                gradients=scaled_gradients,
-            ),
+        gradient_results = self._calculate_one_gradient(
+            variables=variables,
+            mask=mask,
+            perturbed_variables=perturbed_variables,
+            g_eval_results=g_eval_results,
+            function_results=function_results,
+            realizations_to_evaluate=realizations_to_evaluate,
         )
 
         self._signal_finished((function_results, gradient_results), metadata)
