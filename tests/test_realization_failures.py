@@ -1,11 +1,12 @@
 """Tests for detecting failed realizations and reporting failed evaluations."""
 
-from typing import Any, Literal
+from typing import Any, Literal, override
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt import optimize
 from ropt._core import EnsembleEvaluator
 from ropt._core._evaluator import (
     _get_failed_function_realizations,
@@ -14,7 +15,11 @@ from ropt._core._evaluator import (
 from ropt._evaluation import EvaluationFunctionContext
 from ropt._handlers import EventHandler, ResultsHandler
 from ropt._running._run_evaluator import run_evaluation
+from ropt.config import RealizationFilterConfig
 from ropt.context import EnOptContext
+from ropt.enums import ExitCode
+from ropt.exceptions import TooFewRealizations
+from ropt.realization_filter import RealizationFilter
 from ropt.results import (
     ConstraintInfo,
     FunctionEvaluations,
@@ -249,3 +254,108 @@ def test_gradient_is_nan_when_every_realization_failed(
     assert gradient.gradients.constraints is not None
     assert np.all(np.isnan(gradient.target_gradient))
     assert np.all(np.isnan(gradient.gradients.constraints))
+
+
+def _estimate(item: FunctionResults | GradientResults) -> object:
+    return item.functions if isinstance(item, FunctionResults) else item.gradients
+
+
+@pytest.mark.parametrize(
+    ("evaluation_policy", "failing_rows", "expected"),
+    [
+        pytest.param(
+            "speculative",
+            "all",
+            [("FunctionResults", True), ("GradientResults", True)],
+            id="combined-batch-failing-in-the-function",
+        ),
+        pytest.param(
+            "speculative",
+            "perturbed",
+            [("FunctionResults", False), ("GradientResults", True)],
+            id="combined-batch-failing-in-the-gradient",
+        ),
+        pytest.param(
+            "auto",
+            "perturbed",
+            [("FunctionResults", False), ("GradientResults", True)],
+            id="gradient-batch",
+        ),
+    ],
+)
+def test_batch_with_a_failed_estimate_is_reported(
+    evaluation_policy: str,
+    failing_rows: Literal["all", "perturbed"],
+    expected: list[tuple[str, bool]],
+) -> None:
+    # With one of the two realizations failing, the stddev estimator has too
+    # few realizations to produce a value, which stops the run.
+    def _function(
+        variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> float:
+        failing = context.realization == 1 and (
+            failing_rows == "all" or context.perturbation >= 0
+        )
+        return np.nan if failing else float(np.sum(variables**2)) + context.realization
+
+    reported: list[FunctionResults | GradientResults] = []
+    result = optimize(
+        {
+            "variables": {"variable_count": 2, "perturbation_magnitudes": 0.01},
+            "objectives": {"weights": [1.0], "function_estimators": [0]},
+            "function_estimators": [{"method": "stddev"}],
+            "realizations": {"weights": [1.0, 1.0], "realization_min_success": 1},
+            "gradient": {
+                "number_of_perturbations": 2,
+                "evaluation_policy": evaluation_policy,
+            },
+        },
+        np.ones(2),
+        _function,
+        result_callback=reported.append,
+        report_gradients=True,
+    )
+    assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+    assert [
+        (type(item).__name__, _estimate(item) is None) for item in reported
+    ] == expected
+
+
+class _FailingFilter(RealizationFilter):
+    def __init__(self, _: RealizationFilterConfig) -> None:
+        pass
+
+    @override
+    def get_realization_weights(
+        self,
+        objectives: NDArray[np.float64],
+        _: NDArray[np.float64] | None,
+        *,
+        objective_scales: NDArray[np.float64],
+        maximize: NDArray[np.bool_],
+        objective_weights: NDArray[np.float64],
+        constraint_lower_bounds: NDArray[np.float64] | None,
+        constraint_upper_bounds: NDArray[np.float64] | None,
+    ) -> NDArray[np.float64]:
+        raise TooFewRealizations
+
+
+def test_gradient_is_not_estimated_when_the_filter_fails(evaluator: Any) -> None:
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 2},
+            "objectives": {"weights": [1.0], "realization_filters": [0]},
+            "realization_filters": [
+                _FailingFilter(RealizationFilterConfig(method="failing"))
+            ],
+            "realizations": {"weights": [1.0, 1.0]},
+        }
+    )
+    squares = evaluator([lambda variables, _: float(np.sum(variables**2))])
+    function, gradient = EnsembleEvaluator(context, squares).calculate(
+        np.zeros(2), compute_functions=True, compute_gradients=True
+    )
+    assert isinstance(function, FunctionResults)
+    assert isinstance(gradient, GradientResults)
+    assert function.functions is None
+    assert gradient.gradients is None

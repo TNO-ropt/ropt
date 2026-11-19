@@ -333,25 +333,32 @@ class EnsembleEvaluator:
             int(failed_realizations.size),
         )
         assert self._context.realizations.realization_min_success is not None
+        scaled_gradients: Gradients | None = None
+        target_gradient: NDArray[np.float64] | None = None
+        # A failed function evaluation may lack the weights its gradient needs.
         if (
-            np.count_nonzero(~failed_realizations)
+            cached_function.functions is not None
+            and np.count_nonzero(~failed_realizations)
             >= self._context.realizations.realization_min_success
         ):
-            scaled_gradients, target_gradient = self._compute_gradients(
-                variables,
-                mask,
-                perturbed_variables,
-                cached_function.evaluations.objectives,
-                cached_function.evaluations.constraints,
-                g_eval_results.perturbed_objectives,
-                g_eval_results.perturbed_constraints,
-                objective_weights,
-                constraint_weights,
-                failed_realizations,
-            )
-        else:
-            scaled_gradients = None
-            target_gradient = None
+            try:
+                scaled_gradients, target_gradient = self._compute_gradients(
+                    variables,
+                    mask,
+                    perturbed_variables,
+                    cached_function.evaluations.objectives,
+                    cached_function.evaluations.constraints,
+                    g_eval_results.perturbed_objectives,
+                    g_eval_results.perturbed_constraints,
+                    objective_weights,
+                    constraint_weights,
+                    failed_realizations,
+                )
+            except TooFewRealizations:
+                # An estimator could not produce a gradient; record it as failed,
+                # so that the batch is still reported.
+                scaled_gradients = None
+                target_gradient = None
 
         assert g_eval_results.perturbed_objectives is not None
         results = (
@@ -411,10 +418,6 @@ class EnsembleEvaluator:
             deepcopy(metadata),
         )
 
-        objective_weights, constraint_weights = (
-            self._calculate_filtered_realization_weights(f_eval_results)
-        )
-
         failed_realizations = _get_failed_function_realizations(
             f_eval_results.objectives
         )
@@ -424,18 +427,28 @@ class EnsembleEvaluator:
             int(failed_realizations.size),
         )
         assert self._context.realizations.realization_min_success is not None
-        if (
-            np.count_nonzero(~failed_realizations)
-            >= self._context.realizations.realization_min_success
-        ):
-            scaled_functions, target_objective = self._compute_functions(
-                f_eval_results.objectives,
-                f_eval_results.constraints,
-                objective_weights,
-                constraint_weights,
-                failed_realizations,
+        objective_weights: NDArray[np.float64] | None = None
+        constraint_weights: NDArray[np.float64] | None = None
+        scaled_functions: Functions | None = None
+        target_objective: NDArray[np.float64] | None = None
+        try:
+            objective_weights, constraint_weights = (
+                self._calculate_filtered_realization_weights(f_eval_results)
             )
-        else:
+            if (
+                np.count_nonzero(~failed_realizations)
+                >= self._context.realizations.realization_min_success
+            ):
+                scaled_functions, target_objective = self._compute_functions(
+                    f_eval_results.objectives,
+                    f_eval_results.constraints,
+                    objective_weights,
+                    constraint_weights,
+                    failed_realizations,
+                )
+        except TooFewRealizations:
+            # A filter or estimator could not produce a value; record this
+            # evaluation as failed, so that the batch is still reported.
             scaled_functions = None
             target_objective = None
 
@@ -483,25 +496,32 @@ class EnsembleEvaluator:
             int(failed_realizations.size),
         )
         assert self._context.realizations.realization_min_success is not None
+        scaled_gradients: Gradients | None = None
+        target_gradient: NDArray[np.float64] | None = None
+        # A failed function evaluation may lack the weights its gradient needs.
         if (
-            np.count_nonzero(~failed_realizations)
+            scaled_functions is not None
+            and np.count_nonzero(~failed_realizations)
             >= self._context.realizations.realization_min_success
         ):
-            scaled_gradients, target_gradient = self._compute_gradients(
-                variables,
-                mask,
-                perturbed_variables,
-                f_eval_results.objectives,
-                f_eval_results.constraints,
-                g_eval_results.perturbed_objectives,
-                g_eval_results.perturbed_constraints,
-                objective_weights,
-                constraint_weights,
-                failed_realizations,
-            )
-        else:
-            scaled_gradients = None
-            target_gradient = None
+            try:
+                scaled_gradients, target_gradient = self._compute_gradients(
+                    variables,
+                    mask,
+                    perturbed_variables,
+                    f_eval_results.objectives,
+                    f_eval_results.constraints,
+                    g_eval_results.perturbed_objectives,
+                    g_eval_results.perturbed_constraints,
+                    objective_weights,
+                    constraint_weights,
+                    failed_realizations,
+                )
+            except TooFewRealizations:
+                # An estimator could not produce a gradient; record it as failed,
+                # so that the batch is still reported.
+                scaled_gradients = None
+                target_gradient = None
 
         gradient_results = GradientResults(
             batch_id=g_eval_results.batch_id,
