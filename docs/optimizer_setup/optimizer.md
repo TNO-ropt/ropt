@@ -119,6 +119,23 @@ For reproducible results with `differential_evolution`, set its random
 generator seed in `backend.options`, for example `{"rng": 4}` as in the
 [integer-variable example](https://github.com/TNO-ropt/ropt/blob/main/examples/discrete.py).
 
+## Evaluation policy { #evaluation-policy }
+
+`optimizer.evaluation_policy`, a field of
+[`OptimizerConfig`][ropt.config.OptimizerConfig], picks one of:
+
+- `"auto"` — compute objectives and gradients strictly when the backend requests
+  them. The default, and the policy that performs the fewest evaluations.
+- `"speculative"` — also compute the gradient whenever an objective is
+  requested. Improves load balancing on HPC clusters when gradient evaluations
+  are likely to be needed soon.
+- `"separate"` — never combine function and gradient evaluations into a single
+  batch. The functions are evaluated first, so a
+  [realization filter](realization_filters.md) can set the weight of some
+  realizations to zero before the gradient is evaluated. The gradient evaluation
+  then skips those realizations. In a combined batch, the weights are not yet
+  known and all realizations are evaluated.
+
 ## Limiting the length of an optimization { #limiting-the-length-of-a-run }
 
 Four settings can stop an optimization, and they are **split across the two
@@ -183,6 +200,8 @@ overlap. See
 
 ## See also
 
+- What `evaluation_policy` means when evaluations are submitted concurrently:
+  [Evaluating in Parallel](../running/parallel.md).
 - Watching results as they arrive, instead of reading optimizer output:
   [Result Handlers](../results/handlers.md).
 - When an optimization stops earlier than expected, or returns no result at all:

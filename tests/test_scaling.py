@@ -423,11 +423,10 @@ def _run(objectives: dict[str, Any], estimator: str) -> list[Results]:
 
     optimize(
         {
-            "optimizer": {"max_functions": 1},
+            "optimizer": {"max_functions": 1, "evaluation_policy": "speculative"},
             "variables": {"variable_count": 2, "perturbation_magnitudes": 0.01},
             "realizations": {"weights": [1.0, 2.0, 3.0]},
             "objectives": objectives,
-            "gradient": {"evaluation_policy": "speculative"},
             "function_estimators": [{"method": estimator}],
         },
         np.array([0.5, 0.5]),

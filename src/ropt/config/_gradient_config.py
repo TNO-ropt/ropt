@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal, Self
+from typing import Self
 
 from pydantic import (
     BaseModel,
@@ -33,13 +33,11 @@ class GradientConfig(BaseModel):
         number_of_perturbations:  Number of perturbations.
         perturbation_min_success: Minimum number of successful perturbations.
         merge_realizations:       Merge realizations for the final gradient.
-        evaluation_policy:        How to evaluate functions and gradients.
     """
 
     number_of_perturbations: PositiveInt = DEFAULT_NUMBER_OF_PERTURBATIONS
     perturbation_min_success: PositiveInt | None = None
     merge_realizations: bool = False
-    evaluation_policy: Literal["speculative", "separate", "auto"] = "auto"
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

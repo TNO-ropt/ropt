@@ -444,7 +444,7 @@ def test_scipy_evaluation_policy_separate(
     config: Any, method: str, eval_func: Any
 ) -> None:
     config["backend"]["method"] = method
-    config["gradient"] = {"evaluation_policy": "separate"}
+    config["optimizer"] = {"evaluation_policy": "separate"}
 
     result = optimize(config, initial_values, eval_func())
     assert result.results is not None
@@ -460,7 +460,7 @@ def test_scipy_speculative(
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     config["backend"]["method"] = "slsqp"
-    config["gradient"] = {"evaluation_policy": evaluation_policy}
+    config["optimizer"] = {"evaluation_policy": evaluation_policy}
 
     def _observer(event: EnOptEvent) -> None:
         assert event.results is not None

@@ -105,7 +105,7 @@ def test_stddev_function_estimator(
         partial(_compute_distance_squared_stddev, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["optimizer"]["evaluation_policy"] = evaluation_policy
     config["function_estimators"] = [{"method": "stddev"}]
     result = optimize(config, initial_values, eval_func(functions))
     assert result.results is not None

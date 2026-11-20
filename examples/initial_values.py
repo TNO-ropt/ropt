@@ -46,12 +46,12 @@ def config(realizations: int) -> dict[str, Any]:
             "perturbation_magnitudes": 1e-6,
         },
         "realizations": {"weights": [1.0] * realizations},
-        "gradient": {
-            "number_of_perturbations": PERTURBATIONS,
+        "gradient": {"number_of_perturbations": PERTURBATIONS},
+        "optimizer": {
+            "max_functions": 5,
             # A gradient at every evaluation, so there is one at the best point.
             "evaluation_policy": "speculative",
         },
-        "optimizer": {"max_functions": 5},
     }
 
 

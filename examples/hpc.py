@@ -44,10 +44,10 @@ CONFIG: dict[str, Any] = {
     "gradient": {
         "number_of_perturbations": 1,
         "merge_realizations": True,
-        "evaluation_policy": "speculative",
     },
     "optimizer": {
         "max_batches": 8,
+        "evaluation_policy": "speculative",
     },
 }
 INITIAL_VALUES = [1.1, 1.2]

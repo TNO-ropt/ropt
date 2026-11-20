@@ -28,7 +28,7 @@ first = optimize(config(SCREENING_REALIZATIONS), INITIAL_VALUES, rosenbrock)
 ```
 
 The configuration sets
-[`evaluation_policy`](../optimizer_setup/gradients.md#evaluation-policy) to
+[`evaluation_policy`](../optimizer_setup/optimizer.md#evaluation-policy) to
 `"speculative"`, which computes a gradient at every function evaluation, so a
 gradient is available at the point the first optimization returns.
 
