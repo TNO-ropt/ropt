@@ -21,6 +21,16 @@ class FunctionEvaluations(ResultField):
 
     **Result descriptions**
 
+    === "Active"
+
+        `active`: A boolean array indicating which realizations were evaluated.
+        `True` indicates that a realization was evaluated:
+
+        - Shape $(n_r,)$, where:
+            - $n_r$ is the number of realizations.
+        - Axis type:
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+
     === "Objectives"
 
         `objectives`: The calculated objective function values for each
@@ -67,11 +77,17 @@ class FunctionEvaluations(ResultField):
         key. See [User-defined axes](../results/results.md#user-defined-axes).
 
     Attributes:
+        active:      Boolean array indicating evaluated realizations.
         objectives:  The objective function values for each realization.
         constraints: The constraint function values for each realization.
         metadata:    Optional metadata for each evaluated realization.
     """
 
+    active: NDArray[np.bool_] = field(
+        metadata={
+            "__axes__": (AxisName.REALIZATION,),
+        },
+    )
     objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
@@ -97,12 +113,14 @@ class FunctionEvaluations(ResultField):
     )
 
     def __post_init__(self) -> None:
+        self.active = _immutable_copy(self.active)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
 
     @classmethod
     def create(
         cls,
+        active: NDArray[np.bool_],
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None = None,
         metadata: dict[str, NDArray[Any]] | None = None,
@@ -110,6 +128,7 @@ class FunctionEvaluations(ResultField):
         """Create a `FunctionEvaluations` object with the given data.
 
         Args:
+            active:      Which realizations were evaluated.
             objectives:  The objective functions for each realization.
             constraints: The constraint functions for each realization.
             metadata:    Optional info for each evaluation.
@@ -118,6 +137,7 @@ class FunctionEvaluations(ResultField):
             A new FunctionEvaluations object.
         """
         return FunctionEvaluations(
+            active=active,
             objectives=objectives,
             constraints=constraints,
             metadata={} if metadata is None else metadata,

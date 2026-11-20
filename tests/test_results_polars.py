@@ -154,12 +154,12 @@ def test_polars_results_sep(config: Any, eval_func: Any) -> None:
 
 
 def test_polars_results_gradient_results(config: Any, eval_func: Any) -> None:
-    frames = _run(config, eval_func, ["target_gradient"], "gradients")
+    frames = _run(config, eval_func, ["target_objective"], "gradients")
     frame = pl.concat(frames, how="diagonal")
     assert frame.height == 3
     assert frame.columns == [
         "batch_id",
-        *(f"target_gradient,a:{idx}" for idx in range(1, 4)),
+        *(f"target_objective,a:{idx}" for idx in range(1, 4)),
     ]
 
 
@@ -214,7 +214,7 @@ def test_polars_results_mixed_granularity(config: Any, eval_func: Any) -> None:
     frames = _run(
         config,
         eval_func,
-        ["perturbed_variables", "target_gradient"],
+        ["perturbations.variables", "target_objective"],
         "gradients",
     )
     frame = pl.concat(frames, how="diagonal")
@@ -222,13 +222,13 @@ def test_polars_results_mixed_granularity(config: Any, eval_func: Any) -> None:
         "batch_id",
         "realization",
         "perturbation",
-        *(f"perturbed_variables,a:{idx}" for idx in range(1, 4)),
-        *(f"target_gradient,a:{idx}" for idx in range(1, 4)),
+        *(f"perturbations.variables,a:{idx}" for idx in range(1, 4)),
+        *(f"target_objective,a:{idx}" for idx in range(1, 4)),
     ]
     assert frame.null_count().sum_horizontal().item() == 0
     for batch_frame in frame.partition_by("batch_id"):
         assert batch_frame.height == 2
-        target = batch_frame.select(pl.col("^target_gradient,.*$"))
+        target = batch_frame.select(pl.col("^target_objective,.*$"))
         assert target.width > 0
         assert target.row(0) == target.row(1)
 
@@ -239,7 +239,7 @@ _PARITY_FIELDS: list[tuple[list[str], Literal["functions", "gradients"]]] = [
         [
             "batch_id",
             "target_objective",
-            "functions.objectives",
+            "aggregates.objectives",
             "variables",
             "constraint_info.bound_lower",
             "constraint_info.bound_upper",
@@ -248,18 +248,18 @@ _PARITY_FIELDS: list[tuple[list[str], Literal["functions", "gradients"]]] = [
         "functions",
     ),
     (["variables", "metadata.foo.bar"], "functions"),
-    (["target_gradient", "gradients.objectives"], "gradients"),
+    (["target_objective", "aggregates.objectives"], "gradients"),
     (
         [
-            "gradients.objectives",
-            "target_gradient",
+            "aggregates.objectives",
+            "target_objective",
         ],
         "gradients",
     ),
     (
         [
-            "perturbed_variables",
-            "evaluations.perturbed_objectives",
+            "perturbations.variables",
+            "perturbations.objectives",
         ],
         "gradients",
     ),

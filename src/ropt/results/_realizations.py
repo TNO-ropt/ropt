@@ -15,21 +15,11 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Realizations(ResultField):
-    """Per-realization activity, success, and weight information.
+    """Per-realization weights used to aggregate the evaluations.
 
     See [Working with Results](../results/results.md) for usage details.
 
     **Result descriptions**
-
-    === "Evaluated Realizations"
-
-        `evaluated_realizations`: A boolean array indicating which realizations
-        were evaluated. `True` indicates that a realization was evaluated:
-
-        - Shape $(n_r,)$, where:
-            - $n_r$ is the number of realizations.
-        - Axis type:
-            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
     === "Objective Weights"
 
@@ -62,16 +52,10 @@ class Realizations(ResultField):
         constraint calculation.
 
     Attributes:
-        evaluated_realizations: Boolean array indicating evaluated realizations.
-        objective_weights:      Objective weights per realization, if available.
-        constraint_weights:     Constraint weights per realization, if available.
+        objective_weights:  Objective weights per realization, if available.
+        constraint_weights: Constraint weights per realization, if available.
     """
 
-    evaluated_realizations: NDArray[np.bool_] = field(
-        metadata={
-            "__axes__": (AxisName.REALIZATION,),
-        },
-    )
     objective_weights: NDArray[np.float64] | None = field(
         default=None,
         metadata={
@@ -92,6 +76,5 @@ class Realizations(ResultField):
     )
 
     def __post_init__(self) -> None:
-        self.evaluated_realizations = _immutable_copy(self.evaluated_realizations)
         self.objective_weights = _immutable_copy(self.objective_weights)
         self.constraint_weights = _immutable_copy(self.constraint_weights)

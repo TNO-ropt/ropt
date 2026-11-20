@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(slots=True)
-class Functions(ResultField):
+class FunctionAggregates(ResultField):
     """Aggregated objective and constraint function values.
 
     The same class carries both domains: the values the optimizer works with
@@ -76,7 +76,9 @@ class Functions(ResultField):
         self.constraints = _immutable_copy(self.constraints)
 
     @classmethod
-    def from_scaled(cls, context: EnOptContext, scaled: Functions) -> Functions:
+    def from_scaled(
+        cls, context: EnOptContext, scaled: FunctionAggregates
+    ) -> FunctionAggregates:
         """Derive the configured function values from the scaled ones.
 
         Args:
@@ -84,7 +86,7 @@ class Functions(ResultField):
             scaled:  The values as the optimizer sees them.
 
         Returns:
-            A new `Functions` object.
+            A new `FunctionAggregates` object.
         """
         # Undo the flip that made a maximized objective something to minimize,
         # so that the reported aggregate agrees in sign with the values it
@@ -99,4 +101,4 @@ class Functions(ResultField):
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
             constraints = unscale_value(constraints, constraint_scales)
-        return Functions(objectives=objectives, constraints=constraints)
+        return FunctionAggregates(objectives=objectives, constraints=constraints)

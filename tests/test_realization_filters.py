@@ -322,13 +322,9 @@ def test_cvar_filter_on_objectives(
             filtered = result.realizations.objective_weights[:, 0] == 0.0
         if isinstance(result, GradientResults):
             if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] == 0.0
-                )
+                assert np.all(result.perturbations.objectives[filtered, ...] == 0.0)
             else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] != 0.0
-                )
+                assert np.all(result.perturbations.objectives[filtered, ...] != 0.0)
 
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
@@ -383,21 +379,13 @@ def test_cvar_filter_on_objectives_with_constraints(
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[:, 0] == 0.0
         if isinstance(result, GradientResults):
-            assert result.evaluations.perturbed_constraints is not None
+            assert result.perturbations.constraints is not None
             if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] == 0.0
-                )
-                assert np.all(
-                    result.evaluations.perturbed_constraints[filtered, ...] == 0.0
-                )
+                assert np.all(result.perturbations.objectives[filtered, ...] == 0.0)
+                assert np.all(result.perturbations.constraints[filtered, ...] == 0.0)
             else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] != 0.0
-                )
-                assert np.all(
-                    result.evaluations.perturbed_constraints[filtered, ...] != 0.0
-                )
+                assert np.all(result.perturbations.objectives[filtered, ...] != 0.0)
+                assert np.all(result.perturbations.constraints[filtered, ...] != 0.0)
 
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
@@ -452,21 +440,13 @@ def test_cvar_filter_on_constraints(
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[:, 0] == 0.0
         if isinstance(result, GradientResults):
-            assert result.evaluations.perturbed_constraints is not None
+            assert result.perturbations.constraints is not None
             if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] == 0.0
-                )
-                assert np.all(
-                    result.evaluations.perturbed_constraints[filtered, ...] == 0.0
-                )
+                assert np.all(result.perturbations.objectives[filtered, ...] == 0.0)
+                assert np.all(result.perturbations.constraints[filtered, ...] == 0.0)
             else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] != 0.0
-                )
-                assert np.all(
-                    result.evaluations.perturbed_constraints[filtered, ...] != 0.0
-                )
+                assert np.all(result.perturbations.objectives[filtered, ...] != 0.0)
+                assert np.all(result.perturbations.constraints[filtered, ...] != 0.0)
 
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
@@ -490,7 +470,7 @@ def test_cvar_filter_mixed(
     def _add_objective(event: EnOptEvent) -> None:
         for item in event.results or ():
             if isinstance(item, FunctionResults):
-                assert item.scaled.functions is not None
+                assert item.scaled.aggregates is not None
                 assert item.target_objective is not None
                 objective_values.append(item.target_objective)
         _track_results(event, result_list=result_list)
@@ -529,13 +509,9 @@ def test_cvar_filter_mixed(
             filtered = result.realizations.objective_weights[:, 0] == 0.0
         if isinstance(result, GradientResults):
             if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] == 0.0
-                )
+                assert np.all(result.perturbations.objectives[filtered, ...] == 0.0)
             else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] != 0.0
-                )
+                assert np.all(result.perturbations.objectives[filtered, ...] != 0.0)
 
     # Apply filtering only to the first two, giving a wrong result.
     config["realization_filters"] = [

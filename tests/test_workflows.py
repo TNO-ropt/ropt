@@ -690,7 +690,7 @@ def test_evaluator(config: dict[str, Any], evaluator: Any) -> None:
         context=EnOptContext.model_validate(config),
         variables=[0.0, 0.0, 0.1],
     )
-    assert result_handler["results"].functions is not None
+    assert result_handler["results"].aggregates is not None
     assert np.allclose(result_handler["results"].target_objective, 1.66)
 
     result_handler["results"] = None
@@ -700,7 +700,7 @@ def test_evaluator(config: dict[str, Any], evaluator: Any) -> None:
         context=EnOptContext.model_validate(config),
         variables=[0, 0, 0],
     )
-    assert result_handler["results"].functions is not None
+    assert result_handler["results"].aggregates is not None
     assert np.allclose(result_handler["results"].target_objective, 1.75)
 
 
@@ -828,7 +828,7 @@ def test_nested_optimization(
                 context=EnOptContext.model_validate(nested_config),
             )
             return EvaluationFunctionResult(
-                objectives=result_handler["results"].functions.objectives
+                objectives=result_handler["results"].aggregates.objectives
             )
 
         new_variables[1] = outer_result_handler["results"].variables[1]

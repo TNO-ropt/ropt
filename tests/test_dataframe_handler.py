@@ -12,9 +12,9 @@ from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import (
+    FunctionAggregates,
     FunctionEvaluations,
     FunctionResults,
-    Functions,
     Realizations,
     ScaledFunctionResults,
 )
@@ -50,9 +50,10 @@ def _is_empty(frame: Any) -> bool:
 
 def _make_result(batch_id: int, objective: float = 1.0) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
+        active=np.ones(1, dtype=np.bool_),
         objectives=np.array([[objective]]),
     )
-    functions = Functions(objectives=np.array([objective]))
+    aggregates = FunctionAggregates(objectives=np.array([objective]))
     context = EnOptContext.model_validate(_CONFIG)
     return FunctionResults(
         batch_id=batch_id,
@@ -62,14 +63,13 @@ def _make_result(batch_id: int, objective: float = 1.0) -> FunctionResults:
         variables=np.array([0.5, 1.5]),
         evaluations=evaluations,
         realizations=Realizations(
-            evaluated_realizations=np.ones(1, dtype=np.bool_),
             objective_weights=np.ones((1, 1)),
         ),
-        functions=functions,
+        aggregates=aggregates,
         target_objective=np.array(objective),
         scaled=ScaledFunctionResults(
             variables=np.array([0.5, 1.5]),
-            functions=Functions(objectives=np.array([objective])),
+            aggregates=FunctionAggregates(objectives=np.array([objective])),
         ),
     )
 
@@ -91,9 +91,10 @@ def _make_event(
 
 def _make_result_two_realizations(batch_id: int) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
+        active=np.ones(2, dtype=np.bool_),
         objectives=np.array([[1.0], [2.0]]),
     )
-    functions = Functions(objectives=np.array([1.0, 2.0]))
+    aggregates = FunctionAggregates(objectives=np.array([1.0, 2.0]))
     context = EnOptContext.model_validate(_CONFIG_TWO_REALIZATIONS)
     return FunctionResults(
         batch_id=batch_id,
@@ -103,14 +104,13 @@ def _make_result_two_realizations(batch_id: int) -> FunctionResults:
         variables=np.array([0.5, 1.5]),
         evaluations=evaluations,
         realizations=Realizations(
-            evaluated_realizations=np.ones(2, dtype=np.bool_),
             objective_weights=np.ones((2, 1)),
         ),
-        functions=functions,
+        aggregates=aggregates,
         target_objective=np.array(1.5),
         scaled=ScaledFunctionResults(
             variables=np.array([0.5, 1.5]),
-            functions=Functions(objectives=np.array([1.0, 2.0])),
+            aggregates=FunctionAggregates(objectives=np.array([1.0, 2.0])),
         ),
     )
 
@@ -128,7 +128,9 @@ def _make_event_with_metadata(metadata: dict[str, Any]) -> EnOptEvent:
     context = EnOptContext.model_validate(_CONFIG_TWO_REALIZATIONS)
     results = _make_result_two_realizations(1)
     results.evaluations = FunctionEvaluations.create(
-        objectives=np.array([[1.0], [2.0]]), metadata=metadata
+        active=np.ones(2, dtype=np.bool_),
+        objectives=np.array([[1.0], [2.0]]),
+        metadata=metadata,
     )
     return EnOptEvent(
         event_type=EnOptEventType.FINISHED_EVALUATION,
@@ -406,7 +408,7 @@ def test_table_handler_callback_skipped_when_no_table_grew(
     # Function results leave a gradients table untouched, so a callback that
     # persists the tables has nothing to persist.
     handler = DataFrameHandler(engine=engine)
-    handler.add_table("t", "gradients", {"target_gradient": "Grad"})
+    handler.add_table("t", "gradients", {"target_objective": "Grad"})
     called = False
 
     def _record(_: Path | None) -> None:
@@ -507,17 +509,17 @@ def _make_scaled_event() -> EnOptEvent:
                 names=context.names,
                 variables=np.array([3.0, 6.0]),
                 evaluations=FunctionEvaluations.create(
+                    active=np.ones(1, dtype=np.bool_),
                     objectives=np.array([[1.0]]),
                 ),
                 realizations=Realizations(
-                    evaluated_realizations=np.ones(1, dtype=np.bool_),
                     objective_weights=np.ones((1, 1)),
                 ),
-                functions=Functions(objectives=np.array([2.0])),
+                aggregates=FunctionAggregates(objectives=np.array([2.0])),
                 target_objective=np.array(1.0),
                 scaled=ScaledFunctionResults(
                     variables=np.array([1.0, 1.0]),
-                    functions=Functions(objectives=np.array([1.0])),
+                    aggregates=FunctionAggregates(objectives=np.array([1.0])),
                 ),
             ),
         ),
@@ -547,8 +549,8 @@ def test_table_handler_fills_a_column_from_a_nested_scaled_field(
         "t",
         "functions",
         {
-            "functions.objectives": "Obj",
-            "scaled.functions.objectives": "Scaled",
+            "aggregates.objectives": "Obj",
+            "scaled.aggregates.objectives": "Scaled",
             "target_objective": "Total",
         },
     )

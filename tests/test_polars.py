@@ -7,15 +7,16 @@ import pytest
 from ropt.context import EnOptContext
 from ropt.enums import AxisName
 from ropt.results import (
+    FunctionAggregates,
     FunctionEvaluations,
     FunctionResults,
-    Functions,
-    GradientEvaluations,
+    GradientAggregates,
+    GradientPerturbations,
     GradientResults,
-    Gradients,
     Realizations,
     Results,
     ScaledFunctionResults,
+    ScaledGradientPerturbations,
     ScaledGradientResults,
 )
 
@@ -50,13 +51,13 @@ def config_fixture() -> dict[str, Any]:
 @pytest.fixture(name="function_result")
 def function_result_fixture(config: dict[str, Any]) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
+        active=np.ones(3, dtype=np.bool_),
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
     )
     realizations = Realizations(
         objective_weights=np.arange(6, dtype=np.float64).reshape((3, 2)),
-        evaluated_realizations=np.ones(3, dtype=np.bool_),
     )
-    functions = Functions(
+    aggregates = FunctionAggregates(
         objectives=np.array([1.0, 2.0]),
     )
     context = EnOptContext.model_validate(config)
@@ -68,22 +69,24 @@ def function_result_fixture(config: dict[str, Any]) -> FunctionResults:
         variables=np.array([1.0, 2.0]),
         evaluations=evaluations,
         realizations=realizations,
-        functions=functions,
+        aggregates=aggregates,
         target_objective=np.array(1.0),
         scaled=ScaledFunctionResults(
             variables=np.array([1.0, 2.0]),
-            functions=Functions(objectives=np.array([1.0, 2.0])),
+            aggregates=FunctionAggregates(objectives=np.array([1.0, 2.0])),
         ),
     )
 
 
 @pytest.fixture(name="gradient_result")
 def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
-    evaluations = GradientEvaluations(
-        perturbed_objectives=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
+    perturbations = GradientPerturbations(
+        active=np.ones(3, dtype=np.bool_),
+        variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
+        objectives=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
         metadata={"foo": np.arange(15, dtype=np.float64).reshape((3, 5))},
     )
-    gradients = Gradients(
+    aggregates = GradientAggregates(
         objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
     )
     context = EnOptContext.model_validate(config)
@@ -93,17 +96,16 @@ def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
         metadata={},
         names=context.names,
         variables=np.array([1.0, 2.0]),
-        perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
-        evaluations=evaluations,
-        realizations=Realizations(
-            evaluated_realizations=np.ones(36, dtype=np.bool_),
-        ),
-        gradients=gradients,
-        target_gradient=np.array([1.0, 2.0]),
+        perturbations=perturbations,
+        realizations=Realizations(),
+        aggregates=aggregates,
+        target_objective=np.array([1.0, 2.0]),
         scaled=ScaledGradientResults(
             variables=np.array([1.0, 2.0]),
-            perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
-            gradients=Gradients(
+            perturbations=ScaledGradientPerturbations(
+                variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
+            ),
+            aggregates=GradientAggregates(
                 objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
             ),
         ),
@@ -119,12 +121,12 @@ def test_to_polars_scalar(function_result: FunctionResults) -> None:
 
 
 def test_to_polars_function(function_result: FunctionResults) -> None:
-    frame = function_result.to_polars(["functions.objectives"])
+    frame = function_result.to_polars(["aggregates.objectives"])
     assert frame.height == 2
     assert frame.columns == [
         "batch_id",
         "objective",
-        "functions.objectives",
+        "aggregates.objectives",
     ]
     assert frame["batch_id"].to_list() == [1, 1]
     assert frame["objective"].to_list() == ["fa", "fb"]
@@ -133,11 +135,11 @@ def test_to_polars_function(function_result: FunctionResults) -> None:
 def test_to_polars_gradient(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_polars(
         [
-            "evaluations.perturbed_objectives",
-            "evaluations.metadata.foo",
+            "perturbations.objectives",
+            "perturbations.metadata.foo",
         ],
     )
-    assert frame.height == gradient_result.evaluations.perturbed_objectives.size
+    assert frame.height == gradient_result.perturbations.objectives.size
     assert frame.columns[:4] == [
         "batch_id",
         "realization",
@@ -147,7 +149,7 @@ def test_to_polars_gradient(gradient_result: GradientResults) -> None:
     rows = frame.select("batch_id", "realization", "perturbation").rows()
     idx = 0
     for real in gradient_result.names[AxisName.REALIZATION]:
-        for pert in range(gradient_result.perturbed_variables.shape[1]):
+        for pert in range(gradient_result.perturbations.variables.shape[1]):
             for _ in gradient_result.names[AxisName.OBJECTIVE]:
                 assert rows[idx] == (1, real, pert)
                 idx += 1
@@ -155,96 +157,96 @@ def test_to_polars_gradient(gradient_result: GradientResults) -> None:
 
 def test_to_polars_unstack1(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_polars(
-        ["perturbed_variables"],
+        ["perturbations.variables"],
         unstack=[AxisName.REALIZATION, AxisName.VARIABLE],
     )
     assert frame.columns == [
         "batch_id",
         "perturbation",
-        "perturbed_variables,ra,va",
-        "perturbed_variables,ra,vb",
-        "perturbed_variables,rb,va",
-        "perturbed_variables,rb,vb",
-        "perturbed_variables,rc,va",
-        "perturbed_variables,rc,vb",
+        "perturbations.variables,ra,va",
+        "perturbations.variables,ra,vb",
+        "perturbations.variables,rb,va",
+        "perturbations.variables,rb,vb",
+        "perturbations.variables,rc,va",
+        "perturbations.variables,rc,vb",
     ]
 
 
 def test_to_polars_unstack2(gradient_result: GradientResults) -> None:
-    assert gradient_result.scaled.gradients is not None
+    assert gradient_result.scaled.aggregates is not None
     frame = gradient_result.to_polars(
-        ["scaled.gradients.objectives"],
+        ["scaled.aggregates.objectives"],
         unstack=[AxisName.OBJECTIVE, AxisName.VARIABLE],
     )
     assert frame.columns == [
         "batch_id",
-        "scaled.gradients.objectives,fa,va",
-        "scaled.gradients.objectives,fa,vb",
-        "scaled.gradients.objectives,fb,va",
-        "scaled.gradients.objectives,fb,vb",
+        "scaled.aggregates.objectives,fa,va",
+        "scaled.aggregates.objectives,fa,vb",
+        "scaled.aggregates.objectives,fb,va",
+        "scaled.aggregates.objectives,fb,vb",
     ]
 
 
 def test_to_polars_unstack_only_variable(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_polars(
-        ["perturbed_variables"],
+        ["perturbations.variables"],
         unstack=[AxisName.VARIABLE],
     )
     assert frame.columns == [
         "batch_id",
         "realization",
         "perturbation",
-        "perturbed_variables,va",
-        "perturbed_variables,vb",
+        "perturbations.variables,va",
+        "perturbations.variables,vb",
     ]
 
 
 def test_to_polars_sep(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_polars(
-        ["perturbed_variables"],
+        ["perturbations.variables"],
         unstack=[AxisName.REALIZATION, AxisName.VARIABLE],
         sep="::",
     )
     assert frame.columns[2:] == [
-        "perturbed_variables::ra::va",
-        "perturbed_variables::ra::vb",
-        "perturbed_variables::rb::va",
-        "perturbed_variables::rb::vb",
-        "perturbed_variables::rc::va",
-        "perturbed_variables::rc::vb",
+        "perturbations.variables::ra::va",
+        "perturbations.variables::ra::vb",
+        "perturbations.variables::rb::va",
+        "perturbations.variables::rb::vb",
+        "perturbations.variables::rc::va",
+        "perturbations.variables::rc::vb",
     ]
 
 
 def test_to_polars_unnamed_axis(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_polars(
-        ["evaluations.metadata.foo"],
+        ["perturbations.metadata.foo"],
         unstack=[AxisName.PERTURBATION],
     )
     assert frame.columns == [
         "batch_id",
         "realization",
-        "evaluations.metadata.foo,0",
-        "evaluations.metadata.foo,1",
-        "evaluations.metadata.foo,2",
-        "evaluations.metadata.foo,3",
-        "evaluations.metadata.foo,4",
+        "perturbations.metadata.foo,0",
+        "perturbations.metadata.foo,1",
+        "perturbations.metadata.foo,2",
+        "perturbations.metadata.foo,3",
+        "perturbations.metadata.foo,4",
     ]
 
 
 def test_to_polars_missing_field(function_result: FunctionResults) -> None:
-    assert function_result.to_polars(["functions.constraints"]).is_empty()
+    assert function_result.to_polars(["aggregates.constraints"]).is_empty()
     assert function_result.to_polars([]).is_empty()
 
 
 def test_to_polars_invalid_field(function_result: FunctionResults) -> None:
     with pytest.raises(ValueError, match="Not a field name: nonexistent"):
         function_result.to_polars(["nonexistent"])
-    with pytest.raises(ValueError, match=r"Not a field name: functions\.nonexistent"):
-        function_result.to_polars(["functions.nonexistent"])
-    with pytest.raises(ValueError, match=r"Not a correct field name: functions\."):
-        function_result.to_polars(["functions."])
+    with pytest.raises(ValueError, match=r"Not a field name: aggregates\.nonexistent"):
+        function_result.to_polars(["aggregates.nonexistent"])
+    with pytest.raises(ValueError, match=r"Not a correct field name: aggregates\."):
+        function_result.to_polars(["aggregates."])
     with pytest.raises(ValueError, match="Field holds sub-fields, not a value"):
-        function_result.to_polars(["functions"])
+        function_result.to_polars(["aggregates"])
     with pytest.raises(ValueError, match="Field holds a mapping, add a key"):
         function_result.to_polars(["evaluations.metadata"])
 
@@ -267,18 +269,18 @@ def _with_array_metadata(
         names=context.names,
         variables=np.array([1.0, 2.0]),
         evaluations=FunctionEvaluations.create(
+            active=np.ones(3, dtype=np.bool_),
             objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
             metadata=metadata,
         ),
         realizations=Realizations(
             objective_weights=np.arange(6, dtype=np.float64).reshape((3, 2)),
-            evaluated_realizations=np.ones(3, dtype=np.bool_),
         ),
-        functions=Functions(objectives=np.array([1.0, 2.0])),
+        aggregates=FunctionAggregates(objectives=np.array([1.0, 2.0])),
         target_objective=np.array(1.0),
         scaled=ScaledFunctionResults(
             variables=np.array([1.0, 2.0]),
-            functions=Functions(objectives=np.array([1.0, 2.0])),
+            aggregates=FunctionAggregates(objectives=np.array([1.0, 2.0])),
         ),
     )
 
@@ -338,48 +340,48 @@ def test_to_polars_user_axis_stays_stacked_without_unstack(
 
 
 _PARITY_CASES = [
-    ("function_result", ["functions.objectives"], None),
-    ("function_result", ["functions.objectives"], [AxisName.OBJECTIVE]),
+    ("function_result", ["aggregates.objectives"], None),
+    ("function_result", ["aggregates.objectives"], [AxisName.OBJECTIVE]),
     ("function_result", ["evaluations.objectives"], None),
     ("function_result", ["variables"], [AxisName.VARIABLE]),
     ("function_result", ["target_objective"], None),
     (
         "function_result",
-        ["realizations.objective_weights", "realizations.evaluated_realizations"],
+        ["realizations.objective_weights", "evaluations.active"],
         None,
     ),
     (
         "gradient_result",
-        ["evaluations.perturbed_objectives", "evaluations.metadata.foo"],
+        ["perturbations.objectives", "perturbations.metadata.foo"],
         None,
     ),
     (
         "gradient_result",
-        ["perturbed_variables"],
+        ["perturbations.variables"],
         [AxisName.REALIZATION, AxisName.VARIABLE],
     ),
     (
         "gradient_result",
-        ["perturbed_variables"],
+        ["perturbations.variables"],
         [AxisName.VARIABLE, AxisName.REALIZATION],
     ),
-    ("gradient_result", ["perturbed_variables"], [AxisName.VARIABLE]),
+    ("gradient_result", ["perturbations.variables"], [AxisName.VARIABLE]),
     (
         "gradient_result",
-        ["scaled.gradients.objectives"],
+        ["scaled.aggregates.objectives"],
         [AxisName.OBJECTIVE, AxisName.VARIABLE],
     ),
-    ("gradient_result", ["scaled.gradients.objectives"], None),
-    ("gradient_result", ["target_gradient"], [AxisName.VARIABLE]),
-    ("gradient_result", ["evaluations.metadata.foo"], [AxisName.PERTURBATION]),
+    ("gradient_result", ["scaled.aggregates.objectives"], None),
+    ("gradient_result", ["target_objective"], [AxisName.VARIABLE]),
+    ("gradient_result", ["perturbations.metadata.foo"], [AxisName.PERTURBATION]),
     (
         "gradient_result",
-        ["evaluations.perturbed_objectives", "evaluations.metadata.foo"],
+        ["perturbations.objectives", "perturbations.metadata.foo"],
         [AxisName.OBJECTIVE],
     ),
     (
         "gradient_result",
-        ["gradients.objectives", "target_gradient"],
+        ["aggregates.objectives", "target_objective"],
         [AxisName.OBJECTIVE, AxisName.VARIABLE],
     ),
 ]

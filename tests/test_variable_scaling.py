@@ -26,7 +26,7 @@ from ropt.context import EnOptContext
 from ropt.results import (
     ConstraintInfo,
     FunctionResults,
-    Gradients,
+    GradientAggregates,
 )
 from ropt.utils import scales_and_offsets_from_bounds
 
@@ -137,9 +137,9 @@ def test_gradients_are_divided_by_the_variable_scales() -> None:
     # A variable sits in the denominator of a derivative, so the optimizer holds
     # d(f / s_f) / d((x - o) / s_x): the true gradient times s_x / s_f.
     true_gradient = np.array([[3.0, 7.0]])
-    gradients = Gradients.from_scaled(
+    gradients = GradientAggregates.from_scaled(
         context,
-        Gradients(
+        GradientAggregates(
             objectives=true_gradient * [2.0, 4.0] / 5.0,
             constraints=true_gradient * [2.0, 4.0] / 10.0,
         ),

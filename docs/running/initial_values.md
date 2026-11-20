@@ -76,10 +76,10 @@ evaluations are.
 
 | From `f0` | From `g0` |
 | --- | --- |
-| `evaluations.objectives` | `evaluations.perturbed_objectives` |
-| `evaluations.constraints` | `evaluations.perturbed_constraints` |
-| `realizations.evaluated_realizations` | `realizations.evaluated_realizations` |
-| `variables` | `variables` and `perturbed_variables` |
+| `evaluations.active` | `perturbations.active` |
+| `evaluations.objectives` | `perturbations.objectives` |
+| `evaluations.constraints` | `perturbations.constraints` |
+| `variables` | `variables` and `perturbations.variables` |
 
 These are the per-realization values as the evaluation function returned them,
 before any scaling, together with the record of which realizations were
@@ -107,8 +107,8 @@ construction, since `x0` is the `variables` of the result passed as `f0`.
 
 ## Realizations and perturbations that were not recorded
 
-`evaluated_realizations` says which realizations the recorded optimization
-computed. One that it skipped — because its weight was zero, or because it did not
+`evaluations.active` and `perturbations.active` record which realizations the
+recorded optimization computed. One that it skipped — because its weight was zero, or because it did not
 exist yet — is evaluated by the new optimization, and the rest are taken from the
 record. The same holds per perturbation: an optimization configured with more
 perturbations than were recorded evaluates the additional ones and reuses the

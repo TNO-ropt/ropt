@@ -97,7 +97,7 @@ optimum.
     `auto_scale` divides the objective the optimizer reports, so switching it on
     lowers `target_objective` without improving the solution. Two optimizations
     that differ in this setting can only be compared through
-    `functions.objectives` or their variables. The runnable demonstration is
+    `aggregates.objectives` or their variables. The runnable demonstration is
     [examples/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/scaling.py).
 
 See [Scaling objectives](configuration_sections.md#objective-scales) for the

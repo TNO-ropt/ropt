@@ -12,7 +12,7 @@ from collections import Counter
 from collections.abc import Mapping
 from collections.abc import Set as AbstractSet
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Final, Literal, NoReturn
+from typing import TYPE_CHECKING, Any, Final, NoReturn
 
 import numpy as np
 
@@ -193,10 +193,9 @@ def _value_fields(sub_fields: Sequence[str]) -> list[str]:
     return [path for path in sub_fields if path not in _KEY_COLUMNS]
 
 
-def _has_results(
-    results: Results, result_type: Literal["functions", "gradients"]
-) -> bool:
+def _has_results(results: Results, result_class: type[Results]) -> bool:
     # These are None if too few realizations succeeded to aggregate them.
-    if result_type == "functions":
-        return getattr(results, "functions", None) is not None
-    return getattr(results, "gradients", None) is not None
+    return (
+        isinstance(results, result_class)
+        and getattr(results, "aggregates", None) is not None
+    )

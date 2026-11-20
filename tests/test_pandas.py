@@ -7,14 +7,15 @@ import pytest
 from ropt.context import EnOptContext
 from ropt.enums import AxisName
 from ropt.results import (
+    FunctionAggregates,
     FunctionEvaluations,
     FunctionResults,
-    Functions,
-    GradientEvaluations,
+    GradientAggregates,
+    GradientPerturbations,
     GradientResults,
-    Gradients,
     Realizations,
     ScaledFunctionResults,
+    ScaledGradientPerturbations,
     ScaledGradientResults,
 )
 from ropt.results._frame_core import _get_field_data
@@ -50,13 +51,13 @@ def config_fixture() -> dict[str, Any]:
 @pytest.fixture(name="function_result")
 def function_result_fixture(config: dict[str, Any]) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
+        active=np.ones(3, dtype=np.bool_),
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
     )
     realizations = Realizations(
         objective_weights=np.arange(6, dtype=np.float64).reshape((3, 2)),
-        evaluated_realizations=np.ones(3, dtype=np.bool_),
     )
-    functions = Functions(
+    aggregates = FunctionAggregates(
         objectives=np.array([1.0, 2.0]),
     )
     context = EnOptContext.model_validate(config)
@@ -68,22 +69,24 @@ def function_result_fixture(config: dict[str, Any]) -> FunctionResults:
         variables=np.array([1.0, 2.0]),
         evaluations=evaluations,
         realizations=realizations,
-        functions=functions,
+        aggregates=aggregates,
         target_objective=np.array(1.0),
         scaled=ScaledFunctionResults(
             variables=np.array([1.0, 2.0]),
-            functions=Functions(objectives=np.array([1.0, 2.0])),
+            aggregates=FunctionAggregates(objectives=np.array([1.0, 2.0])),
         ),
     )
 
 
 @pytest.fixture(name="gradient_result")
 def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
-    evaluations = GradientEvaluations(
-        perturbed_objectives=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
+    perturbations = GradientPerturbations(
+        active=np.ones(3, dtype=np.bool_),
+        variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
+        objectives=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
         metadata={"foo": np.arange(15, dtype=np.float64).reshape((3, 5))},
     )
-    gradients = Gradients(
+    aggregates = GradientAggregates(
         objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
     )
     context = EnOptContext.model_validate(config)
@@ -93,17 +96,16 @@ def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
         metadata={},
         names=context.names,
         variables=np.array([1.0, 2.0]),
-        perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
-        evaluations=evaluations,
-        realizations=Realizations(
-            evaluated_realizations=np.ones(36, dtype=np.bool_),
-        ),
-        gradients=gradients,
-        target_gradient=np.array([1.0, 2.0]),
+        perturbations=perturbations,
+        realizations=Realizations(),
+        aggregates=aggregates,
+        target_objective=np.array([1.0, 2.0]),
         scaled=ScaledGradientResults(
             variables=np.array([1.0, 2.0]),
-            perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
-            gradients=Gradients(
+            perturbations=ScaledGradientPerturbations(
+                variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
+            ),
+            aggregates=GradientAggregates(
                 objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
             ),
         ),
@@ -112,33 +114,33 @@ def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
 
 def test__get_field_data(gradient_result: GradientResults) -> None:
     field_data = _get_field_data(
-        gradient_result, "perturbed_variables", gradient_result.names
+        gradient_result, "perturbations.variables", gradient_result.names
     )
     assert field_data is not None
-    assert field_data.name == "perturbed_variables"
+    assert field_data.name == "perturbations.variables"
     assert list(field_data.axes) == [
         "realization",
         "perturbation",
         "variable",
     ]
-    assert len(field_data.data) == gradient_result.perturbed_variables.size
+    assert len(field_data.data) == gradient_result.perturbations.variables.size
     values = dict(zip(product(*field_data.labels), field_data.data, strict=True))
     for v_idx, var in enumerate(gradient_result.names[AxisName.VARIABLE]):
         for r_idx, real in enumerate(gradient_result.names[AxisName.REALIZATION]):
-            for pert in range(gradient_result.perturbed_variables.shape[1]):
+            for pert in range(gradient_result.perturbations.variables.shape[1]):
                 assert (
                     values[real, pert, var]
-                    == gradient_result.perturbed_variables[r_idx, pert, v_idx]
+                    == gradient_result.perturbations.variables[r_idx, pert, v_idx]
                 )
 
 
 def test__get_field_data_metadata(gradient_result: GradientResults) -> None:
     field_data = _get_field_data(
-        gradient_result, "evaluations.metadata.foo", gradient_result.names
+        gradient_result, "perturbations.metadata.foo", gradient_result.names
     )
     assert field_data is not None
-    assert field_data.name == "evaluations.metadata.foo"
-    info = np.array(gradient_result.evaluations.metadata["foo"])
+    assert field_data.name == "perturbations.metadata.foo"
+    info = np.array(gradient_result.perturbations.metadata["foo"])
     assert len(field_data.data) == info.size
     assert list(field_data.axes) == [
         "realization",
@@ -146,12 +148,12 @@ def test__get_field_data_metadata(gradient_result: GradientResults) -> None:
     ]
     values = dict(zip(product(*field_data.labels), field_data.data, strict=True))
     for r_idx, real in enumerate(gradient_result.names[AxisName.REALIZATION]):
-        for pert in range(gradient_result.perturbed_variables.shape[1]):
+        for pert in range(gradient_result.perturbations.variables.shape[1]):
             assert values[real, pert] == info[r_idx, pert]
 
 
 def test_to_pandas_function(function_result: FunctionResults) -> None:
-    frame = function_result.to_pandas(["functions.objectives"])
+    frame = function_result.to_pandas(["aggregates.objectives"])
     assert len(frame) == 2
     assert frame.index.names == ["batch_id", "objective"]
     assert frame.index[0] == (1, "fa")
@@ -168,11 +170,11 @@ def test_to_pandas_value_field(function_result: FunctionResults) -> None:
 def test_to_pandas_gradient(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_pandas(
         [
-            "evaluations.perturbed_objectives",
-            "evaluations.metadata.foo",
+            "perturbations.objectives",
+            "perturbations.metadata.foo",
         ],
     )
-    assert len(frame) == gradient_result.evaluations.perturbed_objectives.size
+    assert len(frame) == gradient_result.perturbations.objectives.size
     assert frame.index.names == [
         "batch_id",
         "realization",
@@ -181,7 +183,7 @@ def test_to_pandas_gradient(gradient_result: GradientResults) -> None:
     ]
     idx = 0
     for real in gradient_result.names[AxisName.REALIZATION]:
-        for pert in range(gradient_result.perturbed_variables.shape[1]):
+        for pert in range(gradient_result.perturbations.variables.shape[1]):
             for fnc in gradient_result.names[AxisName.OBJECTIVE]:
                 assert frame.index[idx] == (1, real, pert, fnc)
                 idx += 1
@@ -189,37 +191,37 @@ def test_to_pandas_gradient(gradient_result: GradientResults) -> None:
 
 def test_to_pandas_unstack1(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_pandas(
-        ["perturbed_variables"],
+        ["perturbations.variables"],
         unstack=[AxisName.REALIZATION, AxisName.VARIABLE],
     )
     assert frame.index.names == ["batch_id", "perturbation"]
     assert list(frame.columns.values) == [
-        ("perturbed_variables", "ra", "va"),
-        ("perturbed_variables", "ra", "vb"),
-        ("perturbed_variables", "rb", "va"),
-        ("perturbed_variables", "rb", "vb"),
-        ("perturbed_variables", "rc", "va"),
-        ("perturbed_variables", "rc", "vb"),
+        ("perturbations.variables", "ra", "va"),
+        ("perturbations.variables", "ra", "vb"),
+        ("perturbations.variables", "rb", "va"),
+        ("perturbations.variables", "rb", "vb"),
+        ("perturbations.variables", "rc", "va"),
+        ("perturbations.variables", "rc", "vb"),
     ]
 
 
 def test_to_pandas_unstack2(gradient_result: GradientResults) -> None:
-    assert gradient_result.scaled.gradients is not None
+    assert gradient_result.scaled.aggregates is not None
     frame = gradient_result.to_pandas(
-        ["scaled.gradients.objectives"],
+        ["scaled.aggregates.objectives"],
         unstack=[AxisName.OBJECTIVE, AxisName.VARIABLE],
     )
     assert list(frame.columns.values) == [
-        ("scaled.gradients.objectives", "fa", "va"),
-        ("scaled.gradients.objectives", "fa", "vb"),
-        ("scaled.gradients.objectives", "fb", "va"),
-        ("scaled.gradients.objectives", "fb", "vb"),
+        ("scaled.aggregates.objectives", "fa", "va"),
+        ("scaled.aggregates.objectives", "fa", "vb"),
+        ("scaled.aggregates.objectives", "fb", "va"),
+        ("scaled.aggregates.objectives", "fb", "vb"),
     ]
 
 
 def test_to_pandas_unstack_only_variable(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_pandas(
-        ["perturbed_variables"],
+        ["perturbations.variables"],
         unstack=[AxisName.VARIABLE],
     )
     assert frame.index.names == [
@@ -228,14 +230,14 @@ def test_to_pandas_unstack_only_variable(gradient_result: GradientResults) -> No
         "perturbation",
     ]
     assert list(frame.columns.values) == [
-        ("perturbed_variables", "va"),
-        ("perturbed_variables", "vb"),
+        ("perturbations.variables", "va"),
+        ("perturbations.variables", "vb"),
     ]
 
 
 def test_to_pandas_join(function_result: FunctionResults) -> None:
     frame1 = function_result.to_pandas(["evaluations.objectives"])
-    frame2 = function_result.to_pandas(["functions.objectives"])
+    frame2 = function_result.to_pandas(["aggregates.objectives"])
     frame1.columns = pandas.Index(
         "_".join(column) if isinstance(column, tuple) else column
         for column in frame1.columns.to_numpy()

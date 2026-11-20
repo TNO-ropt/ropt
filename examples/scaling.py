@@ -6,14 +6,14 @@ divided by their `scales`, and objectives can be scaled too: setting
 brings an objective of any magnitude close to one.
 
 A result therefore carries the same quantity twice. `variables` and
-`functions.objectives` are in the units configured here, while
-`scaled.variables` and `scaled.functions.objectives` are in the units the
+`aggregates.objectives` are in the units configured here, while
+`scaled.variables` and `scaled.aggregates.objectives` are in the units the
 optimizer works in. The `target_objective` that an optimization reports is the
 optimizer's number, and has no counterpart in the configured units.
 
 The distinction matters when comparing optimizations. Switching `auto_scale` on
 makes the reported objective much smaller while the solution stays where it was,
-so two optimizations are only comparable through `functions.objectives` or the
+so two optimizations are only comparable through `aggregates.objectives` or the
 variables themselves.
 """
 
@@ -55,15 +55,15 @@ def run(
     # domains live; the summary itself reports only the optimizer's.
     best = result.results
     assert best is not None
-    assert best.functions is not None
-    assert best.scaled.functions is not None
+    assert best.aggregates is not None
+    assert best.scaled.aggregates is not None
     assert best.target_objective is not None
     print(f"\n{label}")
     print(f"  variables          {np.round(best.variables, 4)}")
     print(f"  scaled.variables   {np.round(best.scaled.variables, 4)}")
-    print(f"  objective          {best.functions.objectives[0]:.6f}   (your units)")
+    print(f"  objective          {best.aggregates.objectives[0]:.6f}   (your units)")
     print(
-        f"  scaled objective   {best.scaled.functions.objectives[0]:.6f}   (optimizer)"
+        f"  scaled objective   {best.scaled.aggregates.objectives[0]:.6f}   (optimizer)"
     )
     print(f"  target_objective   {float(best.target_objective):.6f}   (reported)")
     return best
@@ -115,19 +115,19 @@ def main() -> None:
     )
 
     # Without scaling there is nothing to tell the two domains apart.
-    assert plain_best.functions is not None
-    assert plain_best.scaled.functions is not None
+    assert plain_best.aggregates is not None
+    assert plain_best.scaled.aggregates is not None
     assert np.allclose(plain_best.variables, plain_best.scaled.variables)
     assert np.allclose(
-        plain_best.functions.objectives, plain_best.scaled.functions.objectives
+        plain_best.aggregates.objectives, plain_best.scaled.aggregates.objectives
     )
 
     # auto_scale divides the objective by its value in the first batch, so the
     # reported number drops while the solution does not move.
-    assert auto_best.functions is not None
-    assert auto_best.scaled.functions is not None
+    assert auto_best.aggregates is not None
+    assert auto_best.scaled.aggregates is not None
     factor = (
-        auto_best.functions.objectives[0] / auto_best.scaled.functions.objectives[0]
+        auto_best.aggregates.objectives[0] / auto_best.scaled.aggregates.objectives[0]
     )
     print(f"\nauto_scale divided the reported objective by {factor:.1f}")
     assert factor > MIN_AUTO_SCALE_FACTOR

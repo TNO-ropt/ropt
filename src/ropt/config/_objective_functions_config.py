@@ -33,7 +33,7 @@ class ObjectiveFunctionsConfig(BaseModel):
 
     The reported `target_objective` is divided by the estimated `auto_scale`
     factors, so optimizations that differ in that setting compare only through
-    `functions.objectives` or their variables.
+    `aggregates.objectives` or their variables.
 
     Attributes:
         weights:             Weights for the objective functions (default: 1.0).

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Final, Literal
 
 from ropt.exceptions import UnsupportedError
 
@@ -29,12 +29,18 @@ if HAVE_PANDAS:
     from ._pandas import _to_pandas_frame
 
 
+_RESULT_CLASSES: Final[dict[str, type[Results]]] = {
+    "functions": FunctionResults,
+    "gradients": GradientResults,
+}
+
+
 def _get_results(
     results: Results,
     sub_fields: Sequence[str],
     result_type: Literal["functions", "gradients"],
 ) -> pd.DataFrame:
-    if not sub_fields or not _has_results(results, result_type):
+    if not sub_fields or not _has_results(results, _RESULT_CLASSES[result_type]):
         return pd.DataFrame()
     return _to_pandas_frame(
         results, _value_fields(sub_fields), UNSTACK_AXES[result_type], aggregated=True
@@ -90,7 +96,7 @@ def results_to_pandas(
             msg = f"Invalid result type: {type(item)}"
             raise TypeError(msg)
 
-        if _has_results(item, result_type):
+        if _has_results(item, _RESULT_CLASSES[result_type]):
             frames.append(_get_results(item, fields, result_type))
 
     return pd.concat(frames) if frames else pd.DataFrame()

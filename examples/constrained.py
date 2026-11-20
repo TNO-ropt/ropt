@@ -117,10 +117,10 @@ def main(*, linear: bool = False) -> None:
     )
     # --8<-- [end:run]
     assert result.results is not None
-    assert result.results.functions is not None
+    assert result.results.aggregates is not None
     print(f"optimal variables:  {result.results.variables}")
     print(f"optimal objective:  {result.results.target_objective}")
-    print(f"optimal constraint: {result.results.functions.constraints}")
+    print(f"optimal constraint: {result.results.aggregates.constraints}")
     assert np.allclose(result.results.variables, 1.0, atol=1e-1)
 
 

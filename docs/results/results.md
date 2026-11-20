@@ -47,7 +47,7 @@ The fields below describe the data stored in `FunctionResults` and
 `GradientResults`. Some fields hold arrays directly; others group related
 data in [`ResultField`][ropt.results.ResultField] objects. For example, a
 `FunctionResults` object stores per-realization objective values in
-`evaluations.objectives` and their aggregates in `functions.objectives`.
+`evaluations.objectives` and their aggregates in `aggregates.objectives`.
 
 #### `FunctionResults` fields
 
@@ -57,19 +57,18 @@ data in [`ResultField`][ropt.results.ResultField] objects. For example, a
   the optimizer works in; see [Scaling of results](#scaling-of-results).
 - **`evaluations`** ([`FunctionEvaluations`][ropt.results.FunctionEvaluations])
   — the raw per-realization values returned by the evaluator:
+    - `active`: boolean array indicating which realizations were evaluated.
     - `objectives`: objective values per realization.
     - `constraints`: constraint values per realization (only present when
       nonlinear constraints are configured).
     - `metadata`: optional dict of per-realization metadata arrays.
-- **`functions`** ([`Functions`][ropt.results.Functions]) — aggregated values
-  derived from the per-realization evaluations (or `None` if too few
-  realizations succeeded):
+- **`aggregates`** ([`FunctionAggregates`][ropt.results.FunctionAggregates]) —
+  aggregated values derived from the per-realization evaluations (or `None` if
+  too few realizations succeeded):
     - `objectives`: individual objective values.
     - `constraints`: individual constraint values (if configured).
-- **`realizations`** ([`Realizations`][ropt.results.Realizations]) — ensemble
-  metadata:
-    - `evaluated_realizations`: boolean array indicating which realizations were
-      evaluated.
+- **`realizations`** ([`Realizations`][ropt.results.Realizations]) — the
+  per-realization weights used to aggregate the evaluations:
     - `objective_weights`: per-realization objective weights, or `None` when no
       [realization filter](../optimizer_setup/realization_filters.md) is
       configured or every realization failed. A filter may change them from one
@@ -97,18 +96,20 @@ data in [`ResultField`][ropt.results.ResultField] objects. For example, a
 #### `GradientResults` fields
 
 - **`variables`** — the unperturbed variable vector.
-- **`perturbed_variables`** — perturbed variable values.
-- **`target_gradient`** — the gradient the optimizer descends, or `None` if
-  estimation failed. Always in the domain the optimizer works in.
-- **`evaluations`** ([`GradientEvaluations`][ropt.results.GradientEvaluations])
-  — the raw per-perturbation values returned by the evaluator:
-    - `perturbed_objectives`: objective values for each perturbation.
-    - `perturbed_constraints`: constraint values for each perturbation (if
-      configured).
+- **`target_objective`** — the gradient of the target objective, which the
+  optimizer descends, or `None` if estimation failed. Always in the domain the
+  optimizer works in.
+- **`perturbations`**
+  ([`GradientPerturbations`][ropt.results.GradientPerturbations]) — the
+  perturbed variables and the values the evaluator returned for them:
+    - `active`: boolean array indicating which realizations were evaluated.
+    - `variables`: perturbed variable values.
+    - `objectives`: objective values for each perturbation.
+    - `constraints`: constraint values for each perturbation (if configured).
     - `metadata`: optional dict of per-realization/perturbation metadata
       arrays.
-- **`gradients`** ([`Gradients`][ropt.results.Gradients]) — aggregated gradient
-  values (or `None` if estimation failed):
+- **`aggregates`** ([`GradientAggregates`][ropt.results.GradientAggregates]) —
+  aggregated gradient values (or `None` if estimation failed):
     - `objectives`: per-objective gradients.
     - `constraints`: per-constraint gradients (if configured).
 - **`realizations`** ([`Realizations`][ropt.results.Realizations]) — same
@@ -139,22 +140,22 @@ Common access patterns:
 ```python
 result.variables                   # variable vector evaluated
 result.target_objective            # weighted scalar objective
-result.functions.objectives        # per-objective values
-result.functions.constraints       # per-constraint values
+result.aggregates.objectives       # per-objective values
+result.aggregates.constraints      # per-constraint values
 ```
 
-If `functions` is `None`, the result represents a request that produced no
+If `aggregates` is `None`, the result represents a request that produced no
 valid values (for example, fewer realizations succeeded than
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
 requires). `target_objective` is `None` exactly then, so a single guard covers
 both:
 
 ```python
-if result.functions is not None:
+if result.aggregates is not None:
     print(result.target_objective)
 ```
 
-With `realization_min_success` set to zero, `functions` is not `None` even when
+With `realization_min_success` set to zero, `aggregates` is not `None` even when
 all realizations failed: its values and `target_objective` are `NaN`.
 
 ## Axes and dimensionality
@@ -186,7 +187,7 @@ The [`AxisName`][ropt.enums.AxisName] enumeration defines:
 | `NONLINEAR_CONSTRAINT` | Index corresponds to the nonlinear constraint number as defined in [`NonlinearConstraintsConfig`][ropt.config.NonlinearConstraintsConfig].
 | `LINEAR_CONSTRAINT`    | Index corresponds to the linear constraint number as defined in [`LinearConstraintsConfig`][ropt.config.LinearConstraintsConfig].
 | `REALIZATION`          | Index corresponds to the realization number in the ensemble. Present whenever results involve multiple realizations.
-| `PERTURBATION`         | Index corresponds to a perturbation used for gradient estimation. Present in [`GradientEvaluations`][ropt.results.GradientEvaluations] where objectives and constraints are reported for each perturbed variable set.
+| `PERTURBATION`         | Index corresponds to a perturbation used for gradient estimation. Present in [`GradientPerturbations`][ropt.results.GradientPerturbations] where objectives and constraints are reported for each perturbed variable set.
 
 The number and order of dimensions are fixed for each field. Throughout, $n_v$ is
 the number of variables, $n_o$ of objectives, $n_c$ of nonlinear constraints,
@@ -217,7 +218,7 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
       [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
 
-    `functions.objectives`: the same values aggregated over the ensemble.
+    `aggregates.objectives`: the same values aggregated over the ensemble.
 
     - Shape $(n_o,)$
     - Axes: [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
@@ -231,14 +232,14 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
       [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
-    `functions.constraints`: the same values aggregated over the ensemble.
+    `aggregates.constraints`: the same values aggregated over the ensemble.
 
     - Shape $(n_c,)$
     - Axes: [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
 === "Realizations"
 
-    `realizations.evaluated_realizations`: which realizations were evaluated.
+    `evaluations.active`: which realizations were evaluated.
 
     - Shape $(n_r,)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION]
@@ -283,17 +284,18 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
     - Shape $(n_v,)$
     - Axes: [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
-=== "Target gradient"
+=== "Target objective"
 
-    `target_gradient`: the gradient the optimizer descends.
+    `target_objective`: the gradient of the target objective, which the
+    optimizer descends.
 
     - Shape $(n_v,)$
     - Axes: [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
 === "Perturbed variables"
 
-    `perturbed_variables`: the perturbed variable values for each realization
-    and perturbation.
+    `perturbations.variables`: the perturbed variable values for each
+    realization and perturbation.
 
     - Shape $(n_r, n_p, n_v)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
@@ -302,15 +304,15 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
 
 === "Perturbed objectives"
 
-    `evaluations.perturbed_objectives`: the objective values for each
-    realization and perturbation.
+    `perturbations.objectives`: the objective values for each realization and
+    perturbation.
 
     - Shape $(n_r, n_p, n_o)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
       [`PERTURBATION`][ropt.enums.AxisName.PERTURBATION],
       [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
 
-    `gradients.objectives`: the gradient estimated from them, per objective.
+    `aggregates.objectives`: the gradient estimated from them, per objective.
 
     - Shape $(n_o, n_v)$
     - Axes: [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE],
@@ -318,16 +320,16 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
 
 === "Perturbed constraints"
 
-    `evaluations.perturbed_constraints`: the nonlinear constraint values for
-    each realization and perturbation. Only present when nonlinear constraints
-    are configured.
+    `perturbations.constraints`: the nonlinear constraint values for each
+    realization and perturbation. Only present when nonlinear constraints are
+    configured.
 
     - Shape $(n_r, n_p, n_c)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
       [`PERTURBATION`][ropt.enums.AxisName.PERTURBATION],
       [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
-    `gradients.constraints`: the gradient estimated from them, per constraint.
+    `aggregates.constraints`: the gradient estimated from them, per constraint.
 
     - Shape $(n_c, n_v)$
     - Axes: [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT],
@@ -335,11 +337,16 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
 
 === "Realizations"
 
+    `perturbations.active`: which realizations were evaluated.
+
+    - Shape $(n_r,)$
+    - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION]
+
     `realizations.*`: the same fields and shapes as for function results.
 
 === "Metadata"
 
-    `evaluations.metadata`: optional metadata per realization and
+    `perturbations.metadata`: optional metadata per realization and
     perturbation, each entry a two-dimensional array of any `numpy` type.
 
     - Shape $(n_r, n_p)$
@@ -355,8 +362,8 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
 [`ScaledGradientResults`][ropt.results.ScaledGradientResults] repeat a subset of
 the fields above in the optimizer's domain, with identical shapes and
 dimensions:
-`variables`, `functions` and `constraint_info` for the first, and `variables`,
-`perturbed_variables` and `gradients` for the second. See
+`variables`, `aggregates` and `constraint_info` for the first, and `variables`,
+`perturbations.variables` and `aggregates` for the second. See
 [Scaling of results](#scaling-of-results).
 
 ### User-defined axes
@@ -407,19 +414,21 @@ Every result carries both domains at once, and one rule connects them:
 
 So `result.variables` is the variable vector as configured and
 `result.scaled.variables` is the same vector as the optimizer proposed it;
-`result.functions.objectives` and `result.scaled.functions.objectives` are the
-same pair for the aggregates.
+`result.aggregates.objectives` and `result.scaled.aggregates.objectives` are
+the same pair for the aggregates.
 
 Two groups of fields have a single domain:
 
-- The per-realization values in `evaluations` are reported exactly as the
-  evaluator returned them. Scales apply to the quantities the optimizer
+- The per-realization values in `evaluations`, and the objective and
+  constraint values in `perturbations`, are reported exactly as the evaluator
+  returned them. Scales apply to the quantities the optimizer
   consumes, and the optimizer never sees a single realization, so there is
   nothing to undo for those fields.
-- `target_objective` and `target_gradient` exist only in the domain the
-  optimizer works in. Each is a weighted total over objectives that may differ
-  in both scale and direction, so there is no single factor to undo. The
-  gradient is differentiated with respect to the *scaled* variables.
+- `target_objective` exists only in the domain the optimizer works in, in
+  both function and gradient results. It is a weighted total over objectives
+  that may differ in both scale and direction, so there is no single factor to
+  undo. In gradient results it is differentiated with respect to the *scaled*
+  variables.
 
 Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
@@ -430,7 +439,7 @@ The runnable script is
 which runs the same problem unscaled, with `auto_scale` on the objective, and
 with a variable scale, printing both domains each time. It shows that
 `auto_scale` divides the reported objective by a large factor while leaving the
-solution where it was, so only `functions.objectives` and `variables` can be
+solution where it was, so only `aggregates.objectives` and `variables` can be
 compared between optimizations.
 
 ## Metadata
@@ -555,7 +564,7 @@ polars_frame = result.to_polars(["variables", "evaluations.objectives"])
 
 A path may name a field of the result itself (`"variables"`,
 `"target_objective"`), a field of one of its sub-objects
-(`"functions.objectives"`, `"scaled.variables"`), or an entry of a dict-valued
+(`"aggregates.objectives"`, `"scaled.variables"`), or an entry of a dict-valued
 field (`"metadata.run.id"`). Each path becomes a column of that name. Paths
 whose value is `None`, and missing dict keys, are skipped; descending into a
 field that is `None` is an error.

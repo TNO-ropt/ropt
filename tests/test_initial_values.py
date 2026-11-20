@@ -123,10 +123,10 @@ def test_initial_values_reproduce_the_recorded_aggregation(config: Any) -> None:
     history = HistoryHandler()
     optimize(config, _INITIAL, _shifted, handlers=[history], f0=f0, g0=g0)
     restarted = _first_function_result(history)
-    assert f0.functions is not None
-    assert restarted.functions is not None
+    assert f0.aggregates is not None
+    assert restarted.aggregates is not None
     assert np.allclose(restarted.evaluations.objectives, f0.evaluations.objectives)
-    assert np.allclose(restarted.functions.objectives, f0.functions.objectives)
+    assert np.allclose(restarted.aggregates.objectives, f0.aggregates.objectives)
 
 
 def test_changed_realization_weights_reaggregate_the_same_values(config: Any) -> None:
@@ -135,10 +135,10 @@ def test_changed_realization_weights_reaggregate_the_same_values(config: Any) ->
     history = HistoryHandler()
     optimize(config, _INITIAL, _shifted, handlers=[history], f0=f0)
     restarted = _first_function_result(history)
-    assert f0.functions is not None
-    assert restarted.functions is not None
+    assert f0.aggregates is not None
+    assert restarted.aggregates is not None
     assert np.allclose(restarted.evaluations.objectives, f0.evaluations.objectives)
-    assert not np.allclose(restarted.functions.objectives, f0.functions.objectives)
+    assert not np.allclose(restarted.aggregates.objectives, f0.aggregates.objectives)
 
 
 def test_added_realization_is_the_only_one_evaluated(config: Any) -> None:
@@ -169,10 +169,10 @@ def test_initial_gradient_results_keep_the_recorded_perturbed_variables(
     results = history["results"]
     assert results is not None
     restarted = next(item for item in results if isinstance(item, GradientResults))
-    assert np.allclose(restarted.perturbed_variables, g0.perturbed_variables)
+    assert np.allclose(restarted.perturbations.variables, g0.perturbations.variables)
     assert np.allclose(
-        restarted.evaluations.perturbed_objectives,
-        g0.evaluations.perturbed_objectives,
+        restarted.perturbations.objectives,
+        g0.perturbations.objectives,
     )
 
 

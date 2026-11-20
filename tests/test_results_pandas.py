@@ -170,7 +170,7 @@ def test_dataframe_results_gradient_results(config: Any, eval_func: Any) -> None
                 callback=partial(
                     _handle_results,
                     frames=frames,
-                    fields=["target_gradient"],
+                    fields=["target_objective"],
                     result_type="gradients",
                 ),
             )
@@ -179,7 +179,7 @@ def test_dataframe_results_gradient_results(config: Any, eval_func: Any) -> None
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
-        ("target_gradient", f"a:{idx}") for idx in range(1, 4)
+        ("target_objective", f"a:{idx}") for idx in range(1, 4)
     ]
 
 

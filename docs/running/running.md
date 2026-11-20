@@ -178,8 +178,8 @@ Results](../results/results.md):
 if outcome.results is not None:
     outcome.results.variables             # the best variables
     outcome.results.target_objective      # the objective value there
-    outcome.results.functions.objectives  # the separate objective values
-    outcome.results.functions.constraints # the nonlinear constraint values
+    outcome.results.aggregates.objectives  # the separate objective values
+    outcome.results.aggregates.constraints # the nonlinear constraint values
 ```
 
 `outcome.results` is `None` when the optimization produced no valid result: too few
@@ -221,7 +221,7 @@ def report(result):
     if isinstance(result, FunctionResults):
         print("objective", result.target_objective)
     else:
-        print("gradient", result.target_gradient)
+        print("gradient", result.target_objective)
 
 
 optimize(config, x0, objective, result_callback=report, report_gradients=True)
