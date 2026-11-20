@@ -85,10 +85,10 @@ class Sampler(ABC):
         - `n_variables` is the total number of optimization variables.
 
         If the `shared` flag is `True` in the associated
-        [`SamplerConfig`][ropt.config.SamplerConfig], the first dimension
-        still has size `n_realizations`. Implementations may internally
-        generate a single realization of samples and broadcast that internally
-        before returning.
+        [`SamplerConfig`][ropt.config.SamplerConfig], the returned samples must
+        be identical across all realizations. The first dimension still has
+        size `n_realizations`. Implementations may generate one set of samples
+        and broadcast it across realizations before returning.
 
         If a boolean `mask` was provided during initialization, this sampler
         instance is responsible only for a subset of variables (where the mask

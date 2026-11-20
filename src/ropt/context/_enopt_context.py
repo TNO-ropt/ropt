@@ -75,7 +75,7 @@ class EnOptContext(BaseModel):
         nonlinear_constraints:           Optional nonlinear constraint settings.
         realizations:                    Ensemble realization settings.
         optimizer:                       Optimizer settings.
-        backend:                         Backend plugin instance used for function evaluations.
+        backend:                         Backend plugin instance that runs the optimization algorithm.
         gradient:                        Gradient estimation settings.
         realization_filters:             Realization filter instances, by key.
         function_estimators:             Function estimator instances, by key.
