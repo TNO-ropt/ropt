@@ -22,6 +22,7 @@ from ropt.backend.scipy import (
     SUPPORTED_SCIPY_METHODS,
     SciPyBackend,
 )
+from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.exceptions import UnsupportedError
@@ -97,6 +98,27 @@ def test_scipy_invalid_options_type(config: Any) -> None:
 
     with pytest.raises(ValueError, match="SciPy backend options must be a dictionary"):
         validate_backend_options("slsqp", config["backend"]["options"])
+
+
+@pytest.mark.parametrize("tolerance", [0.0, 1e-4])
+@pytest.mark.parametrize(
+    "external", ["", pytest.param("external/", marks=pytest.mark.external)]
+)
+def test_scipy_de_rejects_convergence_tolerance(
+    tolerance: float, external: str
+) -> None:
+    with pytest.raises(
+        ValidationError, match="does not support 'convergence_tolerance'"
+    ):
+        EnOptContext.model_validate(
+            {
+                "variables": {"variable_count": 1},
+                "backend": {
+                    "method": f"{external}scipy/differential_evolution",
+                    "convergence_tolerance": tolerance,
+                },
+            }
+        )
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTED - _REQUIRES_BOUNDS))

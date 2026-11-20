@@ -249,12 +249,21 @@ class SciPyBackend(Backend):
     def validate_options(
         self,
     ) -> None:
-        """Check the configured options against the method's schema.
+        """Validate backend settings and method-specific options.
 
         Raises:
-            ValueError: If the options are not a dictionary, or are not valid
-                        for the configured method.
+            ValueError: If a setting is unsupported, or the method-specific
+                        options are invalid.
         """
+        if (
+            self._method == "differential_evolution"
+            and self._config.convergence_tolerance is not None
+        ):
+            msg = (
+                "The SciPy 'differential_evolution' method does not support "
+                "'convergence_tolerance'; set 'tol' or 'atol' in 'options' instead."
+            )
+            raise ValueError(msg)
         if self._config.options is not None:
             if not isinstance(self._config.options, dict):
                 msg = "SciPy backend options must be a dictionary"

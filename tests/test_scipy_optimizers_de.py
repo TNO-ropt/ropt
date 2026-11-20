@@ -23,7 +23,6 @@ def config_fixture() -> dict[str, Any]:
         },
         "backend": {
             "method": "differential_evolution",
-            "convergence_tolerance": 1e-5,
             "options": {"rng": 1},
         },
         "objectives": {
