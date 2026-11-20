@@ -2783,7 +2783,10 @@ whose docstring documents the methods to implement, including how
 an estimator with the plugin system is only required when it should be
 selectable via <a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../reference/config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>;
 otherwise, an instance can be passed directly in the <code>function_estimators</code>
-section of the configuration.</p>
+section of the configuration.
+For unmerged gradients, <code>calculate_gradient</code> receives an array with shape
+<code>(n_realizations, n_variables)</code>; with merged realizations, it receives
+<code>(n_variables,)</code>.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/function_estimator.py">examples/function_estimator.py</a>,
 which implements a weighted geometric mean, registers it, and selects it from
