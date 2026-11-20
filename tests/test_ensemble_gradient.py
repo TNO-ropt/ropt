@@ -4,7 +4,11 @@ import numpy as np
 import pytest
 from numpy.random import default_rng
 
-from ropt._core._gradient import _apply_bounds, _perturb_variables
+from ropt._core._gradient import (
+    _apply_bounds,
+    _estimate_gradients,
+    _perturb_variables,
+)
 from ropt.config import SamplerConfig
 from ropt.context import EnOptContext
 from ropt.enums import BoundaryType
@@ -58,6 +62,25 @@ def test__apply_bounds() -> None:
         variables, lower_bounds, upper_bounds, (BoundaryType.MIRROR,) * 5
     )
     assert expected_response_mirror == pytest.approx(response)
+
+
+def test_gradient_estimation_marks_successful_weighted_realizations() -> None:
+    delta_variables = np.array(
+        [
+            [[1.0], [2.0]],
+            [[1.0], [2.0]],
+            [[1.0], [2.0]],
+        ]
+    )
+    delta_functions = np.array([[1.0, 2.0], [np.nan, np.nan], [3.0, 6.0]])
+    weights = np.array([1.0, 1.0, 0.0])
+
+    gradients, estimated_realizations = _estimate_gradients(
+        delta_variables, delta_functions, weights
+    )
+
+    np.testing.assert_allclose(gradients, [[1.0], [0.0], [0.0]])
+    assert estimated_realizations.tolist() == [True, False, False]
 
 
 def test_variable_perturbation_enopt() -> None:

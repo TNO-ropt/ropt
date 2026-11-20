@@ -85,12 +85,12 @@ def _get_realizations_to_evaluate(
     if objective_weights is None:
         return np.abs(context.realizations.weights) > 0
     realizations_to_evaluate: NDArray[np.bool_] = np.any(
-        np.abs(objective_weights) > 0, axis=0
+        np.abs(objective_weights) > 0, axis=1
     )
     if constraint_weights is None:
         return realizations_to_evaluate
     return np.logical_or(
-        realizations_to_evaluate, np.any(np.abs(constraint_weights) > 0, axis=0)
+        realizations_to_evaluate, np.any(np.abs(constraint_weights) > 0, axis=1)
     )
 
 

@@ -142,7 +142,7 @@ def test_stddev_estimator_reports_an_infinite_realization_as_an_infinite_spread(
 
 def test_stddev_gradient_propagates_an_infinite_realization() -> None:
     estimator = _estimator("stddev")
-    gradient = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    gradient = np.array([[1.0, 4.0], [2.0, 5.0], [3.0, 6.0]])
     result = estimator.calculate_gradient(
         np.array([1.0, np.inf, 3.0]), gradient, _EQUAL_WEIGHTS
     )
@@ -154,7 +154,7 @@ def test_stddev_gradient_guard_is_scale_invariant() -> None:
     estimator = _estimator("stddev")
     # Small enough that an absolute threshold would suppress it.
     functions = np.array([1.0, 1.0 + 1e-7, 1.0 + 2e-7])
-    gradient = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    gradient = np.array([[1.0, 4.0], [2.0, 5.0], [3.0, 6.0]])
     scale = 1e6
 
     unscaled = estimator.calculate_gradient(functions, gradient, _EQUAL_WEIGHTS)
@@ -168,7 +168,7 @@ def test_stddev_gradient_guard_is_scale_invariant() -> None:
 
 def test_stddev_gradient_is_zero_for_identical_realizations() -> None:
     estimator = _estimator("stddev")
-    gradient = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    gradient = np.array([[1.0, 4.0], [2.0, 5.0], [3.0, 6.0]])
     result = estimator.calculate_gradient(np.zeros(3), gradient, _EQUAL_WEIGHTS)
     assert not np.any(result)
 
@@ -204,7 +204,7 @@ class CustomFunctionEstimator(FunctionEstimator):
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        return np.asarray(np.dot(gradient, weights))
+        return np.asarray(np.dot(gradient.T, weights))
 
 
 def test_custom_function_estimator(

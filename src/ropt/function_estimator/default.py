@@ -124,7 +124,8 @@ class DefaultFunctionEstimator(FunctionEstimator):
     ) -> NDArray[np.float64]:
         if merge_realizations:
             return gradient
-        return np.dot(gradient, weights)  # type: ignore[no-any-return]
+        # Preserve the reduction order with realization-first input.
+        return np.dot(gradient.T, weights)  # type: ignore[no-any-return]
 
 
 def _calculate_function_stddev(
@@ -149,9 +150,9 @@ def _calculate_gradient_stddev(
         raise TooFewRealizations
     functions = _contributing(functions, weights)
     if np.any(np.isinf(functions)):
-        return np.full(gradient.shape[:-1], np.inf, dtype=np.float64)
+        return np.full(gradient.shape[1:], np.inf, dtype=np.float64)
     norm, mean, stddev = _mean_stddev(functions, weights)
-    mean_gradient = np.dot(gradient, weights)
+    mean_gradient = np.dot(gradient.T, weights)
     negligible = bool(
         np.all(stddev <= _STDDEV_TOLERANCE * np.max(np.abs(functions), axis=-1))
     )
@@ -160,7 +161,7 @@ def _calculate_gradient_stddev(
         if negligible
         else (
             (norm / stddev)
-            * (np.dot(gradient, functions * weights) - mean * mean_gradient)
+            * (np.dot(gradient.T, functions * weights) - mean * mean_gradient)
         )
     )
 

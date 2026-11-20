@@ -79,7 +79,7 @@ class FunctionEstimator(ABC):
         """Aggregate gradients across realizations.
 
         When `merge_realizations` is `False` (default), `gradient` has shape
-        `(n_variables, n_realizations)` and must be combined using `weights`.
+        `(n_realizations, n_variables)` and must be combined using `weights`.
         When `True`, a single pre-merged gradient of shape `(n_variables,)` is
         passed instead — suitable only for estimators that aggregate by a
         simple weighted combination (for example the mean). Estimators that need each
@@ -89,7 +89,7 @@ class FunctionEstimator(ABC):
 
         Args:
             functions: Shape `(n_realizations,)` — the per-realization values.
-            gradient:  Shape `(n_variables, n_realizations)`, or `(n_variables,)`.
+            gradient:  Shape `(n_realizations, n_variables)`, or `(n_variables,)`.
             weights:   Shape `(n_realizations,)` — realization weights.
 
         Returns:

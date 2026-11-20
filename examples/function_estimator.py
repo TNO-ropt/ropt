@@ -19,7 +19,7 @@ notebook cannot be found through an entry point, and registering is what closes
 that gap.
 """
 
-from typing import Any, ClassVar
+from typing import Any, ClassVar, override
 
 import numpy as np
 from numpy.random import default_rng
@@ -53,7 +53,8 @@ class GeometricMean(FunctionEstimator):
             estimator_config: The estimator configuration, unused by this estimator.
         """
 
-    def init(self, *, merge_realizations: bool) -> None:  # ruff: ignore[no-self-use]
+    @override
+    def init(self, *, merge_realizations: bool) -> None:
         """Refuse gradients that arrive already merged.
 
         Args:
@@ -68,7 +69,8 @@ class GeometricMean(FunctionEstimator):
             msg = "The geometric mean does not support merged gradients."
             raise ValueError(msg)
 
-    def calculate_function(  # ruff: ignore[no-self-use]
+    @override
+    def calculate_function(
         self,
         functions: NDArray[np.float64],
         weights: NDArray[np.float64],
@@ -84,7 +86,8 @@ class GeometricMean(FunctionEstimator):
         """
         return np.exp(weights @ np.log(functions))
 
-    def calculate_gradient(  # ruff: ignore[no-self-use]
+    @override
+    def calculate_gradient(
         self,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
@@ -98,14 +101,14 @@ class GeometricMean(FunctionEstimator):
 
         Args:
             functions: The objective value of each realization, all positive.
-            gradient:  The gradient of each realization, one column per realization.
+            gradient:  The gradient of each realization, one row per realization.
             weights:   The weight of each realization, summing to one.
 
         Returns:
             The gradient of the weighted geometric mean.
         """
         geometric_mean = np.exp(weights @ np.log(functions))
-        return geometric_mean * (gradient @ (weights / functions))
+        return geometric_mean * (gradient.T @ (weights / functions))
 
 
 def report(result: FunctionResults) -> None:

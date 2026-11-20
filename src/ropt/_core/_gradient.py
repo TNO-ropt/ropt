@@ -90,21 +90,24 @@ def _estimate_gradients(
     delta_variables: NDArray[np.float64],
     delta_functions: NDArray[np.float64],
     weights: NDArray[np.float64],
-) -> NDArray[np.float64]:
+) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
     realizations_mask = np.abs(weights) > 0
     realization_count = realizations_mask.size
     gradients: NDArray[np.float64] = np.zeros(
-        (delta_variables.shape[-1], realization_count), dtype=np.float64
+        (realization_count, delta_variables.shape[-1]), dtype=np.float64
     )
     all_successes = np.logical_not(np.isnan(delta_functions))
+    estimated_realizations = np.logical_and(
+        realizations_mask, np.any(all_successes, axis=1)
+    )
     for idx in range(realization_count):
         success = all_successes[idx]
-        if realizations_mask[idx] and np.any(success):
+        if estimated_realizations[idx]:
             ensemble_matrix = delta_variables[idx, success, :]
-            gradients[:, idx] = _invert_linear_equations(
+            gradients[idx, :] = _invert_linear_equations(
                 ensemble_matrix, delta_functions[idx, success]
             )
-    return gradients
+    return gradients, estimated_realizations
 
 
 def _estimate_merged_gradient(
@@ -177,19 +180,31 @@ class _StochasticGradient:
 
     def estimate(
         self, data: _GradientData, weights: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
+    ) -> tuple[NDArray[np.float64], NDArray[np.bool_] | None]:
         delta_variables = data.perturbed_variables - data.variables
         delta_functions = data.perturbed_functions - np.expand_dims(
             data.functions, axis=1
         )
-        regression = (
-            _estimate_merged_gradient
-            if self.merges_realizations
-            else _estimate_gradients
-        )
-        return np.stack(
-            [
-                regression(delta_variables, delta_functions[..., idx], weights[idx])
-                for idx in range(delta_functions.shape[-1])
-            ]
+        if self.merges_realizations:
+            return (
+                np.stack(
+                    [
+                        _estimate_merged_gradient(
+                            delta_variables, delta_functions[..., idx], weights[:, idx]
+                        )
+                        for idx in range(delta_functions.shape[-1])
+                    ]
+                ),
+                None,
+            )
+
+        estimates = [
+            _estimate_gradients(
+                delta_variables, delta_functions[..., idx], weights[:, idx]
+            )
+            for idx in range(delta_functions.shape[-1])
+        ]
+        return (
+            np.stack([estimate[0] for estimate in estimates], axis=1),
+            np.stack([estimate[1] for estimate in estimates], axis=1),
         )

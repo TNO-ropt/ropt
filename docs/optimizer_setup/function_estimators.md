@@ -75,6 +75,9 @@ an estimator with the plugin system is only required when it should be
 selectable via [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig];
 otherwise, an instance can be passed directly in the `function_estimators`
 section of the configuration.
+For unmerged gradients, `calculate_gradient` receives an array with shape
+`(n_realizations, n_variables)`; with merged realizations, it receives
+`(n_variables,)`.
 
 The runnable script is
 [examples/function_estimator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/function_estimator.py),
