@@ -195,7 +195,7 @@ class SciPySampler(Sampler):
                     self._sampler.random(realization_count * perturbation_count),
                     np.repeat(-1.0, sample_dim),
                     np.repeat(1.0, sample_dim),
-                ).T.reshape((realization_count, perturbation_count, sample_dim)),
+                ).reshape((realization_count, perturbation_count, sample_dim)),
             )
 
         if self._method == "sobol":

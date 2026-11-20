@@ -3,13 +3,15 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
+from scipy.stats.qmc import Halton, LatinHypercube, Sobol
 
 from ropt import optimize
 from ropt._handlers import CallbackHandler
+from ropt.config import SamplerConfig
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import GradientResults
-from ropt.sampler.scipy import SCIPY_SAMPLER_SUPPORTED_METHODS
+from ropt.sampler.scipy import SCIPY_SAMPLER_SUPPORTED_METHODS, SciPySampler
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -42,6 +44,36 @@ def test_scipy_samplers_unconstrained(config: Any, method: str, eval_func: Any) 
     result = optimize(config, initial_values, eval_func())
     assert result.results is not None
     assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
+
+
+@pytest.mark.parametrize("method", ["sobol", "halton", "lhs"])
+@pytest.mark.parametrize("shared", [False, True])
+@pytest.mark.parametrize("masked", [False, True])
+def test_scipy_qmc_sampler_preserves_points(
+    method: str, *, shared: bool, masked: bool
+) -> None:
+    engines = {"sobol": Sobol, "halton": Halton, "lhs": LatinHypercube}
+    mask = np.array([True, not masked, True])
+    sample_dim = int(mask.sum())
+    engine = engines[method](sample_dim, seed=np.random.default_rng(123))
+    expected = 2 * engine.random(4 if shared else 8) - 1
+    if shared:
+        expected = np.tile(expected, (2, 1))
+
+    sampler = SciPySampler(SamplerConfig(method=method, shared=shared))
+    sampler.init(
+        realization_count=2,
+        perturbation_count=4,
+        variable_count=3,
+        mask=mask if masked else None,
+        rng=np.random.default_rng(123),
+    )
+    samples = sampler.generate_samples()
+
+    assert samples.shape == (2, 4, 3)
+    np.testing.assert_array_equal(samples[..., mask].reshape(-1, sample_dim), expected)
+    if masked:
+        np.testing.assert_array_equal(samples[..., ~mask], 0)
 
 
 def test_scipy_indexed_sampler(config: Any, eval_func: Any) -> None:
