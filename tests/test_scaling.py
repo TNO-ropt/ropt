@@ -496,6 +496,35 @@ def test_the_reported_aggregate_matches_the_reported_values(
         )
 
 
+@pytest.mark.parametrize("maximize", [False, True])
+def test_the_reported_gradient_aggregate_matches_the_reported_estimates(
+    *, maximize: bool
+) -> None:
+    results = [
+        item
+        for item in _run(
+            {"weights": [1.0], "scales": [4.0], "maximize": maximize}, "mean"
+        )
+        if isinstance(item, GradientResults)
+    ]
+    assert results
+
+    weights = np.array([1.0, 2.0, 3.0]) / 6.0
+    for item in results:
+        assert item.aggregates is not None
+        assert item.estimates is not None
+        assert item.scaled.estimates is not None
+        assert np.allclose(
+            item.aggregates.objectives,
+            np.tensordot(weights, item.estimates.objectives, axes=1),
+        )
+        # The optimizer's version is scaled and, if maximized, negated.
+        assert np.allclose(
+            item.scaled.estimates.objectives,
+            (-1.0 if maximize else 1.0) * item.estimates.objectives / 4.0,
+        )
+
+
 @pytest.mark.parametrize("estimator", ["mean", "stddev"])
 def test_maximizing_negates_what_the_optimizer_minimizes(estimator: str) -> None:
     minimized = _run_and_collect({"weights": [1.0]}, estimator)

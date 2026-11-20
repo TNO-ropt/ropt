@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
     from ._function_results import FunctionResults
     from ._gradient_aggregates import GradientAggregates
+    from ._gradient_estimates import GradientEstimates
     from ._gradient_perturbations import (
         GradientPerturbations,
         ScaledGradientPerturbations,
@@ -45,6 +46,7 @@ class ScaledGradientResults(ResultField):
     Attributes:
         variables:     The variable vector the optimizer proposed.
         perturbations: The perturbed vectors in the optimizer's domain.
+        estimates:     Scaled per-realization gradients, or `None`.
         aggregates:    Scaled gradients, or `None` if estimation failed.
     """
 
@@ -52,6 +54,7 @@ class ScaledGradientResults(ResultField):
         metadata={"__axes__": (AxisName.VARIABLE,)},
     )
     perturbations: ScaledGradientPerturbations
+    estimates: GradientEstimates | None = None
     aggregates: GradientAggregates | None = None
 
     def __post_init__(self) -> None:
@@ -99,6 +102,8 @@ class GradientResults(Results):
                           evaluated at the same point as the gradient.
         variables:        The variable vector that was perturbed.
         perturbations:    The perturbed vectors and the values returned for them.
+        estimates:        Per-realization gradients, or `None` if realizations
+                          are merged or no gradients were estimated.
         realizations:     Realization weights.
         aggregates:       Aggregated gradients, or `None` if estimation failed.
         target_objective: The gradient the optimizer descends, in its own domain.
@@ -110,6 +115,7 @@ class GradientResults(Results):
         metadata={"__axes__": (AxisName.VARIABLE,)},
     )
     perturbations: GradientPerturbations
+    estimates: GradientEstimates | None
     realizations: Realizations
     aggregates: GradientAggregates | None
     target_objective: NDArray[np.float64] | None = field(

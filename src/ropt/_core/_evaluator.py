@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from contextlib import suppress
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
@@ -19,6 +18,7 @@ from ropt.results import (
     FunctionEvaluations,
     FunctionResults,
     GradientAggregates,
+    GradientEstimates,
     GradientPerturbations,
     GradientResults,
     Realizations,
@@ -55,8 +55,8 @@ _logger = get_logger(__name__)
 class _GradientCalculation:
     scaled_aggregates: GradientAggregates | None
     target_objective: NDArray[np.float64] | None
-    estimates: GradientAggregates | None
-    scaled_estimates: GradientAggregates | None
+    estimates: GradientEstimates | None
+    scaled_estimates: GradientEstimates | None
 
 
 SignalStartCallback = Callable[[], dict[str, Any]]
@@ -392,15 +392,13 @@ class EnsembleEvaluator:
             and np.count_nonzero(~failed_realizations)
             >= self._context.realizations.realization_min_success
         ):
-            # Some function estimators cannot aggregate too few realizations.
-            with suppress(TooFewRealizations):
-                calculation = self._compute_gradients(
-                    data,
-                    mask,
-                    objective_weights=objective_weights,
-                    constraint_weights=constraint_weights,
-                    failed_realizations=failed_realizations,
-                )
+            calculation = self._compute_gradients(
+                data,
+                mask,
+                objective_weights=objective_weights,
+                constraint_weights=constraint_weights,
+                failed_realizations=failed_realizations,
+            )
 
         return GradientResults(
             batch_id=g_eval_results.batch_id,
@@ -415,6 +413,7 @@ class EnsembleEvaluator:
                 constraints=g_eval_results.perturbed_constraints,
                 metadata=g_eval_results.metadata,
             ),
+            estimates=calculation.estimates,
             realizations=Realizations(
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
@@ -426,6 +425,7 @@ class EnsembleEvaluator:
                 perturbations=ScaledGradientPerturbations(
                     variables=perturbed_variables
                 ),
+                estimates=calculation.scaled_estimates,
                 aggregates=calculation.scaled_aggregates,
             ),
         )
@@ -588,60 +588,111 @@ class EnsembleEvaluator:
         constraint_weights: NDArray[np.float64] | None,
         failed_realizations: NDArray[np.bool_],
     ) -> _GradientCalculation:
-        estimates: GradientAggregates | None = None
-        scaled_estimates: GradientAggregates | None = None
         if np.all(failed_realizations):
-            gradients = np.full(
-                (data.functions.shape[-1], data.variables.shape[-1]),
-                np.nan,
-                dtype=np.float64,
-            )
-        else:
-            weights = self._gradient_weights(
-                objective_weights, constraint_weights, failed_realizations
-            )
-            realization_gradients, estimated_realizations = self._gradient.estimate(
-                data, weights
-            )
-            if estimated_realizations is not None:
-                scaled_estimates = self._convert_gradient_values(
-                    realization_gradients,
-                    mask,
-                    estimated_realizations,
-                )
-                estimates = self._unscale_gradients(scaled_estimates)
-            try:
-                gradients = self._aggregate_gradients(
-                    data, realization_gradients, weights
-                )
-            except TooFewRealizations:
-                return _GradientCalculation(
-                    scaled_aggregates=None,
-                    target_objective=None,
-                    estimates=estimates,
-                    scaled_estimates=scaled_estimates,
-                )
-
-        converted_gradients = self._convert_gradient_values(gradients, mask)
-        target_objective_gradient = np.array(
-            (
-                self._context.objectives.weights[:, np.newaxis]
-                * converted_gradients.objectives
-            ).sum(axis=0)
+            return self._failed_gradient_calculation(data, mask)
+        weights = self._gradient_weights(
+            objective_weights, constraint_weights, failed_realizations
         )
+        realization_gradients, estimated_realizations = self._gradient.estimate(
+            data, weights
+        )
+        scaled_estimates = (
+            None
+            if estimated_realizations is None
+            else self._scaled_estimates(
+                realization_gradients, mask, estimated_realizations
+            )
+        )
+        try:
+            gradients = self._aggregate_gradients(data, realization_gradients, weights)
+        except TooFewRealizations:
+            # Some function estimators cannot aggregate too few realizations.
+            return self._gradient_calculation(None, mask, scaled_estimates)
+        return self._gradient_calculation(gradients, mask, scaled_estimates)
+
+    def _failed_gradient_calculation(
+        self, data: _GradientData, mask: NDArray[np.bool_] | None
+    ) -> _GradientCalculation:
+        gradients = np.full(
+            (data.functions.shape[-1], data.variables.shape[-1]),
+            np.nan,
+            dtype=np.float64,
+        )
+        scaled_estimates = (
+            None
+            if self._gradient.merges_realizations
+            else self._scaled_estimates(
+                np.zeros((*data.functions.shape, data.variables.shape[-1])),
+                mask,
+                np.zeros(data.functions.shape, dtype=np.bool_),
+            )
+        )
+        return self._gradient_calculation(gradients, mask, scaled_estimates)
+
+    def _gradient_calculation(
+        self,
+        gradients: NDArray[np.float64] | None,
+        mask: NDArray[np.bool_] | None,
+        scaled_estimates: GradientEstimates | None,
+    ) -> _GradientCalculation:
+        estimates = (
+            None
+            if scaled_estimates is None
+            else GradientEstimates.from_scaled(self._context, scaled_estimates)
+        )
+        if gradients is None:
+            return _GradientCalculation(
+                scaled_aggregates=None,
+                target_objective=None,
+                estimates=estimates,
+                scaled_estimates=scaled_estimates,
+            )
+        objectives, constraints = self._convert_gradient_values(gradients, mask)
         return _GradientCalculation(
-            scaled_aggregates=converted_gradients,
-            target_objective=target_objective_gradient,
+            scaled_aggregates=GradientAggregates(
+                objectives=objectives, constraints=constraints
+            ),
+            target_objective=np.array(
+                (self._context.objectives.weights[:, np.newaxis] * objectives).sum(
+                    axis=0
+                )
+            ),
             estimates=estimates,
             scaled_estimates=scaled_estimates,
+        )
+
+    def _scaled_estimates(
+        self,
+        realization_gradients: NDArray[np.float64],
+        mask: NDArray[np.bool_] | None,
+        estimated_realizations: NDArray[np.bool_],
+    ) -> GradientEstimates:
+        objectives, constraints = self._convert_gradient_values(
+            realization_gradients, mask
+        )
+        objective_count = objectives.shape[1]
+        return GradientEstimates(
+            objectives=np.where(
+                estimated_realizations[:, :objective_count, np.newaxis],
+                objectives,
+                np.nan,
+            ),
+            constraints=(
+                None
+                if constraints is None
+                else np.where(
+                    estimated_realizations[:, objective_count:, np.newaxis],
+                    constraints,
+                    np.nan,
+                )
+            ),
         )
 
     def _convert_gradient_values(
         self,
         gradients: NDArray[np.float64],
         mask: NDArray[np.bool_] | None,
-        estimated_realizations: NDArray[np.bool_] | None = None,
-    ) -> GradientAggregates:
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64] | None]:
         objective_count = self._context.objectives.weights.size
         leading_dimensions = (1,) * (gradients.ndim - 2)
         objective_shape = (*leading_dimensions, objective_count, 1)
@@ -653,40 +704,17 @@ class EnsembleEvaluator:
             objective_gradients,
             self._context.objectives.maximize.reshape(objective_shape),
         )
-        constraint_gradients = None
-        if self._context.nonlinear_constraints is not None:
-            constraint_scales = self._context.get_constraint_scales()
-            assert constraint_scales is not None
-            constraint_shape = (
-                *leading_dimensions,
-                constraint_scales.size,
-                1,
-            )
-            constraint_gradients = scale(
-                gradients[..., objective_count:, :],
-                constraint_scales.reshape(constraint_shape),
-            )
-
-        if estimated_realizations is not None:
-            objective_gradients = np.where(
-                estimated_realizations[..., :objective_count, np.newaxis],
-                objective_gradients,
-                np.nan,
-            )
-            if constraint_gradients is not None:
-                constraint_gradients = np.where(
-                    estimated_realizations[..., objective_count:, np.newaxis],
-                    constraint_gradients,
-                    np.nan,
-                )
-
-        return GradientAggregates(
-            objectives=self._expand_gradients(objective_gradients, mask),
-            constraints=(
-                None
-                if constraint_gradients is None
-                else self._expand_gradients(constraint_gradients, mask)
-            ),
+        if self._context.nonlinear_constraints is None:
+            return self._expand_gradients(objective_gradients, mask), None
+        constraint_scales = self._context.get_constraint_scales()
+        assert constraint_scales is not None
+        constraint_gradients = scale(
+            gradients[..., objective_count:, :],
+            constraint_scales.reshape((*leading_dimensions, constraint_scales.size, 1)),
+        )
+        return (
+            self._expand_gradients(objective_gradients, mask),
+            self._expand_gradients(constraint_gradients, mask),
         )
 
     def _aggregate_gradients(

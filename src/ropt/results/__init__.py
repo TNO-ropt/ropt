@@ -16,6 +16,7 @@ from ._function_aggregates import FunctionAggregates
 from ._function_evaluations import FunctionEvaluations
 from ._function_results import FunctionResults, ScaledFunctionResults
 from ._gradient_aggregates import GradientAggregates
+from ._gradient_estimates import GradientEstimates
 from ._gradient_perturbations import GradientPerturbations, ScaledGradientPerturbations
 from ._gradient_results import GradientResults, ScaledGradientResults
 from ._pandas_frame import results_to_pandas
@@ -31,6 +32,7 @@ __all__ = [
     "FunctionEvaluations",
     "FunctionResults",
     "GradientAggregates",
+    "GradientEstimates",
     "GradientPerturbations",
     "GradientResults",
     "Realizations",
