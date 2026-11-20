@@ -62,7 +62,7 @@ class Results(AxisMetadata, ABC):
         """Export selected fields to a pandas DataFrame.
 
         Fields are named by a dotted path from this result, such as
-        `"functions.objectives"`, `"scaled.variables"` or `"target_objective"`.
+        `"aggregates.objectives"`, `"scaled.variables"` or `"target_objective"`.
         A path may end in one or more mapping keys, as `"metadata.run.id"` does.
         Each selected path becomes a column of that name, in the order given.
 

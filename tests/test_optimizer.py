@@ -227,9 +227,9 @@ def test_objective_with_scales(
 ) -> None:
     result1 = optimize(config, initial_values, eval_func())
     assert result1.results is not None
-    assert result1.results.functions is not None
+    assert result1.results.aggregates is not None
     variables1 = result1.results.variables
-    objectives1 = result1.results.functions.objectives
+    objectives1 = result1.results.aggregates.objectives
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
@@ -252,11 +252,11 @@ def test_objective_with_scales(
         for item in results:
             if isinstance(item, FunctionResults) and not checked:
                 checked = True
-                assert item.scaled.functions is not None
-                assert item.scaled.functions.objectives is not None
-                assert np.allclose(item.scaled.functions.objectives[-1], 1.0)
-                assert item.functions is not None
-                assert np.allclose(item.functions.objectives[-1], init1)
+                assert item.scaled.aggregates is not None
+                assert item.scaled.aggregates.objectives is not None
+                assert np.allclose(item.scaled.aggregates.objectives[-1], 1.0)
+                assert item.aggregates is not None
+                assert np.allclose(item.aggregates.objectives[-1], init1)
 
     result2 = optimize(
         config,
@@ -271,8 +271,8 @@ def test_objective_with_scales(
     assert checked
     assert result2.results is not None
     assert np.allclose(result2.results.variables, variables1, atol=0.02)
-    assert result2.results.functions is not None
-    assert np.allclose(objectives1, result2.results.functions.objectives, atol=0.025)
+    assert result2.results.aggregates is not None
+    assert np.allclose(objectives1, result2.results.aggregates.objectives, atol=0.025)
 
 
 def test_objective_with_auto_scale(
@@ -285,9 +285,9 @@ def test_objective_with_auto_scale(
 
     result1 = optimize(config, initial_values, eval_func())
     assert result1.results is not None
-    assert result1.results.functions is not None
+    assert result1.results.aggregates is not None
     variables1 = result1.results.variables
-    objectives1 = result1.results.functions.objectives
+    objectives1 = result1.results.aggregates.objectives
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
@@ -314,13 +314,13 @@ def test_objective_with_auto_scale(
             if isinstance(item, FunctionResults) and not checked:
                 checked = True
                 assert np.allclose(event.context.get_objective_scales(), scale)
-                assert item.scaled.functions is not None
-                assert item.scaled.functions.objectives is not None
-                assert np.allclose(item.scaled.functions.objectives, initial / scale)
+                assert item.scaled.aggregates is not None
+                assert item.scaled.aggregates.objectives is not None
+                assert np.allclose(item.scaled.aggregates.objectives, initial / scale)
                 assert item.target_objective is not None
                 assert np.allclose(item.target_objective, 1.0)
-                assert item.functions is not None
-                assert np.allclose(item.functions.objectives, initial)
+                assert item.aggregates is not None
+                assert np.allclose(item.aggregates.objectives, initial)
 
     result2 = optimize(
         config,
@@ -337,8 +337,8 @@ def test_objective_with_auto_scale(
     assert np.allclose(result2.results.variables, variables1, atol=0.02)
     # Rescaling the objective changes the steps the optimizer takes, so within
     # the same budget it stops at a slightly different point.
-    assert result2.results.functions is not None
-    assert np.allclose(objectives1, result2.results.functions.objectives, atol=0.05)
+    assert result2.results.aggregates is not None
+    assert np.allclose(objectives1, result2.results.aggregates.objectives, atol=0.05)
 
 
 def test_nonlinear_constraint_with_scales(
@@ -385,12 +385,12 @@ def test_nonlinear_constraint_with_scales(
         for item in results:
             if isinstance(item, FunctionResults) and check:
                 check = False
-                assert item.scaled.functions is not None
-                assert item.scaled.functions.constraints is not None
-                assert np.allclose(item.scaled.functions.constraints, 1.0)
-                assert item.functions is not None
-                assert item.functions.constraints is not None
-                assert np.allclose(item.functions.constraints, scales)
+                assert item.scaled.aggregates is not None
+                assert item.scaled.aggregates.constraints is not None
+                assert np.allclose(item.scaled.aggregates.constraints, 1.0)
+                assert item.aggregates is not None
+                assert item.aggregates.constraints is not None
+                assert np.allclose(item.aggregates.constraints, scales)
 
     result2 = optimize(
         config,
@@ -405,12 +405,12 @@ def test_nonlinear_constraint_with_scales(
     )
     assert not check
     assert result2.results is not None
-    assert result1.results.functions is not None
-    assert result2.results.functions is not None
+    assert result1.results.aggregates is not None
+    assert result2.results.aggregates is not None
     assert np.allclose(result2.results.variables, result1.results.variables, atol=0.02)
     assert np.allclose(
-        result1.results.functions.objectives,
-        result2.results.functions.objectives,
+        result1.results.aggregates.objectives,
+        result2.results.aggregates.objectives,
         atol=0.025,
     )
 
@@ -467,12 +467,12 @@ def test_nonlinear_constraint_with_auto_scale(
                 bounds = context.get_nonlinear_constraint_bounds()
                 assert bounds is not None
                 assert np.allclose(bounds[1], 0.4 / scales)
-                assert item.scaled.functions is not None
-                assert item.scaled.functions.constraints is not None
-                assert np.allclose(item.scaled.functions.constraints, 1.0)
-                assert item.functions is not None
-                assert item.functions.constraints is not None
-                assert np.allclose(item.functions.constraints, scales)
+                assert item.scaled.aggregates is not None
+                assert item.scaled.aggregates.constraints is not None
+                assert np.allclose(item.scaled.aggregates.constraints, 1.0)
+                assert item.aggregates is not None
+                assert item.aggregates.constraints is not None
+                assert np.allclose(item.aggregates.constraints, scales)
 
     result2 = optimize(
         config,
@@ -487,12 +487,12 @@ def test_nonlinear_constraint_with_auto_scale(
     )
     assert not check
     assert result2.results is not None
-    assert result1.results.functions is not None
-    assert result2.results.functions is not None
+    assert result1.results.aggregates is not None
+    assert result2.results.aggregates is not None
     assert np.allclose(result2.results.variables, result1.results.variables, atol=0.02)
     assert np.allclose(
-        result1.results.functions.objectives,
-        result2.results.functions.objectives,
+        result1.results.aggregates.objectives,
+        result2.results.aggregates.objectives,
         atol=0.025,
     )
 
@@ -655,10 +655,10 @@ def test_optimizer_variables_subset(config: Any, eval_func: Any, external: str) 
     def assert_gradient(event: EnOptEvent) -> None:
         for item in event.results:
             if isinstance(item, GradientResults):
-                assert item.scaled.gradients is not None
-                assert item.target_gradient is not None
-                assert item.target_gradient[1] == 0.0
-                assert np.all(item.scaled.gradients.objectives[:, 1] == 0.0)
+                assert item.scaled.aggregates is not None
+                assert item.target_objective is not None
+                assert item.target_objective[1] == 0.0
+                assert np.all(item.scaled.aggregates.objectives[:, 1] == 0.0)
 
     result = optimize(
         config,

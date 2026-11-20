@@ -14,13 +14,14 @@ from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import (
+    FunctionAggregates,
     FunctionEvaluations,
     FunctionResults,
-    Functions,
-    GradientEvaluations,
+    GradientPerturbations,
     GradientResults,
     Realizations,
     ScaledFunctionResults,
+    ScaledGradientPerturbations,
     ScaledGradientResults,
 )
 
@@ -98,9 +99,11 @@ def _function_results(
         metadata={},
         names={},
         variables=np.zeros(1),
-        evaluations=FunctionEvaluations.create(objectives=np.array([[objective]])),
-        realizations=Realizations(evaluated_realizations=np.ones(1, dtype=np.bool_)),
-        functions=Functions(objectives=np.array([objective])),
+        evaluations=FunctionEvaluations.create(
+            active=np.ones(1, dtype=np.bool_), objectives=np.array([[objective]])
+        ),
+        realizations=Realizations(),
+        aggregates=FunctionAggregates(objectives=np.array([objective])),
         target_objective=np.array(objective),
         scaled=ScaledFunctionResults(variables=np.zeros(1)),
     )
@@ -115,15 +118,17 @@ def _gradient_results(
         metadata={},
         names={},
         variables=np.full(1, point),
-        perturbed_variables=np.zeros((1, 1, 1)),
-        evaluations=GradientEvaluations.create(
-            perturbed_objectives=np.zeros((1, 1, 1))
+        perturbations=GradientPerturbations.create(
+            active=np.ones(1, dtype=np.bool_),
+            variables=np.zeros((1, 1, 1)),
+            objectives=np.zeros((1, 1, 1)),
         ),
-        realizations=Realizations(evaluated_realizations=np.ones(1, dtype=np.bool_)),
-        gradients=None,
-        target_gradient=None,
+        realizations=Realizations(),
+        aggregates=None,
+        target_objective=None,
         scaled=ScaledGradientResults(
-            variables=np.full(1, point), perturbed_variables=np.zeros((1, 1, 1))
+            variables=np.full(1, point),
+            perturbations=ScaledGradientPerturbations(variables=np.zeros((1, 1, 1))),
         ),
     )
 

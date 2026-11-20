@@ -20,13 +20,14 @@ from ropt.exceptions import TooFewRealizations
 from ropt.realization_filter import RealizationFilter
 from ropt.results import (
     ConstraintInfo,
+    FunctionAggregates,
     FunctionEvaluations,
     FunctionResults,
-    Functions,
-    GradientEvaluations,
+    GradientPerturbations,
     GradientResults,
     Realizations,
     ScaledFunctionResults,
+    ScaledGradientPerturbations,
     ScaledGradientResults,
 )
 
@@ -124,6 +125,7 @@ def config_fixture() -> dict[str, Any]:
 
 def _make_function_results(*, failed: bool) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
+        active=np.ones(3, dtype=np.bool_),
         objectives=(
             np.array([[np.nan], [np.nan], [np.nan]], dtype=np.float64)
             if failed
@@ -137,14 +139,14 @@ def _make_function_results(*, failed: bool) -> FunctionResults:
         names={},
         variables=np.array([0.0, 0.0]),
         evaluations=evaluations,
-        realizations=Realizations(
-            evaluated_realizations=np.ones(3, dtype=np.bool_),
-        ),
-        functions=None if failed else Functions(objectives=np.array([1.0])),
+        realizations=Realizations(),
+        aggregates=None if failed else FunctionAggregates(objectives=np.array([1.0])),
         target_objective=None if failed else np.array(1.0),
         scaled=ScaledFunctionResults(
             variables=np.array([0.0, 0.0]),
-            functions=None if failed else Functions(objectives=np.array([1.0])),
+            aggregates=None
+            if failed
+            else FunctionAggregates(objectives=np.array([1.0])),
         ),
     )
 
@@ -157,8 +159,10 @@ def _make_gradient_results(
         perturbed_objectives[:, 0, 0] = 1.0
     else:
         perturbed_objectives = np.ones((3, 4, 1), dtype=np.float64)
-    evaluations = GradientEvaluations(
-        perturbed_objectives=perturbed_objectives,
+    perturbations = GradientPerturbations(
+        active=np.ones(3, dtype=np.bool_),
+        variables=np.zeros((3, 4, 2), dtype=np.float64),
+        objectives=perturbed_objectives,
         metadata={},
     )
     return GradientResults(
@@ -167,17 +171,16 @@ def _make_gradient_results(
         metadata={},
         names={},
         variables=np.array([0.0, 0.0]),
-        perturbed_variables=np.zeros((3, 4, 2), dtype=np.float64),
-        evaluations=evaluations,
-        realizations=Realizations(
-            evaluated_realizations=np.ones(3, dtype=np.bool_),
-        ),
-        gradients=None if failed else object(),  # type: ignore[arg-type]
-        target_gradient=None if failed else np.zeros(2),
+        perturbations=perturbations,
+        realizations=Realizations(),
+        aggregates=None if failed else object(),  # type: ignore[arg-type]
+        target_objective=None if failed else np.zeros(2),
         scaled=ScaledGradientResults(
             variables=np.array([0.0, 0.0]),
-            perturbed_variables=np.zeros((3, 4, 2), dtype=np.float64),
-            gradients=None if failed else object(),  # type: ignore[arg-type]
+            perturbations=ScaledGradientPerturbations(
+                variables=np.zeros((3, 4, 2), dtype=np.float64)
+            ),
+            aggregates=None if failed else object(),  # type: ignore[arg-type]
         ),
     )
 
@@ -247,15 +250,11 @@ def test_gradient_is_nan_when_every_realization_failed(
         np.zeros(2), compute_functions=True, compute_gradients=True
     )
     assert isinstance(gradient, GradientResults)
-    assert gradient.target_gradient is not None
-    assert gradient.gradients is not None
-    assert gradient.gradients.constraints is not None
-    assert np.all(np.isnan(gradient.target_gradient))
-    assert np.all(np.isnan(gradient.gradients.constraints))
-
-
-def _estimate(item: FunctionResults | GradientResults) -> object:
-    return item.functions if isinstance(item, FunctionResults) else item.gradients
+    assert gradient.target_objective is not None
+    assert gradient.aggregates is not None
+    assert gradient.aggregates.constraints is not None
+    assert np.all(np.isnan(gradient.target_objective))
+    assert np.all(np.isnan(gradient.aggregates.constraints))
 
 
 @pytest.mark.parametrize(
@@ -315,7 +314,7 @@ def test_batch_with_a_failed_estimate_is_reported(
     )
     assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
     assert [
-        (type(item).__name__, _estimate(item) is None) for item in reported
+        (type(item).__name__, item.aggregates is None) for item in reported
     ] == expected
 
 
@@ -355,5 +354,5 @@ def test_gradient_is_not_estimated_when_the_filter_fails(evaluator: Any) -> None
     )
     assert isinstance(function, FunctionResults)
     assert isinstance(gradient, GradientResults)
-    assert function.functions is None
-    assert gradient.gradients is None
+    assert function.aggregates is None
+    assert gradient.aggregates is None

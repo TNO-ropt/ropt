@@ -14,8 +14,8 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ._constraint_info import ConstraintInfo
+    from ._function_aggregates import FunctionAggregates
     from ._function_evaluations import FunctionEvaluations
-    from ._functions import Functions
     from ._realizations import Realizations
 
 
@@ -40,14 +40,14 @@ class ScaledFunctionResults(ResultField):
 
     Attributes:
         variables:       The variable vector the optimizer proposed.
-        functions:       Scaled aggregates, or `None` if too few realizations succeeded.
+        aggregates:      Scaled aggregates, or `None` if too few realizations succeeded.
         constraint_info: Constraint differences in the optimizer's domain.
     """
 
     variables: NDArray[np.float64] = field(
         metadata={"__axes__": (AxisName.VARIABLE,)},
     )
-    functions: Functions | None = None
+    aggregates: FunctionAggregates | None = None
     constraint_info: ConstraintInfo | None = None
 
     def __post_init__(self) -> None:
@@ -89,8 +89,8 @@ class FunctionResults(Results):
         function_id:      This evaluation's index within its batch.
         variables:        The variable vector that was evaluated.
         evaluations:      Per-realization values returned by the evaluator.
-        realizations:     Realization activity and weights.
-        functions:        Aggregated function values, or `None` if too few
+        realizations:     Realization weights.
+        aggregates:       Aggregated function values, or `None` if too few
                           realizations succeeded.
         target_objective: The value the optimizer minimizes, in its own domain.
         scaled:           The same quantities as the optimizer works with them.
@@ -103,7 +103,7 @@ class FunctionResults(Results):
     )
     evaluations: FunctionEvaluations
     realizations: Realizations
-    functions: Functions | None
+    aggregates: FunctionAggregates | None
     target_objective: NDArray[np.float64] | None
     scaled: ScaledFunctionResults
     constraint_info: ConstraintInfo | None = None
@@ -111,4 +111,4 @@ class FunctionResults(Results):
     def __post_init__(self) -> None:
         self.variables = _immutable_copy(self.variables)
         self.target_objective = _immutable_copy(self.target_objective)
-        assert (self.target_objective is None) == (self.functions is None)
+        assert (self.target_objective is None) == (self.aggregates is None)

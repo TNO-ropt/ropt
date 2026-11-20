@@ -134,9 +134,13 @@ def test_callback_metadata_reaches_evaluations_and_results(
     assert results
     for result in results:
         assert result.metadata == {"run": 3, "prepared": 7}
-        assert isinstance(result, FunctionResults | GradientResults)
-        assert np.all(result.evaluations.metadata["run"] == 3)
-        assert np.all(result.evaluations.metadata["prepared"] == 7)
+        if isinstance(result, FunctionResults):
+            evaluation_metadata = result.evaluations.metadata
+        else:
+            assert isinstance(result, GradientResults)
+            evaluation_metadata = result.perturbations.metadata
+        assert np.all(evaluation_metadata["run"] == 3)
+        assert np.all(evaluation_metadata["prepared"] == 7)
 
 
 def test_callback_metadata_shares_changes_between_handlers() -> None:

@@ -14,15 +14,12 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ._function_results import FunctionResults
-    from ._gradient_evaluations import GradientEvaluations
-    from ._gradients import Gradients
+    from ._gradient_aggregates import GradientAggregates
+    from ._gradient_perturbations import (
+        GradientPerturbations,
+        ScaledGradientPerturbations,
+    )
     from ._realizations import Realizations
-
-_PERTURBED_AXES = (
-    AxisName.REALIZATION,
-    AxisName.PERTURBATION,
-    AxisName.VARIABLE,
-)
 
 
 @dataclass(slots=True)
@@ -45,37 +42,20 @@ class ScaledGradientResults(ResultField):
         - Axis type:
             - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
-    === "Perturbed Variables"
-
-        `perturbed_variables`: A three-dimensional array of perturbed variable
-        values for each realization and perturbation:
-
-        - Shape: $(n_r, n_p, n_v)$, where:
-            - $n_r$ is the number of realizations.
-            - $n_p$ is the number of perturbations.
-            - $n_v$ is the number of variables.
-        - Axis types:
-            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
-            - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
-            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
-
     Attributes:
-        variables:           The variable vector the optimizer proposed.
-        perturbed_variables: The perturbed vectors in the optimizer's domain.
-        gradients:           Scaled gradients, or `None` if estimation failed.
+        variables:     The variable vector the optimizer proposed.
+        perturbations: The perturbed vectors in the optimizer's domain.
+        aggregates:    Scaled gradients, or `None` if estimation failed.
     """
 
     variables: NDArray[np.float64] = field(
         metadata={"__axes__": (AxisName.VARIABLE,)},
     )
-    perturbed_variables: NDArray[np.float64] = field(
-        metadata={"__axes__": _PERTURBED_AXES},
-    )
-    gradients: Gradients | None = None
+    perturbations: ScaledGradientPerturbations
+    aggregates: GradientAggregates | None = None
 
     def __post_init__(self) -> None:
         self.variables = _immutable_copy(self.variables)
-        self.perturbed_variables = _immutable_copy(self.perturbed_variables)
 
 
 @dataclass(slots=True)
@@ -84,10 +64,10 @@ class GradientResults(Results):
 
     Fields that have two domains appear twice: once here, in the domain that was
     configured, and once under `scaled`, in the domain the optimizer works in.
-    The `target_gradient` is the exception. It differentiates a weighted total
-    over objectives that may differ in both scale and direction, with respect to
-    the scaled variables, so it exists only in the optimizer's domain and has no
-    scaled counterpart.
+    The `target_objective` is the exception. It is the gradient of a weighted
+    total over objectives that may differ in both scale and direction, with
+    respect to the scaled variables, so it exists only in the optimizer's domain
+    and has no scaled counterpart.
 
     See [Working with Results](../results/results.md) for usage details.
 
@@ -102,23 +82,10 @@ class GradientResults(Results):
         - Axis type:
             - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
-    === "Perturbed Variables"
+    === "Target Objective"
 
-        `perturbed_variables`: A three-dimensional array of perturbed variable
-        values for each realization and perturbation:
-
-        - Shape: $(n_r, n_p, n_v)$, where:
-            - $n_r$ is the number of realizations.
-            - $n_p$ is the number of perturbations.
-            - $n_v$ is the number of variables.
-        - Axis types:
-            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
-            - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
-            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
-
-    === "Target Gradient"
-
-        `target_gradient`: The gradient the optimizer descends:
+        `target_objective`: The gradient of the target objective, which the
+        optimizer descends:
 
         - Shape: $(n_v,)$, where:
             - $n_v$ is the number of variables.
@@ -126,39 +93,34 @@ class GradientResults(Results):
             - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
     Attributes:
-        source_key:          The batch and function ID of a function evaluation
-                             whose values were used to construct this gradient.
-                             Usually, but not necessarily, that function was
-                             evaluated at the same point as the gradient.
-        variables:           The variable vector that was perturbed.
-        perturbed_variables: The perturbed vectors that were evaluated.
-        evaluations:         Per-perturbation values returned by the evaluator.
-        realizations:        Realization activity and weights.
-        gradients:           Aggregated gradients, or `None` if estimation failed.
-        target_gradient:     The gradient the optimizer descends, in its own domain.
-        scaled:              The same quantities as the optimizer works with them.
+        source_key:       The batch and function ID of a function evaluation
+                          whose values were used to construct this gradient.
+                          Usually, but not necessarily, that function was
+                          evaluated at the same point as the gradient.
+        variables:        The variable vector that was perturbed.
+        perturbations:    The perturbed vectors and the values returned for them.
+        realizations:     Realization weights.
+        aggregates:       Aggregated gradients, or `None` if estimation failed.
+        target_objective: The gradient the optimizer descends, in its own domain.
+        scaled:           The same quantities as the optimizer works with them.
     """
 
     source_key: tuple[int, int]
     variables: NDArray[np.float64] = field(
         metadata={"__axes__": (AxisName.VARIABLE,)},
     )
-    perturbed_variables: NDArray[np.float64] = field(
-        metadata={"__axes__": _PERTURBED_AXES},
-    )
-    evaluations: GradientEvaluations
+    perturbations: GradientPerturbations
     realizations: Realizations
-    gradients: Gradients | None
-    target_gradient: NDArray[np.float64] | None = field(
+    aggregates: GradientAggregates | None
+    target_objective: NDArray[np.float64] | None = field(
         metadata={"__axes__": (AxisName.VARIABLE,)},
     )
     scaled: ScaledGradientResults
 
     def __post_init__(self) -> None:
         self.variables = _immutable_copy(self.variables)
-        self.perturbed_variables = _immutable_copy(self.perturbed_variables)
-        self.target_gradient = _immutable_copy(self.target_gradient)
-        assert (self.target_gradient is None) == (self.gradients is None)
+        self.target_objective = _immutable_copy(self.target_objective)
+        assert (self.target_objective is None) == (self.aggregates is None)
 
     def uses(self, function: FunctionResults) -> bool:
         """Return whether this gradient was constructed from a function evaluation.

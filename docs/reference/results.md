@@ -10,18 +10,21 @@
 ::: ropt.results.ScaledFunctionResults
 ::: ropt.results.GradientResults
 ::: ropt.results.ScaledGradientResults
-::: ropt.results.Functions
+::: ropt.results.FunctionAggregates
     options:
         members: [from_scaled]
-::: ropt.results.Gradients
+::: ropt.results.GradientAggregates
     options:
         members: [from_scaled]
 ::: ropt.results.FunctionEvaluations
     options:
         members: [create]
-::: ropt.results.GradientEvaluations
+::: ropt.results.GradientPerturbations
     options:
         members: [create]
+::: ropt.results.ScaledGradientPerturbations
+    options:
+        members: []
 ::: ropt.results.Realizations
     options:
         members: []

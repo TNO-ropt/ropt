@@ -97,7 +97,7 @@ tables.add_table(
     "functions",
     {
         "batch_id": "Batch",
-        "functions.objectives": "Objective",
+        "aggregates.objectives": "Objective",
         "variables": "Variable",
     },
 )
@@ -181,7 +181,7 @@ are not read from the results: they identify the row, and appear only if they
 are listed. `<key>` in the tables below stands for a key of a metadata dict.
 
 A field that has no value in a result gives no columns, without an error. For
-example, `functions.constraints` gives no columns if no nonlinear constraints
+example, `aggregates.constraints` gives no columns if no nonlinear constraints
 are configured, the realization weights give none without a
 [realization filter](../optimizer_setup/realization_filters.md), and
 `constraint_info.linear_lower` gives none without linear constraints. The
@@ -199,12 +199,12 @@ configured. Without it, a table that lists a `constraint_info` or
     | `function_id`                                | Index of the evaluation within its batch |
     | `variables`                                  | Variable values |
     | `target_objective`                           | Weighted objective that the optimizer minimizes, in its own domain |
-    | `functions.objectives`                       | Objective values, aggregated over the realizations |
-    | `functions.constraints`                      | Nonlinear constraint values, aggregated over the realizations |
+    | `aggregates.objectives`                      | Objective values, aggregated over the realizations |
+    | `aggregates.constraints`                     | Nonlinear constraint values, aggregated over the realizations |
+    | `evaluations.active`                         | `True` if the realization was evaluated |
     | `evaluations.objectives`                     | Objective values of each realization |
     | `evaluations.constraints`                    | Nonlinear constraint values of each realization |
     | `evaluations.metadata.<key>`                 | Per-realization metadata |
-    | `realizations.evaluated_realizations`        | `True` if the realization was evaluated |
     | `realizations.objective_weights`             | Objective weight of each realization |
     | `realizations.constraint_weights`            | Constraint weight of each realization |
     | `constraint_info.bound_lower`                | Variables minus their lower bounds |
@@ -218,8 +218,8 @@ configured. Without it, a table that lists a `constraint_info` or
     | `constraint_info.nonlinear_violation`        | Violation of the nonlinear constraints |
     | `metadata.<key>`                             | Metadata of the optimization |
     | `scaled.variables`                           | `variables`, scaled |
-    | `scaled.functions.objectives`                | `functions.objectives`, scaled |
-    | `scaled.functions.constraints`               | `functions.constraints`, scaled |
+    | `scaled.aggregates.objectives`               | `aggregates.objectives`, scaled |
+    | `scaled.aggregates.constraints`              | `aggregates.constraints`, scaled |
     | `scaled.constraint_info.bound_lower`         | `constraint_info.bound_lower`, scaled |
     | `scaled.constraint_info.bound_upper`         | `constraint_info.bound_upper`, scaled |
     | `scaled.constraint_info.bound_violation`     | `constraint_info.bound_violation`, scaled |
@@ -232,27 +232,27 @@ configured. Without it, a table that lists a `constraint_info` or
 
 ??? info "Available fields for gradient tables"
 
-    | Field                                 | Content |
-    | ------------------------------------- | ------- |
-    | `batch_id`                            | Batch ID |
-    | `realization`                         | Realization index |
-    | `perturbation`                        | Perturbation index |
-    | `variables`                           | Variable values that were perturbed |
-    | `target_gradient`                     | Gradient that the optimizer descends, in its own domain |
-    | `gradients.objectives`                | Gradient of each objective |
-    | `gradients.constraints`               | Gradient of each nonlinear constraint |
-    | `perturbed_variables`                 | Perturbed variable values |
-    | `evaluations.perturbed_objectives`    | Objective values of each perturbation |
-    | `evaluations.perturbed_constraints`   | Nonlinear constraint values of each perturbation |
-    | `evaluations.metadata.<key>`          | Per-perturbation metadata |
-    | `realizations.evaluated_realizations` | `True` if the realization was evaluated |
-    | `realizations.objective_weights`      | Objective weight of each realization |
-    | `realizations.constraint_weights`     | Constraint weight of each realization |
-    | `metadata.<key>`                      | Metadata of the optimization |
-    | `scaled.variables`                    | `variables`, scaled |
-    | `scaled.perturbed_variables`          | `perturbed_variables`, scaled |
-    | `scaled.gradients.objectives`         | `gradients.objectives`, scaled |
-    | `scaled.gradients.constraints`        | `gradients.constraints`, scaled |
+    | Field                              | Content |
+    | ---------------------------------- | ------- |
+    | `batch_id`                         | Batch ID |
+    | `realization`                      | Realization index |
+    | `perturbation`                     | Perturbation index |
+    | `variables`                        | Variable values that were perturbed |
+    | `target_objective`                 | Gradient that the optimizer descends, in its own domain |
+    | `aggregates.objectives`            | Gradient of each objective |
+    | `aggregates.constraints`           | Gradient of each nonlinear constraint |
+    | `perturbations.active`             | `True` if the realization was evaluated |
+    | `perturbations.variables`          | Perturbed variable values |
+    | `perturbations.objectives`         | Objective values of each perturbation |
+    | `perturbations.constraints`        | Nonlinear constraint values of each perturbation |
+    | `perturbations.metadata.<key>`     | Per-perturbation metadata |
+    | `realizations.objective_weights`   | Objective weight of each realization |
+    | `realizations.constraint_weights`  | Constraint weight of each realization |
+    | `metadata.<key>`                   | Metadata of the optimization |
+    | `scaled.variables`                 | `variables`, scaled |
+    | `scaled.perturbations.variables`   | `perturbations.variables`, scaled |
+    | `scaled.aggregates.objectives`     | `aggregates.objectives`, scaled |
+    | `scaled.aggregates.constraints`    | `aggregates.constraints`, scaled |
 
 The `names` and `source_key` attributes of a result are not fields of a table:
 an entry of `names` repeats the labels that are already part of the column
@@ -276,11 +276,11 @@ for a problem without bounds or constraints.
         "function_id": "Function ID",
         "variables": "Variable",
         "target_objective": "Target objective",
-        "functions.objectives": "Objective",
-        "functions.constraints": "Constraint",
+        "aggregates.objectives": "Objective",
+        "aggregates.constraints": "Constraint",
+        "evaluations.active": "Evaluated",
         "evaluations.objectives": "Realization objective",
         "evaluations.constraints": "Realization constraint",
-        "realizations.evaluated_realizations": "Evaluated",
         "realizations.objective_weights": "Objective weight",
         "realizations.constraint_weights": "Constraint weight",
         "constraint_info.bound_lower": "Bound lower difference",
@@ -293,8 +293,8 @@ for a problem without bounds or constraints.
         "constraint_info.nonlinear_upper": "Nonlinear upper difference",
         "constraint_info.nonlinear_violation": "Nonlinear violation",
         "scaled.variables": "Scaled variable",
-        "scaled.functions.objectives": "Scaled objective",
-        "scaled.functions.constraints": "Scaled constraint",
+        "scaled.aggregates.objectives": "Scaled objective",
+        "scaled.aggregates.constraints": "Scaled constraint",
         "scaled.constraint_info.bound_lower": "Scaled bound lower difference",
         "scaled.constraint_info.bound_upper": "Scaled bound upper difference",
         "scaled.constraint_info.bound_violation": "Scaled bound violation",
@@ -317,21 +317,21 @@ for a problem without bounds or constraints.
         "realization": "Realization",
         "perturbation": "Perturbation",
         "variables": "Variable",
-        "target_gradient": "Target gradient",
-        "gradients.objectives": "Objective gradient",
-        "gradients.constraints": "Constraint gradient",
-        "perturbed_variables": "Perturbed variable",
-        "evaluations.perturbed_objectives": "Perturbed objective",
-        "evaluations.perturbed_constraints": "Perturbed constraint",
-        "realizations.evaluated_realizations": "Evaluated",
+        "target_objective": "Target gradient",
+        "aggregates.objectives": "Objective gradient",
+        "aggregates.constraints": "Constraint gradient",
+        "perturbations.active": "Evaluated",
+        "perturbations.variables": "Perturbed variable",
+        "perturbations.objectives": "Perturbed objective",
+        "perturbations.constraints": "Perturbed constraint",
         "realizations.objective_weights": "Objective weight",
         "realizations.constraint_weights": "Constraint weight",
         "scaled.variables": "Scaled variable",
-        "scaled.perturbed_variables": "Scaled perturbed variable",
-        "scaled.gradients.objectives": "Scaled objective gradient",
-        "scaled.gradients.constraints": "Scaled constraint gradient",
+        "scaled.perturbations.variables": "Scaled perturbed variable",
+        "scaled.aggregates.objectives": "Scaled objective gradient",
+        "scaled.aggregates.constraints": "Scaled constraint gradient",
         # "metadata.<key>": "<title>",
-        # "evaluations.metadata.<key>": "<title>",
+        # "perturbations.metadata.<key>": "<title>",
     }
     ```
 

@@ -12,12 +12,12 @@ the result hierarchy, axis metadata, scaling, and pandas/polars export.
 """
 
 from ._constraint_info import ConstraintInfo
+from ._function_aggregates import FunctionAggregates
 from ._function_evaluations import FunctionEvaluations
 from ._function_results import FunctionResults, ScaledFunctionResults
-from ._functions import Functions
-from ._gradient_evaluations import GradientEvaluations
+from ._gradient_aggregates import GradientAggregates
+from ._gradient_perturbations import GradientPerturbations, ScaledGradientPerturbations
 from ._gradient_results import GradientResults, ScaledGradientResults
-from ._gradients import Gradients
 from ._pandas_frame import results_to_pandas
 from ._polars_frame import results_to_polars
 from ._realizations import Realizations
@@ -27,16 +27,17 @@ from ._results import Results
 __all__ = [
     "AxisMetadata",
     "ConstraintInfo",
+    "FunctionAggregates",
     "FunctionEvaluations",
     "FunctionResults",
-    "Functions",
-    "GradientEvaluations",
+    "GradientAggregates",
+    "GradientPerturbations",
     "GradientResults",
-    "Gradients",
     "Realizations",
     "ResultField",
     "Results",
     "ScaledFunctionResults",
+    "ScaledGradientPerturbations",
     "ScaledGradientResults",
     "results_to_pandas",
     "results_to_polars",

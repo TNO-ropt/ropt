@@ -61,7 +61,7 @@ class _InitialValueFiller:
         # on which perturbations carry supplied values.
         self._gradient_pending = True
         supplied = scale(
-            self._g0.perturbed_variables,
+            self._g0.perturbations.variables,
             self._context.variables.scales,
             self._context.variables.offsets,
         )
@@ -148,17 +148,13 @@ class _InitialValueFiller:
             self._function_pending = False
         if self._gradient_pending:
             assert self._g0 is not None
-            perturbed = self._g0.evaluations
+            perturbed = self._g0.perturbations
             index = realizations[gradient_rows]
             columns = perturbations[gradient_rows]
-            objectives[gradient_rows, :] = perturbed.perturbed_objectives[
-                index, columns, :
-            ]
+            objectives[gradient_rows, :] = perturbed.objectives[index, columns, :]
             if constraints is not None:
-                assert perturbed.perturbed_constraints is not None
-                constraints[gradient_rows, :] = perturbed.perturbed_constraints[
-                    index, columns, :
-                ]
+                assert perturbed.constraints is not None
+                constraints[gradient_rows, :] = perturbed.constraints[index, columns, :]
             self._g0 = None
             self._gradient_pending = False
         return replace(result, objectives=objectives, constraints=constraints)
@@ -172,7 +168,7 @@ def _function_coverage(
     f0: FunctionResults, realization_count: int
 ) -> NDArray[np.bool_]:
     covered = np.zeros(realization_count, dtype=np.bool_)
-    evaluated = f0.realizations.evaluated_realizations
+    evaluated = f0.evaluations.active
     overlap = min(evaluated.size, f0.evaluations.objectives.shape[0], realization_count)
     covered[:overlap] = evaluated[:overlap]
     return covered
@@ -182,10 +178,8 @@ def _gradient_coverage(
     g0: GradientResults, realization_count: int, perturbation_count: int
 ) -> NDArray[np.bool_]:
     covered = np.zeros((realization_count, perturbation_count), dtype=np.bool_)
-    evaluated = g0.realizations.evaluated_realizations
-    stored_realizations, stored_perturbations = (
-        g0.evaluations.perturbed_objectives.shape[:2]
-    )
+    evaluated = g0.perturbations.active
+    stored_realizations, stored_perturbations = g0.perturbations.objectives.shape[:2]
     rows = min(evaluated.size, stored_realizations, realization_count)
     columns = min(stored_perturbations, perturbation_count)
     covered[:rows, :columns] = evaluated[:rows, np.newaxis]
@@ -214,14 +208,14 @@ def _check_shapes(
     if g0 is not None:
         _check_axis(g0.variables.shape[-1], variable_count, "gradient", "variables")
         _check_axis(
-            g0.perturbed_variables.shape[-1],
+            g0.perturbations.variables.shape[-1],
             variable_count,
             "gradient",
             "perturbed variables",
         )
         _check_values(
-            g0.evaluations.perturbed_objectives,
-            g0.evaluations.perturbed_constraints,
+            g0.perturbations.objectives,
+            g0.perturbations.constraints,
             objective_count,
             constraint_count,
             "gradient",

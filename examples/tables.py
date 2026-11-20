@@ -51,8 +51,8 @@ FUNCTIONS: dict[str, str] = {
     "batch_id": "Batch",
     "variables": "Variable",
     "target_objective": "Target objective",
-    "functions.objectives": "Objective",
-    "functions.constraints": "Constraint",
+    "aggregates.objectives": "Objective",
+    "aggregates.constraints": "Constraint",
     "constraint_info.nonlinear_violation": "Violation",
 }
 EVALUATIONS: dict[str, str] = {
@@ -64,15 +64,15 @@ EVALUATIONS: dict[str, str] = {
 GRADIENTS: dict[str, str] = {
     "batch_id": "Batch",
     "variables": "Variable",
-    "gradients.objectives": "Objective gradient",
-    "gradients.constraints": "Constraint gradient",
+    "aggregates.objectives": "Objective gradient",
+    "aggregates.constraints": "Constraint gradient",
 }
 PERTURBATIONS: dict[str, str] = {
     "batch_id": "Batch",
     "realization": "Realization",
     "perturbation": "Perturbation",
-    "perturbed_variables": "Variable",
-    "evaluations.perturbed_objectives": "Objective",
+    "perturbations.variables": "Variable",
+    "perturbations.objectives": "Objective",
 }
 # --8<-- [end:columns]
 

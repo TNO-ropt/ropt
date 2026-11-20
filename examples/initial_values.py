@@ -92,8 +92,8 @@ def main() -> None:
     )
     restart = reported[0]
 
-    assert first.results.functions is not None
-    assert restart.functions is not None
+    assert first.results.aggregates is not None
+    assert restart.aggregates is not None
     print(
         f"per-realization objectives at the restart point: "
         f"{restart.evaluations.objectives.ravel()}"
@@ -104,11 +104,11 @@ def main() -> None:
     )
     print(
         f"objective there, {SCREENING_REALIZATIONS} realizations: "
-        f"{first.results.functions.objectives}"
+        f"{first.results.aggregates.objectives}"
     )
     print(
         f"objective there, {FULL_REALIZATIONS} realizations: "
-        f"{restart.functions.objectives}"
+        f"{restart.aggregates.objectives}"
     )
 
     assert np.allclose(

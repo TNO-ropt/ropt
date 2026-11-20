@@ -37,7 +37,7 @@ from ropt._handlers import EventHandler
 from ropt._running._function import adapt_function
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import AbortedError, ExecutionError, WorkflowError
-from ropt.results import FunctionResults
+from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -107,9 +107,9 @@ def test_optimize_returns_run_result(config: Any, test_functions: Any) -> None:
     assert result.results is not None
     assert np.allclose(result.results.variables, 0.5, atol=0.02)
     assert result.results.target_objective == pytest.approx(0.0, abs=1e-3)
-    assert result.results.functions is not None
-    assert result.results.functions.objectives.shape == (1,)
-    assert result.results.functions.constraints is None
+    assert result.results.aggregates is not None
+    assert result.results.aggregates.objectives.shape == (1,)
+    assert result.results.aggregates.constraints is None
 
 
 def test_optimize_accepts_evaluation_function_result(
@@ -400,9 +400,9 @@ def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     assert isinstance(result, FunctionResults)
     assert result.target_objective is not None
     assert result.target_objective == pytest.approx(0.66)
-    assert result.functions is not None
-    assert result.functions.objectives.shape == (1,)
-    assert result.functions.constraints is None
+    assert result.aggregates is not None
+    assert result.aggregates.objectives.shape == (1,)
+    assert result.aggregates.constraints is None
     assert result.variables.shape == (initial_values.size,)
 
 
@@ -530,9 +530,9 @@ def test_evaluate_multiple_objectives(config: Any, eval_func: Any) -> None:
     config["objectives"] = {"weights": [0.75, 0.25]}
     result = evaluate(config, initial_values, eval_func()).results
     assert result is not None
-    assert result.functions is not None
-    assert result.functions.objectives.shape == (2,)
-    assert result.functions.constraints is None
+    assert result.aggregates is not None
+    assert result.aggregates.objectives.shape == (2,)
+    assert result.aggregates.constraints is None
 
 
 def test_evaluate_attaches_metadata_to_results(
@@ -869,7 +869,7 @@ def test_thread_pool_runs_evaluations_concurrently(
         pool=pools(workers=4),
     )
     assert results.results is not None
-    assert results.results.functions is not None
+    assert results.results.aggregates is not None
 
 
 _NESTED_INNER: dict[str, Any] = {
@@ -941,7 +941,11 @@ def test_concurrent_inner_runs_on_a_second_pool_feed_one_handler(
     pids: set[int] = set()
     for item in history["results"]:
         batches.setdefault(item.metadata["outer"], set()).add(item.batch_id)
-        recorded = item.evaluations.metadata.get("pid")
+        if isinstance(item, FunctionResults):
+            recorded = item.evaluations.metadata.get("pid")
+        else:
+            assert isinstance(item, GradientResults)
+            recorded = item.perturbations.metadata.get("pid")
         if recorded is not None:
             pids.update(int(pid) for pid in np.ravel(recorded))
     # Both inner runs reached the one handler, each tagged with the outer

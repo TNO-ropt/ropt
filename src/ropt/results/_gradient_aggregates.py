@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(slots=True)
-class Gradients(ResultField):
+class GradientAggregates(ResultField):
     """Aggregated objective and constraint gradients.
 
     The same class carries both domains: the gradients the optimizer works with
@@ -28,10 +28,11 @@ class Gradients(ResultField):
 
     See [Working with Results](../results/results.md) for usage details.
 
-    There is no target gradient here: the quantity the optimizer descends is a
-    weighted total over objectives that may differ in both scale and direction,
-    so it has no counterpart in the configured domain. It is reported as
-    `target_gradient` on [`GradientResults`][ropt.results.GradientResults].
+    There is no gradient of the target objective here: the target objective is
+    a weighted total over objectives that may differ in both scale and
+    direction, so its gradient has no counterpart in the configured domain. It
+    is reported as `target_objective` on
+    [`GradientResults`][ropt.results.GradientResults].
 
     **Result descriptions**
 
@@ -88,7 +89,9 @@ class Gradients(ResultField):
         self.constraints = _immutable_copy(self.constraints)
 
     @classmethod
-    def from_scaled(cls, context: EnOptContext, scaled: Gradients) -> Gradients:
+    def from_scaled(
+        cls, context: EnOptContext, scaled: GradientAggregates
+    ) -> GradientAggregates:
         """Derive the configured gradients from the scaled ones.
 
         Args:
@@ -96,7 +99,7 @@ class Gradients(ResultField):
             scaled:  The gradients as the optimizer sees them.
 
         Returns:
-            A new `Gradients` object.
+            A new `GradientAggregates` object.
         """
         # A gradient carries a function in its numerator and a variable in its
         # denominator, so both axes must be undone: the function axis comes
@@ -120,4 +123,4 @@ class Gradients(ResultField):
                 unscale_diff(constraints, constraint_scales[:, np.newaxis])
                 / variable_scales
             )
-        return Gradients(objectives=objectives, constraints=constraints)
+        return GradientAggregates(objectives=objectives, constraints=constraints)

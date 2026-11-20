@@ -255,9 +255,7 @@ class EnsembleOptimizer:
         too_few = False
         for result in results:
             assert isinstance(result, FunctionResults | GradientResults)
-            if (isinstance(result, FunctionResults) and result.functions is None) or (
-                isinstance(result, GradientResults) and result.gradients is None
-            ):
+            if result.aggregates is None:
                 too_few = True
                 break
 
@@ -273,7 +271,7 @@ class EnsembleOptimizer:
         if constraint_index is None:
             return np.array(target_objective, ndmin=1)
         assert self._use_lower_bound is not None
-        functions = results.scaled.functions
+        functions = results.scaled.aggregates
         assert functions is not None
         assert functions.constraints is not None
         bounds = self._context.get_nonlinear_constraint_bounds()
@@ -292,7 +290,7 @@ class EnsembleOptimizer:
     def _gradients_from_results(
         self, results: GradientResults, mask: NDArray[np.bool_] | None
     ) -> NDArray[np.float64]:
-        target_gradient = results.target_gradient
+        target_gradient = results.target_objective
         assert target_gradient is not None
         target_gradient = (
             target_gradient.copy() if mask is None else target_gradient[mask]
@@ -302,7 +300,7 @@ class EnsembleOptimizer:
             return np.expand_dims(target_gradient, axis=0)
         use_lower_bound = self._use_lower_bound
         assert use_lower_bound is not None
-        gradients = results.scaled.gradients
+        gradients = results.scaled.aggregates
         assert gradients is not None
         assert gradients.constraints is not None
         constraint_gradients = (

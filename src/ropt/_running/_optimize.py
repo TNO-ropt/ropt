@@ -76,7 +76,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
                 g0=g0,
             )
     results = result_handler["results"]
-    if results is None or results.functions is None:
+    if results is None or results.aggregates is None:
         return OptimizationResult(exit_code=exit_code, results=None)
     return OptimizationResult(
         exit_code=exit_code,

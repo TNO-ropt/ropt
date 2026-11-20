@@ -27,10 +27,10 @@ from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import (
     ConstraintInfo,
+    FunctionAggregates,
     FunctionResults,
-    Functions,
+    GradientAggregates,
     GradientResults,
-    Gradients,
     Results,
     ScaledFunctionResults,
     ScaledGradientResults,
@@ -60,9 +60,9 @@ def test_objective_offsets_are_undone_when_reporting() -> None:
             "offsets": [1.0, 3.0],
         }
     )
-    functions = Functions.from_scaled(
+    functions = FunctionAggregates.from_scaled(
         context,
-        Functions(objectives=np.array([1.0, 2.0])),
+        FunctionAggregates(objectives=np.array([1.0, 2.0])),
     )
     assert np.allclose(functions.objectives, [3.0, 11.0])
 
@@ -112,9 +112,9 @@ def test_the_direction_of_an_aggregate_is_undone_when_reporting() -> None:
             "maximize": [False, True],
         }
     )
-    functions = Functions.from_scaled(
+    functions = FunctionAggregates.from_scaled(
         context,
-        Functions(objectives=np.array([3.0, -5.0])),
+        FunctionAggregates(objectives=np.array([3.0, -5.0])),
     )
     # The maximized objective was negated for the optimizer; reporting it
     # undoes that, so it comes back positive.
@@ -125,16 +125,18 @@ def test_the_target_is_only_reported_in_the_optimizers_domain() -> None:
     # It mixes objectives of different scales and directions, so there is no
     # single factor to undo: it is always a value to minimize, and it has no
     # counterpart in the domain the user configured.
-    assert not hasattr(Functions(objectives=np.zeros(2)), "target_objective")
-    assert not hasattr(Gradients(objectives=np.zeros((2, 2))), "target_gradient")
+    assert not hasattr(FunctionAggregates(objectives=np.zeros(2)), "target_objective")
+    assert not hasattr(
+        GradientAggregates(objectives=np.zeros((2, 2))), "target_objective"
+    )
     assert not hasattr(ScaledFunctionResults(variables=np.zeros(2)), "target_objective")
 
 
 def test_gradients_are_scaled_as_differences() -> None:
     context = _context(objectives={"weights": [0.5, 0.5], "scales": [2.0, 4.0]})
-    gradients = Gradients.from_scaled(
+    gradients = GradientAggregates.from_scaled(
         context,
-        Gradients(objectives=np.array([[1.0, 2.0], [3.0, 4.0]])),
+        GradientAggregates(objectives=np.array([[1.0, 2.0], [3.0, 4.0]])),
     )
     # Every column of a row is scaled by the scale of that objective.
     assert np.allclose(gradients.objectives, [[2.0, 4.0], [12.0, 16.0]])
@@ -148,9 +150,9 @@ def test_gradient_directions_are_undone_when_reporting() -> None:
             "maximize": [False, True],
         }
     )
-    gradients = Gradients.from_scaled(
+    gradients = GradientAggregates.from_scaled(
         context,
-        Gradients(objectives=np.array([[1.0, 2.0], [3.0, 4.0]])),
+        GradientAggregates(objectives=np.array([[1.0, 2.0], [3.0, 4.0]])),
     )
     assert np.allclose(gradients.objectives, [[2.0, 4.0], [-12.0, -16.0]])
 
@@ -453,8 +455,8 @@ def _first_target_gradient(
     objectives: dict[str, Any], estimator: str
 ) -> NDArray[np.float64]:
     for item in _run(objectives, estimator):
-        if isinstance(item, GradientResults) and item.target_gradient is not None:
-            return item.target_gradient
+        if isinstance(item, GradientResults) and item.target_objective is not None:
+            return item.target_objective
     msg = "the run produced no gradients"
     raise AssertionError(msg)
 
@@ -486,10 +488,10 @@ def test_the_reported_aggregate_matches_the_reported_values(
     aggregate.init(merge_realizations=context.gradient.merge_realizations)
 
     for item in results:
-        assert item.functions is not None
+        assert item.aggregates is not None
         values = item.evaluations.objectives[:, 0]
         assert np.allclose(
-            item.functions.objectives[0],
+            item.aggregates.objectives[0],
             aggregate.calculate_function(values, context.realizations.weights),
         )
 
@@ -517,7 +519,7 @@ def test_maximizing_negates_what_the_optimizer_minimizes(estimator: str) -> None
 def test_maximizing_negates_the_gradient_the_optimizer_follows(estimator: str) -> None:
     minimized = _first_target_gradient({"weights": [1.0]}, estimator)
     maximized = _first_target_gradient({"weights": [1.0], "maximize": True}, estimator)
-    # `target_gradient` is the gradient the optimizer descends, so the flip
+    # `target_objective` is the gradient the optimizer descends, so the flip
     # shows there.
     assert np.any(np.abs(minimized) > 0.0)
     assert np.allclose(maximized, -minimized)
@@ -540,8 +542,8 @@ def test_an_objective_offset_is_undone_before_it_is_reported(estimator: str) -> 
     with_offset = _run_and_collect({"weights": [1.0], "offsets": [100.0]}, estimator)
     assert without
     for plain, offset in zip(without, with_offset, strict=True):
-        assert plain.functions is not None
-        assert offset.functions is not None
+        assert plain.aggregates is not None
+        assert offset.aggregates is not None
         # True for a spread as well, which is invariant under a shift of its
         # inputs: the offset applies to the aggregate, so it comes back off it.
-        assert np.allclose(plain.functions.objectives, offset.functions.objectives)
+        assert np.allclose(plain.aggregates.objectives, offset.aggregates.objectives)
