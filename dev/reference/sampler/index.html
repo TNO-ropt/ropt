@@ -3245,10 +3245,10 @@ responsible for every variable.</p>
 <li><code>n_variables</code> is the total number of optimization variables.</li>
 </ul>
 <p>If the <code>shared</code> flag is <code>True</code> in the associated
-<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>, the first dimension
-still has size <code>n_realizations</code>. Implementations may internally
-generate a single realization of samples and broadcast that internally
-before returning.</p>
+<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>, the returned samples must
+be identical across all realizations. The first dimension still has
+size <code>n_realizations</code>. Implementations may generate one set of samples
+and broadcast it across realizations before returning.</p>
 <p>If a boolean <code>mask</code> was provided during initialization, this sampler
 instance is responsible only for a subset of variables (where the mask
 is <code>True</code>). The returned array must still have the full <code>n_variables</code>

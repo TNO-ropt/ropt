@@ -2937,6 +2937,9 @@ not interchangeable.</p>
 with, which are <strong>scaled</strong>. An objective that has been divided by a large number
 reaches any absolute tolerance sooner; see <a href="../objectives/">Objectives</a> for how
 scaling changes what the optimizer sees.</p>
+<p>For SciPy's <code>differential_evolution</code>, leave <code>backend.convergence_tolerance</code> unset
+or <code>None</code>; any other value raises a validation error. Set <code>tol</code> and <code>atol</code> in
+<code>backend.options</code> to configure its relative and absolute stopping tolerances.</p>
 <p>To stop on a condition of your own rather than a count, return <code>True</code> from the
 result callback; that is covered in
 <a href="../../running/running/">Running Optimizations</a>, with
