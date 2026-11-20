@@ -36,12 +36,12 @@ class Realizations(ResultField):
         `objective_weights`: A two-dimensional array of weights used for each
         objective in each realization:
 
-        - Shape $(n_o, n_r)$, where:
-            - $n_o$ is the number of objectives.
+        - Shape $(n_r, n_o)$, where:
             - $n_r$ is the number of realizations.
+            - $n_o$ is the number of objectives.
         - Axis types:
-            - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+            - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
 
         These weights may change during optimization, depending on the type of
         objective calculation.
@@ -51,12 +51,12 @@ class Realizations(ResultField):
         `constraint_weights`: A two-dimensional array of weights used for each
         constraint in each realization:
 
-        - Shape $(n_c, n_r)$, where:
-            - $n_c$ is the number of constraints.
+        - Shape $(n_r, n_c)$, where:
             - $n_r$ is the number of realizations.
+            - $n_c$ is the number of constraints.
         - Axis types:
-            - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+            - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
         These weights may change during optimization, depending on the type of
         constraint calculation.
@@ -76,8 +76,8 @@ class Realizations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                AxisName.OBJECTIVE,
                 AxisName.REALIZATION,
+                AxisName.OBJECTIVE,
             ),
         },
     )
@@ -85,8 +85,8 @@ class Realizations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                AxisName.NONLINEAR_CONSTRAINT,
                 AxisName.REALIZATION,
+                AxisName.NONLINEAR_CONSTRAINT,
             ),
         },
     )

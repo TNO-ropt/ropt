@@ -319,7 +319,7 @@ def test_cvar_filter_on_objectives(
         if isinstance(result, FunctionResults):
             assert result.realizations is not None
             assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
+            filtered = result.realizations.objective_weights[:, 0] == 0.0
         if isinstance(result, GradientResults):
             if evaluation_policy == "separate":
                 assert np.all(
@@ -381,7 +381,7 @@ def test_cvar_filter_on_objectives_with_constraints(
         if isinstance(result, FunctionResults):
             assert result.realizations is not None
             assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
+            filtered = result.realizations.objective_weights[:, 0] == 0.0
         if isinstance(result, GradientResults):
             assert result.evaluations.perturbed_constraints is not None
             if evaluation_policy == "separate":
@@ -450,7 +450,7 @@ def test_cvar_filter_on_constraints(
         if isinstance(result, FunctionResults):
             assert result.realizations is not None
             assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
+            filtered = result.realizations.objective_weights[:, 0] == 0.0
         if isinstance(result, GradientResults):
             assert result.evaluations.perturbed_constraints is not None
             if evaluation_policy == "separate":
@@ -526,7 +526,7 @@ def test_cvar_filter_mixed(
         if isinstance(result, FunctionResults):
             assert result.realizations is not None
             assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
+            filtered = result.realizations.objective_weights[:, 0] == 0.0
         if isinstance(result, GradientResults):
             if evaluation_policy == "separate":
                 assert np.all(
@@ -568,7 +568,7 @@ def test_cvar_filter_mixed(
         if isinstance(result, FunctionResults):
             assert result.realizations is not None
             assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
+            filtered = result.realizations.objective_weights[:, 0] == 0.0
 
     # The first objective values should differ.
     assert objective_values[0] != objective_values[1]

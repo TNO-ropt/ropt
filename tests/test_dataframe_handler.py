@@ -104,7 +104,7 @@ def _make_result_two_realizations(batch_id: int) -> FunctionResults:
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(2, dtype=np.bool_),
-            objective_weights=np.ones((1, 2)),
+            objective_weights=np.ones((2, 1)),
         ),
         functions=functions,
         target_objective=np.array(1.5),

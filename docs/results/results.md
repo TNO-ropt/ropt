@@ -246,10 +246,10 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
     `realizations.objective_weights` and `realizations.constraint_weights`:
     per-realization weights, `None` unless a realization filter is configured.
 
-    - Shape $(n_o, n_r)$ and $(n_c, n_r)$
-    - Axes: [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE] or
-      [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT], then
-      [`REALIZATION`][ropt.enums.AxisName.REALIZATION]
+    - Shape $(n_r, n_o)$ and $(n_r, n_c)$
+    - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION], then
+      [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE] or
+      [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
 === "Constraint info"
 

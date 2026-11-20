@@ -292,12 +292,8 @@ class EnsembleEvaluator:
             ),
             realizations=Realizations(
                 evaluated_realizations=realizations_to_evaluate,
-                objective_weights=(
-                    None if objective_weights is None else objective_weights.T
-                ),
-                constraint_weights=(
-                    None if constraint_weights is None else constraint_weights.T
-                ),
+                objective_weights=objective_weights,
+                constraint_weights=constraint_weights,
             ),
             functions=self._unscale_functions(scaled_functions),
             target_objective=target_objective,
@@ -328,12 +324,8 @@ class EnsembleEvaluator:
         constraint_weights = cached_function.realizations.constraint_weights
         realizations_to_evaluate = _get_realizations_to_evaluate(
             self._context,
-            objective_weights=(
-                None if objective_weights is None else objective_weights.T
-            ),
-            constraint_weights=(
-                None if constraint_weights is None else constraint_weights.T
-            ),
+            objective_weights=objective_weights,
+            constraint_weights=constraint_weights,
         )
         g_eval_results = _get_gradient_results(
             self._context,
@@ -367,10 +359,6 @@ class EnsembleEvaluator:
     ) -> GradientResults:
         objective_weights = function_results.realizations.objective_weights
         constraint_weights = function_results.realizations.constraint_weights
-        if objective_weights is not None:
-            objective_weights = objective_weights.T
-        if constraint_weights is not None:
-            constraint_weights = constraint_weights.T
         evaluations = function_results.evaluations
         data = _GradientData(
             variables=variables if mask is None else variables[mask],
@@ -427,12 +415,8 @@ class EnsembleEvaluator:
             ),
             realizations=Realizations(
                 evaluated_realizations=realizations_to_evaluate,
-                objective_weights=(
-                    None if objective_weights is None else objective_weights.T
-                ),
-                constraint_weights=(
-                    None if constraint_weights is None else constraint_weights.T
-                ),
+                objective_weights=objective_weights,
+                constraint_weights=constraint_weights,
             ),
             gradients=self._unscale_gradients(calculation.scaled_aggregates),
             target_gradient=calculation.target_gradient,

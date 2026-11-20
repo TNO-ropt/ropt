@@ -53,7 +53,7 @@ def function_result_fixture(config: dict[str, Any]) -> FunctionResults:
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
     )
     realizations = Realizations(
-        objective_weights=np.arange(6, dtype=np.float64).reshape((2, 3)),
+        objective_weights=np.arange(6, dtype=np.float64).reshape((3, 2)),
         evaluated_realizations=np.ones(3, dtype=np.bool_),
     )
     functions = Functions(
@@ -271,7 +271,7 @@ def _with_array_metadata(
             metadata=metadata,
         ),
         realizations=Realizations(
-            objective_weights=np.arange(6, dtype=np.float64).reshape((2, 3)),
+            objective_weights=np.arange(6, dtype=np.float64).reshape((3, 2)),
             evaluated_realizations=np.ones(3, dtype=np.bool_),
         ),
         functions=Functions(objectives=np.array([1.0, 2.0])),
