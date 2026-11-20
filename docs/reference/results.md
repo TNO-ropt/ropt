@@ -16,6 +16,9 @@
 ::: ropt.results.GradientAggregates
     options:
         members: [from_scaled]
+::: ropt.results.GradientEstimates
+    options:
+        members: [from_scaled]
 ::: ropt.results.FunctionEvaluations
     options:
         members: [create]

@@ -188,7 +188,9 @@ are configured, the realization weights give none without a
 exception is `constraint_info` as a whole: it exists only if all lower or all
 upper variable bounds are finite, or if linear or nonlinear constraints are
 configured. Without it, a table that lists a `constraint_info` or
-`scaled.constraint_info` entry raises a `ValueError`.
+`scaled.constraint_info` entry raises a `ValueError`. In the same way, a
+gradient table that lists an `estimates` or `scaled.estimates` entry raises a
+`ValueError` if the realizations are merged before the gradient is estimated.
 
 ??? info "Available fields for function tables"
 
@@ -241,6 +243,8 @@ configured. Without it, a table that lists a `constraint_info` or
     | `target_objective`                 | Gradient that the optimizer descends, in its own domain |
     | `aggregates.objectives`            | Gradient of each objective |
     | `aggregates.constraints`           | Gradient of each nonlinear constraint |
+    | `estimates.objectives`             | Gradient of each objective, per realization |
+    | `estimates.constraints`            | Gradient of each nonlinear constraint, per realization |
     | `perturbations.active`             | `True` if the realization was evaluated |
     | `perturbations.variables`          | Perturbed variable values |
     | `perturbations.objectives`         | Objective values of each perturbation |
@@ -251,6 +255,8 @@ configured. Without it, a table that lists a `constraint_info` or
     | `metadata.<key>`                   | Metadata of the optimization |
     | `scaled.variables`                 | `variables`, scaled |
     | `scaled.perturbations.variables`   | `perturbations.variables`, scaled |
+    | `scaled.estimates.objectives`      | `estimates.objectives`, scaled |
+    | `scaled.estimates.constraints`     | `estimates.constraints`, scaled |
     | `scaled.aggregates.objectives`     | `aggregates.objectives`, scaled |
     | `scaled.aggregates.constraints`    | `aggregates.constraints`, scaled |
 
@@ -265,7 +271,8 @@ for each. Copy one, delete the entries you do not need, and pass it to
 `add_table`. Both dicts list fields at the realization level, so a table built
 from the complete dict has one row per realization, or per realization and
 perturbation. Delete the `constraint_info` and `scaled.constraint_info` entries
-for a problem without bounds or constraints.
+for a problem without bounds or constraints, and the `estimates` and
+`scaled.estimates` entries if the realizations are merged.
 
 ??? example "Column dictionary for function tables"
 
@@ -320,6 +327,8 @@ for a problem without bounds or constraints.
         "target_objective": "Target gradient",
         "aggregates.objectives": "Objective gradient",
         "aggregates.constraints": "Constraint gradient",
+        "estimates.objectives": "Realization objective gradient",
+        "estimates.constraints": "Realization constraint gradient",
         "perturbations.active": "Evaluated",
         "perturbations.variables": "Perturbed variable",
         "perturbations.objectives": "Perturbed objective",
@@ -328,6 +337,8 @@ for a problem without bounds or constraints.
         "realizations.constraint_weights": "Constraint weight",
         "scaled.variables": "Scaled variable",
         "scaled.perturbations.variables": "Scaled perturbed variable",
+        "scaled.estimates.objectives": "Scaled realization objective gradient",
+        "scaled.estimates.constraints": "Scaled realization constraint gradient",
         "scaled.aggregates.objectives": "Scaled objective gradient",
         "scaled.aggregates.constraints": "Scaled constraint gradient",
         # "metadata.<key>": "<title>",

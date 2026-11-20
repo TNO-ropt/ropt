@@ -101,26 +101,34 @@ class GradientAggregates(ResultField):
         Returns:
             A new `GradientAggregates` object.
         """
-        # A gradient carries a function in its numerator and a variable in its
-        # denominator, so both axes must be undone: the function axis comes
-        # first here and takes a trailing axis to broadcast against the
-        # variables, while the variable scales divide along the last axis.
-        variable_scales = context.variables.scales
-        objectives = (
-            unscale_diff(
-                apply_direction(
-                    scaled.objectives, context.objectives.maximize[:, np.newaxis]
-                ),
-                context.get_objective_scales()[:, np.newaxis],
-            )
+        objectives, constraints = _unscale_gradients(
+            context, scaled.objectives, scaled.constraints
+        )
+        return GradientAggregates(objectives=objectives, constraints=constraints)
+
+
+def _unscale_gradients(
+    context: EnOptContext,
+    objectives: NDArray[np.float64],
+    constraints: NDArray[np.float64] | None,
+) -> tuple[NDArray[np.float64], NDArray[np.float64] | None]:
+    # A gradient carries a function in its numerator and a variable in its
+    # denominator, so both axes must be undone: the function axis is the
+    # second-to-last and takes a trailing axis to broadcast against the
+    # variables, while the variable scales divide along the last axis.
+    variable_scales = context.variables.scales
+    objectives = (
+        unscale_diff(
+            apply_direction(objectives, context.objectives.maximize[:, np.newaxis]),
+            context.get_objective_scales()[:, np.newaxis],
+        )
+        / variable_scales
+    )
+    if constraints is not None:
+        constraint_scales = context.get_constraint_scales()
+        assert constraint_scales is not None
+        constraints = (
+            unscale_diff(constraints, constraint_scales[:, np.newaxis])
             / variable_scales
         )
-        constraints = scaled.constraints
-        if constraints is not None:
-            constraint_scales = context.get_constraint_scales()
-            assert constraint_scales is not None
-            constraints = (
-                unscale_diff(constraints, constraint_scales[:, np.newaxis])
-                / variable_scales
-            )
-        return GradientAggregates(objectives=objectives, constraints=constraints)
+    return objectives, constraints

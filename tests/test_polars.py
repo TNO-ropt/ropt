@@ -97,6 +97,7 @@ def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
         names=context.names,
         variables=np.array([1.0, 2.0]),
         perturbations=perturbations,
+        estimates=None,
         realizations=Realizations(),
         aggregates=aggregates,
         target_objective=np.array([1.0, 2.0]),

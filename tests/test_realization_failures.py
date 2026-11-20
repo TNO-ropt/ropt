@@ -172,6 +172,7 @@ def _make_gradient_results(
         names={},
         variables=np.array([0.0, 0.0]),
         perturbations=perturbations,
+        estimates=None,
         realizations=Realizations(),
         aggregates=None if failed else object(),  # type: ignore[arg-type]
         target_objective=None if failed else np.zeros(2),
@@ -255,6 +256,79 @@ def test_gradient_is_nan_when_every_realization_failed(
     assert gradient.aggregates.constraints is not None
     assert np.all(np.isnan(gradient.target_objective))
     assert np.all(np.isnan(gradient.aggregates.constraints))
+
+
+def test_gradient_estimates_are_nan_when_every_realization_failed(
+    evaluator: Any,
+) -> None:
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 2},
+            "realizations": {"weights": [1.0, 1.0], "realization_min_success": 0},
+            "nonlinear_constraints": {"lower_bounds": [0.0], "upper_bounds": [1.0]},
+        }
+    )
+    failing = evaluator([lambda _0, _1: np.nan], [lambda _0, _1: np.nan])
+    _, gradient = EnsembleEvaluator(context, failing).calculate(
+        np.zeros(2), compute_functions=True, compute_gradients=True
+    )
+    assert isinstance(gradient, GradientResults)
+    assert gradient.estimates is not None
+    assert gradient.estimates.constraints is not None
+    assert gradient.estimates.objectives.shape == (2, 1, 2)
+    assert gradient.estimates.constraints.shape == (2, 1, 2)
+    assert np.all(np.isnan(gradient.estimates.objectives))
+    assert np.all(np.isnan(gradient.estimates.constraints))
+
+
+def test_gradient_estimates_are_not_reported_when_realizations_are_merged(
+    evaluator: Any,
+) -> None:
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 2},
+            "realizations": {"weights": [1.0, 1.0]},
+            "gradient": {"merge_realizations": True},
+        }
+    )
+    squares = evaluator([lambda variables, _: float(np.sum(variables**2))])
+    _, gradient = EnsembleEvaluator(context, squares).calculate(
+        np.ones(2), compute_functions=True, compute_gradients=True
+    )
+    assert isinstance(gradient, GradientResults)
+    assert gradient.aggregates is not None
+    assert gradient.estimates is None
+    assert gradient.scaled.estimates is None
+
+
+def test_gradient_estimate_of_a_failed_realization_is_nan_for_every_variable(
+    evaluator: Any,
+) -> None:
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 2, "mask": [True, False]},
+            "realizations": {"weights": [1.0, 1.0], "realization_min_success": 1},
+        }
+    )
+    failing_second = evaluator(
+        [
+            lambda variables, context: (
+                np.nan if context.realization == 1 else float(np.sum(variables**2))
+            )
+        ]
+    )
+    _, gradient = EnsembleEvaluator(context, failing_second).calculate(
+        np.ones(2), compute_functions=True, compute_gradients=True
+    )
+    assert isinstance(gradient, GradientResults)
+    assert gradient.aggregates is not None
+    assert gradient.estimates is not None
+    estimates = gradient.estimates.objectives
+    # The fixed variable has a zero gradient, unless no gradient was estimated.
+    assert np.isfinite(estimates[0, 0, 0])
+    assert estimates[0, 0, 1] == pytest.approx(0.0)
+    assert np.all(np.isnan(estimates[1]))
+    assert np.array_equal(gradient.aggregates.objectives, estimates[0])
 
 
 @pytest.mark.parametrize(

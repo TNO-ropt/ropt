@@ -123,6 +123,7 @@ def _gradient_results(
             variables=np.zeros((1, 1, 1)),
             objectives=np.zeros((1, 1, 1)),
         ),
+        estimates=None,
         realizations=Realizations(),
         aggregates=None,
         target_objective=None,

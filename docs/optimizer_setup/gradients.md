@@ -112,7 +112,9 @@ per iteration. With `merge_realizations=False` (the default) the per-realization
 gradient is estimated from `number_of_perturbations` samples *per realization*;
 with `merge_realizations=True` all realizations are pooled before estimation,
 which lets you use a much smaller `number_of_perturbations` (down to 1) at the
-cost of losing per-realization signal.
+cost of losing per-realization signal. Without merging, the per-realization
+gradients are stored in the `estimates` field of each
+[`GradientResults`][ropt.results.GradientResults].
 
 ## Tolerating failures
 

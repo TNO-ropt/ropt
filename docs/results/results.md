@@ -108,6 +108,14 @@ data in [`ResultField`][ropt.results.ResultField] objects. For example, a
     - `constraints`: constraint values for each perturbation (if configured).
     - `metadata`: optional dict of per-realization/perturbation metadata
       arrays.
+- **`estimates`** ([`GradientEstimates`][ropt.results.GradientEstimates]) —
+  the gradient estimated for each realization, which the function estimators
+  combine into `aggregates`. It is `None` if the realizations are merged before
+  estimation (`merge_realizations`), or if no gradient was estimated. A
+  realization without an estimate, because it failed, was not evaluated or has
+  zero weight, holds `NaN`:
+    - `objectives`: per-realization objective gradients.
+    - `constraints`: per-realization constraint gradients (if configured).
 - **`aggregates`** ([`GradientAggregates`][ropt.results.GradientAggregates]) —
   aggregated gradient values (or `None` if estimation failed):
     - `objectives`: per-objective gradients.
@@ -335,6 +343,24 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
     - Axes: [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT],
       [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
+=== "Estimates"
+
+    `estimates.objectives`: the objective gradients estimated for each
+    realization.
+
+    - Shape $(n_r, n_o, n_v)$
+    - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
+      [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE],
+      [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
+    `estimates.constraints`: the nonlinear constraint gradients estimated for
+    each realization. Only present when nonlinear constraints are configured.
+
+    - Shape $(n_r, n_c, n_v)$
+    - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
+      [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT],
+      [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
 === "Realizations"
 
     `perturbations.active`: which realizations were evaluated.
@@ -363,7 +389,7 @@ $n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
 the fields above in the optimizer's domain, with identical shapes and
 dimensions:
 `variables`, `aggregates` and `constraint_info` for the first, and `variables`,
-`perturbations.variables` and `aggregates` for the second. See
+`perturbations.variables`, `estimates` and `aggregates` for the second. See
 [Scaling of results](#scaling-of-results).
 
 ### User-defined axes
@@ -415,7 +441,8 @@ Every result carries both domains at once, and one rule connects them:
 So `result.variables` is the variable vector as configured and
 `result.scaled.variables` is the same vector as the optimizer proposed it;
 `result.aggregates.objectives` and `result.scaled.aggregates.objectives` are
-the same pair for the aggregates.
+the same pair for the aggregates, and `result.estimates.objectives` and
+`result.scaled.estimates.objectives` for the per-realization gradients.
 
 Two groups of fields have a single domain:
 
