@@ -50,8 +50,8 @@ for the parameters. The corresponding constraint variant is
 
 Filters that disable some realizations only deliver savings on the gradient
 side when the optimizer requests gradients separately from functions. Set
-`gradient.evaluation_policy = "separate"` (see
-[Stochastic Gradients](gradients.md)) to maximize that benefit.
+`optimizer.evaluation_policy = "separate"` (see
+[Evaluation policy](optimizer.md#evaluation-policy)) to maximize that benefit.
 
 ## Writing a custom filter
 

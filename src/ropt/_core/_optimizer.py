@@ -144,7 +144,7 @@ class EnsembleOptimizer:
                 self._backend.start(
                     problem,
                     self._optimizer_callback,
-                    evaluation_policy=self._context.gradient.evaluation_policy,
+                    evaluation_policy=self._context.optimizer.evaluation_policy,
                     output_dir=self._context.optimizer.output_dir,
                 )
         except TooFewRealizations:

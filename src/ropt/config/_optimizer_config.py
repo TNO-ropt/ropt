@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path  # ruff: ignore[typing-only-standard-library-import]
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, PositiveInt
 
@@ -23,15 +24,17 @@ class OptimizerConfig(BaseModel):
         [`WorkflowError`][ropt.exceptions.WorkflowError].
 
     Attributes:
-        max_batches:    Maximum number of batch evaluations (optional).
-        max_functions:  Maximum number of function evaluations (optional).
-        output_dir:     Output directory for the optimizer (optional).
-        stdout:         File to redirect optimizer standard output (optional).
-        stderr:         File to redirect optimizer standard error (optional).
+        max_batches:       Maximum number of batch evaluations (optional).
+        max_functions:     Maximum number of function evaluations (optional).
+        evaluation_policy: How to evaluate functions and gradients.
+        output_dir:        Output directory for the optimizer (optional).
+        stdout:            File to redirect optimizer standard output (optional).
+        stderr:            File to redirect optimizer standard error (optional).
     """
 
     max_batches: PositiveInt | None = None
     max_functions: PositiveInt | None = None
+    evaluation_policy: Literal["speculative", "separate", "auto"] = "auto"
     output_dir: Path | None = None
     stdout: Path | None = None
     stderr: Path | None = None

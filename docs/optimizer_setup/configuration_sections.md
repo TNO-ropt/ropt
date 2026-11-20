@@ -48,6 +48,8 @@ shown separately.
         "optimizer": {
             "max_batches": None,                              # default: no limit
             "max_functions": None,                            # default: no limit
+            "evaluation_policy": "auto",                      # default: evaluate functions and perturbations
+                                                              #          as needed
             "output_dir": None,                               # default: no output directory
             "stdout": None,                                   # default: not captured
             "stderr": None,                                   # default: not captured
@@ -64,8 +66,7 @@ shown separately.
             "number_of_perturbations": 5,
             "perturbation_min_success": None,                 # default: equal to number_of_perturbations
             "merge_realizations": False,                      # default: estimate and average gradients
-            "evaluation_policy": "auto",                      # default: evaluate functions and perturbations
-        },                                                    #          as needed
+        },
         "sampler": {
             "method": "scipy/default",                        # default: standard normal N(0,1)
             "options": {},
@@ -343,6 +344,8 @@ directory or stream capture).
   contain multiple function or gradient evaluations.
 - `max_functions`: Maximum number of function evaluations across calls. The
   final batch may cause the completed count to exceed this limit.
+- `evaluation_policy`: when functions and gradients are evaluated (default:
+  `"auto"`; also `"speculative"` or `"separate"`).
 - `output_dir`: Directory for optimizer output files. Relative `stdout` and
   `stderr` paths are resolved against it.
 - `stdout`: File for the optimizer's standard output. If `stderr` is unset,
@@ -350,7 +353,8 @@ directory or stream capture).
 - `stderr`: Optional file for the optimizer's standard error.
 
 See [Choosing an Optimizer](optimizer.md#limiting-the-length-of-a-run)
-for how the limits affect a run, and [Getting Output](../results/output.md) for
+for how the limits affect a run,
+[Evaluation policy](optimizer.md#evaluation-policy) for the policies, and [Getting Output](../results/output.md) for
 capturing optimizer output.
 
 ## `backend` { #backend }
@@ -382,7 +386,7 @@ Validated into [`GradientConfig`][ropt.config.GradientConfig].
 Controls how stochastic gradients are estimated (see also [Stochastic
 Gradients](gradients.md) for a deeper discussion).
 
-The `gradient` section has four fields:
+The `gradient` section has three fields:
 
 - `number_of_perturbations`: positive number of perturbed variable sets
   (default: [`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS]).
@@ -390,8 +394,6 @@ The `gradient` section has four fields:
   `number_of_perturbations`).
 - `merge_realizations`: whether realizations are combined before estimating
   the gradient (default: `False`).
-- `evaluation_policy`: when functions and gradients are evaluated (default:
-  `"auto"`; also `"speculative"` or `"separate"`).
 
 See [Stochastic Gradients](gradients.md) for how these settings affect the
 estimates and evaluation work.

@@ -358,7 +358,7 @@ def test_two_optimizers_alternating(config: dict[str, Any], evaluator: Any) -> N
             if isinstance(item, FunctionResults):
                 completed_functions += 1
 
-    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["evaluation_policy"] = "speculative"
     del config["backend"]["convergence_tolerance"]
 
     config1 = deepcopy(config)
@@ -430,7 +430,7 @@ def test_optimization_sequential(config: dict[str, Any], evaluator: Any) -> None
             item for item in event.results if isinstance(item, FunctionResults)
         ]
 
-    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["evaluation_policy"] = "speculative"
     config["optimizer"]["max_functions"] = 2
 
     config2 = deepcopy(config)
@@ -475,7 +475,7 @@ def test_restart_initial(config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.results if isinstance(item, FunctionResults)
         ]
 
-    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["evaluation_policy"] = "speculative"
     config["optimizer"]["max_functions"] = 3
 
     run_evaluator = evaluator()
@@ -509,7 +509,7 @@ def test_restart_last(config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.results if isinstance(item, FunctionResults)
         ]
 
-    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["evaluation_policy"] = "speculative"
     config["optimizer"]["max_functions"] = 3
 
     run_evaluator = evaluator()
@@ -547,7 +547,7 @@ def test_restart_optimum(config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.results if isinstance(item, FunctionResults)
         ]
 
-    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["evaluation_policy"] = "speculative"
     config["optimizer"]["max_functions"] = 4
 
     run_evaluator = evaluator()
@@ -607,7 +607,7 @@ def test_restart_optimum_with_reset(
         ),
     )
 
-    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["evaluation_policy"] = "speculative"
     config["optimizer"]["max_functions"] = max_functions
 
     run_evaluator = evaluator(new_functions)
@@ -705,7 +705,7 @@ def test_evaluator(config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_evaluator_multi(config: dict[str, Any], evaluator: Any) -> None:
-    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["evaluation_policy"] = "speculative"
     config["optimizer"]["max_functions"] = 4
 
     history_handler = HistoryHandler()
@@ -773,7 +773,7 @@ def test_exit_code(
     max_criterion: str,
     max_enum: ExitCode,
 ) -> None:
-    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["evaluation_policy"] = "speculative"
     match max_criterion:
         case "max_functions":
             config["optimizer"]["max_functions"] = 4

@@ -134,7 +134,9 @@ methods do not use these settings. The main choices are:
 - **Evaluation policy:** whether function and gradient evaluations follow the
   optimizer's requests, always run as separate batches, or the gradient is
   evaluated with every function evaluation. Separate evaluation allows
-  realization filters to reduce the gradient work.
+  realization filters to reduce the gradient work. This is the
+  [`evaluation_policy`](optimizer.md#evaluation-policy) field of the
+  `optimizer` section.
 
 See [Stochastic Gradients](gradients.md),
 [Samplers](samplers.md), and

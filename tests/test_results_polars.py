@@ -30,6 +30,7 @@ def config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "max_functions": 3,
+            "evaluation_policy": "speculative",
         },
         "backend": {
             "convergence_tolerance": 1e-5,
@@ -42,9 +43,6 @@ def config_fixture() -> dict[str, Any]:
         },
         "objectives": {
             "weights": [0.75, 0.25],
-        },
-        "gradient": {
-            "evaluation_policy": "speculative",
         },
         "names": {
             AxisName.VARIABLE: tuple(f"a:{idx}" for idx in range(1, 4)),
@@ -210,7 +208,7 @@ def test_polars_results_invalid_type() -> None:
 
 
 def test_polars_results_mixed_granularity(config: Any, eval_func: Any) -> None:
-    config["gradient"]["number_of_perturbations"] = 2
+    config["gradient"] = {"number_of_perturbations": 2}
     frames = _run(
         config,
         eval_func,

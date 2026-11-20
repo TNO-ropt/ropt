@@ -136,7 +136,7 @@ def test_max_functions_not_exceeded(config: Any, eval_func: Any, external: str) 
 
     max_functions = 100
     config["optimizer"]["max_functions"] = max_functions
-    config["gradient"] = {"evaluation_policy": "separate"}
+    config["optimizer"]["evaluation_policy"] = "separate"
     config["backend"]["method"] = f"{external}{_SLSQP}"
     result = optimize(
         config,

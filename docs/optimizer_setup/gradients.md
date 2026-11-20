@@ -18,7 +18,7 @@ gradient settings at their defaults.
 
 | Piece                                                                 | Purpose                                                                       |
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| [`GradientConfig`][ropt.config.GradientConfig]                        | Number of perturbations, success thresholds, evaluation policy.               |
+| [`GradientConfig`][ropt.config.GradientConfig]                        | Number of perturbations, success thresholds, merging of realizations.         |
 | [`VariablesConfig`][ropt.config.VariablesConfig] perturbation fields  | Magnitudes, boundary handling, sampler indices.                               |
 | [`SamplerConfig`][ropt.config.SamplerConfig] + `sampler` tuple        | How perturbation samples are drawn (uniform, normal, Sobol, ...).             |
 | [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]      | How per-realization gradients combine into the final estimate.                |
@@ -43,7 +43,6 @@ CONFIG = {
         "number_of_perturbations": 5,
         "perturbation_min_success": 3,  # allow some failures
         "merge_realizations": False,    # estimate per-realization then combine
-        "evaluation_policy": "auto",    # "speculative" | "separate" | "auto"
     },
     "sampler": [{"method": "scipy/default"}, {"method": "scipy/sobol"}],
 }
@@ -130,22 +129,6 @@ realization ends the optimization with `TOO_FEW_REALIZATIONS` and no result, and
 once with `realization_min_success` lowered, where the optimization finishes on
 the realizations that did work.
 
-## Evaluation policy
-
-[`GradientConfig.evaluation_policy`][ropt.config.GradientConfig] picks one of:
-
-- `"auto"` — compute objectives and gradients strictly when the backend requests
-  them. The default, and the policy that performs the fewest evaluations.
-- `"speculative"` — also compute the gradient whenever an objective is
-  requested. Improves load balancing on HPC clusters when gradient evaluations
-  are likely to be needed soon.
-- `"separate"` — never combine function and gradient evaluations into a single
-  batch. The functions are evaluated first, so a
-  [realization filter](realization_filters.md) can set the weight of some
-  realizations to zero before the gradient is evaluated. The gradient evaluation
-  then skips those realizations. In a combined batch, the weights are not yet
-  known and all realizations are evaluated.
-
 ## Samplers
 
 A sampler determines *where* the perturbed points are placed, while
@@ -164,8 +147,6 @@ average, are covered in [Function Estimators](function_estimators.md).
 
 ## See also
 
-- What `evaluation_policy` means when evaluations are submitted concurrently:
-  [Evaluating in Parallel](../running/parallel.md).
 - When an optimization ends with `TOO_FEW_REALIZATIONS`, or two optimizations
   disagree:
   [Troubleshooting](../troubleshooting/index.md).

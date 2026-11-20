@@ -31,13 +31,13 @@ def config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "max_functions": 10,
+            "evaluation_policy": "speculative",
         },
         "objectives": {
             "weights": [0.75, 0.25],
         },
         "gradient": {
             "number_of_perturbations": 5,
-            "evaluation_policy": "speculative",
         },
         "realizations": {
             "weights": 5 * [1.0],
@@ -283,7 +283,7 @@ def test_cvar_filter_on_objectives(
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["optimizer"]["evaluation_policy"] = evaluation_policy
 
     opt_result = optimize(config, initial_values, eval_func(objective_functions))
     assert opt_result.results is not None
@@ -341,7 +341,7 @@ def test_cvar_filter_on_objectives_with_constraints(
         partial(_constraint_function),
     ]
 
-    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["optimizer"]["evaluation_policy"] = evaluation_policy
 
     config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
@@ -402,7 +402,7 @@ def test_cvar_filter_on_constraints(
         partial(_constraint_function),
     ]
 
-    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["optimizer"]["evaluation_policy"] = evaluation_policy
 
     config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
@@ -462,7 +462,7 @@ def test_cvar_filter_mixed(
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["optimizer"]["evaluation_policy"] = evaluation_policy
     config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
 
     objective_values: list[NDArray[np.float64]] = []
@@ -621,7 +621,7 @@ def test_run_with_a_cvar_filter_ends_with_too_few_realizations_when_all_failed(
     eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
-    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["optimizer"]["evaluation_policy"] = evaluation_policy
     config["realization_filter"] = [
         {"method": "cvar-objective", "options": {"sort": [0], "percentile": 0.4}}
     ]
