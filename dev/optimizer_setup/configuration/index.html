@@ -1608,10 +1608,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sharing-optimizer-components-by-key" class="md-nav__link">
+  <a href="#sharing-optimizer-components-by-index" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Sharing optimizer components by key
+        Sharing optimizer components by index
       </span>
     </span>
   </a>
@@ -2828,10 +2828,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sharing-optimizer-components-by-key" class="md-nav__link">
+  <a href="#sharing-optimizer-components-by-index" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Sharing optimizer components by key
+        Sharing optimizer components by index
       </span>
     </span>
   </a>
@@ -2941,14 +2941,14 @@ top-level key becomes an instance of that section's configuration class:
 <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>, <code>objectives</code> an
 <a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig" href="../../reference/config/#ropt.config.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig</code></a>, and so on.
 Only <code>variables</code> is required; every other section has defaults.</p>
-<p>Three keys are different in kind. <code>samplers</code>, <code>realization_filters</code> and
+<p>Three sections are different in kind. <code>samplers</code>, <code>realization_filters</code> and
 <code>function_estimators</code> do not hold settings but <strong>components</strong> — objects built by
-the plugin system, which the sections that use them refer to by key.</p>
+the plugin system, which other sections select by index.</p>
 <p>Most of the rules below follow from this one step. Because the dictionary is
 converted once, validation and coercion happen before the optimization rather
-than during it; because the result is a set of objects rather than the dict you wrote, those
-objects are frozen; and because components are shared rather than copied, they
-are addressed by key.</p>
+than during it; because the result is a set of objects rather than the dict you
+wrote, those objects are frozen; and because components are shared rather than
+copied, they are addressed by index.</p>
 <h2 id="top-level-layout">Top-level layout</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                        <span class="c1"># required</span>
@@ -2959,15 +2959,16 @@ are addressed by key.</p>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                        <span class="c1"># optional</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                          <span class="c1"># optional</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                         <span class="c1"># optional</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>              <span class="c1"># optional, tuple</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>              <span class="c1"># optional, tuple</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>                         <span class="c1"># optional, tuple</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>              <span class="c1"># optional, list of components</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>              <span class="c1"># optional, list of components</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>                         <span class="c1"># optional, list of components</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                            <span class="c1"># optional, for labelled output</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Only <code>variables</code> is required. Each value is either a plain dict (which Pydantic
 validates against the corresponding config class) or a list/tuple of such
-dicts for the plugin-bearing fields.</p>
+dicts for the plugin-bearing fields. A single plugin config dict is also
+accepted and is treated as a one-item list.</p>
 <h2 id="rules-that-apply-everywhere">Rules that apply everywhere</h2>
 <h3 id="pydantic-validation">Pydantic validation</h3>
 <p>All configuration dictionaries are validated using
@@ -2989,7 +2990,7 @@ size-1 value is broadcast to match the relevant count, for example:</p>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Length-mismatched arrays raise a validation error.</p>
-<h3 id="sharing-optimizer-components-by-key">Sharing optimizer components by key</h3>
+<h3 id="sharing-optimizer-components-by-index">Sharing optimizer components by index</h3>
 <p>Each tuple-typed field holds the optimizer <strong>components</strong> of the corresponding
 kind:</p>
 <table>
@@ -3016,9 +3017,9 @@ kind:</p>
 </table>
 <p>You usually specify each component with a small config dict; see
 <a href="#providing-optimizer-components">Providing optimizer components</a> below.</p>
-<p>Other config sections refer to these components <strong>by key</strong>. Give them as a
-mapping to choose the keys yourself, or as a list, which is keyed by position —
-so a list entry is reached by the integer that used to index it. For example,
+<p>Other config sections refer to these components <strong>by index</strong>. Give each
+component as an item in a list; each item is reached by its integer position.
+For example,
 <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> has a <code>samplers</code> field that
 selects a sampler for each variable:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span>
@@ -3030,19 +3031,11 @@ selects a sampler for each variable:</p>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>   <span class="c1"># variables 0,1 use sampler 0; 2,3 use sampler 1</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">},</span>
 </span></code></pre></div>
-<p>The same thing written with names:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"coarse"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="s2">"fine"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">}},</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"coarse"</span><span class="p">,</span> <span class="s2">"coarse"</span><span class="p">,</span> <span class="s2">"fine"</span><span class="p">,</span> <span class="s2">"fine"</span><span class="p">],</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="p">},</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>Use a single key to share one component across all elements; thanks to
-broadcasting, a single value (the default <code>"0"</code>) is sufficient.</p>
+<p>Use one component for all elements with index <code>0</code>, the default.</p>
 <p>For optional fields like <code>realization_filters</code>, <code>None</code> (the default) leaves the
-corresponding element unfiltered. Any other key must exist, or building the
-context fails with an error naming the unknown key.</p>
+corresponding element unfiltered. Any other index must refer to an item in the
+corresponding component list, or building the context fails with an error
+naming the unknown index.</p>
 <p>Two runnable scripts select a component by position this way:
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py">examples/realization_filter.py</a>
 and
@@ -3059,10 +3052,10 @@ the required object:</p>
 <p><strong>A plain <code>dict</code></strong> — <em>the usual case</em>. Give a small dictionary with a <code>method</code>
    field (and optional <code>options</code>), and <code>ropt</code> builds the object for you through
    the plugin system:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">},</span>   <span class="c1"># index 0  -&gt; SciPySampler</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/sobol"</span><span class="p">},</span>     <span class="c1"># index 1  -&gt; SciPySampler</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">],</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">},</span>   <span class="c1"># index 0  -&gt; SciPySampler</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/sobol"</span><span class="p">},</span>     <span class="c1"># index 1  -&gt; SciPySampler</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">],</span>
 </span></code></pre></div>
 <p>The validator looks up a plugin in the <code>ropt.plugins</code> sub-package by the
 <code>method</code> field (<code>"plugin/method"</code> form, or just <code>"method"</code> for implicit
@@ -3132,11 +3125,11 @@ variables, objectives, realizations and other items in
 <a href="../../results/results/">exported results</a>. For example,
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/export.py">examples/export.py</a>
 uses:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">),</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">"objective"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"val"</span><span class="p">,</span> <span class="s2">"cost"</span><span class="p">),</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"r0"</span><span class="p">,</span> <span class="s2">"r1"</span><span class="p">),</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">},</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">),</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">"objective"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"val"</span><span class="p">,</span> <span class="s2">"cost"</span><span class="p">),</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">"realization"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"r0"</span><span class="p">,</span> <span class="s2">"r1"</span><span class="p">),</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">},</span>
 </span></code></pre></div>
 <p>Each key specifies what to label: <code>"variable"</code> labels the variables,
 <code>"objective"</code> labels the objectives, and <code>"realization"</code> labels the
@@ -3154,22 +3147,22 @@ shown in
 evaluations: those operations depend on position, not labels. Keep the ordering
 consistent when reusing results between optimizations.</p>
 <h2 id="a-worked-example">A worked example</h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span>  <span class="mf">5.0</span><span class="p">,</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="p">},</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]},</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"max_batches"</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>
-</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
-</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>    <span class="p">},</span>
-</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span>  <span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="p">},</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]},</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"max_batches"</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    <span class="p">},</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>This configures a 5-variable problem with bounded variables, an ensemble of
 10 equally-weighted realizations, 5 perturbations per gradient estimate,
