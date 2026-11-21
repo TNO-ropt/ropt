@@ -46,14 +46,14 @@ def _convert_tuple[T](value: T | Sequence[T]) -> tuple[T, ...]:
     return tuple(value) if isinstance(value, AbstractSequence) else (value,)
 
 
-def _convert_keys(value: Any) -> tuple[str | None, ...]:  # ruff: ignore[any-type]
+def _convert_indices(value: Any) -> tuple[Any, ...]:  # ruff: ignore[any-type]
     if isinstance(value, np.ndarray):
-        items: Any = value.tolist()
+        items: Any = np.atleast_1d(value).tolist()
     elif isinstance(value, AbstractSequence) and not isinstance(value, str):
         items = value
     else:
         items = (value,)
-    return tuple(None if item is None else str(item) for item in items)
+    return tuple(items)
 
 
 Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
@@ -71,5 +71,5 @@ Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_boo
 type ItemOrTuple[T] = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
 """Convert a single item, or a sequence or array to a tuple."""
 
-Keys = Annotated[tuple[str | None, ...], BeforeValidator(_convert_keys)]
-"""Convert a single key or a sequence or array to a tuple."""
+Indices = Annotated[tuple[int | None, ...], BeforeValidator(_convert_indices)]
+"""Convert a single index or a sequence or array to a tuple."""

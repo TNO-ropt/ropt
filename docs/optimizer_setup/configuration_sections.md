@@ -27,7 +27,7 @@ shown separately.
             "offsets": 0.0,                                   # default: no offset
             "perturbation_magnitudes": 0.005,
             "boundary_types": "mirror",
-            "samplers": "0",                                  # default: use first sampler for all
+            "samplers": 0,                                    # default: use first sampler for all
             "seed": 1,
         },
         "objectives": {
@@ -37,7 +37,7 @@ shown separately.
             "auto_scale": False,                              # default: do not estimate scales
             "maximize": False,                                # default: minimize
             "realization_filters": None,                      # default: no filter
-            "function_estimators": "0",                       # default: use first estimator for all
+            "function_estimators": 0,                         # default: use first estimator for all
         },
         "linear_constraints": None,                           # default: no linear constraints
         "nonlinear_constraints": None,                        # default: no nonlinear constraints
@@ -112,7 +112,7 @@ shown separately.
         "scales": 1.0,                            # default: no scaling
         "auto_scale": False,                      # default: do not estimate scales
         "realization_filters": None,              # default: no filter
-        "function_estimators": "0",               # default: use first estimator
+        "function_estimators": 0,                 # default: use first estimator
     }
 
     # realization_filters entries (method is required):
@@ -179,7 +179,7 @@ These fields configure the perturbations used for gradient estimation; see
   units (default: `0.005`).
 - `boundary_types`: how perturbations outside the bounds are handled (default:
   `"mirror"`; values of [`BoundaryType`][ropt.enums.BoundaryType]).
-- `samplers`: sampler key per variable (default: `"0"`).
+- `samplers`: sampler index per variable (default: `0`).
 - `seed`: random seed (default: `1`).
 
 ### Scaling the variables { #variable-scales }
@@ -203,18 +203,18 @@ See [Objectives](objectives.md) for how weights combine.
 Objective functions can optionally be processed using
 [realization filters](realization_filters.md) and
 [function estimators](function_estimators.md). Both fields select an object by
-its key in the corresponding section of the configuration.
+its index in the corresponding section of the configuration.
 
 - `realization_filters`: default `None` (no filter applied).
-- `function_estimators`: default `"0"` (the first function estimator). Unless
+- `function_estimators`: default `0` (the first function estimator). Unless
   explicitly configured otherwise, the default function estimator method is
   `"default/default"`, which computes a weighted average of the per-realization
   values.
 
 Setting `function_estimators` to `None` leaves that objective unestimated, and
-its value is reported as `NaN`. Any other key must exist; see [Sharing optimizer
-components by
-key](configuration.md#sharing-optimizer-components-by-key).
+its value is reported as `NaN`. Any other index must exist; see [Sharing
+optimizer components by
+index](configuration.md#sharing-optimizer-components-by-index).
 
 ### Scaling objectives { #objective-scales }
 
@@ -306,10 +306,10 @@ backend, see the table in [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
 
 Like objectives, nonlinear constraints can optionally be processed using
 [realization filters](realization_filters.md) and
-[function estimators](function_estimators.md), selected by key:
+[function estimators](function_estimators.md), selected by index:
 
 - `realization_filters`: default `None` (no filter applied).
-- `function_estimators`: default `"0"` (the first function estimator, which by
+- `function_estimators`: default `0` (the first function estimator, which by
   default computes a weighted average of per-realization values).
 
 ### Scaling constraints { #constraint-scales }
@@ -408,9 +408,10 @@ Validated into
 [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig].
 
 A list of component configurations, each selecting a plugin with a `method`
-field and an optional `options` dict, referenced by key from the sections that
-use it (see [Sharing optimizer components by
-key](configuration.md#sharing-optimizer-components-by-key)).
+field and an optional `options` dict. Other sections select a component by its
+index in this list (see [Sharing optimizer components by
+index](configuration.md#sharing-optimizer-components-by-index)). A single
+configuration dict is also accepted.
 
 Fields:
 
@@ -426,9 +427,10 @@ Validated into
 [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig].
 
 A list of component configurations, each selecting a plugin with a `method`
-field and an optional `options` dict, referenced by key from the sections that
-use it (see [Sharing optimizer components by
-key](configuration.md#sharing-optimizer-components-by-key)).
+field and an optional `options` dict. Other sections select a component by its
+index in this list (see [Sharing optimizer components by
+index](configuration.md#sharing-optimizer-components-by-index)). A single
+configuration dict is also accepted.
 
 Fields:
 
@@ -443,9 +445,10 @@ how to select one.
 Validated into [`SamplerConfig`][ropt.config.SamplerConfig].
 
 A list of component configurations, each selecting a plugin with a `method`
-field and an optional `options` dict, referenced by key from
-[`variables.samplers`](#variables) (see [Sharing optimizer components by
-key](configuration.md#sharing-optimizer-components-by-key)).
+field and an optional `options` dict. [`variables.samplers`](#variables)
+selects each component by its index in this list (see [Sharing optimizer
+components by index](configuration.md#sharing-optimizer-components-by-index)).
+A single configuration dict is also accepted.
 
 Fields:
 
