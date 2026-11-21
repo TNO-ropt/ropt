@@ -14,15 +14,15 @@ top-level key becomes an instance of that section's configuration class:
 [`ObjectiveFunctionsConfig`][ropt.config.ObjectiveFunctionsConfig], and so on.
 Only `variables` is required; every other section has defaults.
 
-Three keys are different in kind. `samplers`, `realization_filters` and
+Three sections are different in kind. `samplers`, `realization_filters` and
 `function_estimators` do not hold settings but **components** — objects built by
-the plugin system, which the sections that use them refer to by key.
+the plugin system, which other sections select by index.
 
 Most of the rules below follow from this one step. Because the dictionary is
 converted once, validation and coercion happen before the optimization rather
-than during it; because the result is a set of objects rather than the dict you wrote, those
-objects are frozen; and because components are shared rather than copied, they
-are addressed by key.
+than during it; because the result is a set of objects rather than the dict you
+wrote, those objects are frozen; and because components are shared rather than
+copied, they are addressed by index.
 
 ## Top-level layout
 
@@ -36,16 +36,17 @@ CONFIG = {
     "optimizer": {...},                        # optional
     "backend": {...},                          # optional
     "gradient": {...},                         # optional
-    "realization_filters": [...],              # optional, tuple
-    "function_estimators": [...],              # optional, tuple
-    "samplers": [...],                         # optional, tuple
+    "realization_filters": [...],              # optional, list of components
+    "function_estimators": [...],              # optional, list of components
+    "samplers": [...],                         # optional, list of components
     "names": {...},                            # optional, for labelled output
 }
 ```
 
 Only `variables` is required. Each value is either a plain dict (which Pydantic
 validates against the corresponding config class) or a list/tuple of such
-dicts for the plugin-bearing fields.
+dicts for the plugin-bearing fields. A single plugin config dict is also
+accepted and is treated as a one-item list.
 
 ## Rules that apply everywhere
 
@@ -79,7 +80,7 @@ size-1 value is broadcast to match the relevant count, for example:
 
 Length-mismatched arrays raise a validation error.
 
-### Sharing optimizer components by key
+### Sharing optimizer components by index
 
 Each tuple-typed field holds the optimizer **components** of the corresponding
 kind:
@@ -93,9 +94,9 @@ kind:
 You usually specify each component with a small config dict; see
 [Providing optimizer components](#providing-optimizer-components) below.
 
-Other config sections refer to these components **by key**. Give them as a
-mapping to choose the keys yourself, or as a list, which is keyed by position —
-so a list entry is reached by the integer that used to index it. For example,
+Other config sections refer to these components **by index**. Give each
+component as an item in a list; each item is reached by its integer position.
+For example,
 [`VariablesConfig`][ropt.config.VariablesConfig] has a `samplers` field that
 selects a sampler for each variable:
 
@@ -110,23 +111,12 @@ selects a sampler for each variable:
 },
 ```
 
-The same thing written with names:
-
-```python
-{
-    "samplers": {"coarse": {...}, "fine": {...}},
-    "variables": {
-        "samplers": ["coarse", "coarse", "fine", "fine"],
-    },
-}
-```
-
-Use a single key to share one component across all elements; thanks to
-broadcasting, a single value (the default `"0"`) is sufficient.
+Use one component for all elements with index `0`, the default.
 
 For optional fields like `realization_filters`, `None` (the default) leaves the
-corresponding element unfiltered. Any other key must exist, or building the
-context fails with an error naming the unknown key.
+corresponding element unfiltered. Any other index must refer to an item in the
+corresponding component list, or building the context fails with an error
+naming the unknown index.
 
 Two runnable scripts select a component by position this way:
 [examples/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py)

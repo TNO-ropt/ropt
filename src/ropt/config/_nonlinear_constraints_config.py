@@ -18,7 +18,7 @@ from ropt._utils import (
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
     Array1DBool,
-    Keys,
+    Indices,
 )
 
 
@@ -37,16 +37,16 @@ class NonlinearConstraintsConfig(BaseModel):
         upper_bounds:        Upper bounds for the right-hand-side values.
         scales:              Scale factors for the constraint functions (default: 1.0).
         auto_scale:          Which constraints to auto-scale (default: `False`).
-        realization_filters: Realization filter per constraint, by key (default: none).
-        function_estimators: Function estimator per constraint, by key (default: `"0"`).
+        realization_filters: Realization filter index per constraint (default: none).
+        function_estimators: Function estimator index per constraint (default: `0`).
     """
 
     lower_bounds: Array1D
     upper_bounds: Array1D
     scales: Array1D = np.array(1.0)
     auto_scale: Array1DBool = np.array(0)
-    realization_filters: Keys = (None,)
-    function_estimators: Keys = ("0",)
+    realization_filters: Indices = (None,)
+    function_estimators: Indices = (0,)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

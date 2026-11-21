@@ -40,7 +40,7 @@ evaluation a filter returns per-realization weights that replace
 `realizations.weights` for that evaluation. An evaluation in which every
 realization failed is not filtered, and gives the same result as without a
 filter. See [Sharing optimizer components by
-key](configuration.md#sharing-optimizer-components-by-key) for the indexing
+index](configuration.md#sharing-optimizer-components-by-index) for the indexing
 pattern, and [`realization_filters`](configuration_sections.md#realization-filters)
 for the fields of a filter configuration.
 

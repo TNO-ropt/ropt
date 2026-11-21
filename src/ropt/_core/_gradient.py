@@ -66,18 +66,20 @@ def _invert_linear_equations(
 def _perturb_variables(
     context: EnOptContext,
     variables: NDArray[np.float64],
-    samplers: dict[str, Sampler],
+    samplers: tuple[Sampler, ...],
 ) -> NDArray[np.float64]:
     # The results should be independent of the order of the samplers,
     # reordering would affect the random numbers they are based on. We
     # obtain a consistent order by running multiple samplers in the order
     # that they appear in the config.variables.samplers array:
-    keys = list(
-        dict.fromkeys(key for key in context.variables.samplers if key is not None)
+    indices = list(
+        dict.fromkeys(
+            index for index in context.variables.samplers if index is not None
+        )
     )
-    samples = samplers[keys[0]].generate_samples()
-    for key in keys[1:]:
-        samples += samplers[key].generate_samples()
+    samples = samplers[indices[0]].generate_samples()
+    for index in indices[1:]:
+        samples += samplers[index].generate_samples()
     return _apply_bounds(
         variables + context.variables.perturbation_magnitudes * samples,
         context.variables.lower_bounds,

@@ -315,8 +315,8 @@ def test_context_defaults_and_scaling_apply_when_built_directly(config: Any) -> 
         warnings.simplefilter("error", UserWarning)
         direct = EnOptContext(**config)
     validated = EnOptContext.model_validate(config)
-    assert list(direct.samplers) == list(validated.samplers)
-    assert list(direct.function_estimators) == list(validated.function_estimators)
+    assert len(direct.samplers) == len(validated.samplers)
+    assert len(direct.function_estimators) == len(validated.function_estimators)
     assert np.allclose(direct.variables.upper_bounds, [5.0, 5.0])
     assert np.allclose(direct.variables.upper_bounds, validated.variables.upper_bounds)
 
@@ -381,29 +381,49 @@ def test_plugin_field_rejects_unknown_value(
         EnOptContext.model_validate(config)
 
 
-def test_components_given_as_a_list_are_keyed_by_position(
+def test_components_given_as_a_list_are_selected_by_index(
     config: dict[str, Any],
 ) -> None:
     config["samplers"] = [{}, {}]
     config["variables"]["samplers"] = [0, 1]
     context = EnOptContext.model_validate(config)
-    assert list(context.samplers) == ["0", "1"]
-    assert context.variables.samplers == ("0", "1")
+    assert len(context.samplers) == 2
+    assert context.variables.samplers == (0, 1)
 
 
-def test_components_can_be_selected_by_name(config: dict[str, Any]) -> None:
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("samplers", {"method": "scipy/default"}),
+        ("function_estimators", {"method": "default/mean"}),
+        (
+            "realization_filters",
+            {
+                "method": "default/cvar-objective",
+                "options": {"sort": [0]},
+            },
+        ),
+    ],
+)
+def test_a_single_component_dict_is_wrapped(
+    config: dict[str, Any], field: str, value: dict[str, Any]
+) -> None:
+    config[field] = value
+    context = EnOptContext.model_validate(config)
+    assert len(getattr(context, field)) == 1
+
+
+def test_components_cannot_be_selected_by_name(config: dict[str, Any]) -> None:
     config["samplers"] = {"coarse": {}, "fine": {}}
-    config["variables"]["samplers"] = ["fine", "coarse"]
-    context = EnOptContext.model_validate(config)
-    assert list(context.samplers) == ["coarse", "fine"]
-    assert context.variables.samplers == ("fine", "coarse")
+    with pytest.raises(ValidationError):
+        EnOptContext.model_validate(config)
 
 
-def test_a_single_key_is_broadcast_over_the_elements(config: dict[str, Any]) -> None:
-    config["samplers"] = {"only": {}}
-    config["variables"]["samplers"] = "only"
+def test_a_single_index_is_broadcast_over_the_elements(config: dict[str, Any]) -> None:
+    config["samplers"] = [{}]
+    config["variables"]["samplers"] = 0
     context = EnOptContext.model_validate(config)
-    assert context.variables.samplers == ("only", "only")
+    assert context.variables.samplers == (0, 0)
 
 
 def test_a_null_reference_selects_no_realization_filter(
@@ -414,20 +434,22 @@ def test_a_null_reference_selects_no_realization_filter(
     assert context.objectives.realization_filters == (None,)
 
 
-def test_an_unknown_key_names_the_defined_keys(config: dict[str, Any]) -> None:
-    config["samplers"] = {"coarse": {}}
-    config["variables"]["samplers"] = "fine"
+def test_an_unknown_index_names_the_defined_indices(config: dict[str, Any]) -> None:
+    config["samplers"] = [{}]
+    config["variables"]["samplers"] = 1
     with pytest.raises(
         ValidationError,
-        match=re.escape("variables.samplers: unknown key 'fine'; defined keys are"),
+        match=re.escape("variables.samplers: unknown index 1; defined indices are 0"),
     ):
         EnOptContext.model_validate(config)
 
 
-def test_the_former_sentinel_is_now_an_unknown_key(config: dict[str, Any]) -> None:
+def test_negative_indices_are_rejected(config: dict[str, Any]) -> None:
     config["objectives"]["realization_filters"] = -1
     with pytest.raises(
         ValidationError,
-        match=re.escape("objectives.realization_filters: unknown key '-1'"),
+        match=re.escape(
+            "objectives.realization_filters: unknown index -1; no indices are defined"
+        ),
     ):
         EnOptContext.model_validate(config)

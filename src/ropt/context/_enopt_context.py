@@ -77,9 +77,9 @@ class EnOptContext(BaseModel):
         optimizer:                       Optimizer settings.
         backend:                         Backend plugin instance that runs the optimization algorithm.
         gradient:                        Gradient estimation settings.
-        realization_filters:             Realization filter instances, by key.
-        function_estimators:             Function estimator instances, by key.
-        samplers:                        Sampler instances, by key.
+        realization_filters:             Realization filter instances, selected by index.
+        function_estimators:             Function estimator instances, selected by index.
+        samplers:                        Sampler instances, selected by index.
         names:                           Optional mapping of axis names to label sequences.
     """
 
@@ -91,9 +91,9 @@ class EnOptContext(BaseModel):
     optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
     backend: BackendInstance = {}  # type: ignore[assignment]
     gradient: GradientConfig = GradientConfig.model_validate({})
-    realization_filters: RealizationFilterInstances = {}
-    function_estimators: FunctionEstimatorInstances = {}
-    samplers: SamplerInstances = {}
+    realization_filters: RealizationFilterInstances = ()
+    function_estimators: FunctionEstimatorInstances = ()
+    samplers: SamplerInstances = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
     _locked: bool = PrivateAttr(default=False)
@@ -211,16 +211,16 @@ class EnOptContext(BaseModel):
         updates: dict[str, Any] = {}
         if not self.function_estimators:
             function_estimator_config = FunctionEstimatorConfig.model_validate({})
-            updates["function_estimators"] = {
-                "0": get_plugin(
+            updates["function_estimators"] = (
+                get_plugin(
                     "function_estimator", method=function_estimator_config.method
-                )(function_estimator_config)
-            }
+                )(function_estimator_config),
+            )
         if not self.samplers:
             sampler_config = SamplerConfig.model_validate({})
-            updates["samplers"] = {
-                "0": get_plugin("sampler", method=sampler_config.method)(sampler_config)
-            }
+            updates["samplers"] = (
+                get_plugin("sampler", method=sampler_config.method)(sampler_config),
+            )
         if updates:
             update_fields(self, **updates)
         return self
@@ -246,15 +246,15 @@ class EnOptContext(BaseModel):
         for section, config, fields in sections:
             for field in fields:
                 defined = getattr(self, field)
-                for key in getattr(config, field):
-                    if key is not None and key not in defined:
+                for index in getattr(config, field):
+                    if index is not None and not 0 <= index < len(defined):
                         known = (
-                            "defined keys are "
-                            + ", ".join(repr(item) for item in defined)
+                            "defined indices are "
+                            + ", ".join(str(item) for item in range(len(defined)))
                             if defined
-                            else "no keys are defined"
+                            else "no indices are defined"
                         )
-                        msg = f"{section}.{field}: unknown key {key!r}; {known}"
+                        msg = f"{section}.{field}: unknown index {index!r}; {known}"
                         raise ValueError(msg)
         return self
 

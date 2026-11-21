@@ -13,8 +13,8 @@ from ropt.enums import BoundaryType, VariableType
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
     Array1DBool,
+    Indices,
     ItemOrTuple,
-    Keys,
 )
 from .constants import (
     DEFAULT_PERTURBATION_BOUNDARY_TYPE,
@@ -54,7 +54,7 @@ class VariablesConfig(BaseModel):
         offsets:                 Offsets for the variables (default: 0.0).
         perturbation_magnitudes: Magnitude of each variable's perturbations, in configured units.
         boundary_types:          Handling of perturbations that violate a bound.
-        samplers:                Sampler for each variable, by key (default: `"0"`).
+        samplers:                Sampler index for each variable (default: `0`).
         seed:                    Seed for the random number generator used by the samplers.
     """
 
@@ -67,7 +67,7 @@ class VariablesConfig(BaseModel):
     offsets: Array1D = np.array(0.0)
     perturbation_magnitudes: Array1D = np.array(DEFAULT_PERTURBATION_MAGNITUDE)
     boundary_types: ItemOrTuple[BoundaryType] = (DEFAULT_PERTURBATION_BOUNDARY_TYPE,)
-    samplers: Keys = ("0",)
+    samplers: Indices = (0,)
     seed: ItemOrTuple[int] = (DEFAULT_SEED,)
 
     model_config = ConfigDict(

@@ -118,7 +118,7 @@ class EnsembleEvaluator:
         self._evaluator = (
             evaluator if self._initial_values is None else self._initial_values
         )
-        self._realization_filters: dict[str, RealizationFilter] = (
+        self._realization_filters: tuple[RealizationFilter, ...] = (
             context.realization_filters
         )
         self._function_estimators = self._init_function_estimators()
@@ -807,16 +807,16 @@ class EnsembleEvaluator:
             else self._context.nonlinear_constraints.upper_bounds
         )
 
-        for key, realization_filter in self._realization_filters.items():
+        for index, realization_filter in enumerate(self._realization_filters):
             apply_to_objectives = (
                 None
                 if objective_filters is None
-                else np.array([item == key for item in objective_filters])
+                else np.array([item == index for item in objective_filters])
             )
             apply_to_constraints = (
                 None
                 if constraint_filters is None
-                else np.array([item == key for item in constraint_filters])
+                else np.array([item == index for item in constraint_filters])
             )
             if (apply_to_objectives is None or not np.any(apply_to_objectives)) and (
                 apply_to_constraints is None or not np.any(apply_to_constraints)
@@ -853,8 +853,8 @@ class EnsembleEvaluator:
                 constraint_weights[:, apply_to_constraints] = weights[:, np.newaxis]
         return objective_weights, constraint_weights
 
-    def _init_function_estimators(self) -> dict[str, FunctionEstimator]:
-        for function_estimator in self._context.function_estimators.values():
+    def _init_function_estimators(self) -> tuple[FunctionEstimator, ...]:
+        for function_estimator in self._context.function_estimators:
             function_estimator.init(
                 merge_realizations=self._gradient.merges_realizations
             )
@@ -862,10 +862,10 @@ class EnsembleEvaluator:
 
     def _init_samplers(self) -> None:
         rng = default_rng(self._context.variables.seed)
-        for key, sampler in self._context.samplers.items():
+        for index, sampler in enumerate(self._context.samplers):
             mask = np.asarray(
                 self._context.variables.mask
-                & np.array([item == key for item in self._context.variables.samplers])
+                & np.array([item == index for item in self._context.variables.samplers])
             )
             sampler.init(
                 realization_count=self._context.realizations.weights.size,
@@ -891,24 +891,24 @@ def _join_functions(
 
 
 def _calculate_estimated_functions(
-    function_estimators: dict[str, FunctionEstimator],
-    estimator_keys: tuple[str | None, ...] | None,
+    function_estimators: tuple[FunctionEstimator, ...],
+    estimator_indices: tuple[int | None, ...] | None,
     functions: NDArray[np.float64],
     realization_weights: NDArray[np.float64],
     failed_realizations: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
     result: NDArray[np.float64] = np.full(functions.shape[-1], np.nan, dtype=np.float64)
 
-    if estimator_keys is None:
-        estimator_keys = ("0",) * functions.shape[1]
+    if estimator_indices is None:
+        estimator_indices = (0,) * functions.shape[1]
 
     if realization_weights.ndim == 1:
         realization_weights = np.broadcast_to(
             realization_weights[:, np.newaxis], functions.shape
         )
 
-    for key, estimator in function_estimators.items():
-        mask = np.array([item == key for item in estimator_keys])
+    for index, estimator in enumerate(function_estimators):
+        mask = np.array([item == index for item in estimator_indices])
         for idx in np.where(mask)[0]:
             weights = realization_weights[:, idx]
             weights = np.where(failed_realizations, 0.0, weights)
@@ -919,8 +919,8 @@ def _calculate_estimated_functions(
 
 
 def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments]
-    function_estimators: dict[str, FunctionEstimator],
-    estimator_keys: tuple[str | None, ...] | None,
+    function_estimators: tuple[FunctionEstimator, ...],
+    estimator_indices: tuple[int | None, ...] | None,
     functions: NDArray[np.float64],
     realization_gradients: NDArray[np.float64],
     weights: NDArray[np.float64],
@@ -933,11 +933,11 @@ def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments]
         dtype=np.float64,
     )
 
-    if estimator_keys is None:
-        estimator_keys = ("0",) * functions.shape[1]
+    if estimator_indices is None:
+        estimator_indices = (0,) * functions.shape[1]
 
-    for key, estimator in function_estimators.items():
-        mask = np.array([item == key for item in estimator_keys])
+    for index, estimator in enumerate(function_estimators):
+        mask = np.array([item == index for item in estimator_indices])
         for idx in np.where(mask)[0]:
             gradients[idx, ...] = estimator.calculate_gradient(
                 functions[:, idx],

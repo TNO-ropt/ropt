@@ -18,7 +18,7 @@ from ropt._utils import (
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
     Array1DBool,
-    Keys,
+    Indices,
 )
 
 
@@ -41,8 +41,8 @@ class ObjectiveFunctionsConfig(BaseModel):
         offsets:             Offsets for the objective functions (default: 0.0).
         auto_scale:          Estimate additional scales from the first batch.
         maximize:            Which objectives to maximize (default: `False`).
-        realization_filters: Realization filter per objective, by key (default: none).
-        function_estimators: Function estimator per objective, by key (default: `"0"`).
+        realization_filters: Realization filter index per objective (default: none).
+        function_estimators: Function estimator index per objective (default: `0`).
     """
 
     weights: Array1D = np.array(1.0)
@@ -50,8 +50,8 @@ class ObjectiveFunctionsConfig(BaseModel):
     offsets: Array1D = np.array(0.0)
     auto_scale: bool = False
     maximize: Array1DBool = np.array(0)
-    realization_filters: Keys = (None,)
-    function_estimators: Keys = ("0",)
+    realization_filters: Indices = (None,)
+    function_estimators: Indices = (0,)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

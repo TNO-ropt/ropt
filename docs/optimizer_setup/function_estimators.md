@@ -39,8 +39,8 @@ Because `mean` is the default, both fields can be omitted entirely when
 weighted-average aggregation is all you need. During optimization the estimator
 receives the per-realization function and gradient arrays together with the
 current weights, and returns a single aggregated value. See [Sharing optimizer
-components by key](configuration.md#sharing-optimizer-components-by-key) for the
-indexing pattern, and
+components by index](configuration.md#sharing-optimizer-components-by-index) for
+the indexing pattern, and
 [`function_estimators`](configuration_sections.md#function-estimators)
 for the fields of an estimator configuration.
 
