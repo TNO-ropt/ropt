@@ -2977,7 +2977,7 @@ well at runtime.</p>
 <p>The entry-point name is the plugin name used in method strings. After
 installing the package, the sampler is available as <code>"my_package/uniform"</code>, or
 as <code>"uniform"</code> if no other installed plugin claims that name:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"my_package/uniform"</span><span class="p">}],</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">"sampler"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"my_package/uniform"</span><span class="p">},</span>
 </span></code></pre></div>
 <p>Check that the plugin is found with
 <a class="autorefs autorefs-internal" title="            ropt.plugins.get_plugin_name" href="../../reference/plugin_manager/#ropt.plugins.get_plugin_name"><code>get_plugin_name</code></a>:</p>

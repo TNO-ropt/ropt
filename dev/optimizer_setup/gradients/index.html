@@ -2904,7 +2904,7 @@ gradient settings at their defaults.</p>
 <td>Magnitudes, boundary handling, sampler indices.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> + samplers tuple</td>
+<td><a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> + <code>sampler</code> tuple</td>
 <td>How perturbation samples are drawn (uniform, normal, Sobol, ...).</td>
 </tr>
 <tr>
@@ -2932,7 +2932,7 @@ the Configuration Reference.</p>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="s2">"merge_realizations"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># estimate per-realization then combine</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="s2">"evaluation_policy"</span><span class="p">:</span> <span class="s2">"auto"</span><span class="p">,</span>    <span class="c1"># "speculative" | "separate" | "auto"</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="p">},</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/sobol"</span><span class="p">}],</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="s2">"sampler"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">},</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/sobol"</span><span class="p">}],</span>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="perturbation-magnitude-and-scaling">Perturbation magnitude and scaling</h2>
