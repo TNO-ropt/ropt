@@ -48,7 +48,7 @@ def test_stddev_function_estimator_merge_error(
     config["gradient"]["merge_realizations"] = True
     config["objectives"]["weights"].extend([0.75, 0.25])
     config["objectives"]["function_estimators"] = [0, 0, 1, 1]
-    config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
+    config["function_estimator"] = [{"method": "mean"}, {"method": "stddev"}]
     with pytest.raises(
         ValueError,
         match=(
@@ -66,7 +66,7 @@ def test_mean_stddev_function_estimator(
 
     config["objectives"]["weights"].extend([0.75, 0.25])
     config["objectives"]["function_estimators"] = [0, 0, 1, 1]
-    config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
+    config["function_estimator"] = [{"method": "mean"}, {"method": "stddev"}]
     result = optimize(config, initial_values, eval_func(test_functions))
     assert result.results is not None
     assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -106,7 +106,7 @@ def test_stddev_function_estimator(
     ]
 
     config["gradient"]["evaluation_policy"] = evaluation_policy
-    config["function_estimators"] = [{"method": "stddev"}]
+    config["function_estimator"] = [{"method": "stddev"}]
     result = optimize(config, initial_values, eval_func(functions))
     assert result.results is not None
     assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -211,7 +211,7 @@ def test_custom_function_estimator(
     config: Any, eval_func: Any, test_functions: Any
 ) -> None:
     config["objectives"]["function_estimators"] = 0
-    config["function_estimators"] = [
+    config["function_estimator"] = [
         CustomFunctionEstimator(FunctionEstimatorConfig(method="custom"))
     ]
     result = optimize(config, initial_values, eval_func(test_functions))

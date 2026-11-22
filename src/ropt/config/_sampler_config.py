@@ -13,7 +13,7 @@ class SamplerConfig(BaseModel):
     `SamplerConfig` configures a [`Sampler`][ropt.sampler.Sampler] plugin that
     generates variable perturbations for gradient estimation.
 
-    See [Configuration Reference](../optimizer_setup/configuration_sections.md#samplers)
+    See [Configuration Reference](../optimizer_setup/configuration_sections.md#sampler)
     for field descriptions and defaults.
 
     Attributes:

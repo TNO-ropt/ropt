@@ -14,8 +14,8 @@ top-level key becomes an instance of that section's configuration class:
 [`ObjectiveFunctionsConfig`][ropt.config.ObjectiveFunctionsConfig], and so on.
 Only `variables` is required; every other section has defaults.
 
-Three sections are different in kind. `samplers`, `realization_filters` and
-`function_estimators` do not hold settings but **components** — objects built by
+Three sections are different in kind. `sampler`, `realization_filter` and
+`function_estimator` do not hold settings but **components** — objects built by
 the plugin system, which other sections select by index.
 
 Most of the rules below follow from this one step. Because the dictionary is
@@ -36,9 +36,9 @@ CONFIG = {
     "optimizer": {...},                        # optional
     "backend": {...},                          # optional
     "gradient": {...},                         # optional
-    "realization_filters": [...],              # optional, list of components
-    "function_estimators": [...],              # optional, list of components
-    "samplers": [...],                         # optional, list of components
+    "realization_filter": {...},               # optional, one component or a list
+    "function_estimator": {...},               # optional, one component or a list
+    "sampler": {...},                          # optional, one component or a list
     "names": {...},                            # optional, for labelled output
 }
 ```
@@ -82,26 +82,36 @@ Length-mismatched arrays raise a validation error.
 
 ### Sharing optimizer components by index
 
-Each tuple-typed field holds the optimizer **components** of the corresponding
-kind:
+The top-level component fields use singular names, whether they contain one
+component or several. Each accepts a single configuration or a list/tuple of
+configurations; validation stores a tuple of **components**:
 
 | Field                              | Component type                                                                  |
 | ---------------------------------- | ------------------------------------------------------------------------------- |
-| `realization_filters`              | [`RealizationFilter`][ropt.realization_filter.RealizationFilter]                |
-| `function_estimators`              | [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator]                |
-| `samplers`                         | [`Sampler`][ropt.sampler.Sampler]                                               |
+| `realization_filter`               | [`RealizationFilter`][ropt.realization_filter.RealizationFilter]                |
+| `function_estimator`               | [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator]                |
+| `sampler`                          | [`Sampler`][ropt.sampler.Sampler]                                               |
 
 You usually specify each component with a small config dict; see
 [Providing optimizer components](#providing-optimizer-components) below.
 
-Other config sections refer to these components **by index**. Give each
-component as an item in a list; each item is reached by its integer position.
-For example,
-[`VariablesConfig`][ropt.config.VariablesConfig] has a `samplers` field that
-selects a sampler for each variable:
+For a single sampler, no explicit selection is needed:
 
 ```python
-"samplers": [
+CONFIG = {
+    "variables": {"variable_count": 4},
+    "sampler": {"method": "scipy/sobol"},
+}
+```
+
+Other config sections refer to these components **by index**. The selector
+fields remain plural: `variables.samplers`, `objectives.function_estimators`
+and `objectives.realization_filters`, with the same two fields for nonlinear
+constraints. Each selector holds an index per variable, objective or constraint.
+For example, to select between two samplers:
+
+```python
+"sampler": [
     {"method": "scipy/default"},   # index 0
     {"method": "scipy/sobol"},     # index 1
 ],
@@ -113,10 +123,13 @@ selects a sampler for each variable:
 
 Use one component for all elements with index `0`, the default.
 
-For optional fields like `realization_filters`, `None` (the default) leaves the
-corresponding element unfiltered. Any other index must refer to an item in the
-corresponding component list, or building the context fails with an error
-naming the unknown index.
+For the `realization_filters` selectors, `None` (the default) leaves the
+corresponding element unfiltered, even when `realization_filter` is configured.
+Any other index must refer to an item in the corresponding component tuple,
+or building the context fails with an error naming the unknown index.
+
+The former plural top-level names are not accepted. `backend` remains a single
+component, and `gradient` remains a single settings object.
 
 Two runnable scripts select a component by position this way:
 [examples/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py)
@@ -137,10 +150,7 @@ the required object:
    the plugin system:
 
     ```python
-    "samplers": [
-        {"method": "scipy/default"},   # index 0  -> SciPySampler
-        {"method": "scipy/sobol"},     # index 1  -> SciPySampler
-    ],
+    "sampler": {"method": "scipy/sobol"},
     ```
 
     The validator looks up a plugin in the `ropt.plugins` sub-package by the
@@ -158,8 +168,8 @@ the required object:
    the Python object yourself and want to provide it directly, without
    registering it as a plugin.
 
-The same pattern applies to `backend`, `function_estimators`, and
-`realization_filters`. You can mix these forms
+The same pattern applies to `backend`, `function_estimator`, and
+`realization_filter`. You can mix these forms
 freely — for example, a hand-built `Sampler` instance alongside a dict-configured
 one in the same tuple. The dict and config-object forms resolve the `method`
 through the plugin system, so the plugin must be registered; providing an object

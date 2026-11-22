@@ -134,13 +134,11 @@ def main() -> None:
         "realizations": {
             "weights": [1.0] * realizations,
         },
-        # Estimators are listed here and referred to by index by the objectives
-        # or the nonlinear constraints that use them. Passing the instance
+        # Estimators are configured here and referred to by index by the
+        # objectives or nonlinear constraints that use them. Passing the instance
         # itself, `GeometricMean(FunctionEstimatorConfig(method="geometric"))`,
         # works too and needs no registration.
-        "function_estimators": [
-            {"method": "custom/geometric"},
-        ],
+        "function_estimator": {"method": "custom/geometric"},
         "objectives": {
             "function_estimators": [0],
         },

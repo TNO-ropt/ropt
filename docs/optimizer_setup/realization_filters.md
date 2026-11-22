@@ -12,10 +12,10 @@ constraints, or both.
 
 ## Selecting a filter
 
-Filters are listed at the top level of the configuration and referenced from the
-objectives or nonlinear constraints that use them, so different objectives can be
-filtered differently. This one optimizes the conditional expectation of the worst
-30% of 10 realizations:
+Filters are configured in the top-level `realization_filter` field and
+referenced from the objectives or nonlinear constraints that use them, so
+different objectives can be filtered differently. This one optimizes the
+conditional expectation of the worst 30% of 10 realizations:
 
 ```python
 CONFIG = {
@@ -25,12 +25,10 @@ CONFIG = {
         "weights": [1.0],
         "realization_filters": [0],   # objective uses filter 0
     },
-    "realization_filters": [
-        {
-            "method": "default/cvar-objective",
-            "options": {"sort": [0], "percentile": 0.3},
-        },
-    ],
+    "realization_filter": {
+        "method": "default/cvar-objective",
+        "options": {"sort": [0], "percentile": 0.3},
+    },
     "gradient": {"number_of_perturbations": 5},
 }
 ```
@@ -41,7 +39,7 @@ evaluation a filter returns per-realization weights that replace
 realization failed is not filtered, and gives the same result as without a
 filter. See [Sharing optimizer components by
 index](configuration.md#sharing-optimizer-components-by-index) for the indexing
-pattern, and [`realization_filters`](configuration_sections.md#realization-filters)
+pattern, and [`realization_filter`](configuration_sections.md#realization-filter)
 for the fields of a filter configuration.
 
 See [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions]
@@ -63,7 +61,7 @@ whose abstract methods define what a filter must provide. A filter defined where
 an entry point cannot reach it — in a script or a notebook — is added with
 [`register_plugin`][ropt.plugins.register_plugin], after which it is
 selected by its `"plugin/method"` string exactly like an installed one. An
-instance can also be passed directly in the `realization_filters` section of
+instance can also be passed directly in the `realization_filter` section of
 the configuration, which needs no registration.
 
 The runnable script is

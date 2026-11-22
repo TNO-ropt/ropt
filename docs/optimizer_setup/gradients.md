@@ -20,7 +20,7 @@ gradient settings at their defaults.
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | [`GradientConfig`][ropt.config.GradientConfig]                        | Number of perturbations, success thresholds, evaluation policy.               |
 | [`VariablesConfig`][ropt.config.VariablesConfig] perturbation fields  | Magnitudes, boundary handling, sampler indices.                               |
-| [`SamplerConfig`][ropt.config.SamplerConfig] + samplers tuple         | How perturbation samples are drawn (uniform, normal, Sobol, ...).             |
+| [`SamplerConfig`][ropt.config.SamplerConfig] + `sampler` tuple        | How perturbation samples are drawn (uniform, normal, Sobol, ...).             |
 | [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]      | How per-realization gradients combine into the final estimate.                |
 
 The fields themselves are described under
@@ -45,7 +45,7 @@ CONFIG = {
         "merge_realizations": False,    # estimate per-realization then combine
         "evaluation_policy": "auto",    # "speculative" | "separate" | "auto"
     },
-    "samplers": [{"method": "scipy/default"}, {"method": "scipy/sobol"}],
+    "sampler": [{"method": "scipy/default"}, {"method": "scipy/sobol"}],
 }
 ```
 

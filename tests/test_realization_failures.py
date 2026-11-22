@@ -301,7 +301,7 @@ def test_batch_with_a_failed_estimate_is_reported(
         {
             "variables": {"variable_count": 2, "perturbation_magnitudes": 0.01},
             "objectives": {"weights": [1.0], "function_estimators": [0]},
-            "function_estimators": [{"method": "stddev"}],
+            "function_estimator": [{"method": "stddev"}],
             "realizations": {"weights": [1.0, 1.0], "realization_min_success": 1},
             "gradient": {
                 "number_of_perturbations": 2,
@@ -343,7 +343,7 @@ def test_gradient_is_not_estimated_when_the_filter_fails(evaluator: Any) -> None
         {
             "variables": {"variable_count": 2},
             "objectives": {"weights": [1.0], "realization_filters": [0]},
-            "realization_filters": [
+            "realization_filter": [
                 _FailingFilter(RealizationFilterConfig(method="failing"))
             ],
             "realizations": {"weights": [1.0, 1.0]},

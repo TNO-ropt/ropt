@@ -15,7 +15,7 @@ class RealizationFilterConfig(BaseModel):
     adjusts per-realization weights.
 
     See [Configuration
-    Sections](../optimizer_setup/configuration_sections.md#realization-filters) for detailed
+    Sections](../optimizer_setup/configuration_sections.md#realization-filter) for detailed
     descriptions and usage examples.
 
     Attributes:

@@ -289,7 +289,7 @@ def test_cvar_filter_on_objectives(
     assert opt_result.results is not None
     assert not np.allclose(opt_result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
-    config["realization_filters"] = [
+    config["realization_filter"] = [
         {
             "method": "cvar-objective",
             "options": {
@@ -351,7 +351,7 @@ def test_cvar_filter_on_objectives_with_constraints(
         "lower_bounds": -np.inf,
         "upper_bounds": 0.4,
     }
-    config["realization_filters"] = [
+    config["realization_filter"] = [
         {
             "method": "cvar-objective",
             "options": {
@@ -420,7 +420,7 @@ def test_cvar_filter_on_constraints(
         "lower_bounds": -np.inf,
         "upper_bounds": 0.4,
     }
-    config["realization_filters"] = [
+    config["realization_filter"] = [
         {
             "method": "cvar-constraint",
             "options": {
@@ -496,7 +496,7 @@ def test_cvar_filter_mixed(
         _track_results(event, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
-    config["realization_filters"] = [
+    config["realization_filter"] = [
         {
             "method": "cvar-objective",
             "options": {
@@ -538,7 +538,7 @@ def test_cvar_filter_mixed(
                 )
 
     # Apply filtering only to the first two, giving a wrong result.
-    config["realization_filters"] = [
+    config["realization_filter"] = [
         {
             "method": "cvar-objective",
             "options": {
@@ -597,7 +597,7 @@ def test_custom_realization_filter(
     config: Any, eval_func: Any, test_functions: Any
 ) -> None:
     config["objectives"]["realization_filters"] = 0
-    config["realization_filters"] = [
+    config["realization_filter"] = [
         CustomRealizationFilter(RealizationFilterConfig(method="custom"))
     ]
     opt_result = optimize(config, initial_values, eval_func(test_functions))
@@ -631,7 +631,7 @@ def test_filter_receives_the_configured_objective_scales(
     realization_filter = _ScaleRecordingFilter(RealizationFilterConfig(method="custom"))
     config["objectives"]["scales"] = [2.0, 4.0]
     config["objectives"]["realization_filters"] = 0
-    config["realization_filters"] = [realization_filter]
+    config["realization_filter"] = [realization_filter]
     optimize(config, initial_values, eval_func(test_functions))
     assert realization_filter.received
     assert all(
@@ -646,7 +646,7 @@ def test_run_with_a_cvar_filter_ends_with_too_few_realizations_when_all_failed(
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     config["gradient"]["evaluation_policy"] = evaluation_policy
-    config["realization_filters"] = [
+    config["realization_filter"] = [
         {"method": "cvar-objective", "options": {"sort": [0], "percentile": 0.4}}
     ]
     config["objectives"]["realization_filters"] = [0, 0]
@@ -663,7 +663,7 @@ def test_realization_filter_is_skipped_when_every_realization_failed(
             "variables": {"variable_count": 1},
             "realizations": {"weights": [1.0, 1.0], "realization_min_success": 0},
             "objectives": {"weights": [1.0], "realization_filters": [0]},
-            "realization_filters": [
+            "realization_filter": [
                 {
                     "method": "cvar-objective",
                     "options": {"sort": [0], "percentile": 0.5},

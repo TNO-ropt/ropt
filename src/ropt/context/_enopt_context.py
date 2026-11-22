@@ -69,18 +69,18 @@ class EnOptContext(BaseModel):
         serialized field values; persist the raw input dictionaries instead.
 
     Attributes:
-        variables:                       Variable settings.
-        objectives:                      Objective function settings.
-        linear_constraints:              Optional linear constraint settings.
-        nonlinear_constraints:           Optional nonlinear constraint settings.
-        realizations:                    Ensemble realization settings.
-        optimizer:                       Optimizer settings.
-        backend:                         Backend plugin instance that runs the optimization algorithm.
-        gradient:                        Gradient estimation settings.
-        realization_filters:             Realization filter instances, selected by index.
-        function_estimators:             Function estimator instances, selected by index.
-        samplers:                        Sampler instances, selected by index.
-        names:                           Optional mapping of axis names to label sequences.
+        variables:             Variable settings.
+        objectives:            Objective function settings.
+        linear_constraints:    Optional linear constraint settings.
+        nonlinear_constraints: Optional nonlinear constraint settings.
+        realizations:          Ensemble realization settings.
+        optimizer:             Optimizer settings.
+        backend:               Backend plugin instance that runs the optimization algorithm.
+        gradient:              Gradient estimation settings.
+        realization_filter:    Realization filter instances, selected by index.
+        function_estimator:    Function estimator instances, selected by index.
+        sampler:               Sampler instances, selected by index.
+        names:                 Optional mapping of axis names to label sequences.
     """
 
     variables: VariablesConfig
@@ -91,9 +91,9 @@ class EnOptContext(BaseModel):
     optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
     backend: BackendInstance = {}  # type: ignore[assignment]
     gradient: GradientConfig = GradientConfig.model_validate({})
-    realization_filters: RealizationFilterInstances = ()
-    function_estimators: FunctionEstimatorInstances = ()
-    samplers: SamplerInstances = ()
+    realization_filter: RealizationFilterInstances = ()
+    function_estimator: FunctionEstimatorInstances = ()
+    sampler: SamplerInstances = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
     _locked: bool = PrivateAttr(default=False)
@@ -209,16 +209,16 @@ class EnOptContext(BaseModel):
     @model_validator(mode="after")
     def _defaults(self) -> Self:
         updates: dict[str, Any] = {}
-        if not self.function_estimators:
+        if not self.function_estimator:
             function_estimator_config = FunctionEstimatorConfig.model_validate({})
-            updates["function_estimators"] = (
+            updates["function_estimator"] = (
                 get_plugin(
                     "function_estimator", method=function_estimator_config.method
                 )(function_estimator_config),
             )
-        if not self.samplers:
+        if not self.sampler:
             sampler_config = SamplerConfig.model_validate({})
-            updates["samplers"] = (
+            updates["sampler"] = (
                 get_plugin("sampler", method=sampler_config.method)(sampler_config),
             )
         if updates:
@@ -227,6 +227,11 @@ class EnOptContext(BaseModel):
 
     @model_validator(mode="after")
     def _check_references(self) -> Self:
+        components = {
+            "samplers": self.sampler,
+            "function_estimators": self.function_estimator,
+            "realization_filters": self.realization_filter,
+        }
         sections = [
             ("variables", self.variables, ("samplers",)),
             (
@@ -245,7 +250,7 @@ class EnOptContext(BaseModel):
             )
         for section, config, fields in sections:
             for field in fields:
-                defined = getattr(self, field)
+                defined = components[field]
                 for index in getattr(config, field):
                     if index is not None and not 0 <= index < len(defined):
                         known = (

@@ -102,13 +102,11 @@ def main() -> None:
         "realizations": {
             "weights": [1.0] * realizations,
         },
-        # Filters are listed here and referred to by index by the objectives or
-        # the nonlinear constraints that use them. Passing the instance itself,
+        # Filters are configured here and referred to by index by the objectives
+        # or nonlinear constraints that use them. Passing the instance itself,
         # `MedianFilter(RealizationFilterConfig(method="median"))`, works too
         # and needs no registration.
-        "realization_filters": [
-            {"method": "custom/median"},
-        ],
+        "realization_filter": {"method": "custom/median"},
         "objectives": {
             "realization_filters": [0],
         },

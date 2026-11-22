@@ -66,21 +66,17 @@ shown separately.
             "merge_realizations": False,                      # default: estimate and average gradients
             "evaluation_policy": "auto",                      # default: evaluate functions and perturbations
         },                                                    #          as needed
-        "samplers": [
-            {
-                "method": "scipy/default",                    # default: standard normal N(0,1)
-                "options": {},
-                "shared": False,                             # default: each realization has its own
+        "sampler": {
+            "method": "scipy/default",                        # default: standard normal N(0,1)
+            "options": {},
+            "shared": False,                                 # default: each realization has its own
                                                              #          set of perturbations
-            },
-        ],
-        "function_estimators": [
-            {
-                "method": "default/default",                  # default: weighted average
-                "options": {},
-            },
-        ],
-        "realization_filters": [],                            # default: none configured
+        },
+        "function_estimator": {
+            "method": "default/default",                      # default: weighted average
+            "options": {},
+        },
+        "realization_filter": [],                             # default: none configured
         "names": {},                                          # default: none configured
     }
     ```
@@ -115,13 +111,11 @@ shown separately.
         "function_estimators": 0,                 # default: use first estimator
     }
 
-    # realization_filters entries (method is required):
-    "realization_filters": [
-        {
-            "method": ...,                        # required: str ("plugin/method")
-            "options": {},
-        },
-    ]
+    # realization_filter (method is required):
+    "realization_filter": {
+        "method": ...,                            # required: str ("plugin/method")
+        "options": {},
+    }
     ```
 
 ## Built-in methods
@@ -134,9 +128,9 @@ separately installed plugins have their own method lists.
 | Section | `method` values | Options and capabilities | Usage |
 | --- | --- | --- | --- |
 | `backend` | `scipy/default`, `scipy/nelder-mead`, `scipy/powell`, `scipy/cg`, `scipy/bfgs`, `scipy/newton-cg`, `scipy/l-bfgs-b`, `scipy/tnc`, `scipy/cobyla`, `scipy/cobyqa`, `scipy/slsqp`, `scipy/trust-constr`, `scipy/differential_evolution` | [`SciPyBackend`][ropt.backend.scipy.SciPyBackend] | [Choosing an Optimizer](optimizer.md) |
-| `samplers` | `scipy/default`, `scipy/norm`, `scipy/truncnorm`, `scipy/uniform`, `scipy/sobol`, `scipy/halton`, `scipy/lhs` | [`SciPySampler`][ropt.sampler.scipy.SciPySampler] | [Selecting a sampler](samplers.md#selecting-a-sampler) |
-| `function_estimators` | `default/default`, `default/mean`, `default/stddev` | [`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator] | [Selecting an estimator](function_estimators.md#selecting-an-estimator) |
-| `realization_filters` | `default/cvar-objective`, `default/cvar-constraint` | [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions], [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions] | [Selecting a filter](realization_filters.md#selecting-a-filter) |
+| `sampler` | `scipy/default`, `scipy/norm`, `scipy/truncnorm`, `scipy/uniform`, `scipy/sobol`, `scipy/halton`, `scipy/lhs` | [`SciPySampler`][ropt.sampler.scipy.SciPySampler] | [Selecting a sampler](samplers.md#selecting-a-sampler) |
+| `function_estimator` | `default/default`, `default/mean`, `default/stddev` | [`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator] | [Selecting an estimator](function_estimators.md#selecting-an-estimator) |
+| `realization_filter` | `default/cvar-objective`, `default/cvar-constraint` | [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions], [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions] | [Selecting a filter](realization_filters.md#selecting-a-filter) |
 
 For backends, `scipy/default` selects `scipy/slsqp`; for samplers, it selects
 `scipy/norm`. The estimator `default/default` selects `default/mean`.
@@ -402,16 +396,16 @@ The `gradient` section has four fields:
 See [Stochastic Gradients](gradients.md) for how these settings affect the
 estimates and evaluation work.
 
-## `function_estimators` { #function-estimators }
+## `function_estimator` { #function-estimator }
 
 Validated into
 [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig].
 
-A list of component configurations, each selecting a plugin with a `method`
-field and an optional `options` dict. Other sections select a component by its
-index in this list (see [Sharing optimizer components by
-index](configuration.md#sharing-optimizer-components-by-index)). A single
-configuration dict is also accepted.
+A component configuration, or a list/tuple of configurations, each selecting a
+plugin with a `method` field and an optional `options` dict. Objectives and
+nonlinear constraints select components by index using their
+`function_estimators` fields (see [Sharing optimizer components by
+index](configuration.md#sharing-optimizer-components-by-index)).
 
 Fields:
 
@@ -421,16 +415,16 @@ Fields:
 See [Function Estimators](function_estimators.md) for the available methods
 and how to select one.
 
-## `realization_filters` { #realization-filters }
+## `realization_filter` { #realization-filter }
 
 Validated into
 [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig].
 
-A list of component configurations, each selecting a plugin with a `method`
-field and an optional `options` dict. Other sections select a component by its
-index in this list (see [Sharing optimizer components by
-index](configuration.md#sharing-optimizer-components-by-index)). A single
-configuration dict is also accepted.
+A component configuration, or a list/tuple of configurations, each selecting a
+plugin with a `method` field and an optional `options` dict. Objectives and
+nonlinear constraints select components by index using their
+`realization_filters` fields (see [Sharing optimizer components by
+index](configuration.md#sharing-optimizer-components-by-index)).
 
 Fields:
 
@@ -440,15 +434,15 @@ Fields:
 See [Realization Filters](realization_filters.md) for available filters and
 how to select one.
 
-## `samplers` { #samplers }
+## `sampler` { #sampler }
 
 Validated into [`SamplerConfig`][ropt.config.SamplerConfig].
 
-A list of component configurations, each selecting a plugin with a `method`
-field and an optional `options` dict. [`variables.samplers`](#variables)
-selects each component by its index in this list (see [Sharing optimizer
+A component configuration, or a list/tuple of configurations, each selecting a
+plugin with a `method` field and an optional `options` dict.
+[`variables.samplers`](#variables) selects each component by its index in the
+resulting tuple (see [Sharing optimizer
 components by index](configuration.md#sharing-optimizer-components-by-index)).
-A single configuration dict is also accepted.
 
 Fields:
 

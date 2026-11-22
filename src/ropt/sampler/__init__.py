@@ -1,6 +1,6 @@
 """Samplers: generators of the perturbation values used for gradient estimation.
 
-A sampler is selected through the `samplers` section of the configuration,
+A sampler is selected through the `sampler` section of the configuration,
 either as an instance or as a
 [`SamplerConfig`][ropt.config.SamplerConfig] naming a method.
 [`SciPySampler`][ropt.sampler.scipy.SciPySampler] provides the methods backed by

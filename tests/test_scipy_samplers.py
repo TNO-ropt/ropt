@@ -40,7 +40,7 @@ def config_fixture() -> dict[str, Any]:
 
 @pytest.mark.parametrize("method", sorted(SCIPY_SAMPLER_SUPPORTED_METHODS))
 def test_scipy_samplers_unconstrained(config: Any, method: str, eval_func: Any) -> None:
-    config["samplers"] = [{"method": method}]
+    config["sampler"] = [{"method": method}]
     result = optimize(config, initial_values, eval_func())
     assert result.results is not None
     assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -94,7 +94,7 @@ def test_scipy_indexed_sampler(config: Any, eval_func: Any) -> None:
 @pytest.mark.parametrize("method", sorted(SCIPY_SAMPLER_SUPPORTED_METHODS))
 def test_scipy_samplers_shared(config: Any, method: str, eval_func: Any) -> None:
     config["realizations"] = {"weights": [1.0, 1.0]}
-    config["samplers"] = [{"method": method}]
+    config["sampler"] = [{"method": method}]
 
     perturbations: dict[str, NDArray[np.float64]] = {}
 
@@ -103,7 +103,7 @@ def test_scipy_samplers_shared(config: Any, method: str, eval_func: Any) -> None
             if isinstance(item, GradientResults) and tag not in perturbations:
                 perturbations[tag] = item.perturbed_variables
 
-    config["samplers"][0]["shared"] = False
+    config["sampler"][0]["shared"] = False
     result1 = optimize(
         config,
         initial_values,
@@ -117,7 +117,7 @@ def test_scipy_samplers_shared(config: Any, method: str, eval_func: Any) -> None
     )
     assert result1.results is not None
 
-    config["samplers"][0]["shared"] = True
+    config["sampler"][0]["shared"] = True
     result2 = optimize(
         config,
         initial_values,

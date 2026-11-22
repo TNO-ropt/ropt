@@ -170,7 +170,7 @@ class _StochasticGradient:
     def perturbed_variables(
         self, variables: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        return _perturb_variables(self._context, variables, self._context.samplers)
+        return _perturb_variables(self._context, variables, self._context.sampler)
 
     def failed_realizations(self, data: _GradientData) -> NDArray[np.bool_]:
         assert self._config.perturbation_min_success is not None

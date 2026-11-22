@@ -315,8 +315,8 @@ def test_context_defaults_and_scaling_apply_when_built_directly(config: Any) -> 
         warnings.simplefilter("error", UserWarning)
         direct = EnOptContext(**config)
     validated = EnOptContext.model_validate(config)
-    assert len(direct.samplers) == len(validated.samplers)
-    assert len(direct.function_estimators) == len(validated.function_estimators)
+    assert len(direct.sampler) == len(validated.sampler)
+    assert len(direct.function_estimator) == len(validated.function_estimator)
     assert np.allclose(direct.variables.upper_bounds, [5.0, 5.0])
     assert np.allclose(direct.variables.upper_bounds, validated.variables.upper_bounds)
 
@@ -360,14 +360,14 @@ def test_variables_reject_perturbation_types(perturbation_type: str) -> None:
     ("field", "value", "message"),
     [
         ("backend", object(), "Value must be a Backend, BackendConfig, or dict."),
-        ("samplers", (object(),), "Value must be a Sampler, SamplerConfig, or dict."),
+        ("sampler", (object(),), "Value must be a Sampler, SamplerConfig, or dict."),
         (
-            "realization_filters",
+            "realization_filter",
             (object(),),
             "Value must be a RealizationFilter, RealizationFilterConfig, or dict.",
         ),
         (
-            "function_estimators",
+            "function_estimator",
             (object(),),
             "Value must be a FunctionEstimator, FunctionEstimatorConfig, or dict.",
         ),
@@ -381,23 +381,48 @@ def test_plugin_field_rejects_unknown_value(
         EnOptContext.model_validate(config)
 
 
-def test_components_given_as_a_list_are_selected_by_index(
-    config: dict[str, Any],
+@pytest.mark.parametrize("as_tuple", [False, True])
+def test_component_sequence_uses_plural_selectors(
+    config: dict[str, Any], *, as_tuple: bool
 ) -> None:
-    config["samplers"] = [{}, {}]
-    config["variables"]["samplers"] = [0, 1]
+    config["sampler"] = ({}, {}) if as_tuple else [{}, {}]
+    config["function_estimator"] = ({}, {}) if as_tuple else [{}, {}]
+    filters = [
+        {"method": "cvar-objective", "options": {"sort": [0]}},
+        {"method": "cvar-objective", "options": {"sort": [1]}},
+    ]
+    config["realization_filter"] = tuple(filters) if as_tuple else filters
+    config["variables"]["samplers"] = [1, 0]
+    config["objectives"] = {
+        "weights": [1.0, 1.0],
+        "function_estimators": [1, 0],
+        "realization_filters": [None, 1],
+    }
+    config["nonlinear_constraints"] = {
+        "lower_bounds": [0.0, 0.0],
+        "upper_bounds": [1.0, 1.0],
+        "function_estimators": [0, 1],
+        "realization_filters": [1, None],
+    }
     context = EnOptContext.model_validate(config)
-    assert len(context.samplers) == 2
-    assert context.variables.samplers == (0, 1)
+    assert len(context.sampler) == 2
+    assert len(context.function_estimator) == 2
+    assert len(context.realization_filter) == 2
+    assert context.variables.samplers == (1, 0)
+    assert context.objectives.function_estimators == (1, 0)
+    assert context.objectives.realization_filters == (None, 1)
+    assert context.nonlinear_constraints is not None
+    assert context.nonlinear_constraints.function_estimators == (0, 1)
+    assert context.nonlinear_constraints.realization_filters == (1, None)
 
 
 @pytest.mark.parametrize(
     ("field", "value"),
     [
-        ("samplers", {"method": "scipy/default"}),
-        ("function_estimators", {"method": "default/mean"}),
+        ("sampler", {"method": "scipy/default"}),
+        ("function_estimator", {"method": "default/mean"}),
         (
-            "realization_filters",
+            "realization_filter",
             {
                 "method": "default/cvar-objective",
                 "options": {"sort": [0]},
@@ -405,22 +430,42 @@ def test_components_given_as_a_list_are_selected_by_index(
         ),
     ],
 )
-def test_a_single_component_dict_is_wrapped(
+def test_component_dict_is_wrapped(
     config: dict[str, Any], field: str, value: dict[str, Any]
 ) -> None:
     config[field] = value
     context = EnOptContext.model_validate(config)
-    assert len(getattr(context, field)) == 1
+    components = getattr(context, field)
+    assert isinstance(components, tuple)
+    assert len(components) == 1
+
+
+@pytest.mark.parametrize(
+    ("field", "method"),
+    [
+        ("samplers", "scipy/default"),
+        ("function_estimators", "default/mean"),
+        ("realization_filters", "default/cvar-objective"),
+    ],
+)
+def test_component_sections_reject_plural_names(
+    config: dict[str, Any], field: str, method: str
+) -> None:
+    config[field] = [{"method": method}]
+    with pytest.raises(
+        ValidationError, match=rf"{field}\s+Extra inputs are not permitted"
+    ):
+        EnOptContext.model_validate(config)
 
 
 def test_components_cannot_be_selected_by_name(config: dict[str, Any]) -> None:
-    config["samplers"] = {"coarse": {}, "fine": {}}
+    config["sampler"] = {"coarse": {}, "fine": {}}
     with pytest.raises(ValidationError):
         EnOptContext.model_validate(config)
 
 
 def test_a_single_index_is_broadcast_over_the_elements(config: dict[str, Any]) -> None:
-    config["samplers"] = [{}]
+    config["sampler"] = [{}]
     config["variables"]["samplers"] = 0
     context = EnOptContext.model_validate(config)
     assert context.variables.samplers == (0, 0)
@@ -435,7 +480,7 @@ def test_a_null_reference_selects_no_realization_filter(
 
 
 def test_an_unknown_index_names_the_defined_indices(config: dict[str, Any]) -> None:
-    config["samplers"] = [{}]
+    config["sampler"] = [{}]
     config["variables"]["samplers"] = 1
     with pytest.raises(
         ValidationError,
