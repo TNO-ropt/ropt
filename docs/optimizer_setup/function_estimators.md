@@ -17,9 +17,10 @@ strategy.
 
 ## Selecting an estimator
 
-Estimators are listed at the top level of the configuration and referenced from
-the objectives or nonlinear constraints that use them, so different objectives
-can be aggregated differently. The default method is a weighted average:
+Estimators are configured in the top-level `function_estimator` field and
+referenced from the objectives or nonlinear constraints that use them, so
+different objectives can be aggregated differently. The default method is a
+weighted average:
 
 ```python
 CONFIG = {
@@ -29,9 +30,7 @@ CONFIG = {
         "weights": [1.0],
         "function_estimators": [0],   # objective uses estimator 0
     },
-    "function_estimators": [
-        {"method": "default/mean"},   # index 0
-    ],
+    "function_estimator": {"method": "default/mean"},
 }
 ```
 
@@ -41,7 +40,7 @@ receives the per-realization function and gradient arrays together with the
 current weights, and returns a single aggregated value. See [Sharing optimizer
 components by index](configuration.md#sharing-optimizer-components-by-index) for
 the indexing pattern, and
-[`function_estimators`](configuration_sections.md#function-estimators)
+[`function_estimator`](configuration_sections.md#function-estimator)
 for the fields of an estimator configuration.
 
 ## Standard-deviation estimator
@@ -49,9 +48,7 @@ for the fields of an estimator configuration.
 To optimize for low variability instead of low mean, use `stddev`:
 
 ```python
-"function_estimators": [
-    {"method": "default/stddev"},
-],
+"function_estimator": {"method": "default/stddev"},
 "objectives": {"weights": [1.0], "function_estimators": [0]},
 ```
 
@@ -73,7 +70,7 @@ whose docstring documents the methods to implement, including how
 `merge_realizations` changes what `calculate_gradient` receives. Registering
 an estimator with the plugin system is only required when it should be
 selectable via [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig];
-otherwise, an instance can be passed directly in the `function_estimators`
+otherwise, an instance can be passed directly in the `function_estimator`
 section of the configuration.
 For unmerged gradients, `calculate_gradient` receives an array with shape
 `(n_realizations, n_variables)`; with merged realizations, it receives

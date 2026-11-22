@@ -200,4 +200,4 @@ error from pandas or polars when a result is turned into a table.
 | What you see | Most likely cause |
 | --- | --- |
 | `RuntimeError: Auto-scaling of the objectives failed to estimate a scale factor` | The first batch averaged to zero, or to a value that is not finite, so no scale could be derived. Set the scales yourself, or start somewhere else. |
-| Two optimizations that should agree give different gradients | Quasi-random samplers (`sobol`, `halton`, `lhs`) are seeded in the order the [samplers](../optimizer_setup/configuration_sections.md#samplers) are defined, so reordering that section changes the perturbations. |
+| Two optimizations that should agree give different gradients | Quasi-random samplers (`sobol`, `halton`, `lhs`) are seeded in the order the [samplers](../optimizer_setup/configuration_sections.md#sampler) are defined, so reordering that section changes the perturbations. |

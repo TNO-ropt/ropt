@@ -147,9 +147,7 @@ def main() -> None:
             "gradient": {
                 "number_of_perturbations": DIM,
             },
-            "samplers": [
-                {"method": f"custom/{method}", "shared": shared},
-            ],
+            "sampler": {"method": f"custom/{method}", "shared": shared},
         }
 
         result = optimize(config, INITIAL_VALUES, rosenbrock)

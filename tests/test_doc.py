@@ -70,9 +70,9 @@ def test_scipy_capability_table() -> None:
     ("section", "plugin", "methods"),
     [
         ("backend", "scipy", SUPPORTED_SCIPY_METHODS | {"default"}),
-        ("samplers", "scipy", SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"}),
-        ("function_estimators", "default", DEFAULT_FUNCTION_ESTIMATOR_METHODS),
-        ("realization_filters", "default", DEFAULT_REALIZATION_FILTER_METHODS),
+        ("sampler", "scipy", SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"}),
+        ("function_estimator", "default", DEFAULT_FUNCTION_ESTIMATOR_METHODS),
+        ("realization_filter", "default", DEFAULT_REALIZATION_FILTER_METHODS),
     ],
 )
 def test_configuration_reference_lists_builtin_methods(

@@ -119,7 +119,7 @@ class EnsembleEvaluator:
             evaluator if self._initial_values is None else self._initial_values
         )
         self._realization_filters: tuple[RealizationFilter, ...] = (
-            context.realization_filters
+            context.realization_filter
         )
         self._function_estimators = self._init_function_estimators()
         self._init_samplers()
@@ -854,15 +854,15 @@ class EnsembleEvaluator:
         return objective_weights, constraint_weights
 
     def _init_function_estimators(self) -> tuple[FunctionEstimator, ...]:
-        for function_estimator in self._context.function_estimators:
+        for function_estimator in self._context.function_estimator:
             function_estimator.init(
                 merge_realizations=self._gradient.merges_realizations
             )
-        return self._context.function_estimators
+        return self._context.function_estimator
 
     def _init_samplers(self) -> None:
         rng = default_rng(self._context.variables.seed)
-        for index, sampler in enumerate(self._context.samplers):
+        for index, sampler in enumerate(self._context.sampler):
             mask = np.asarray(
                 self._context.variables.mask
                 & np.array([item == index for item in self._context.variables.samplers])

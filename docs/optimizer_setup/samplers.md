@@ -12,7 +12,7 @@ sequences, which cover a space more evenly than independent draws.
 
 ## Selecting a sampler
 
-Samplers are listed at the top level of the configuration and referenced from
+Samplers are configured in the top-level `sampler` field and referenced from
 `variables.samplers`, one entry per variable, so different variables can be
 perturbed by different samplers:
 
@@ -23,7 +23,7 @@ CONFIG = {
         "perturbation_magnitudes": 1e-6,
         "samplers": [0, 0, 1, 1],   # variables 0,1 use sampler 0; 2,3 use sampler 1
     },
-    "samplers": [
+    "sampler": [
         {"method": "scipy/default"},   # index 0
         {"method": "scipy/sobol"},     # index 1
     ],
@@ -34,7 +34,7 @@ Omit both fields entirely to perturb every variable with the default sampler.
 See [Sharing optimizer components by
 index](configuration.md#sharing-optimizer-components-by-index) for the indexing
 pattern, which objectives and constraints use in the same way, and
-[`samplers`](configuration_sections.md#samplers) for the fields of a sampler
+[`sampler`](configuration_sections.md#sampler) for the fields of a sampler
 configuration.
 
 ## Sample scaling
@@ -56,7 +56,7 @@ perturbations. Setting the `shared` flag to `True` in
 across all realizations:
 
 ```python
-"samplers": [{"method": "scipy/default", "shared": True}]
+"sampler": {"method": "scipy/default", "shared": True}
 ```
 
 This can reduce noise in the gradient estimate when the objective varies

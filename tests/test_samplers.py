@@ -30,7 +30,7 @@ def config_fixture() -> dict[str, Any]:
         "objectives": {
             "weights": [0.75, 0.24],
         },
-        "samplers": [
+        "sampler": [
             {
                 "method": "test",
             },
@@ -121,14 +121,14 @@ def test_sampler_simple(config: Any) -> None:
     sampler_config = SamplerConfig.model_validate({"method": "test"})
     sampler = MockedSampler(sampler_config)
     config["gradient"]["number_of_perturbations"] = 3
-    config["samplers"] = [sampler]
+    config["sampler"] = [sampler]
     context = EnOptContext.model_validate(config)
     rng = default_rng(123)
     _init(sampler, context, None, rng)
     perturbed_variables = _perturb_variables(
         context,
         np.array([0.0, 0.0, 0.0]),
-        context.samplers,
+        context.sampler,
     )
     assert np.allclose(perturbed_variables, 0.01 * np.eye(3))
 
@@ -150,13 +150,13 @@ def test_sampler_applies_absolute_magnitudes_with_variable_scaling(
                 "offsets": offsets,
             },
             "gradient": {"number_of_perturbations": 3},
-            "samplers": [sampler],
+            "sampler": [sampler],
         }
     )
     _init(sampler, context, None, default_rng(123))
     variables = np.array([0.5, 350.0, 0.0])
     perturbed_variables = _perturb_variables(
-        context, (variables - offsets) / scales, context.samplers
+        context, (variables - offsets) / scales, context.sampler
     )
     assert perturbed_variables.shape == (1, 3, 3)
     np.testing.assert_allclose(
@@ -170,14 +170,14 @@ def test_sampler_use_options(config: Any) -> None:
         {"method": "test", "options": {"scale": 100.0}}
     )
     sampler = MockedSampler(sampler_config)
-    config["samplers"] = [sampler]
+    config["sampler"] = [sampler]
     context = EnOptContext.model_validate(config)
     rng = default_rng(123)
     _init(sampler, context, None, rng)
     perturbed_variables = _perturb_variables(
         context,
         np.array([0.0, 0.0, 0.0]),
-        context.samplers,
+        context.sampler,
     )
     assert np.allclose(perturbed_variables, np.eye(3))
 
@@ -191,7 +191,7 @@ def test_sampler_indexed(config: Any) -> None:
     sampler1 = MockedSampler(sampler_config)
 
     config["variables"]["samplers"] = [0, 1, 1]
-    config["samplers"] = [sampler0, sampler1]
+    config["sampler"] = [sampler0, sampler1]
     context = EnOptContext.model_validate(config)
 
     rng = default_rng(123)
@@ -201,14 +201,14 @@ def test_sampler_indexed(config: Any) -> None:
     perturbed_variables = _perturb_variables(
         context,
         np.array([0.0, 0.0, 0.0]),
-        context.samplers,
+        context.sampler,
     )
     assert np.allclose(perturbed_variables[0, ...], np.diag([0.01, -0.01, -0.01]))
 
 
 def test_sampler_order(config: Any, eval_func: Any) -> None:
     config["variables"]["samplers"] = [0, 0, 1]
-    config["samplers"] = [
+    config["sampler"] = [
         {"method": "norm"},
         {"method": "uniform"},
     ]
@@ -217,7 +217,7 @@ def test_sampler_order(config: Any, eval_func: Any) -> None:
     assert np.allclose(result1.results.variables, [0, 0, 0.5], atol=0.025)
 
     # Switch the samplers:
-    config["samplers"] = [
+    config["sampler"] = [
         {"method": "uniform"},
         {"method": "norm"},
     ]

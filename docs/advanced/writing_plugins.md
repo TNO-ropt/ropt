@@ -128,7 +128,7 @@ installing the package, the sampler is available as `"my_package/uniform"`, or
 as `"uniform"` if no other installed plugin claims that name:
 
 ```python
-"samplers": [{"method": "my_package/uniform"}],
+"sampler": {"method": "my_package/uniform"},
 ```
 
 Check that the plugin is found with
