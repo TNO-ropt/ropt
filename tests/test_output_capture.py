@@ -7,6 +7,8 @@
 from __future__ import annotations
 
 import ctypes
+import errno
+import os
 import subprocess
 import sys
 import textwrap
@@ -104,6 +106,17 @@ def _config(method: str, **optimizer: Any) -> dict[str, Any]:
 
 def _run(method: str, **optimizer: Any) -> None:
     optimize(_config(method, **optimizer), np.ones(2), _objective)
+
+
+def _process_streams() -> tuple[object, ...]:
+    # The Python streams, and the files that descriptors 1 and 2 refer to.
+    stdout, stderr = os.fstat(1), os.fstat(2)
+    return (
+        sys.stdout,
+        sys.stderr,
+        (stdout.st_dev, stdout.st_ino),
+        (stderr.st_dev, stderr.st_ino),
+    )
 
 
 def test_capture_writes_optimizer_output_to_the_configured_file(tmp_path: Path) -> None:
@@ -235,6 +248,45 @@ def test_capture_releases_the_claim_when_the_run_fails(tmp_path: Path) -> None:
         )
     _run("printing/printing", stdout=tmp_path / "after.log")
     assert "OPTIMIZER-PYTHON-STDOUT" in (tmp_path / "after.log").read_text()
+
+
+def test_capture_restores_the_streams_when_writing_fails() -> None:
+    full = Path("/dev/full")
+    if not full.exists():
+        pytest.skip("needs /dev/full")
+    before = _process_streams()
+    with pytest.raises(OSError, match=os.strerror(errno.ENOSPC)):
+        _run("native/printing", stdout=full)
+    assert _process_streams() == before
+
+
+def test_capture_restores_the_streams_when_redirecting_fails(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    dup = os.dup
+
+    def dup_failing_for_stderr(fd: int) -> int:
+        if fd == 2:
+            raise OSError(errno.EMFILE, os.strerror(errno.EMFILE))
+        return dup(fd)
+
+    monkeypatch.setattr(os, "dup", dup_failing_for_stderr)
+    before = _process_streams()
+    with pytest.raises(OSError, match=os.strerror(errno.EMFILE)):
+        _run(
+            "native/printing", stdout=tmp_path / "out.log", stderr=tmp_path / "err.log"
+        )
+    assert _process_streams() == before
+
+
+def test_capture_works_when_sys_stdout_is_none(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sys, "stdout", None)
+    log = tmp_path / "run.log"
+    _run("native/printing", stdout=log)
+    assert sys.stdout is None
+    assert "OPTIMIZER-PYTHON-STDOUT" in log.read_text()
 
 
 def test_capture_does_not_leak_file_descriptors(tmp_path: Path) -> None:

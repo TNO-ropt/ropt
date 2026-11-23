@@ -11,17 +11,19 @@ helpers accept or return is scaled, as is everything else a backend sees.
 """
 
 import io
-import os
-import sys
 from collections.abc import Callable
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import ExitStack, redirect_stderr, redirect_stdout
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt._native_streams import flush_native_streams
+from ropt._native_streams import (
+    flush_native_streams,
+    flush_python_streams,
+    redirect_descriptor,
+)
 from ropt._utils import split_constraints
 
 __all__ = [
@@ -81,23 +83,17 @@ def collect_native_output(run: Callable[[], None]) -> str:
     """
     with TemporaryDirectory() as directory:
         path = Path(directory) / "native-output.txt"
-        sys.stdout.flush()
-        sys.stderr.flush()
-        flush_native_streams()
-        saved_stdout_fd = os.dup(1)
-        saved_stderr_fd = os.dup(2)
-        try:
-            with path.open("w") as handle:
-                os.dup2(handle.fileno(), 1)
-                os.dup2(handle.fileno(), 2)
-                with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-                    run()
-                flush_native_streams()
-        finally:
-            os.dup2(saved_stdout_fd, 1)
-            os.dup2(saved_stderr_fd, 2)
-            os.close(saved_stdout_fd)
-            os.close(saved_stderr_fd)
+        with path.open("w") as handle, ExitStack() as stack:
+            flush_python_streams()
+            flush_native_streams()
+            redirect_descriptor(stack, 1, handle.fileno())
+            redirect_descriptor(stack, 2, handle.fileno())
+            # Registered after the descriptors, so it runs before they are
+            # restored, while they still refer to the file.
+            stack.callback(flush_native_streams)
+            stack.enter_context(redirect_stdout(io.StringIO()))
+            stack.enter_context(redirect_stderr(io.StringIO()))
+            run()
         return path.read_text()
 
 

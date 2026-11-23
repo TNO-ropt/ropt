@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
-import os
-import sys
 import threading
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager, redirect_stderr, redirect_stdout
 from typing import TYPE_CHECKING
 
 import numpy as np
 
 from ropt._logging import get_logger
-from ropt._native_streams import flush_native_streams
+from ropt._native_streams import (
+    flush_native_streams,
+    flush_python_streams,
+    redirect_descriptor,
+)
 from ropt._utils import split_constraints
 from ropt.backend import OptimizationProblem
 from ropt.backend._callback import OptimizerCallbackResult
@@ -332,11 +334,8 @@ class _OutputCapture:
 
         self._stdout_file: TextIO | None = None
         self._stderr_file: TextIO | None = None
-        self._saved_stdout: TextIO | None = None
-        self._saved_stderr: TextIO | None = None
-        self._saved_stdout_fd: int | None = None
-        self._saved_stderr_fd: int | None = None
-        self._installed = False
+        # Undoes the redirection while it is in place, and is `None` otherwise.
+        self._redirection: ExitStack | None = None
 
     @contextmanager
     def capture(self) -> Generator[None]:
@@ -356,7 +355,7 @@ class _OutputCapture:
 
     @contextmanager
     def release(self) -> Generator[None]:
-        if not self._installed:
+        if self._redirection is None:
             yield
             return
         self._uninstall()
@@ -386,47 +385,36 @@ class _OutputCapture:
                 handle.close()
 
     def _install(self) -> None:
-        sys.stdout.flush()
-        sys.stderr.flush()
-        if self._redirect_descriptors:
-            flush_native_streams()
-
-        self._saved_stdout = sys.stdout
-        self._saved_stderr = sys.stderr
-        if self._stdout_file is not None:
-            sys.stdout = self._stdout_file
-        if self._stderr_file is not None:
-            sys.stderr = self._stderr_file
-
-        if self._redirect_descriptors:
-            if self._stdout_file is not None:
-                self._saved_stdout_fd = os.dup(1)
-                os.dup2(self._stdout_file.fileno(), 1)
-            if self._stderr_file is not None:
-                self._saved_stderr_fd = os.dup(2)
-                os.dup2(self._stderr_file.fileno(), 2)
-
-        self._installed = True
+        with ExitStack() as stack:
+            self._redirect(stack)
+            # Reached only if every step succeeded; otherwise leaving the `with`
+            # block has undone the steps that did.
+            self._redirection = stack.pop_all()
 
     def _uninstall(self) -> None:
-        for handle in (self._stdout_file, self._stderr_file):
-            if handle is not None:
-                handle.flush()
+        redirection = self._redirection
+        self._redirection = None
+        if redirection is not None:
+            redirection.close()
+
+    def _redirect(self, stack: ExitStack) -> None:
+        flush_python_streams()
         if self._redirect_descriptors:
             flush_native_streams()
 
-        if self._saved_stdout_fd is not None:
-            os.dup2(self._saved_stdout_fd, 1)
-            os.close(self._saved_stdout_fd)
-            self._saved_stdout_fd = None
-        if self._saved_stderr_fd is not None:
-            os.dup2(self._saved_stderr_fd, 2)
-            os.close(self._saved_stderr_fd)
-            self._saved_stderr_fd = None
+        if self._stdout_file is not None:
+            stack.enter_context(redirect_stdout(self._stdout_file))
+        if self._stderr_file is not None:
+            stack.enter_context(redirect_stderr(self._stderr_file))
 
-        if self._saved_stdout is not None:
-            sys.stdout = self._saved_stdout
-        if self._saved_stderr is not None:
-            sys.stderr = self._saved_stderr
+        if self._redirect_descriptors:
+            for fd, target in ((1, self._stdout_file), (2, self._stderr_file)):
+                if target is not None:
+                    redirect_descriptor(stack, fd, target.fileno())
+            # Registered after the descriptors, so it runs before they are
+            # restored, while they still refer to the files.
+            stack.callback(flush_native_streams)
 
-        self._installed = False
+        for target in (self._stdout_file, self._stderr_file):
+            if target is not None:
+                stack.callback(target.flush)
