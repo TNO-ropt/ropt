@@ -2751,10 +2751,10 @@ module, which selects the realizations contributing to the
 Conditional-Value-at-Risk tail. It can be configured for objectives, for
 constraints, or both.</p>
 <h2 id="selecting-a-filter">Selecting a filter</h2>
-<p>Filters are configured in the top-level <code>realization_filter</code> field and
-referenced from the objectives or nonlinear constraints that use them, so
-different objectives can be filtered differently. This one optimizes the
-conditional expectation of the worst 30% of 10 realizations:</p>
+<p>Filters are listed at the top level of the configuration and referenced from the
+objectives or nonlinear constraints that use them, so different objectives can be
+filtered differently. This one optimizes the conditional expectation of the worst
+30% of 10 realizations:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">},</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
@@ -2762,20 +2762,22 @@ conditional expectation of the worst 30% of 10 realizations:</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>   <span class="c1"># objective uses filter 0</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">},</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">"realization_filter"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"default/cvar-objective"</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"sort"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"percentile"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="p">},</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">}</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="p">{</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>            <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"default/cvar-objective"</span><span class="p">,</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>            <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"sort"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"percentile"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="p">},</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="p">],</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Omit both fields to leave every realization at its configured weight. At each
 evaluation a filter returns per-realization weights that replace
 <code>realizations.weights</code> for that evaluation. An evaluation in which every
 realization failed is not filtered, and gives the same result as without a
-filter. See <a href="../configuration/#sharing-optimizer-components-by-index">Sharing optimizer components by
-index</a> for the indexing
-pattern, and <a href="../configuration_sections/#realization-filter"><code>realization_filter</code></a>
+filter. See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
+key</a> for the indexing
+pattern, and <a href="../configuration_sections/#realization-filters"><code>realization_filters</code></a>
 for the fields of a filter configuration.</p>
 <p>See <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRObjectiveOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>
 for the parameters. The corresponding constraint variant is
@@ -2792,7 +2794,7 @@ whose abstract methods define what a filter must provide. A filter defined where
 an entry point cannot reach it — in a script or a notebook — is added with
 <a class="autorefs autorefs-internal" title="            ropt.plugins.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.register_plugin"><code>register_plugin</code></a>, after which it is
 selected by its <code>"plugin/method"</code> string exactly like an installed one. An
-instance can also be passed directly in the <code>realization_filter</code> section of
+instance can also be passed directly in the <code>realization_filters</code> section of
 the configuration, which needs no registration.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py">examples/realization_filter.py</a>,

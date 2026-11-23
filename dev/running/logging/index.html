@@ -2842,22 +2842,30 @@ appears twice.</p>
 <h2 id="logging-during-an-optimization">While the optimizer is running</h2>
 <p>Setting <a href="../../optimizer_setup/configuration_sections/#optimizer"><code>stdout</code> or
 <code>stderr</code></a> sends the
-optimizer's own output to a file. That capture is scoped to a period of time
-rather than to a source, so other output produced during that period could end
-up in the file as well. Almost no log output does: <code>ropt</code> lifts the capture
-around every evaluation, and a console destination created before the
-optimization starts keeps writing to the stream it was given.</p>
-<p>The exception is an optimizer that prints from compiled code or from a process
-of its own. <code>ropt</code> then redirects the output streams of the Python process as
-well, and at that level console logging <em>is</em> caught: its lines land in the
-capture file along with the optimizer's own. This applies to the SciPy method
-<code>tnc</code>, and to every
-<a href="../../optimizer_setup/optimizer/#external-backend"><code>external/</code></a> method. Giving
-<code>ropt</code> a destination of its own, as above, keeps its output out of the file in
-that case too.</p>
-<p>Python warnings go the other way round. A <code>warnings.warn</code> raised while the
-optimizer is working <em>is</em> captured, which is usually what you want, since it
-generally comes from the optimizer.</p>
+optimizer's output to a file. In the parent process, capture is active while
+the backend runs and is released around each optimizer callback. Output from
+the callback, including the evaluation and <code>ropt</code>'s callback logs, goes to the
+original streams.</p>
+<p>The stream redirection is process-wide. While it is active, output from other
+threads can also end up in the capture file. This includes <code>print(...,
+file=sys.stderr)</code> and <code>warnings.warn</code> when they write to a redirected Python
+stream.</p>
+<p>For backends that write from compiled code or a child process, <code>ropt</code> also
+redirects file descriptors 1 and 2. This applies to the SciPy method <code>tnc</code> and
+every <a href="../../optimizer_setup/optimizer/#external-backend"><code>external/</code></a> method.
+The descriptor redirection is process-wide too, so logging handlers created
+before the optimization, and other threads writing to those descriptors, can
+also write to the capture file.</p>
+<p>To keep console logging on the original standard error when descriptor
+redirection is used, create the logging handler with a duplicate of descriptor
+2 before the optimization:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">stream</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">dup</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">buffering</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</span></code></pre></div>
+<p>This applies only to messages sent through that handler. Other output from
+threads can still be captured.</p>
 <details class="info">
 <summary>Narrowing it down further</summary>
 <p>Every line comes from a logger named after the part of <code>ropt</code> that produced

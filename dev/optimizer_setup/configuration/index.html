@@ -1608,10 +1608,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sharing-optimizer-components-by-index" class="md-nav__link">
+  <a href="#sharing-optimizer-components-by-key" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Sharing optimizer components by index
+        Sharing optimizer components by key
       </span>
     </span>
   </a>
@@ -2828,10 +2828,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sharing-optimizer-components-by-index" class="md-nav__link">
+  <a href="#sharing-optimizer-components-by-key" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
-        Sharing optimizer components by index
+        Sharing optimizer components by key
       </span>
     </span>
   </a>
@@ -2941,14 +2941,14 @@ top-level key becomes an instance of that section's configuration class:
 <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>, <code>objectives</code> an
 <a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig" href="../../reference/config/#ropt.config.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig</code></a>, and so on.
 Only <code>variables</code> is required; every other section has defaults.</p>
-<p>Three sections are different in kind. <code>sampler</code>, <code>realization_filter</code> and
-<code>function_estimator</code> do not hold settings but <strong>components</strong> — objects built by
-the plugin system, which other sections select by index.</p>
+<p>Three keys are different in kind. <code>samplers</code>, <code>realization_filters</code> and
+<code>function_estimators</code> do not hold settings but <strong>components</strong> — objects built by
+the plugin system, which the sections that use them refer to by key.</p>
 <p>Most of the rules below follow from this one step. Because the dictionary is
 converted once, validation and coercion happen before the optimization rather
-than during it; because the result is a set of objects rather than the dict you
-wrote, those objects are frozen; and because components are shared rather than
-copied, they are addressed by index.</p>
+than during it; because the result is a set of objects rather than the dict you wrote, those
+objects are frozen; and because components are shared rather than copied, they
+are addressed by key.</p>
 <h2 id="top-level-layout">Top-level layout</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                        <span class="c1"># required</span>
@@ -2959,16 +2959,15 @@ copied, they are addressed by index.</p>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                        <span class="c1"># optional</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                          <span class="c1"># optional</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                         <span class="c1"># optional</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s2">"realization_filter"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>               <span class="c1"># optional, one component or a list</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">"function_estimator"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>               <span class="c1"># optional, one component or a list</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="s2">"sampler"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                          <span class="c1"># optional, one component or a list</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>              <span class="c1"># optional, tuple</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>              <span class="c1"># optional, tuple</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>                         <span class="c1"># optional, tuple</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                            <span class="c1"># optional, for labelled output</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Only <code>variables</code> is required. Each value is either a plain dict (which Pydantic
 validates against the corresponding config class) or a list/tuple of such
-dicts for the plugin-bearing fields. A single plugin config dict is also
-accepted and is treated as a one-item list.</p>
+dicts for the plugin-bearing fields.</p>
 <h2 id="rules-that-apply-everywhere">Rules that apply everywhere</h2>
 <h3 id="pydantic-validation">Pydantic validation</h3>
 <p>All configuration dictionaries are validated using
@@ -2990,10 +2989,9 @@ size-1 value is broadcast to match the relevant count, for example:</p>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Length-mismatched arrays raise a validation error.</p>
-<h3 id="sharing-optimizer-components-by-index">Sharing optimizer components by index</h3>
-<p>The top-level component fields use singular names, whether they contain one
-component or several. Each accepts a single configuration or a list/tuple of
-configurations; validation stores a tuple of <strong>components</strong>:</p>
+<h3 id="sharing-optimizer-components-by-key">Sharing optimizer components by key</h3>
+<p>Each tuple-typed field holds the optimizer <strong>components</strong> of the corresponding
+kind:</p>
 <table>
 <thead>
 <tr>
@@ -3003,48 +3001,48 @@ configurations; validation stores a tuple of <strong>components</strong>:</p>
 </thead>
 <tbody>
 <tr>
-<td><code>realization_filter</code></td>
+<td><code>realization_filters</code></td>
 <td><a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a></td>
 </tr>
 <tr>
-<td><code>function_estimator</code></td>
+<td><code>function_estimators</code></td>
 <td><a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../../reference/function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a></td>
 </tr>
 <tr>
-<td><code>sampler</code></td>
+<td><code>samplers</code></td>
 <td><a class="autorefs autorefs-internal" title="            ropt.sampler.Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a></td>
 </tr>
 </tbody>
 </table>
 <p>You usually specify each component with a small config dict; see
 <a href="#providing-optimizer-components">Providing optimizer components</a> below.</p>
-<p>For a single sampler, no explicit selection is needed:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">"sampler"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/sobol"</span><span class="p">},</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
+<p>Other config sections refer to these components <strong>by key</strong>. Give them as a
+mapping to choose the keys yourself, or as a list, which is keyed by position —
+so a list entry is reached by the integer that used to index it. For example,
+<a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> has a <code>samplers</code> field that
+selects a sampler for each variable:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">},</span>   <span class="c1"># index 0</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/sobol"</span><span class="p">},</span>     <span class="c1"># index 1</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">],</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>   <span class="c1"># variables 0,1 use sampler 0; 2,3 use sampler 1</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">},</span>
 </span></code></pre></div>
-<p>Other config sections refer to these components <strong>by index</strong>. The selector
-fields remain plural: <code>variables.samplers</code>, <code>objectives.function_estimators</code>
-and <code>objectives.realization_filters</code>, with the same two fields for nonlinear
-constraints. Each selector holds an index per variable, objective or constraint.
-For example, to select between two samplers:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">"sampler"</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">},</span>   <span class="c1"># index 0</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/sobol"</span><span class="p">},</span>     <span class="c1"># index 1</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">],</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>   <span class="c1"># variables 0,1 use sampler 0; 2,3 use sampler 1</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">},</span>
+<p>The same thing written with names:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"coarse"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span> <span class="s2">"fine"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">}},</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"coarse"</span><span class="p">,</span> <span class="s2">"coarse"</span><span class="p">,</span> <span class="s2">"fine"</span><span class="p">,</span> <span class="s2">"fine"</span><span class="p">],</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="p">},</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Use one component for all elements with index <code>0</code>, the default.</p>
-<p>For the <code>realization_filters</code> selectors, <code>None</code> (the default) leaves the
-corresponding element unfiltered, even when <code>realization_filter</code> is configured.
-Any other index must refer to an item in the corresponding component tuple,
-or building the context fails with an error naming the unknown index.</p>
-<p>The former plural top-level names are not accepted. <code>backend</code> remains a single
-component, and <code>gradient</code> remains a single settings object.</p>
+<p>Use a single key to share one component across all elements; thanks to
+broadcasting, a single value (the default <code>"0"</code>) is sufficient.</p>
+<p>For optional fields like <code>realization_filters</code>, <code>None</code> (the default) leaves the
+corresponding element unfiltered. Any other key must exist, or building the
+context fails with an error naming the unknown key.</p>
 <p>Two runnable scripts select a component by position this way:
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py">examples/realization_filter.py</a>
 and
@@ -3061,7 +3059,10 @@ the required object:</p>
 <p><strong>A plain <code>dict</code></strong> — <em>the usual case</em>. Give a small dictionary with a <code>method</code>
    field (and optional <code>options</code>), and <code>ropt</code> builds the object for you through
    the plugin system:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s2">"sampler"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/sobol"</span><span class="p">},</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">},</span>   <span class="c1"># index 0  -&gt; SciPySampler</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/sobol"</span><span class="p">},</span>     <span class="c1"># index 1  -&gt; SciPySampler</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">],</span>
 </span></code></pre></div>
 <p>The validator looks up a plugin in the <code>ropt.plugins</code> sub-package by the
 <code>method</code> field (<code>"plugin/method"</code> form, or just <code>"method"</code> for implicit
@@ -3081,8 +3082,8 @@ discovery) and builds the object, applying any <code>options</code>.</p>
    registering it as a plugin.</p>
 </li>
 </ol>
-<p>The same pattern applies to <code>backend</code>, <code>function_estimator</code>, and
-<code>realization_filter</code>. You can mix these forms
+<p>The same pattern applies to <code>backend</code>, <code>function_estimators</code>, and
+<code>realization_filters</code>. You can mix these forms
 freely — for example, a hand-built <code>Sampler</code> instance alongside a dict-configured
 one in the same tuple. The dict and config-object forms resolve the <code>method</code>
 through the plugin system, so the plugin must be registered; providing an object

@@ -3384,11 +3384,11 @@ derives scales from the bounds when that is what is wanted.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.VariablesConfig.samplers">samplers</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Indices">Indices</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Sampler index for each variable (default: <code>0</code>).</p>
+                <p>Sampler for each variable, by key (default: <code>"0"</code>).</p>
               </div>
             </td>
           </tr>
@@ -3526,22 +3526,22 @@ factors, so optimizations that differ in that setting compare only through
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.ObjectiveFunctionsConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Indices">Indices</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Realization filter index per objective (default: none).</p>
+                <p>Realization filter per objective, by key (default: none).</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.ObjectiveFunctionsConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Indices">Indices</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Function estimator index per objective (default: <code>0</code>).</p>
+                <p>Function estimator per objective, by key (default: <code>"0"</code>).</p>
               </div>
             </td>
           </tr>
@@ -3773,22 +3773,22 @@ descriptions and usage examples.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.NonlinearConstraintsConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Indices">Indices</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Realization filter index per constraint (default: none).</p>
+                <p>Realization filter per constraint, by key (default: none).</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.NonlinearConstraintsConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Indices">Indices</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Function estimator index per constraint (default: <code>0</code>).</p>
+                <p>Function estimator per constraint, by key (default: <code>"0"</code>).</p>
               </div>
             </td>
           </tr>
@@ -4294,7 +4294,7 @@ and <code>perturbation_min_success</code> to <code>number_of_perturbations</code
 <p><code>FunctionEstimatorConfig</code> configures a function estimator plugin, which
 controls how objective and constraint function values (and their gradients)
 are combined across realizations.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#function-estimator">Configuration
+<p>See <a href="../../optimizer_setup/configuration_sections/#function-estimators">Configuration
 Sections</a> for detailed
 descriptions and usage examples.</p>
 
@@ -4380,7 +4380,7 @@ descriptions and usage examples.</p>
 <p><code>RealizationFilterConfig</code> configures a
 <a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> plugin that
 adjusts per-realization weights.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#realization-filter">Configuration
+<p>See <a href="../../optimizer_setup/configuration_sections/#realization-filters">Configuration
 Sections</a> for detailed
 descriptions and usage examples.</p>
 
@@ -4465,7 +4465,7 @@ descriptions and usage examples.</p>
         <p>Configuration class for samplers.</p>
 <p><code>SamplerConfig</code> configures a <a class="autorefs autorefs-internal" title="            ropt.sampler.Sampler" href="../sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> plugin that
 generates variable perturbations for gradient estimation.</p>
-<p>See <a href="../../optimizer_setup/configuration_sections/#sampler">Configuration Reference</a>
+<p>See <a href="../../optimizer_setup/configuration_sections/#samplers">Configuration Reference</a>
 for field descriptions and defaults.</p>
 
 
