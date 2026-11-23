@@ -104,24 +104,36 @@ appears twice.
 
 Setting [`stdout` or
 `stderr`](../optimizer_setup/configuration_sections.md#optimizer) sends the
-optimizer's own output to a file. That capture is scoped to a period of time
-rather than to a source, so other output produced during that period could end
-up in the file as well. Almost no log output does: `ropt` lifts the capture
-around every evaluation, and a console destination created before the
-optimization starts keeps writing to the stream it was given.
+optimizer's output to a file. In the parent process, capture is active while
+the backend runs and is released around each optimizer callback. Output from
+the callback, including the evaluation and `ropt`'s callback logs, goes to the
+original streams.
 
-The exception is an optimizer that prints from compiled code or from a process
-of its own. `ropt` then redirects the output streams of the Python process as
-well, and at that level console logging *is* caught: its lines land in the
-capture file along with the optimizer's own. This applies to the SciPy method
-`tnc`, and to every
-[`external/`](../optimizer_setup/optimizer.md#external-backend) method. Giving
-`ropt` a destination of its own, as above, keeps its output out of the file in
-that case too.
+The stream redirection is process-wide. While it is active, output from other
+threads can also end up in the capture file. This includes `print(...,
+file=sys.stderr)` and `warnings.warn` when they write to a redirected Python
+stream.
 
-Python warnings go the other way round. A `warnings.warn` raised while the
-optimizer is working *is* captured, which is usually what you want, since it
-generally comes from the optimizer.
+For backends that write from compiled code or a child process, `ropt` also
+redirects file descriptors 1 and 2. This applies to the SciPy method `tnc` and
+every [`external/`](../optimizer_setup/optimizer.md#external-backend) method.
+The descriptor redirection is process-wide too, so logging handlers created
+before the optimization, and other threads writing to those descriptors, can
+also write to the capture file.
+
+To keep console logging on the original standard error when descriptor
+redirection is used, create the logging handler with a duplicate of descriptor
+2 before the optimization:
+
+```python
+import logging
+import os
+
+logging.basicConfig(stream=os.fdopen(os.dup(2), "w", buffering=1))
+```
+
+This applies only to messages sent through that handler. Other output from
+threads can still be captured.
 
 ??? info "Narrowing it down further"
 

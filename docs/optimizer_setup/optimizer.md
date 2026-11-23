@@ -64,6 +64,15 @@ in the child is re-raised in the parent. This is unrelated to evaluating in
 parallel, which is about where your *objective* runs; see
 [Evaluating in Parallel](../running/parallel.md).
 
+If [`stdout` or `stderr`](configuration_sections.md#optimizer) is configured,
+the child inherits those destinations, so its optimizer output is captured.
+The parent also redirects its output descriptors while the backend runs outside
+the optimizer callback. The child's descriptors continue to refer to those
+destinations while the parent's descriptors are restored during callbacks.
+Other parent threads can write to the capture files while the parent's
+descriptors are redirected; see
+[Logging while the optimizer is running](../running/logging.md#logging-during-an-optimization).
+
 This is useful when a backend cannot safely share a process with the rest of
 your program — for example one that crashes the interpreter, leaks memory,
 keeps state between optimizations, or links against native libraries that clash
