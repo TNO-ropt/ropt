@@ -18,7 +18,6 @@ from ropt._scaling import scale
 from ropt._utils import immutable_array, update_fields
 from ropt.config import (
     FunctionEstimatorConfig,
-    GradientConfig,
     LinearConstraintsConfig,
     NonlinearConstraintsConfig,
     ObjectiveFunctionsConfig,
@@ -33,6 +32,7 @@ from ropt.plugins import get_plugin
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     BackendInstance,
     FunctionEstimatorInstances,
+    GradientInstance,
     RealizationFilterInstances,
     SamplerInstances,
 )
@@ -57,7 +57,7 @@ class EnOptContext(BaseModel):
     """The validated configuration of a single optimization run.
 
     Holds the variables, objectives, constraints, realizations, gradient
-    settings, samplers, filters, optimizer and backend that a run needs. It is
+    estimator, samplers, filters, optimizer and backend that a run needs. It is
     built from plain dictionaries or configuration objects and validated on
     creation.
 
@@ -76,7 +76,7 @@ class EnOptContext(BaseModel):
         realizations:          Ensemble realization settings.
         optimizer:             Optimizer settings.
         backend:               Backend plugin instance that runs the optimization algorithm.
-        gradient:              Gradient estimation settings.
+        gradient:              Gradient estimator plugin instance.
         realization_filter:    Realization filter instances, selected by index.
         function_estimator:    Function estimator instances, selected by index.
         sampler:               Sampler instances, selected by index.
@@ -90,7 +90,7 @@ class EnOptContext(BaseModel):
     realizations: RealizationsConfig = RealizationsConfig.model_validate({})
     optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
     backend: BackendInstance = {}  # type: ignore[assignment]
-    gradient: GradientConfig = GradientConfig.model_validate({})
+    gradient: GradientInstance = {}  # type: ignore[assignment]
     realization_filter: RealizationFilterInstances = ()
     function_estimator: FunctionEstimatorInstances = ()
     sampler: SamplerInstances = ()

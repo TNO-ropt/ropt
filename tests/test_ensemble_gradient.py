@@ -4,14 +4,14 @@ import numpy as np
 import pytest
 from numpy.random import default_rng
 
-from ropt._core._gradient import (
+from ropt.config import SamplerConfig
+from ropt.context import EnOptContext
+from ropt.enums import BoundaryType
+from ropt.gradient.default import (
     _apply_bounds,
     _estimate_gradients,
     _perturb_variables,
 )
-from ropt.config import SamplerConfig
-from ropt.context import EnOptContext
-from ropt.enums import BoundaryType
 from ropt.sampler.scipy import SciPySampler
 
 if TYPE_CHECKING:
@@ -76,7 +76,7 @@ def test_gradient_estimation_marks_successful_weighted_realizations() -> None:
     weights = np.array([1.0, 1.0, 0.0])
 
     gradients, estimated_realizations = _estimate_gradients(
-        delta_variables, delta_functions, weights
+        delta_variables, delta_functions, weights, svd_threshold=0.999
     )
 
     np.testing.assert_allclose(gradients, [[1.0], [0.0], [0.0]])
@@ -304,5 +304,7 @@ def test_variable_perturbation_enopt() -> None:
         mask=None,
         rng=default_rng(123),
     )
-    perturbations = _perturb_variables(context, np.array(variables), (sampler,))
+    perturbations = _perturb_variables(
+        context, np.array(variables), (sampler,), perturbation_count=10
+    )
     assert expected_perturbations == pytest.approx(perturbations)

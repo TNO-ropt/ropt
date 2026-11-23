@@ -7,6 +7,11 @@ gradients stochastically using the *Stochastic Simplex Approximate Gradient*
 function values evaluated at the current point and at a number of randomly
 perturbed points.
 
+The estimation is done by a **gradient estimator**, a component selected by the
+`method` field of the `gradient` section. The built-in estimator implements the
+stochastic method and is the default. Other estimators can be added as plugins,
+see [Writing a Plugin](../advanced/writing_plugins.md#gradient-estimators).
+
 This page explains how perturbations, samplers, function estimators, and the
 gradient configuration work together. The runnable script is
 [examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py),
@@ -18,7 +23,7 @@ gradient settings at their defaults.
 
 | Piece                                                                 | Purpose                                                                       |
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| [`GradientConfig`][ropt.config.GradientConfig]                        | Number of perturbations, success thresholds, merging of realizations.         |
+| [`GradientConfig`][ropt.config.GradientConfig]                        | Estimation method and options, number of perturbations, success thresholds, merging of realizations. |
 | [`VariablesConfig`][ropt.config.VariablesConfig] perturbation fields  | Magnitudes, boundary handling, sampler indices.                               |
 | [`SamplerConfig`][ropt.config.SamplerConfig] + `sampler` tuple        | How perturbation samples are drawn (uniform, normal, Sobol, ...).             |
 | [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]      | How per-realization gradients combine into the final estimate.                |
@@ -40,9 +45,11 @@ CONFIG = {
     },
     "realizations": {"weights": [1.0] * 10},
     "gradient": {
+        "method": "stochastic",         # the default
         "number_of_perturbations": 5,
         "perturbation_min_success": 3,  # allow some failures
         "merge_realizations": False,    # estimate per-realization then combine
+        "options": {"svd_threshold": 0.999},
     },
     "sampler": [{"method": "scipy/default"}, {"method": "scipy/sobol"}],
 }
@@ -102,6 +109,39 @@ its own perturbations while remaining reproducible on its own.
 ```python
 "variables": {"variable_count": 5, "seed": (run_id, 1)}
 ```
+
+## How the gradient is estimated { #how-the-gradient-is-estimated }
+
+For each realization and each function, the differences between the perturbed
+points and the current point form the rows of a matrix $\Delta X$, and the
+differences between the function values at those points and at the current
+point form a vector $\Delta f$. The gradient $g$ is the least-squares solution
+of
+
+$$
+\Delta X \, g = \Delta f .
+$$
+
+Perturbations whose evaluation failed are left out of the system.
+
+The system is solved with a truncated singular value decomposition of
+$\Delta X$. The singular values are kept in decreasing order until the sum of
+their squares reaches the fraction `svd_threshold` of the total sum of squares;
+the others are discarded. The option is set in the
+`options` field of the `gradient` section, and its default is 0.999:
+
+```python
+"gradient": {"options": {"svd_threshold": 0.99}}
+```
+
+A lower value removes more of the directions with small singular values from
+the solution. The option is described in
+[`StochasticGradientOptions`][ropt.gradient.default.StochasticGradientOptions].
+
+With `merge_realizations=True`, the rows of all realizations are stacked into
+one system, with the function differences multiplied by the realization
+weights, and one gradient is solved for all realizations. Realizations with
+zero weight are left out.
 
 ## Choosing `number_of_perturbations`
 

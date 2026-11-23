@@ -35,12 +35,14 @@ differences.
 ## Optimization components
 
 Several parts of an optimization are pluggable: you select them in the
-configuration and `ropt` configures them for you. Four kinds of component can be
+configuration and `ropt` configures them for you. Five kinds of component can be
 chosen this way:
 
 - **Optimization backends** provide the optimization algorithms — the *methods*
   the optimizer runs. The built-in backend wraps [SciPy](https://www.scipy.org);
   other backends add algorithms from external packages.
+- **Gradient estimators** compute the gradient from the evaluated perturbations.
+  The built-in estimator implements the stochastic method.
 - **Samplers** generate the perturbations used to estimate stochastic gradients.
 - **Function estimators** combine the per-realization values into the single
   robust objective, for example a mean, or a mean plus a standard-deviation term.
@@ -60,12 +62,12 @@ A component is always an **object**. You can provide it in one of two ways:
 Plugins themselves are either built-in (shipped with `ropt`) or added by
 installing extra packages.
 
-Each of the four kinds has its own place in the configuration. The
+Each of the five kinds has its own place in the configuration. The
 exact syntax, the `method` naming convention (see
 [method strings](configuration.md#method-strings)), and the available options are
 described in [Configuration Reference](configuration_sections.md); the dedicated
-pages [Choosing an Optimizer](optimizer.md), [Samplers](samplers.md),
-[Realization Filters](realization_filters.md) and
+pages [Choosing an Optimizer](optimizer.md), [Stochastic Gradients](gradients.md),
+[Samplers](samplers.md), [Realization Filters](realization_filters.md) and
 [Function Estimators](function_estimators.md) cover each kind in depth.
 
 [examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py)

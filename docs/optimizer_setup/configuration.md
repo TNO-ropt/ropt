@@ -128,9 +128,6 @@ corresponding element unfiltered, even when `realization_filter` is configured.
 Any other index must refer to an item in the corresponding component tuple,
 or building the context fails with an error naming the unknown index.
 
-The former plural top-level names are not accepted. `backend` remains a single
-component, and `gradient` remains a single settings object.
-
 Two runnable scripts select a component by position this way:
 [examples/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py)
 and
@@ -168,7 +165,7 @@ the required object:
    the Python object yourself and want to provide it directly, without
    registering it as a plugin.
 
-The same pattern applies to `backend`, `function_estimator`, and
+The same pattern applies to `backend`, `gradient`, `function_estimator`, and
 `realization_filter`. You can mix these forms
 freely — for example, a hand-built `Sampler` instance alongside a dict-configured
 one in the same tuple. The dict and config-object forms resolve the `method`

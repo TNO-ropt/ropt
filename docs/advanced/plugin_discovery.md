@@ -20,8 +20,8 @@ get_plugin_name("backend", "unknown")         # None
 get_plugin_name("sampler", "scipy/default")   # "scipy"
 ```
 
-The plugin type is one of `"backend"`, `"sampler"`, `"realization_filter"` or
-`"function_estimator"`.
+The plugin type is one of `"backend"`, `"sampler"`, `"realization_filter"`,
+`"function_estimator"` or `"gradient"`.
 
 [`validate_backend_options`][ropt.utils.validate_backend_options] checks
 whether a set of backend-specific options is valid for a given method, raising

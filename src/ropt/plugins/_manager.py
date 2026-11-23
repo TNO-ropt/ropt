@@ -26,6 +26,7 @@ PluginType = Literal[
     "sampler",
     "realization_filter",
     "function_estimator",
+    "gradient",
 ]
 """The plugin types a method string can select from."""
 
@@ -35,6 +36,7 @@ _DEFAULT_PLUGINS: Final = {
     "backend": "scipy",
     "sampler": "scipy",
     "realization_filter": "default",
+    "gradient": "default",
 }
 
 _logger = get_logger(__name__)
@@ -72,6 +74,7 @@ class PluginManager:
         # ruff: disable[import-outside-top-level]
         from ropt.backend import Backend
         from ropt.function_estimator import FunctionEstimator
+        from ropt.gradient import GradientEstimator
         from ropt.realization_filter import RealizationFilter
         from ropt.sampler import Sampler
         # ruff: enable[import-outside-top-level]
@@ -81,6 +84,7 @@ class PluginManager:
             "backend": Backend,
             "sampler": Sampler,
             "realization_filter": RealizationFilter,
+            "gradient": GradientEstimator,
         }
 
         self._plugins: dict[PluginType, dict[str, type[Any]]] = {}
@@ -99,6 +103,7 @@ class PluginManager:
         from ropt.sampler.scipy import SciPySampler
         from ropt.realization_filter.default import DefaultRealizationFilter
         from ropt.function_estimator.default import DefaultFunctionEstimator
+        from ropt.gradient.default import DefaultGradientEstimator
         from ropt.backend.external import ExternalBackend
         from ropt.backend.scipy import SciPyBackend
 
@@ -107,6 +112,7 @@ class PluginManager:
         self._add_plugin("sampler", "scipy", SciPySampler)
         self._add_plugin("realization_filter", "default", DefaultRealizationFilter)
         self._add_plugin("function_estimator", "default", DefaultFunctionEstimator)
+        self._add_plugin("gradient", "default", DefaultGradientEstimator)
 
         for plugin_type_name in self._PLUGIN_TYPES:
             assert plugin_type_name in self._PLUGIN_TYPES

@@ -9,10 +9,12 @@ from ropt.backend import Backend
 from ropt.config import (
     BackendConfig,
     FunctionEstimatorConfig,
+    GradientConfig,
     RealizationFilterConfig,
     SamplerConfig,
 )
 from ropt.function_estimator import FunctionEstimator
+from ropt.gradient import GradientEstimator
 from ropt.plugins import PluginType, get_plugin
 from ropt.realization_filter import RealizationFilter
 from ropt.sampler import Sampler
@@ -75,6 +77,12 @@ BackendInstance = Annotated[
     ),
 ]
 """Validate that the value is an instance of a Backend."""
+
+GradientInstance = Annotated[
+    GradientEstimator,
+    PlainValidator(_make_validator("gradient", GradientConfig, GradientEstimator)),
+]
+"""Validate that the value is an instance of a GradientEstimator."""
 
 SamplerInstance = Annotated[
     Sampler, PlainValidator(_make_validator("sampler", SamplerConfig, Sampler))

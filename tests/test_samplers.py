@@ -7,9 +7,9 @@ import pytest
 from numpy.random import Generator, default_rng
 
 from ropt import optimize
-from ropt._core._gradient import _perturb_variables
 from ropt.config import SamplerConfig
 from ropt.context import EnOptContext
+from ropt.gradient.default import _perturb_variables
 from ropt.sampler import Sampler
 
 if TYPE_CHECKING:
@@ -121,6 +121,7 @@ def test_sampler_simple(config: Any) -> None:
         context,
         np.array([0.0, 0.0, 0.0]),
         context.sampler,
+        perturbation_count=3,
     )
     assert np.allclose(perturbed_variables, 0.01 * np.eye(3))
 
@@ -148,7 +149,7 @@ def test_sampler_applies_absolute_magnitudes_with_variable_scaling(
     _init(sampler, context, None, default_rng(123))
     variables = np.array([0.5, 350.0, 0.0])
     perturbed_variables = _perturb_variables(
-        context, (variables - offsets) / scales, context.sampler
+        context, (variables - offsets) / scales, context.sampler, perturbation_count=3
     )
     assert perturbed_variables.shape == (1, 3, 3)
     np.testing.assert_allclose(
@@ -170,6 +171,7 @@ def test_sampler_use_options(config: Any) -> None:
         context,
         np.array([0.0, 0.0, 0.0]),
         context.sampler,
+        perturbation_count=3,
     )
     assert np.allclose(perturbed_variables, np.eye(3))
 
@@ -194,6 +196,7 @@ def test_sampler_indexed(config: Any) -> None:
         context,
         np.array([0.0, 0.0, 0.0]),
         context.sampler,
+        perturbation_count=3,
     )
     assert np.allclose(perturbed_variables[0, ...], np.diag([0.01, -0.01, -0.01]))
 

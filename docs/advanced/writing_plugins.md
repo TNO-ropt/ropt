@@ -31,6 +31,7 @@ and its own base class:
 | `ropt.plugins.sampler` | [`Sampler`][ropt.sampler.Sampler] |
 | `ropt.plugins.realization_filter` | [`RealizationFilter`][ropt.realization_filter.RealizationFilter] |
 | `ropt.plugins.function_estimator` | [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator] |
+| `ropt.plugins.gradient` | [`GradientEstimator`][ropt.gradient.GradientEstimator] |
 
 ## What a plugin must declare
 
@@ -279,3 +280,109 @@ def test_backend_declares_native_output_correctly():
 
 These properties drift, so a test catches a change that a one-off check does not.
 SciPy's `disp` silently became a no-op for `l-bfgs-b` and `nelder-mead` in 1.18.
+
+## Gradient estimators { #gradient-estimators }
+
+A gradient estimator, a [`GradientEstimator`][ropt.gradient.GradientEstimator]
+subclass, determines the points at which the functions are evaluated to
+estimate a gradient, and computes the gradients from the results. `ropt`
+evaluates the points, handles failed evaluations, and combines the gradients of
+the realizations with the function estimators. The built-in
+[`DefaultGradientEstimator`][ropt.gradient.default.DefaultGradientEstimator]
+implements the [stochastic method](../optimizer_setup/gradients.md).
+
+An estimator that uses forward differences, with one perturbed point per
+variable:
+
+```python
+from typing import ClassVar
+
+import numpy as np
+from numpy.typing import NDArray
+
+from ropt.config import GradientConfig
+from ropt.context import EnOptContext
+from ropt.gradient import GradientData, GradientEstimator
+from ropt.plugins import MethodSpec
+
+STEP = 1e-6
+
+
+class ForwardDifferences(GradientEstimator):
+    methods: ClassVar[MethodSpec] = {"default", "forward"}
+
+    def __init__(self, gradient_config: GradientConfig) -> None:
+        self._config = gradient_config
+
+    def init(self, context: EnOptContext, *, mask: NDArray[np.bool_]) -> None:
+        self._realization_count = context.realizations.weights.size
+        self._mask = mask
+
+    def perturbed_variables(
+        self, variables: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        points = variables + STEP * np.eye(variables.size)[self._mask]
+        return np.repeat(points[np.newaxis], self._realization_count, axis=0)
+
+    def failed_realizations(self, data: GradientData) -> NDArray[np.bool_]:
+        return np.any(np.isnan(data.perturbed_functions[..., 0]), axis=-1)
+
+    def estimate(
+        self, data: GradientData, weights: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+        differences = data.perturbed_functions - data.functions[:, np.newaxis, :]
+        return np.swapaxes(differences, 1, 2) / STEP, weights > 0
+```
+
+`ropt` calls the methods in this order:
+
+1. `init` once, before the first gradient. `mask` selects the variables for
+   which gradients are estimated. `ropt` initializes the samplers in
+   `context.sampler` before this call, so an estimator that uses them only
+   calls their `generate_samples`.
+2. `perturbed_variables` for each gradient. It receives the current point and
+   returns the points to evaluate for each realization. The estimator chooses
+   the number of points. Variables outside the mask must keep their value. The
+   example does not keep the points within the variable bounds.
+3. `failed_realizations` after the points are evaluated. It returns the
+   realizations whose perturbed evaluations do not suffice for an estimate.
+   `ropt` adds the realizations whose evaluation at the current point failed.
+4. `estimate`, which returns the gradient of each function in each
+   realization, with a mask that is `True` where a gradient was estimated. The
+   weights are zero for failed realizations.
+
+The variables are in the optimizer's scaled domain.
+[`GradientData`][ropt.gradient.GradientData] holds the evaluated points,
+restricted to the variables selected by the mask, with the objectives followed
+by the nonlinear constraints as functions. A failed evaluation is `NaN` in
+every function.
+
+The estimator receives the whole `gradient` section as a
+[`GradientConfig`][ropt.config.GradientConfig], including
+`number_of_perturbations`, `perturbation_min_success` and
+`merge_realizations`, which the example does not use. Validate
+`gradient_config.options` in `__init__` and raise a `ValueError` for invalid
+options; it is reported as a validation error of the configuration.
+
+An estimator that returns `True` from
+[`merge_realizations`][ropt.gradient.GradientEstimator.merge_realizations]
+calculates each function's aggregated gradient directly, rather than estimating
+per-realization gradients and then aggregating them. How this is done depends on
+the plugin. The [built-in stochastic estimator](../optimizer_setup/gradients.md#how-the-gradient-is-estimated)
+combines perturbations across realizations, which can reduce the number of
+perturbations needed per realization.
+
+The [`estimate`][ropt.gradient.GradientEstimator.estimate] method then returns
+one gradient per function, of shape `(n_functions, n_variables)`, and `None`
+for the mask. `ropt` does not report per-realization gradient estimates in this
+mode.
+
+Registered under the `ropt.plugins.gradient` entry-point group, or with
+[`register_plugin`][ropt.plugins.register_plugin], the estimator is selected in
+the `gradient` section:
+
+```python
+register_plugin("gradient", "my_package", ForwardDifferences)
+
+"gradient": {"method": "my_package/forward"}
+```

@@ -73,6 +73,7 @@ nav = [
         ] },
         { "Optimizer Components" = [
             { "Function Estimators" = "reference/function_estimator.md" },
+            { "Gradient Estimators" = "reference/gradient.md" },
             { "Realization Filters" = "reference/realization_filter.md" },
             { "Optimizer Backends" = "reference/backend.md" },
             { Samplers = "reference/sampler.md" },

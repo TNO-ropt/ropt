@@ -63,6 +63,8 @@ shown separately.
             "options": None,                                  # default: no extra options
         },
         "gradient": {
+            "method": "default/default",                      # default: stochastic gradient
+            "options": {},
             "number_of_perturbations": 5,
             "perturbation_min_success": None,                 # default: equal to number_of_perturbations
             "merge_realizations": False,                      # default: estimate and average gradients
@@ -132,9 +134,11 @@ separately installed plugins have their own method lists.
 | `sampler` | `scipy/default`, `scipy/norm`, `scipy/truncnorm`, `scipy/uniform`, `scipy/sobol`, `scipy/halton`, `scipy/lhs` | [`SciPySampler`][ropt.sampler.scipy.SciPySampler] | [Selecting a sampler](samplers.md#selecting-a-sampler) |
 | `function_estimator` | `default/default`, `default/mean`, `default/stddev` | [`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator] | [Selecting an estimator](function_estimators.md#selecting-an-estimator) |
 | `realization_filter` | `default/cvar-objective`, `default/cvar-constraint` | [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions], [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions] | [Selecting a filter](realization_filters.md#selecting-a-filter) |
+| `gradient` | `default/default`, `default/stochastic` | [`StochasticGradientOptions`][ropt.gradient.default.StochasticGradientOptions] | [How the gradient is estimated](gradients.md#how-the-gradient-is-estimated) |
 
 For backends, `scipy/default` selects `scipy/slsqp`; for samplers, it selects
-`scipy/norm`. The estimator `default/default` selects `default/mean`.
+`scipy/norm`. The estimator `default/default` selects `default/mean`, and the
+gradient method `default/default` selects `default/stochastic`.
 There is no default realization-filter method.
 To run a backend in a separate process, see the
 [`external/` prefix](optimizer.md#external-backend).
@@ -384,11 +388,16 @@ listed in [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
 
 Validated into [`GradientConfig`][ropt.config.GradientConfig].
 
-Controls how stochastic gradients are estimated (see also [Stochastic
-Gradients](gradients.md) for a deeper discussion).
+Selects the gradient estimator and controls how gradients are estimated (see
+also [Stochastic Gradients](gradients.md) for a deeper discussion). Like
+`backend`, it holds a single component, given as a configuration or as an
+already-constructed [`GradientEstimator`][ropt.gradient.GradientEstimator].
 
-The `gradient` section has three fields:
+The `gradient` section has five fields:
 
+- `method` (default: `"default/default"`): Selects the estimator plugin. The
+  default is the stochastic method.
+- `options` (default: `{}`): Method-specific options.
 - `number_of_perturbations`: positive number of perturbed variable sets
   (default: [`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS]).
 - `perturbation_min_success`: minimum successful perturbations (default:

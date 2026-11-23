@@ -12,6 +12,7 @@ from ropt._logging import get_logger
 from ropt._scaling import scale, unscale_value
 from ropt._utils import apply_direction
 from ropt.exceptions import TooFewRealizations
+from ropt.gradient import GradientData
 from ropt.results import (
     ConstraintInfo,
     FunctionAggregates,
@@ -28,7 +29,6 @@ from ropt.results import (
     ScaledGradientResults,
 )
 
-from ._gradient import _GradientData, _StochasticGradient
 from ._initial_values import _InitialValueFiller
 from ._results import (
     _FunctionEvaluatorResults,
@@ -104,8 +104,9 @@ class EnsembleEvaluator:
         self._context = context
         self._signal_start_callback = signal_start
         self._signal_finished_callback = signal_finished
-        self._gradient = _StochasticGradient(context.gradient)
-        self._gradient.init(context)
+        self._init_samplers()
+        self._gradient = context.gradient
+        self._gradient.init(context, mask=context.variables.mask)
         self._initial_values = (
             None
             if f0 is None and g0 is None
@@ -123,7 +124,6 @@ class EnsembleEvaluator:
             context.realization_filter
         )
         self._function_estimators = self._init_function_estimators()
-        self._init_samplers()
         self._cached_results: FunctionResults | None = None
 
     def calculate(
@@ -361,7 +361,7 @@ class EnsembleEvaluator:
         objective_weights = function_results.realizations.objective_weights
         constraint_weights = function_results.realizations.constraint_weights
         evaluations = function_results.evaluations
-        data = _GradientData(
+        data = GradientData(
             variables=variables if mask is None else variables[mask],
             functions=_join_functions(evaluations.objectives, evaluations.constraints),
             perturbed_variables=(
@@ -373,7 +373,9 @@ class EnsembleEvaluator:
             ),
         )
 
-        failed_realizations = self._gradient.failed_realizations(data)
+        # A failed evaluation is NaN in every function, so the first one suffices.
+        failed_realizations = np.isnan(data.functions[..., 0])
+        failed_realizations |= self._gradient.failed_realizations(data)
         _logger.info(
             "Gradient evaluation: %d/%d realizations succeeded",
             int(np.count_nonzero(~failed_realizations)),
@@ -581,7 +583,7 @@ class EnsembleEvaluator:
 
     def _compute_gradients(
         self,
-        data: _GradientData,
+        data: GradientData,
         mask: NDArray[np.bool_] | None,
         *,
         objective_weights: NDArray[np.float64] | None,
@@ -593,16 +595,16 @@ class EnsembleEvaluator:
         weights = self._gradient_weights(
             objective_weights, constraint_weights, failed_realizations
         )
-        realization_gradients, estimated_realizations = self._gradient.estimate(
-            data, weights
-        )
-        scaled_estimates = (
-            None
-            if estimated_realizations is None
-            else self._scaled_estimates(
-                realization_gradients, mask, estimated_realizations
+        realization_gradients, estimated = self._gradient.estimate(data, weights)
+        scaled_estimates = None
+        if not self._gradient.merge_realizations:
+            assert estimated is not None
+            realization_gradients = np.where(
+                estimated[..., np.newaxis], realization_gradients, 0.0
             )
-        )
+            scaled_estimates = self._scaled_estimates(
+                realization_gradients, mask, estimated
+            )
         try:
             gradients = self._aggregate_gradients(data, realization_gradients, weights)
         except TooFewRealizations:
@@ -611,7 +613,7 @@ class EnsembleEvaluator:
         return self._gradient_calculation(gradients, mask, scaled_estimates)
 
     def _failed_gradient_calculation(
-        self, data: _GradientData, mask: NDArray[np.bool_] | None
+        self, data: GradientData, mask: NDArray[np.bool_] | None
     ) -> _GradientCalculation:
         gradients = np.full(
             (data.functions.shape[-1], data.variables.shape[-1]),
@@ -620,7 +622,7 @@ class EnsembleEvaluator:
         )
         scaled_estimates = (
             None
-            if self._gradient.merges_realizations
+            if self._gradient.merge_realizations
             else self._scaled_estimates(
                 np.zeros((*data.functions.shape, data.variables.shape[-1])),
                 mask,
@@ -719,7 +721,7 @@ class EnsembleEvaluator:
 
     def _aggregate_gradients(
         self,
-        data: _GradientData,
+        data: GradientData,
         realization_gradients: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
@@ -735,11 +737,11 @@ class EnsembleEvaluator:
             data.functions[:, objectives],
             (
                 realization_gradients[objectives]
-                if self._gradient.merges_realizations
+                if self._gradient.merge_realizations
                 else realization_gradients[:, objectives, :]
             ),
             weights[:, objectives],
-            merge_realizations=self._gradient.merges_realizations,
+            merge_realizations=self._gradient.merge_realizations,
         )
         if self._context.nonlinear_constraints is not None:
             constraints = slice(objectives.stop, None)
@@ -749,11 +751,11 @@ class EnsembleEvaluator:
                 data.functions[:, constraints],
                 (
                     realization_gradients[constraints]
-                    if self._gradient.merges_realizations
+                    if self._gradient.merge_realizations
                     else realization_gradients[:, constraints, :]
                 ),
                 weights[:, constraints],
-                merge_realizations=self._gradient.merges_realizations,
+                merge_realizations=self._gradient.merge_realizations,
             )
         return gradients
 
@@ -883,7 +885,7 @@ class EnsembleEvaluator:
     def _init_function_estimators(self) -> tuple[FunctionEstimator, ...]:
         for function_estimator in self._context.function_estimator:
             function_estimator.init(
-                merge_realizations=self._gradient.merges_realizations
+                merge_realizations=self._gradient.merge_realizations
             )
         return self._context.function_estimator
 

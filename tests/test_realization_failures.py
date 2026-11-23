@@ -9,7 +9,6 @@ from numpy.typing import NDArray
 from ropt import optimize
 from ropt._core import EnsembleEvaluator
 from ropt._core._evaluator import _get_failed_function_realizations
-from ropt._core._gradient import _get_failed_gradient_realizations
 from ropt._evaluation import EvaluationFunctionContext
 from ropt._handlers import EventHandler, ResultsHandler
 from ropt._running._run_evaluator import run_evaluation
@@ -17,6 +16,7 @@ from ropt.config import RealizationFilterConfig
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import TooFewRealizations
+from ropt.gradient.default import _failed_perturbation_realizations
 from ropt.realization_filter import RealizationFilter
 from ropt.results import (
     ConstraintInfo,
@@ -38,17 +38,15 @@ def test_failed_function_realization_nan_objective() -> None:
 
 
 @pytest.mark.parametrize(
-    ("objectives", "perturbed_objectives", "perturbation_min_success", "expected"),
+    ("perturbed_objectives", "perturbation_min_success", "expected"),
     [
         pytest.param(
-            np.array([[1.0, 1.0]]),
             np.array([[5 * [np.nan, 1.0]]]),
             1,
             [True],
             id="no_perturbation_success",
         ),
         pytest.param(
-            np.array([[1.0, 1.0]]),
             np.array(
                 [
                     [
@@ -64,45 +62,29 @@ def test_failed_function_realization_nan_objective() -> None:
             [True],
         ),
         pytest.param(
-            np.array([[1.0, 1.0]]),
             np.array([[[1.0, 1.0], [1.0, 1.0], [1.0, 1.0], [1.0, 1.0], [np.nan, 1.0]]]),
             4,
             [False],
         ),
         pytest.param(
-            np.array([[1.0, 1.0], [1.0, 1.0]]),
             np.array([[[1.0, 1.0]], [[np.nan, 1.0]]]),
             1,
             [False, True],
         ),
         pytest.param(
-            np.array([[1.0, 1.0], [np.nan, 1.0]]),
-            np.array([[[1.0], [1.0]], [[1.0], [1.0]]]),
-            1,
-            [False, True],
-        ),
-        pytest.param(
-            np.array([[1.0, 1.0], [np.nan, np.nan]]),
-            np.array([[[1.0], [1.0]], [[1.0], [1.0]]]),
-            1,
-            [False, True],
-        ),
-        pytest.param(
-            np.array([[1.0, 1.0], [1.0, 1.0]]),
             np.array([[[1.0, 1.0], [1.0, 1.0]], [[np.nan, np.nan], [1.0, 1.0]]]),
             1,
             [False, False],
         ),
     ],
 )
-def test_failed_gradient_realizations(
-    objectives: Any,
+def test_failed_perturbation_realizations_require_min_success(
     perturbed_objectives: Any,
     perturbation_min_success: int,
     expected: list[bool],
 ) -> None:
-    failed_realizations = _get_failed_gradient_realizations(
-        objectives, perturbed_objectives, perturbation_min_success
+    failed_realizations = _failed_perturbation_realizations(
+        perturbed_objectives, perturbation_min_success
     )
     assert np.all(failed_realizations == expected)
 

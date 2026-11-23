@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Self
+from typing import Any, Self
 
 from pydantic import (
     BaseModel,
@@ -19,8 +19,10 @@ from .constants import DEFAULT_NUMBER_OF_PERTURBATIONS
 class GradientConfig(BaseModel):
     """Configuration class for gradient calculations.
 
-    `GradientConfig` specifies how gradients are estimated in gradient-based
-    optimizers. It is the `gradient` section of the configuration.
+    `GradientConfig` configures a
+    [`GradientEstimator`][ropt.gradient.GradientEstimator] plugin that
+    estimates gradients in gradient-based optimizers. It is the `gradient`
+    section of the configuration.
 
     See [Configuration Reference](../optimizer_setup/configuration_sections.md#gradient)
     for field descriptions and defaults.
@@ -30,11 +32,15 @@ class GradientConfig(BaseModel):
     and `perturbation_min_success` to `number_of_perturbations`.
 
     Attributes:
+        method:                   Name of the gradient estimation method.
+        options:                  Dictionary of options for the method.
         number_of_perturbations:  Number of perturbations.
         perturbation_min_success: Minimum number of successful perturbations.
         merge_realizations:       Merge realizations for the final gradient.
     """
 
+    method: str = "default/default"
+    options: dict[str, Any] = {}
     number_of_perturbations: PositiveInt = DEFAULT_NUMBER_OF_PERTURBATIONS
     perturbation_min_success: PositiveInt | None = None
     merge_realizations: bool = False
@@ -42,6 +48,8 @@ class GradientConfig(BaseModel):
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
         extra="forbid",
+        str_min_length=1,
+        str_strip_whitespace=True,
         validate_default=True,
         frozen=True,
     )

@@ -8,6 +8,7 @@ import pytest
 from pydantic import ValidationError
 
 from ropt.config import (
+    GradientConfig,
     LinearConstraintsConfig,
     NonlinearConstraintsConfig,
     ObjectiveFunctionsConfig,
@@ -352,8 +353,10 @@ def test_check_config_min_success(config: Any) -> None:
     real_test_map = {None: 4, 1: 1, 3: 3, 7: 4}
     test_space = zip(pert_test_map.keys(), real_test_map.keys(), strict=False)
     for pert_in, real_in in test_space:
-        context = EnOptContext.model_validate(gen_config(pert_in, real_in))
-        assert pert_test_map[pert_in] == context.gradient.perturbation_min_success
+        config_dict = gen_config(pert_in, real_in)
+        context = EnOptContext.model_validate(config_dict)
+        gradient = GradientConfig.model_validate(config_dict["gradient"])
+        assert pert_test_map[pert_in] == gradient.perturbation_min_success
         assert real_test_map[real_in] == context.realizations.realization_min_success
 
 
