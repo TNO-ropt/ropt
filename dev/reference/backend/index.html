@@ -2773,6 +2773,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.backend.external.ExternalBackend.bypasses_python_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        bypasses_python_output
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3385,6 +3396,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.backend.external.ExternalBackend.bypasses_python_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        bypasses_python_output
+      </span>
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.backend.external.ExternalBackend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
       <span class="md-typeset">
@@ -3847,9 +3869,11 @@ the algorithm happens to need them (<code>"auto"</code>).</p>
 <p>Compiled optimizers commonly write to file descriptors 1 and 2 directly
 instead of through <code>sys.stdout</code>, which puts their output beyond reach of
 the capture <code>ropt</code> applies for the <code>stdout</code> and <code>stderr</code> settings of
-<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a>. A backend wrapping
-such a library should override this to return <code>True</code>, and <code>ropt</code> then
-redirects the descriptors as well.</p>
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a>. So does a process the
+backend starts, which writes to the descriptors it inherits. A backend
+wrapping such a library, or starting such a process, should override
+this to return <code>True</code>, and <code>ropt</code> then redirects the descriptors as
+well.</p>
 <p>The answer may differ per method, in which case return it based on the
 configured method. Return <code>True</code> for the whole backend when unsure: the
 cost is that capture briefly rewires process-global state, whereas the
@@ -5629,6 +5653,35 @@ be sent as well.</p>
 
         <p>Run the delegate backend in a child process until it finishes.</p>
 
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.backend.external.ExternalBackend.bypasses_python_output" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">bypasses_python_output</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">bypasses_python_output</span><span class="p">:</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether the optimizer prints outside <code>sys.stdout</code>: always.</p>
 
     </div>
 

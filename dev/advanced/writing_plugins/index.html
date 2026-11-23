@@ -3063,7 +3063,9 @@ flag instead of conflicting with it.</p>
 from Python — which is most optimizers, including everything in SciPy except
 <code>tnc</code>.
 A compiled optimizer, though, commonly writes to file descriptors 1 and 2
-directly, and never touches <code>sys.stdout</code> at all.</p>
+directly, and never touches <code>sys.stdout</code> at all. So does a process the backend
+starts, such as a solver run as a separate program: it writes to the descriptors
+it inherits.</p>
 <p>Set
 <a class="autorefs autorefs-internal" title="            bypasses_python_output
 
@@ -3071,8 +3073,8 @@ directly, and never touches <code>sys.stdout</code> at all.</p>
   
       property
   " href="../../reference/backend/#ropt.backend.Backend.bypasses_python_output"><code>bypasses_python_output</code></a> to
-<code>True</code> when the wrapped library does that, and <code>ropt</code> redirects the descriptors
-as well:</p>
+<code>True</code> when the wrapped library does that, or when the backend starts processes,
+and <code>ropt</code> redirects the descriptors as well:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyBackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="nd">@property</span>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">bypasses_python_output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -3080,6 +3082,8 @@ as well:</p>
 </span></code></pre></div>
 <p>The answer may differ per method, in which case return it based on the
 configured method — the built-in SciPy backend returns <code>self._method == "tnc"</code>.
+The built-in <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../../reference/backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> backend always
+returns <code>True</code>, because it runs the optimizer in a child process.
 Declaring it for the whole backend when only some methods need it costs only a
 brief rewiring of process-global state. Declaring it for none when a method
 needs it sends the user's output to the terminal, with no error raised.</p>
