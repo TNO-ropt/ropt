@@ -162,48 +162,51 @@ class EnsembleOptimizer:
     ) -> OptimizerCallbackResult:
         assert return_functions or return_gradients
 
-        if return_functions and return_gradients:
-            _logger.debug("Optimizer callback: requesting functions and gradients")
-        elif return_functions:
-            _logger.debug("Optimizer callback: requesting functions")
-        else:
-            _logger.debug("Optimizer callback: requesting gradients")
+        with self._capture.release():
+            if return_functions and return_gradients:
+                _logger.debug("Optimizer callback: requesting functions and gradients")
+            elif return_functions:
+                _logger.debug("Optimizer callback: requesting functions")
+            else:
+                _logger.debug("Optimizer callback: requesting gradients")
 
-        self._check_stopping_criteria()
+            self._check_stopping_criteria()
 
-        variables = self._get_completed_variables(variables)
+            variables = self._get_completed_variables(variables)
 
-        results = self._run_evaluations(
-            variables,
-            compute_functions=return_functions,
-            compute_gradients=return_gradients,
-        )
-
-        functions = None
-        if return_functions:
-            # Functions might be parallelized hence we need potentially to
-            # process a list of function results:
-            functions_list = [
-                self._functions_from_results(item)
-                for item in results
-                if isinstance(item, FunctionResults)
-            ]
-            self._completed_functions += len(functions_list)
-            functions = (
-                np.vstack(functions_list) if variables.ndim > 1 else functions_list[0]
+            results = self._run_evaluations(
+                variables,
+                compute_functions=return_functions,
+                compute_gradients=return_gradients,
             )
 
-        gradients = None
-        if return_gradients:
-            # Gradients cannot be parallelized, there is at most one gradient:
-            gradients = self._gradients_from_results(
-                next(item for item in results if isinstance(item, GradientResults)),
-                self._context.variables.mask,
-            )
+            functions = None
+            if return_functions:
+                # Functions might be parallelized hence we need potentially to
+                # process a list of function results:
+                functions_list = [
+                    self._functions_from_results(item)
+                    for item in results
+                    if isinstance(item, FunctionResults)
+                ]
+                self._completed_functions += len(functions_list)
+                functions = (
+                    np.vstack(functions_list)
+                    if variables.ndim > 1
+                    else functions_list[0]
+                )
 
-        self._completed_batches += 1
+            gradients = None
+            if return_gradients:
+                # Gradients cannot be parallelized, there is at most one gradient:
+                gradients = self._gradients_from_results(
+                    next(item for item in results if isinstance(item, GradientResults)),
+                    self._context.variables.mask,
+                )
 
-        return OptimizerCallbackResult(functions=functions, gradients=gradients)
+            self._completed_batches += 1
+
+            return OptimizerCallbackResult(functions=functions, gradients=gradients)
 
     def _get_completed_variables(
         self, variables: NDArray[np.float64]
@@ -242,25 +245,24 @@ class EnsembleOptimizer:
         compute_functions: bool = False,
         compute_gradients: bool = False,
     ) -> tuple[Results, ...]:
-        with self._capture.release():
-            assert compute_functions or compute_gradients
-            results = self._function_evaluator.calculate(
-                variables,
-                compute_functions=compute_functions,
-                compute_gradients=compute_gradients,
-            )
+        assert compute_functions or compute_gradients
+        results = self._function_evaluator.calculate(
+            variables,
+            compute_functions=compute_functions,
+            compute_gradients=compute_gradients,
+        )
 
-            too_few = False
-            for result in results:
-                assert isinstance(result, FunctionResults | GradientResults)
-                if (
-                    isinstance(result, FunctionResults) and result.functions is None
-                ) or (isinstance(result, GradientResults) and result.gradients is None):
-                    too_few = True
-                    break
+        too_few = False
+        for result in results:
+            assert isinstance(result, FunctionResults | GradientResults)
+            if (isinstance(result, FunctionResults) and result.functions is None) or (
+                isinstance(result, GradientResults) and result.gradients is None
+            ):
+                too_few = True
+                break
 
-            if too_few:
-                raise TooFewRealizations
+        if too_few:
+            raise TooFewRealizations
 
         return results
 

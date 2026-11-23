@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ctypes
 import errno
+import logging
 import os
 import subprocess
 import sys
@@ -198,6 +199,25 @@ def test_capture_collects_native_output_when_the_backend_declares_it(
     log = tmp_path / "run.log"
     _run("native/printing", stdout=log)
     assert "OPTIMIZER-NATIVE" in log.read_text()
+
+
+def test_capture_releases_native_output_while_the_optimizer_callback_runs(
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    logger = logging.getLogger("ropt.core")
+    handler = logging.StreamHandler(os.fdopen(2, "w", closefd=False))
+    caplog.set_level(logging.DEBUG, logger="ropt.core")
+    logger.addHandler(handler)
+    try:
+        log = tmp_path / "run.log"
+        _run("native/printing", stdout=log)
+    finally:
+        logger.removeHandler(handler)
+        handler.close()
+
+    assert "Optimizer callback: requesting functions" in caplog.text
+    assert "Optimizer callback: requesting functions" not in log.read_text()
 
 
 @pytest.mark.external
