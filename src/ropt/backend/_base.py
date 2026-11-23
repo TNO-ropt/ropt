@@ -115,9 +115,11 @@ class Backend(ABC):
         Compiled optimizers commonly write to file descriptors 1 and 2 directly
         instead of through `sys.stdout`, which puts their output beyond reach of
         the capture `ropt` applies for the `stdout` and `stderr` settings of
-        [`OptimizerConfig`][ropt.config.OptimizerConfig]. A backend wrapping
-        such a library should override this to return `True`, and `ropt` then
-        redirects the descriptors as well.
+        [`OptimizerConfig`][ropt.config.OptimizerConfig]. So does a process the
+        backend starts, which writes to the descriptors it inherits. A backend
+        wrapping such a library, or starting such a process, should override
+        this to return `True`, and `ropt` then redirects the descriptors as
+        well.
 
         The answer may differ per method, in which case return it based on the
         configured method. Return `True` for the whole backend when unsure: the

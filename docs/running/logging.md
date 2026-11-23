@@ -110,12 +110,14 @@ up in the file as well. Almost no log output does: `ropt` lifts the capture
 around every evaluation, and a console destination created before the
 optimization starts keeps writing to the stream it was given.
 
-The exception is an optimizer that prints from compiled code. `ropt` then
-redirects the process's output streams as well, and at that level console
-logging *is* caught: its lines land in the capture file along with the
-optimizer's own. Among the SciPy methods this applies to `tnc`. Giving `ropt` a
-destination of its own, as above, keeps its output out of the file in that case
-too.
+The exception is an optimizer that prints from compiled code or from a process
+of its own. `ropt` then redirects the output streams of the Python process as
+well, and at that level console logging *is* caught: its lines land in the
+capture file along with the optimizer's own. This applies to the SciPy method
+`tnc`, and to every
+[`external/`](../optimizer_setup/optimizer.md#external-backend) method. Giving
+`ropt` a destination of its own, as above, keeps its output out of the file in
+that case too.
 
 Python warnings go the other way round. A `warnings.warn` raised while the
 optimizer is working *is* captured, which is usually what you want, since it

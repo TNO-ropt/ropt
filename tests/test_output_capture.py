@@ -185,6 +185,16 @@ def test_capture_collects_native_output_when_the_backend_declares_it(
     assert "OPTIMIZER-NATIVE" in log.read_text()
 
 
+@pytest.mark.external
+def test_capture_collects_the_output_of_an_external_backend(tmp_path: Path) -> None:
+    log = tmp_path / "run.log"
+    _run("external/printing/printing", stdout=log)
+    captured = log.read_text()
+    assert "OPTIMIZER-PYTHON-STDOUT" in captured
+    assert "OPTIMIZER-NATIVE" in captured
+    assert "CALLBACK-OUTPUT" not in captured
+
+
 def test_capture_refuses_a_second_run_while_one_is_active(tmp_path: Path) -> None:
     inner_log = tmp_path / "inner.log"
 

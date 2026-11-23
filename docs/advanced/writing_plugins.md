@@ -240,12 +240,14 @@ flag instead of conflicting with it.
 from Python — which is most optimizers, including everything in SciPy except
 `tnc`.
 A compiled optimizer, though, commonly writes to file descriptors 1 and 2
-directly, and never touches `sys.stdout` at all.
+directly, and never touches `sys.stdout` at all. So does a process the backend
+starts, such as a solver run as a separate program: it writes to the descriptors
+it inherits.
 
 Set
 [`bypasses_python_output`][ropt.backend.Backend.bypasses_python_output] to
-`True` when the wrapped library does that, and `ropt` redirects the descriptors
-as well:
+`True` when the wrapped library does that, or when the backend starts processes,
+and `ropt` redirects the descriptors as well:
 
 ```python
 class MyBackend(Backend):
@@ -256,6 +258,8 @@ class MyBackend(Backend):
 
 The answer may differ per method, in which case return it based on the
 configured method — the built-in SciPy backend returns `self._method == "tnc"`.
+The built-in [`external`][ropt.backend.external.ExternalBackend] backend always
+returns `True`, because it runs the optimizer in a child process.
 Declaring it for the whole backend when only some methods need it costs only a
 brief rewiring of process-global state. Declaring it for none when a method
 needs it sends the user's output to the terminal, with no error raised.

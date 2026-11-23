@@ -172,6 +172,14 @@ class ExternalBackend(Backend):
         if exception is not None:
             raise exception
 
+    @property
+    @override
+    def bypasses_python_output(self) -> bool:
+        """Whether the optimizer prints outside `sys.stdout`: always."""
+        # The delegate prints from a child process, which writes to the file
+        # descriptors it inherits, whatever the delegate itself declares.
+        return True
+
     @override
     def validate_options(
         self,
