@@ -12,6 +12,7 @@ import os
 import subprocess
 import sys
 import textwrap
+import threading
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, override
 
@@ -23,6 +24,7 @@ from ropt._evaluation import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
+from ropt._native_streams import flush_native_streams
 from ropt.backend import Backend
 from ropt.backend.utils import collect_native_output
 from ropt.exceptions import WorkflowError
@@ -297,6 +299,33 @@ def test_capture_does_not_leak_file_descriptors(tmp_path: Path) -> None:
     for index in range(5):
         _run("native/printing", stdout=tmp_path / f"run{index}.log")
     assert len(list(descriptors.iterdir())) == before
+
+
+def test_flush_native_streams_does_not_wait_for_a_locked_stream() -> None:
+    libc = ctypes.CDLL(None)
+    libc.fopen.restype = ctypes.c_void_p
+    libc.fopen.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
+    libc.flockfile.argtypes = [ctypes.c_void_p]
+    libc.funlockfile.argtypes = [ctypes.c_void_p]
+    libc.fclose.argtypes = [ctypes.c_void_p]
+    stream = libc.fopen(os.devnull.encode(), b"w")
+    assert stream is not None
+    flushed = threading.Event()
+
+    def flush() -> None:
+        flush_native_streams()
+        flushed.set()
+
+    # Hold the lock of an unrelated stream, as a thread blocked reading it does.
+    libc.flockfile(stream)
+    worker = threading.Thread(target=flush)
+    try:
+        worker.start()
+        assert flushed.wait(timeout=5)
+    finally:
+        libc.funlockfile(stream)
+        worker.join(timeout=5)
+        libc.fclose(stream)
 
 
 _SUBPROCESS_SCRIPT = """
