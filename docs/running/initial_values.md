@@ -92,7 +92,7 @@ own configuration.
 
 The number of realizations and the number of perturbations may both grow or
 shrink. Realization weights, realization filters, objective weights, scales,
-offsets, `maximize` flags, function estimators, `merge_realizations` and the
+offsets, `maximize` flags, realization aggregators, `merge_realizations` and the
 sampler settings may all change.
 
 What may not change is the meaning of the recorded columns: the number of

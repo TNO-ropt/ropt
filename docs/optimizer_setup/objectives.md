@@ -62,7 +62,7 @@ objective](configuration_sections.md#objective-direction).
 
 The sign is flipped **after** the realizations have been combined, never on the
 per-realization values. That ordering matters as soon as a
-[function estimator](function_estimators.md) produces something other than an
+[realization aggregator](realization_aggregators.md) produces something other than an
 average. Negating the inputs of a standard deviation leaves it unchanged, so
 flipping first would silently minimize the dispersion that was declared for
 maximization; flipping the combined value is correct whatever produced it.
@@ -114,7 +114,7 @@ optimizer sees, which can affect when a stopping tolerance is met. For example,
 subtracting a baseline near $10^9$ before scaling variations of about $10^5$
 can bring those variations to order one.
 
-With an estimator that measures dispersion, such as standard deviation, the
+With an aggregator that measures dispersion, such as standard deviation, the
 offset is also subtracted from the estimated value and restored in the reported
 result. See [Offsetting objectives](configuration_sections.md#objective-offsets)
 for the field reference.

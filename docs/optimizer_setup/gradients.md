@@ -7,18 +7,18 @@ gradients stochastically using the *Stochastic Simplex Approximate Gradient*
 function values evaluated at the current point and at a number of randomly
 perturbed points.
 
-The estimation is done by a **gradient estimator**, a component selected by the
+The estimation is done by a **gradient calculator**, a component selected by the
 `method` field of the `gradient` section. The stochastic method is the default
-method of the built-in estimator, which also provides
-[finite-difference methods](finite_differences.md). Other estimators can be
-added as plugins, see
-[Writing a Plugin](../advanced/writing_plugins.md#gradient-estimators).
+method of the built-in calculator, which also provides
+[finite-difference methods](finite_differences.md). Other gradient calculators
+can be added as plugins; see
+[Writing a Plugin](../advanced/writing_plugins.md#gradient-calculators).
 
-This page explains how perturbations, samplers, function estimators, and the
+This page explains how perturbations, samplers, realization aggregators, and the
 gradient configuration work together. The runnable script is
 [examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py),
 which exercises this estimation with only `perturbation_magnitudes` and the
-realization weights set, leaving the sampler, the estimator and the remaining
+realization weights set, leaving the sampler, the calculator and the remaining
 gradient settings at their defaults.
 
 ## The pieces
@@ -28,7 +28,7 @@ gradient settings at their defaults.
 | [`GradientConfig`][ropt.config.GradientConfig]                        | Estimation method and options, number of perturbations, success thresholds, merging of realizations. |
 | [`VariablesConfig`][ropt.config.VariablesConfig] perturbation fields  | Magnitudes, boundary handling, sampler indices.                               |
 | [`SamplerConfig`][ropt.config.SamplerConfig] + `sampler` tuple        | How perturbation samples are drawn (uniform, normal, Sobol, ...).             |
-| [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]      | How per-realization gradients combine into the final estimate.                |
+| [`RealizationAggregatorConfig`][ropt.config.RealizationAggregatorConfig]      | How per-realization gradients combine into the final estimate.                |
 
 The fields themselves are described under
 [`gradient`](configuration_sections.md#gradient) and
@@ -180,12 +180,12 @@ Selecting one, perturbing different variables differently, sharing samples
 across realizations and writing your own are all covered in
 [Samplers](samplers.md).
 
-## Function estimators
+## Realization aggregators
 
-A function estimator determines *how* the per-realization values and gradients are
+A realization aggregator determines *how* the per-realization values and gradients are
 combined into the single estimate the optimizer receives. The default is a
 weighted mean; alternatives, including a measure of dispersion rather than an
-average, are covered in [Function Estimators](function_estimators.md).
+average, are covered in [Realization Aggregators](realization_aggregators.md).
 
 ## See also
 

@@ -1,19 +1,19 @@
-"""Gradient estimators: the methods that estimate gradients from evaluated points.
+"""Gradient calculators: the methods that calculate gradients from evaluated points.
 
-A gradient estimator is selected through the `gradient` section of the
+A gradient calculator is selected through the `gradient` section of the
 configuration, either as an instance or as a
 [`GradientConfig`][ropt.config.GradientConfig] naming a method.
-[`DefaultGradientEstimator`][ropt.gradient.default.DefaultGradientEstimator]
+[`DefaultGradientCalculator`][ropt.gradient.default.DefaultGradientCalculator]
 provides the stochastic method.
 
 See [Stochastic Gradients](../optimizer_setup/gradients.md) for the stochastic
 method, and [Writing a Plugin](../advanced/writing_plugins.md) for implementing
-an estimator.
+a calculator.
 """
 
-from ._base import GradientData, GradientEstimator
+from ._base import GradientCalculator, GradientData
 
 __all__ = [
+    "GradientCalculator",
     "GradientData",
-    "GradientEstimator",
 ]

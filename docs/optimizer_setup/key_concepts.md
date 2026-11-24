@@ -41,12 +41,13 @@ chosen this way:
 - **Optimization backends** provide the optimization algorithms — the *methods*
   the optimizer runs. The built-in backend wraps [SciPy](https://www.scipy.org);
   other backends add algorithms from external packages.
-- **Gradient estimators** compute the gradient from the evaluated perturbations.
-  The built-in estimator implements the stochastic method and finite
-  differences.
+- **Gradient calculators** compute the gradient from the evaluated
+  perturbations. The built-in calculator implements the stochastic method and
+  finite differences.
 - **Samplers** generate the perturbations used to estimate stochastic gradients.
-- **Function estimators** combine the per-realization values into the single
-  robust objective, for example a mean, or a mean plus a standard-deviation term.
+- **Realization aggregators** combine the per-realization values into the single
+  robust objective, for example a mean, or a mean plus a standard-deviation
+  term.
 - **Realization filters** select or reweight a subset of the realizations, for
   example to focus on the worst-performing ones.
 
@@ -69,7 +70,7 @@ exact syntax, the `method` naming convention (see
 described in [Configuration Reference](configuration_sections.md); the dedicated
 pages [Choosing an Optimizer](optimizer.md), [Stochastic Gradients](gradients.md),
 [Samplers](samplers.md), [Realization Filters](realization_filters.md) and
-[Function Estimators](function_estimators.md) cover each kind in depth.
+[Realization Aggregators](realization_aggregators.md) cover each kind in depth.
 
 [examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py)
 puts the central terms in one short script: a variable vector optimized across
@@ -145,10 +146,10 @@ optimization as implemented by `ropt`.
 :   A component that generates the perturbations used for stochastic gradient
     estimation. See [Samplers](samplers.md).
 
-**Function estimator**
-:   A component that combines the per-realization function values into the single
-    robust objective, for example a mean, or a mean plus a standard-deviation
-    term. See [Function Estimators](function_estimators.md).
+**Realization aggregator**
+:   A component that combines the per-realization function values into the
+    single robust objective, for example a mean, or a mean plus a
+    standard-deviation term. See [Realization Aggregators](realization_aggregators.md).
 
 **Realization filter**
 :   A component that selects or reweights a subset of the realizations, for

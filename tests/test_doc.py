@@ -17,7 +17,7 @@ from ropt.backend.scipy import (
 )
 from ropt.config.options import gen_options_table
 from ropt.enums import ExitCode
-from ropt.function_estimator.default import DEFAULT_FUNCTION_ESTIMATOR_METHODS
+from ropt.realization_aggregator.default import DEFAULT_REALIZATION_AGGREGATOR_METHODS
 from ropt.realization_filter.default import DEFAULT_REALIZATION_FILTER_METHODS
 from ropt.results import FunctionResults, GradientResults
 from ropt.sampler.scipy import SCIPY_SAMPLER_SUPPORTED_METHODS
@@ -71,7 +71,7 @@ def test_scipy_capability_table() -> None:
     [
         ("backend", "scipy", SUPPORTED_SCIPY_METHODS | {"default"}),
         ("sampler", "scipy", SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"}),
-        ("function_estimator", "default", DEFAULT_FUNCTION_ESTIMATOR_METHODS),
+        ("realization_aggregator", "default", DEFAULT_REALIZATION_AGGREGATOR_METHODS),
         ("realization_filter", "default", DEFAULT_REALIZATION_FILTER_METHODS),
     ],
 )

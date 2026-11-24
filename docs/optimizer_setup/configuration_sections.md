@@ -37,7 +37,7 @@ shown separately.
             "auto_scale": False,                              # default: do not estimate scales
             "maximize": False,                                # default: minimize
             "realization_filters": None,                      # default: no filter
-            "function_estimators": 0,                         # default: use first estimator for all
+            "realization_aggregators": 0,                     # default: use first aggregator for all
         },
         "linear_constraints": None,                           # default: no linear constraints
         "nonlinear_constraints": None,                        # default: no nonlinear constraints
@@ -72,10 +72,10 @@ shown separately.
         "sampler": {
             "method": "scipy/default",                        # default: standard normal N(0,1)
             "options": {},
-            "shared": False,                                 # default: each realization has its own
-                                                             #          set of perturbations
+            "shared": False,                                  # default: each realization has its own
+                                                              #          set of perturbations
         },
-        "function_estimator": {
+        "realization_aggregator": {
             "method": "default/default",                      # default: weighted average
             "options": {},
         },
@@ -111,7 +111,7 @@ shown separately.
         "scales": 1.0,                            # default: no scaling
         "auto_scale": False,                      # default: do not estimate scales
         "realization_filters": None,              # default: no filter
-        "function_estimators": 0,                 # default: use first estimator
+        "realization_aggregators": 0,             # default: use first aggregator
     }
 
     # realization_filter (method is required):
@@ -132,12 +132,12 @@ separately installed plugins have their own method lists.
 | --- | --- | --- | --- |
 | `backend` | `scipy/default`, `scipy/nelder-mead`, `scipy/powell`, `scipy/cg`, `scipy/bfgs`, `scipy/newton-cg`, `scipy/l-bfgs-b`, `scipy/tnc`, `scipy/cobyla`, `scipy/cobyqa`, `scipy/slsqp`, `scipy/trust-constr`, `scipy/differential_evolution` | [`SciPyBackend`][ropt.backend.scipy.SciPyBackend] | [Choosing an Optimizer](optimizer.md) |
 | `sampler` | `scipy/default`, `scipy/norm`, `scipy/truncnorm`, `scipy/uniform`, `scipy/sobol`, `scipy/halton`, `scipy/lhs` | [`SciPySampler`][ropt.sampler.scipy.SciPySampler] | [Selecting a sampler](samplers.md#selecting-a-sampler) |
-| `function_estimator` | `default/default`, `default/mean`, `default/stddev` | [`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator] | [Selecting an estimator](function_estimators.md#selecting-an-estimator) |
+| `realization_aggregator` | `default/default`, `default/mean`, `default/stddev` | [`DefaultRealizationAggregator`][ropt.realization_aggregator.default.DefaultRealizationAggregator] | [Selecting a realization aggregator](realization_aggregators.md#selecting-a-realization-aggregator) |
 | `realization_filter` | `default/cvar-objective`, `default/cvar-constraint` | [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions], [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions] | [Selecting a filter](realization_filters.md#selecting-a-filter) |
 | `gradient` | `default/default`, `default/stochastic`, `default/forward`, `default/backward`, `default/central` | [`StochasticGradientOptions`][ropt.gradient.default.StochasticGradientOptions]; the finite-difference methods have no options | [How the gradient is estimated](gradients.md#how-the-gradient-is-estimated), [Finite-Difference Gradients](finite_differences.md) |
 
 For backends, `scipy/default` selects `scipy/slsqp`; for samplers, it selects
-`scipy/norm`. The estimator `default/default` selects `default/mean`, and the
+`scipy/norm`. The aggregator `default/default` selects `default/mean`, and the
 gradient method `default/default` selects `default/stochastic`.
 There is no default realization-filter method.
 To run a backend in a separate process, see the
@@ -202,16 +202,16 @@ See [Objectives](objectives.md) for how weights combine.
 
 Objective functions can optionally be processed using
 [realization filters](realization_filters.md) and
-[function estimators](function_estimators.md). Both fields select an object by
+[realization aggregators](realization_aggregators.md). Both fields select an object by
 its index in the corresponding section of the configuration.
 
 - `realization_filters`: default `None` (no filter applied).
-- `function_estimators`: default `0` (the first function estimator). Unless
-  explicitly configured otherwise, the default function estimator method is
+- `realization_aggregators`: default `0` (the first realization aggregator). Unless
+  explicitly configured otherwise, the default realization aggregator method is
   `"default/default"`, which computes a weighted average of the per-realization
   values.
 
-Setting `function_estimators` to `None` leaves that objective unestimated, and
+Setting `realization_aggregators` to `None` leaves that objective unestimated, and
 its value is reported as `NaN`. Any other index must exist; see [Sharing
 optimizer components by
 index](configuration.md#sharing-optimizer-components-by-index).
@@ -306,10 +306,10 @@ backend, see the table in [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
 
 Like objectives, nonlinear constraints can optionally be processed using
 [realization filters](realization_filters.md) and
-[function estimators](function_estimators.md), selected by index:
+[realization aggregators](realization_aggregators.md), selected by index:
 
 - `realization_filters`: default `None` (no filter applied).
-- `function_estimators`: default `0` (the first function estimator, which by
+- `realization_aggregators`: default `0` (the first realization aggregator, which by
   default computes a weighted average of per-realization values).
 
 ### Scaling constraints { #constraint-scales }
@@ -388,16 +388,16 @@ listed in [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
 
 Validated into [`GradientConfig`][ropt.config.GradientConfig].
 
-Selects the gradient estimator and controls how gradients are estimated (see
+Selects the gradient calculator and controls how gradients are estimated (see
 also [Stochastic Gradients](gradients.md) and
 [Finite-Difference Gradients](finite_differences.md) for a deeper discussion). Like
 `backend`, it holds a single component, given as a configuration or as an
-already-constructed [`GradientEstimator`][ropt.gradient.GradientEstimator].
+already-constructed [`GradientCalculator`][ropt.gradient.GradientCalculator].
 
 The `gradient` section has five fields:
 
-- `method` (default: `"default/default"`): Selects the estimator plugin. The
-  default is the stochastic method.
+- `method` (default: `"default/default"`): Selects the gradient calculator
+  plugin. The default is the stochastic method.
 - `options` (default: `{}`): Method-specific options.
 - `number_of_perturbations`: positive number of perturbed variable sets
   (default: [`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS]).
@@ -412,24 +412,23 @@ methods raise an error if any of them is set.
 See [Stochastic Gradients](gradients.md) for how these settings affect the
 estimates and evaluation work.
 
-## `function_estimator` { #function-estimator }
+## `realization_aggregator` { #realization-aggregator }
 
 Validated into
-[`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig].
+[`RealizationAggregatorConfig`][ropt.config.RealizationAggregatorConfig].
 
 A component configuration, or a list/tuple of configurations, each selecting a
 plugin with a `method` field and an optional `options` dict. Objectives and
-nonlinear constraints select components by index using their
-`function_estimators` fields (see [Sharing optimizer components by
-index](configuration.md#sharing-optimizer-components-by-index)).
+nonlinear constraints select components by index using their `realization_aggregators`
+fields (see [Sharing optimizer components by index](configuration.md#sharing-optimizer-components-by-index)).
 
 Fields:
 
-- `method` (default: `"default/default"`): Selects the estimator plugin.
+- `method` (default: `"default/default"`): Selects the aggregator plugin.
 - `options` (default: `{}`): Plugin-specific options.
 
-See [Function Estimators](function_estimators.md) for the available methods
-and how to select one.
+See [Realization Aggregators](realization_aggregators.md) for the available methods and how
+to select one.
 
 ## `realization_filter` { #realization-filter }
 

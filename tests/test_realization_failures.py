@@ -355,8 +355,8 @@ def test_batch_with_a_failed_estimate_is_reported(
     result = optimize(
         {
             "variables": {"variable_count": 2, "perturbation_magnitudes": 0.01},
-            "objectives": {"weights": [1.0], "function_estimators": [0]},
-            "function_estimator": [{"method": "stddev"}],
+            "objectives": {"weights": [1.0], "realization_aggregators": [0]},
+            "realization_aggregator": [{"method": "stddev"}],
             "realizations": {"weights": [1.0, 1.0], "realization_min_success": 1},
             "gradient": {"number_of_perturbations": 2},
             "optimizer": {"evaluation_policy": evaluation_policy},

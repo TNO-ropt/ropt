@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 
     from ropt._evaluation import BatchEvaluator
     from ropt.context import EnOptContext
-    from ropt.function_estimator import FunctionEstimator
+    from ropt.realization_aggregator import RealizationAggregator
     from ropt.realization_filter import RealizationFilter
 
 
@@ -123,7 +123,7 @@ class EnsembleEvaluator:
         self._realization_filters: tuple[RealizationFilter, ...] = (
             context.realization_filter
         )
-        self._function_estimators = self._init_function_estimators()
+        self._realization_aggregators = self._init_realization_aggregators()
         self._cached_results: FunctionResults | None = None
 
     def calculate(
@@ -168,7 +168,7 @@ class EnsembleEvaluator:
             if self._cached_results is not None:
                 _logger.debug("Function evaluation: returning cached results")
                 return (self._cached_results,)
-            functions = self._calculate_functions(variables)
+            functions = self._aggregate_functions(variables)
             # Gradient-based methods are currently not parallelized, and there is
             # only one function result. That function may be needed in a gradient
             # calculation, so it is cached here:
@@ -185,7 +185,7 @@ class EnsembleEvaluator:
             and self._cached_results is not None
         ):
             _logger.debug("Gradient evaluation: using cached function results")
-            return self._calculate_gradients(
+            return self._aggregate_gradients(
                 variables, self._context.variables.mask, self._cached_results
             )
 
@@ -210,7 +210,7 @@ class EnsembleEvaluator:
         if self._signal_finished_callback is not None:
             self._signal_finished_callback(results)
 
-    def _calculate_functions(
+    def _aggregate_functions(
         self, variables: NDArray[np.float64]
     ) -> tuple[FunctionResults, ...]:
         if variables.ndim == 1:
@@ -268,7 +268,7 @@ class EnsembleEvaluator:
                     failed_realizations,
                 )
         except TooFewRealizations:
-            # A filter or estimator could not produce a value; record this
+            # A filter or aggregator could not produce a value; record this
             # evaluation as failed, so that it is still reported and the batch
             # continues with the others.
             scaled_functions = None
@@ -306,7 +306,7 @@ class EnsembleEvaluator:
             constraint_info=self._unscale_constraint_info(scaled_constraint_info),
         )
 
-    def _calculate_gradients(
+    def _aggregate_gradients(
         self,
         variables: NDArray[np.float64],
         mask: NDArray[np.bool_] | None,
@@ -516,7 +516,7 @@ class EnsembleEvaluator:
         failed_realizations: NDArray[np.bool_],
     ) -> tuple[FunctionAggregates, NDArray[np.float64]]:
         # Individual objective and constraint functions are calculated from the
-        # realizations using one or more function estimators:
+        # realizations using one or more realization aggregators:
         if np.all(failed_realizations):
             objectives = np.empty(
                 self._context.objectives.weights.size, dtype=np.float64
@@ -532,8 +532,8 @@ class EnsembleEvaluator:
             target_objective = np.array(np.nan)
         else:
             objectives = _calculate_estimated_functions(
-                self._function_estimators,
-                self._context.objectives.function_estimators,
+                self._realization_aggregators,
+                self._context.objectives.realization_aggregators,
                 objectives,
                 (
                     self._context.realizations.weights
@@ -545,8 +545,8 @@ class EnsembleEvaluator:
             if constraints is not None:
                 assert self._context.nonlinear_constraints is not None
                 constraints = _calculate_estimated_functions(
-                    self._function_estimators,
-                    self._context.nonlinear_constraints.function_estimators,
+                    self._realization_aggregators,
+                    self._context.nonlinear_constraints.realization_aggregators,
                     constraints,
                     (
                         self._context.realizations.weights
@@ -595,7 +595,7 @@ class EnsembleEvaluator:
         weights = self._gradient_weights(
             objective_weights, constraint_weights, failed_realizations
         )
-        realization_gradients, estimated = self._gradient.estimate(data, weights)
+        realization_gradients, estimated = self._gradient.calculate(data, weights)
         scaled_estimates = None
         if not self._gradient.merge_realizations:
             assert estimated is not None
@@ -606,9 +606,11 @@ class EnsembleEvaluator:
                 realization_gradients, mask, estimated
             )
         try:
-            gradients = self._aggregate_gradients(data, realization_gradients, weights)
+            gradients = self._aggregate_realization_gradients(
+                data, realization_gradients, weights
+            )
         except TooFewRealizations:
-            # Some function estimators cannot aggregate too few realizations.
+            # Some realization aggregators cannot aggregate too few realizations.
             return self._gradient_calculation(None, mask, scaled_estimates)
         return self._gradient_calculation(gradients, mask, scaled_estimates)
 
@@ -719,7 +721,7 @@ class EnsembleEvaluator:
             self._expand_gradients(constraint_gradients, mask),
         )
 
-    def _aggregate_gradients(
+    def _aggregate_realization_gradients(
         self,
         data: GradientData,
         realization_gradients: NDArray[np.float64],
@@ -732,8 +734,8 @@ class EnsembleEvaluator:
         )
         objectives = slice(0, self._context.objectives.weights.size)
         gradients[objectives] = _calculate_estimated_gradients(
-            self._function_estimators,
-            self._context.objectives.function_estimators,
+            self._realization_aggregators,
+            self._context.objectives.realization_aggregators,
             data.functions[:, objectives],
             (
                 realization_gradients[objectives]
@@ -746,8 +748,8 @@ class EnsembleEvaluator:
         if self._context.nonlinear_constraints is not None:
             constraints = slice(objectives.stop, None)
             gradients[constraints] = _calculate_estimated_gradients(
-                self._function_estimators,
-                self._context.nonlinear_constraints.function_estimators,
+                self._realization_aggregators,
+                self._context.nonlinear_constraints.realization_aggregators,
                 data.functions[:, constraints],
                 (
                     realization_gradients[constraints]
@@ -882,12 +884,10 @@ class EnsembleEvaluator:
                 constraint_weights[:, apply_to_constraints] = weights[:, np.newaxis]
         return objective_weights, constraint_weights
 
-    def _init_function_estimators(self) -> tuple[FunctionEstimator, ...]:
-        for function_estimator in self._context.function_estimator:
-            function_estimator.init(
-                merge_realizations=self._gradient.merge_realizations
-            )
-        return self._context.function_estimator
+    def _init_realization_aggregators(self) -> tuple[RealizationAggregator, ...]:
+        for aggregator in self._context.realization_aggregator:
+            aggregator.init(merge_realizations=self._gradient.merge_realizations)
+        return self._context.realization_aggregator
 
     def _init_samplers(self) -> None:
         rng = default_rng(self._context.variables.seed)
@@ -918,36 +918,36 @@ def _join_functions(
 
 
 def _calculate_estimated_functions(
-    function_estimators: tuple[FunctionEstimator, ...],
-    estimator_indices: tuple[int | None, ...] | None,
+    realization_aggregators: tuple[RealizationAggregator, ...],
+    realization_aggregator_indices: tuple[int | None, ...] | None,
     functions: NDArray[np.float64],
     realization_weights: NDArray[np.float64],
     failed_realizations: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
     result: NDArray[np.float64] = np.full(functions.shape[-1], np.nan, dtype=np.float64)
 
-    if estimator_indices is None:
-        estimator_indices = (0,) * functions.shape[1]
+    if realization_aggregator_indices is None:
+        realization_aggregator_indices = (0,) * functions.shape[1]
 
     if realization_weights.ndim == 1:
         realization_weights = np.broadcast_to(
             realization_weights[:, np.newaxis], functions.shape
         )
 
-    for index, estimator in enumerate(function_estimators):
-        mask = np.array([item == index for item in estimator_indices])
+    for index, aggregator in enumerate(realization_aggregators):
+        mask = np.array([item == index for item in realization_aggregator_indices])
         for idx in np.where(mask)[0]:
             weights = realization_weights[:, idx]
             weights = np.where(failed_realizations, 0.0, weights)
             weights /= weights.sum()
-            result[idx] = estimator.calculate_function(functions[:, idx], weights)
+            result[idx] = aggregator.aggregate_function(functions[:, idx], weights)
 
     return result
 
 
 def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments]
-    function_estimators: tuple[FunctionEstimator, ...],
-    estimator_indices: tuple[int | None, ...] | None,
+    realization_aggregators: tuple[RealizationAggregator, ...],
+    realization_aggregator_indices: tuple[int | None, ...] | None,
     functions: NDArray[np.float64],
     realization_gradients: NDArray[np.float64],
     weights: NDArray[np.float64],
@@ -960,13 +960,13 @@ def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments]
         dtype=np.float64,
     )
 
-    if estimator_indices is None:
-        estimator_indices = (0,) * functions.shape[1]
+    if realization_aggregator_indices is None:
+        realization_aggregator_indices = (0,) * functions.shape[1]
 
-    for index, estimator in enumerate(function_estimators):
-        mask = np.array([item == index for item in estimator_indices])
+    for index, aggregator in enumerate(realization_aggregators):
+        mask = np.array([item == index for item in realization_aggregator_indices])
         for idx in np.where(mask)[0]:
-            gradients[idx, ...] = estimator.calculate_gradient(
+            gradients[idx, ...] = aggregator.aggregate_gradient(
                 functions[:, idx],
                 (
                     realization_gradients[idx, :]

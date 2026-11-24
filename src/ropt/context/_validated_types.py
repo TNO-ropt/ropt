@@ -8,14 +8,14 @@ from pydantic import BeforeValidator, PlainValidator
 from ropt.backend import Backend
 from ropt.config import (
     BackendConfig,
-    FunctionEstimatorConfig,
     GradientConfig,
+    RealizationAggregatorConfig,
     RealizationFilterConfig,
     SamplerConfig,
 )
-from ropt.function_estimator import FunctionEstimator
-from ropt.gradient import GradientEstimator
+from ropt.gradient import GradientCalculator
 from ropt.plugins import PluginType, get_plugin
+from ropt.realization_aggregator import RealizationAggregator
 from ropt.realization_filter import RealizationFilter
 from ropt.sampler import Sampler
 
@@ -79,10 +79,10 @@ BackendInstance = Annotated[
 """Validate that the value is an instance of a Backend."""
 
 GradientInstance = Annotated[
-    GradientEstimator,
-    PlainValidator(_make_validator("gradient", GradientConfig, GradientEstimator)),
+    GradientCalculator,
+    PlainValidator(_make_validator("gradient", GradientConfig, GradientCalculator)),
 ]
-"""Validate that the value is an instance of a GradientEstimator."""
+"""Validate that the value is an instance of a GradientCalculator."""
 
 SamplerInstance = Annotated[
     Sampler, PlainValidator(_make_validator("sampler", SamplerConfig, Sampler))
@@ -109,17 +109,17 @@ RealizationFilterInstances = Annotated[
 ]
 """Validate one realization filter or a sequence of realization filters."""
 
-FunctionEstimatorInstance = Annotated[
-    FunctionEstimator,
+RealizationAggregatorInstance = Annotated[
+    RealizationAggregator,
     PlainValidator(
         _make_validator(
-            "function_estimator", FunctionEstimatorConfig, FunctionEstimator
+            "realization_aggregator", RealizationAggregatorConfig, RealizationAggregator
         )
     ),
 ]
-"""Validate that the value is an instance of a FunctionEstimator."""
+"""Validate that the value is an instance of a RealizationAggregator."""
 
-FunctionEstimatorInstances = Annotated[
-    tuple[FunctionEstimatorInstance, ...], BeforeValidator(_convert_to_tuple)
+RealizationAggregatorInstances = Annotated[
+    tuple[RealizationAggregatorInstance, ...], BeforeValidator(_convert_to_tuple)
 ]
-"""Validate one function estimator or a sequence of function estimators."""
+"""Validate one realization aggregator or a sequence of realization aggregators."""

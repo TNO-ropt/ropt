@@ -1,4 +1,4 @@
-"""Default gradient estimator plugin with the stochastic and finite-difference methods."""
+"""Default gradient calculator plugin with the stochastic and finite-difference methods."""
 
 from typing import Annotated, ClassVar, Final, override
 
@@ -10,7 +10,7 @@ from ropt._utils import enum_mask
 from ropt.config import GradientConfig
 from ropt.context import EnOptContext
 from ropt.enums import BoundaryType
-from ropt.gradient import GradientData, GradientEstimator
+from ropt.gradient import GradientCalculator, GradientData
 from ropt.plugins import MethodSpec
 from ropt.sampler import Sampler
 
@@ -49,8 +49,8 @@ class StochasticGradientOptions(BaseModel):
     )
 
 
-class DefaultGradientEstimator(GradientEstimator):
-    """Default gradient estimator with stochastic and finite-difference methods.
+class DefaultGradientCalculator(GradientCalculator):
+    """Default gradient calculator with stochastic and finite-difference methods.
 
     The method is selected via the `method` field of
     [`GradientConfig`][ropt.config.GradientConfig]: `stochastic`, the default,
@@ -63,7 +63,7 @@ class DefaultGradientEstimator(GradientEstimator):
     methods: ClassVar[MethodSpec] = DEFAULT_GRADIENT_METHODS
 
     def __init__(self, gradient_config: GradientConfig) -> None:
-        """Initialize the gradient estimator.
+        """Initialize the gradient calculator.
 
         Args:
             gradient_config: The gradient configuration.
@@ -139,13 +139,13 @@ class DefaultGradientEstimator(GradientEstimator):
         )
 
     @override
-    def estimate(
+    def calculate(
         self, data: GradientData, weights: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.bool_] | None]:
-        """Estimate the gradients with the selected method.
+        """Calculate the gradients with the selected method.
 
         Returns:
-            The gradients and the mask of estimated gradients.
+            The gradients and the mask of calculated gradients.
         """
         if self._method != "stochastic":
             return _estimate_finite_differences(

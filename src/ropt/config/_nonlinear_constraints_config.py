@@ -33,12 +33,12 @@ class NonlinearConstraintsConfig(BaseModel):
     descriptions and usage examples.
 
     Attributes:
-        lower_bounds:        Lower bounds for the right-hand-side values.
-        upper_bounds:        Upper bounds for the right-hand-side values.
-        scales:              Scale factors for the constraint functions (default: 1.0).
-        auto_scale:          Which constraints to auto-scale (default: `False`).
-        realization_filters: Realization filter index per constraint (default: none).
-        function_estimators: Function estimator index per constraint (default: `0`).
+        lower_bounds:            Lower bounds for the right-hand-side values.
+        upper_bounds:            Upper bounds for the right-hand-side values.
+        scales:                  Scale factors for the constraint functions (default: 1.0).
+        auto_scale:              Which constraints to auto-scale (default: `False`).
+        realization_filters:     Realization filter index per constraint (default: none).
+        realization_aggregators: Realization aggregator index per constraint (default: `0`).
     """
 
     lower_bounds: Array1D
@@ -46,7 +46,7 @@ class NonlinearConstraintsConfig(BaseModel):
     scales: Array1D = np.array(1.0)
     auto_scale: Array1DBool = np.array(0)
     realization_filters: Indices = (None,)
-    function_estimators: Indices = (0,)
+    realization_aggregators: Indices = (0,)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -71,8 +71,10 @@ class NonlinearConstraintsConfig(BaseModel):
             realization_filters=broadcast_tuple(
                 self.realization_filters, "realization_filters", lower_bounds.size
             ),
-            function_estimators=broadcast_tuple(
-                self.function_estimators, "function_estimators", lower_bounds.size
+            realization_aggregators=broadcast_tuple(
+                self.realization_aggregators,
+                "realization_aggregators",
+                lower_bounds.size,
             ),
         )
         return self

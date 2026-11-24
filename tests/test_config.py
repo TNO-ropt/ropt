@@ -333,7 +333,7 @@ def test_context_defaults_and_scaling_apply_when_built_directly(config: Any) -> 
         direct = EnOptContext(**config)
     validated = EnOptContext.model_validate(config)
     assert len(direct.sampler) == len(validated.sampler)
-    assert len(direct.function_estimator) == len(validated.function_estimator)
+    assert len(direct.realization_aggregator) == len(validated.realization_aggregator)
     assert np.allclose(direct.variables.upper_bounds, [5.0, 5.0])
     assert np.allclose(direct.variables.upper_bounds, validated.variables.upper_bounds)
 
@@ -386,9 +386,9 @@ def test_variables_reject_perturbation_types(perturbation_type: str) -> None:
             "Value must be a RealizationFilter, RealizationFilterConfig, or dict.",
         ),
         (
-            "function_estimator",
+            "realization_aggregator",
             (object(),),
-            "Value must be a FunctionEstimator, FunctionEstimatorConfig, or dict.",
+            "Value must be a RealizationAggregator, RealizationAggregatorConfig, or dict.",
         ),
     ],
 )
@@ -405,7 +405,7 @@ def test_component_sequence_uses_plural_selectors(
     config: dict[str, Any], *, as_tuple: bool
 ) -> None:
     config["sampler"] = ({}, {}) if as_tuple else [{}, {}]
-    config["function_estimator"] = ({}, {}) if as_tuple else [{}, {}]
+    config["realization_aggregator"] = ({}, {}) if as_tuple else [{}, {}]
     filters = [
         {"method": "cvar-objective", "options": {"sort": [0]}},
         {"method": "cvar-objective", "options": {"sort": [1]}},
@@ -414,24 +414,24 @@ def test_component_sequence_uses_plural_selectors(
     config["variables"]["samplers"] = [1, 0]
     config["objectives"] = {
         "weights": [1.0, 1.0],
-        "function_estimators": [1, 0],
+        "realization_aggregators": [1, 0],
         "realization_filters": [None, 1],
     }
     config["nonlinear_constraints"] = {
         "lower_bounds": [0.0, 0.0],
         "upper_bounds": [1.0, 1.0],
-        "function_estimators": [0, 1],
+        "realization_aggregators": [0, 1],
         "realization_filters": [1, None],
     }
     context = EnOptContext.model_validate(config)
     assert len(context.sampler) == 2
-    assert len(context.function_estimator) == 2
+    assert len(context.realization_aggregator) == 2
     assert len(context.realization_filter) == 2
     assert context.variables.samplers == (1, 0)
-    assert context.objectives.function_estimators == (1, 0)
+    assert context.objectives.realization_aggregators == (1, 0)
     assert context.objectives.realization_filters == (None, 1)
     assert context.nonlinear_constraints is not None
-    assert context.nonlinear_constraints.function_estimators == (0, 1)
+    assert context.nonlinear_constraints.realization_aggregators == (0, 1)
     assert context.nonlinear_constraints.realization_filters == (1, None)
 
 
@@ -439,7 +439,7 @@ def test_component_sequence_uses_plural_selectors(
     ("field", "value"),
     [
         ("sampler", {"method": "scipy/default"}),
-        ("function_estimator", {"method": "default/mean"}),
+        ("realization_aggregator", {"method": "default/mean"}),
         (
             "realization_filter",
             {
@@ -463,7 +463,7 @@ def test_component_dict_is_wrapped(
     ("field", "method"),
     [
         ("samplers", "scipy/default"),
-        ("function_estimators", "default/mean"),
+        ("realization_aggregators", "default/mean"),
         ("realization_filters", "default/cvar-objective"),
     ],
 )

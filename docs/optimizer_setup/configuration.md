@@ -15,7 +15,7 @@ top-level key becomes an instance of that section's configuration class:
 Only `variables` is required; every other section has defaults.
 
 Three sections are different in kind. `sampler`, `realization_filter` and
-`function_estimator` do not hold settings but **components** — objects built by
+`realization_aggregator` do not hold settings but **components** — objects built by
 the plugin system, which other sections select by index.
 
 Most of the rules below follow from this one step. Because the dictionary is
@@ -37,7 +37,7 @@ CONFIG = {
     "backend": {...},                          # optional
     "gradient": {...},                         # optional
     "realization_filter": {...},               # optional, one component or a list
-    "function_estimator": {...},               # optional, one component or a list
+    "realization_aggregator": {...},           # optional, one component or a list
     "sampler": {...},                          # optional, one component or a list
     "names": {...},                            # optional, for labelled output
 }
@@ -89,7 +89,7 @@ configurations; validation stores a tuple of **components**:
 | Field                              | Component type                                                                  |
 | ---------------------------------- | ------------------------------------------------------------------------------- |
 | `realization_filter`               | [`RealizationFilter`][ropt.realization_filter.RealizationFilter]                |
-| `function_estimator`               | [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator]                |
+| `realization_aggregator`           | [`RealizationAggregator`][ropt.realization_aggregator.RealizationAggregator]                |
 | `sampler`                          | [`Sampler`][ropt.sampler.Sampler]                                               |
 
 You usually specify each component with a small config dict; see
@@ -105,7 +105,7 @@ CONFIG = {
 ```
 
 Other config sections refer to these components **by index**. The selector
-fields remain plural: `variables.samplers`, `objectives.function_estimators`
+fields remain plural: `variables.samplers`, `objectives.realization_aggregators`
 and `objectives.realization_filters`, with the same two fields for nonlinear
 constraints. Each selector holds an index per variable, objective or constraint.
 For example, to select between two samplers:
@@ -131,7 +131,7 @@ or building the context fails with an error naming the unknown index.
 Two runnable scripts select a component by position this way:
 [examples/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/realization_filter.py)
 and
-[examples/function_estimator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/function_estimator.py),
+[examples/realization_aggregator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/realization_aggregator.py),
 each of which registers a custom component and points the objectives at it.
 
 ### Providing optimizer components
@@ -165,7 +165,7 @@ the required object:
    the Python object yourself and want to provide it directly, without
    registering it as a plugin.
 
-The same pattern applies to `backend`, `gradient`, `function_estimator`, and
+The same pattern applies to `backend`, `gradient`, `realization_aggregator`, and
 `realization_filter`. You can mix these forms
 freely — for example, a hand-built `Sampler` instance alongside a dict-configured
 one in the same tuple. The dict and config-object forms resolve the `method`

@@ -41,5 +41,5 @@ For runnable programs by task, see the [Examples index](../getting_started/examp
 | Look up | Reference | Usage |
 | --- | --- | --- |
 | Utilities and enums | [Utility functions](utils.md), [enumerations](enums.md) | [Variable scaling](../optimizer_setup/variables.md#scaling) |
-| Optimizer component interfaces | [Backends](backend.md), [gradient estimators](gradient.md), [samplers](sampler.md), [function estimators](function_estimator.md), [realization filters](realization_filter.md) | [Writing a Plugin](../advanced/writing_plugins.md) |
+| Optimizer component interfaces | [Backends](backend.md), [gradient calculators](gradient.md), [samplers](sampler.md), [realization aggregators](realization_aggregator.md), [realization filters](realization_filter.md) | [Writing a Plugin](../advanced/writing_plugins.md) |
 | Plugin registration and discovery | [Plugin system API](plugin_manager.md) | [Plugin Discovery](../advanced/plugin_discovery.md) |

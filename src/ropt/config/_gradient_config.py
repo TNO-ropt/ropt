@@ -20,7 +20,7 @@ class GradientConfig(BaseModel):
     """Configuration class for gradient calculations.
 
     `GradientConfig` configures a
-    [`GradientEstimator`][ropt.gradient.GradientEstimator] plugin that
+    [`GradientCalculator`][ropt.gradient.GradientCalculator] plugin that
     estimates gradients in gradient-based optimizers. It is the `gradient`
     section of the configuration.
 

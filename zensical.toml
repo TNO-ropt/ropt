@@ -53,7 +53,7 @@ nav = [
         { "Finite-Difference Gradients" = "optimizer_setup/finite_differences.md" },
         { Samplers = "optimizer_setup/samplers.md" },
         { "Realization Filters" = "optimizer_setup/realization_filters.md" },
-        { "Function Estimators" = "optimizer_setup/function_estimators.md" },
+        { "Realization Aggregators" = "optimizer_setup/realization_aggregators.md" },
         { "Configuration Reference" = "optimizer_setup/configuration_sections.md" },
     ] },
     { Troubleshooting = [
@@ -73,8 +73,8 @@ nav = [
             { "Optimization Events" = "reference/events.md" },
         ] },
         { "Optimizer Components" = [
-            { "Function Estimators" = "reference/function_estimator.md" },
-            { "Gradient Estimators" = "reference/gradient.md" },
+            { "Realization Aggregators" = "reference/realization_aggregator.md" },
+            { "Gradient Calculators" = "reference/gradient.md" },
             { "Realization Filters" = "reference/realization_filter.md" },
             { "Optimizer Backends" = "reference/backend.md" },
             { Samplers = "reference/sampler.md" },

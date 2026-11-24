@@ -427,7 +427,7 @@ def _run(objectives: dict[str, Any], estimator: str) -> list[Results]:
             "variables": {"variable_count": 2, "perturbation_magnitudes": 0.01},
             "realizations": {"weights": [1.0, 2.0, 3.0]},
             "objectives": objectives,
-            "function_estimator": [{"method": estimator}],
+            "realization_aggregator": [{"method": estimator}],
         },
         np.array([0.5, 0.5]),
         _spread_evaluator,
@@ -481,9 +481,9 @@ def test_the_reported_aggregate_matches_the_reported_values(
     context = _context(
         realizations={"weights": [1.0, 2.0, 3.0]},
         objectives={"weights": [1.0]},
-        function_estimator=[{"method": estimator}],
+        realization_aggregator=[{"method": estimator}],
     )
-    aggregate = context.function_estimator[0]
+    aggregate = context.realization_aggregator[0]
     aggregate.init(merge_realizations=context.gradient.merge_realizations)
 
     for item in results:
@@ -491,7 +491,7 @@ def test_the_reported_aggregate_matches_the_reported_values(
         values = item.evaluations.objectives[:, 0]
         assert np.allclose(
             item.aggregates.objectives[0],
-            aggregate.calculate_function(values, context.realizations.weights),
+            aggregate.aggregate_function(values, context.realizations.weights),
         )
 
 

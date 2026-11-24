@@ -11,7 +11,7 @@
             - OptimizerConfig
             - BackendConfig
             - GradientConfig
-            - FunctionEstimatorConfig
+            - RealizationAggregatorConfig
             - RealizationFilterConfig
             - SamplerConfig
         group_by_category: false

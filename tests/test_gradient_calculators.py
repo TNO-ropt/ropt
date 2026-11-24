@@ -10,14 +10,14 @@ from ropt._core import EnsembleEvaluator
 from ropt._evaluation import EvaluationFunctionContext
 from ropt.config import GradientConfig
 from ropt.context import EnOptContext
-from ropt.gradient import GradientData, GradientEstimator
+from ropt.gradient import GradientCalculator, GradientData
 from ropt.plugins import MethodSpec, register_plugin
 from ropt.results import GradientResults
 
 _STEP = 1e-3
 
 
-class ForwardDifferences(GradientEstimator):
+class ForwardDifferences(GradientCalculator):
     methods: ClassVar[MethodSpec] = {"forward"}
 
     def __init__(self, gradient_config: GradientConfig) -> None:
@@ -41,7 +41,7 @@ class ForwardDifferences(GradientEstimator):
         return np.zeros(data.functions.shape[0], dtype=np.bool_)
 
     @override
-    def estimate(
+    def calculate(
         self, data: GradientData, weights: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
         self.weights = weights
@@ -75,7 +75,7 @@ def _gradient(
 
 
 @pytest.mark.parametrize("selection", ["method", "instance"])
-def test_gradient_estimator_plugin_estimates_the_masked_variables(
+def test_gradient_calculator_plugin_estimates_the_masked_variables(
     monkeypatch: Any, evaluator: Any, selection: str
 ) -> None:
     monkeypatch.setattr("ropt.plugins._manager._plugin_manager", None)
@@ -101,7 +101,7 @@ def test_gradient_estimator_plugin_estimates_the_masked_variables(
     np.testing.assert_allclose(gradient.aggregates.objectives, [[1.0, 0.0, 3.0]])
 
 
-def test_gradient_estimator_receives_zero_weight_for_failed_function(
+def test_gradient_calculator_receives_zero_weight_for_failed_function(
     evaluator: Any,
 ) -> None:
     estimator = ForwardDifferences(GradientConfig())

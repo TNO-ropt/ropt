@@ -1,4 +1,4 @@
-"""Abstract base class for gradient estimator implementations."""
+"""Abstract base class for gradient calculator implementations."""
 
 from __future__ import annotations
 
@@ -17,22 +17,22 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True)
 class GradientData:
-    """The evaluated points from which gradients are estimated.
+    """The evaluated points used to calculate gradients.
 
     Variables are in the optimizer's scaled domain and contain only the
     variables selected by the mask passed to
-    [`GradientEstimator.init`][ropt.gradient.GradientEstimator.init]. The
+    [`GradientCalculator.init`][ropt.gradient.GradientCalculator.init]. The
     functions are the objectives followed by the nonlinear constraints, as
     evaluated. A failed evaluation is `NaN` in every function.
 
     Attributes:
         variables:           Shape `(n_variables,)`, the point at which
-                             gradients are estimated.
+                             gradients are calculated.
         functions:           Shape `(n_realizations, n_functions)`, the
                              functions at that point.
         perturbed_variables: Shape `(n_realizations, n_perturbations,
                              n_variables)`, the points returned by
-                             [`perturbed_variables`][ropt.gradient.GradientEstimator.perturbed_variables].
+                             [`perturbed_variables`][ropt.gradient.GradientCalculator.perturbed_variables].
         perturbed_functions: Shape `(n_realizations, n_perturbations,
                              n_functions)`, the functions at those points.
     """
@@ -43,19 +43,19 @@ class GradientData:
     perturbed_functions: NDArray[np.float64]
 
 
-class GradientEstimator(ABC):
-    """Abstract base class for gradient estimator implementations.
+class GradientCalculator(ABC):
+    """Abstract base class for gradient calculator implementations.
 
-    A gradient estimator chooses the points at which the functions are
-    evaluated, and estimates the gradient of each function in each realization
+    A gradient calculator chooses the points at which the functions are
+    evaluated, and calculates the gradient of each function in each realization
     from the results. `ropt` evaluates the points, and aggregates the
-    gradients over the realizations with the function estimators.
+    gradients over the realizations with the realization aggregators.
 
-    See [Writing a Plugin](../advanced/writing_plugins.md#gradient-estimators).
+    See [Writing a Plugin](../advanced/writing_plugins.md#gradient-calculators).
     """
 
     methods: ClassVar[MethodSpec]
-    """The gradient estimation methods this class provides.
+    """The gradient calculation methods this class provides.
 
     Either a set of names, which the registry matches case-insensitively, or a
     predicate for classes that cannot enumerate them. Include `"default"` in the
@@ -64,7 +64,7 @@ class GradientEstimator(ABC):
 
     @abstractmethod
     def __init__(self, gradient_config: GradientConfig) -> None:
-        """Create a new gradient estimator instance.
+        """Create a new gradient calculator instance.
 
         Store the configuration and validate the method options. Setup that
         depends on the optimization belongs in `init`. Raise a `ValueError` for
@@ -85,29 +85,29 @@ class GradientEstimator(ABC):
 
     @abstractmethod
     def init(self, context: EnOptContext, *, mask: NDArray[np.bool_]) -> None:
-        """Prepare the estimator before the optimization starts.
+        """Prepare the calculator before the optimization starts.
 
         Called once, before any points are requested. `mask` selects the
-        variables for which the estimator estimates gradients; use it instead
+        variables for which the calculator calculates gradients; use it instead
         of `context.variables.mask`.
 
         Args:
             context: The optimization context.
-            mask:    Shape `(n_variables,)`, the variables to estimate
+            mask:    Shape `(n_variables,)`, the variables to calculate
                      gradients for.
         """
 
     @property
     def merge_realizations(self) -> bool:
-        """Indicate whether the aggregated gradient is estimated directly.
+        """Indicate whether the aggregated gradient is calculated directly.
 
-        If `True`, [`estimate`][ropt.gradient.GradientEstimator.estimate]
-        returns one gradient per function, estimated from all realizations,
-        and no per-realization estimates are reported. The default
+        If `True`, [`calculate`][ropt.gradient.GradientCalculator.calculate]
+        returns one gradient per function, calculated from all realizations,
+        and no per-realization gradients are reported. The default
         implementation returns `False`.
 
         Returns:
-            `True` if the aggregated gradient is estimated directly.
+            `True` if the aggregated gradient is calculated directly.
         """
         return False
 
@@ -123,16 +123,16 @@ class GradientEstimator(ABC):
 
         Args:
             variables: Shape `(n_variables,)`, the point at which gradients are
-                       estimated.
+                       calculated.
 
         Returns:
             Shape `(n_realizations, n_perturbations, n_variables)`, where the
-            estimator chooses `n_perturbations`.
+            calculator chooses `n_perturbations`.
         """
 
     @abstractmethod
     def failed_realizations(self, data: GradientData) -> NDArray[np.bool_]:
-        """Identify the realizations for which no gradient can be estimated.
+        """Identify the realizations for which no gradient can be calculated.
 
         Report only the failures in the evaluations of the perturbed points.
         `ropt` also marks a realization as failed if the evaluation at the
@@ -146,10 +146,10 @@ class GradientEstimator(ABC):
         """
 
     @abstractmethod
-    def estimate(
+    def calculate(
         self, data: GradientData, weights: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.bool_] | None]:
-        """Estimate the gradient of each function in each realization.
+        """Calculate the gradient of each function in each realization.
 
         The weights of each function are normalized to sum to one, and are zero
         for failed realizations.
@@ -162,9 +162,9 @@ class GradientEstimator(ABC):
         Returns:
             The gradients, of shape `(n_realizations, n_functions,
             n_variables)`, and a mask of shape `(n_realizations, n_functions)`
-            that is `True` where a gradient was estimated. Gradients where the
+            that is `True` where a gradient was calculated. Gradients where the
             mask is `False` are not used. If
-            [`merge_realizations`][ropt.gradient.GradientEstimator.merge_realizations]
+            [`merge_realizations`][ropt.gradient.GradientCalculator.merge_realizations]
             is `True`, the gradients have shape `(n_functions, n_variables)`
             and the mask is `None`.
         """

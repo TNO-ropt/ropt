@@ -17,11 +17,11 @@ from pydantic import (
 from ropt._scaling import scale
 from ropt._utils import immutable_array, update_fields
 from ropt.config import (
-    FunctionEstimatorConfig,
     LinearConstraintsConfig,
     NonlinearConstraintsConfig,
     ObjectiveFunctionsConfig,
     OptimizerConfig,
+    RealizationAggregatorConfig,
     RealizationsConfig,
     SamplerConfig,
     VariablesConfig,
@@ -31,8 +31,8 @@ from ropt.plugins import get_plugin
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     BackendInstance,
-    FunctionEstimatorInstances,
     GradientInstance,
+    RealizationAggregatorInstances,
     RealizationFilterInstances,
     SamplerInstances,
 )
@@ -57,9 +57,9 @@ class EnOptContext(BaseModel):
     """The validated configuration of a single optimization run.
 
     Holds the variables, objectives, constraints, realizations, gradient
-    estimator, samplers, filters, optimizer and backend that a run needs. It is
-    built from plain dictionaries or configuration objects and validated on
-    creation.
+    calculator, realization aggregators, samplers, filters, optimizer and
+    backend that a run needs. It is built from plain dictionaries or
+    configuration objects and validated on creation.
 
     See [Configuration](../optimizer_setup/configuration.md).
 
@@ -69,18 +69,18 @@ class EnOptContext(BaseModel):
         serialized field values; persist the raw input dictionaries instead.
 
     Attributes:
-        variables:             Variable settings.
-        objectives:            Objective function settings.
-        linear_constraints:    Optional linear constraint settings.
-        nonlinear_constraints: Optional nonlinear constraint settings.
-        realizations:          Ensemble realization settings.
-        optimizer:             Optimizer settings.
-        backend:               Backend plugin instance that runs the optimization algorithm.
-        gradient:              Gradient estimator plugin instance.
-        realization_filter:    Realization filter instances, selected by index.
-        function_estimator:    Function estimator instances, selected by index.
-        sampler:               Sampler instances, selected by index.
-        names:                 Optional mapping of axis names to label sequences.
+        variables:              Variable settings.
+        objectives:             Objective function settings.
+        linear_constraints:     Optional linear constraint settings.
+        nonlinear_constraints:  Optional nonlinear constraint settings.
+        realizations:           Ensemble realization settings.
+        optimizer:              Optimizer settings.
+        backend:                Backend plugin instance that runs the optimization algorithm.
+        gradient:               Gradient calculator plugin instance.
+        realization_filter:     Realization filter instances, selected by index.
+        realization_aggregator: Realization aggregator instances, selected by index.
+        sampler:                Sampler instances, selected by index.
+        names:                  Optional mapping of axis names to label sequences.
     """
 
     variables: VariablesConfig
@@ -92,7 +92,7 @@ class EnOptContext(BaseModel):
     backend: BackendInstance = {}  # type: ignore[assignment]
     gradient: GradientInstance = {}  # type: ignore[assignment]
     realization_filter: RealizationFilterInstances = ()
-    function_estimator: FunctionEstimatorInstances = ()
+    realization_aggregator: RealizationAggregatorInstances = ()
     sampler: SamplerInstances = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
@@ -209,12 +209,15 @@ class EnOptContext(BaseModel):
     @model_validator(mode="after")
     def _defaults(self) -> Self:
         updates: dict[str, Any] = {}
-        if not self.function_estimator:
-            function_estimator_config = FunctionEstimatorConfig.model_validate({})
-            updates["function_estimator"] = (
+        if not self.realization_aggregator:
+            realization_aggregator_config = RealizationAggregatorConfig.model_validate(
+                {}
+            )
+            updates["realization_aggregator"] = (
                 get_plugin(
-                    "function_estimator", method=function_estimator_config.method
-                )(function_estimator_config),
+                    "realization_aggregator",
+                    method=realization_aggregator_config.method,
+                )(realization_aggregator_config),
             )
         if not self.sampler:
             sampler_config = SamplerConfig.model_validate({})
@@ -229,7 +232,7 @@ class EnOptContext(BaseModel):
     def _check_references(self) -> Self:
         components = {
             "samplers": self.sampler,
-            "function_estimators": self.function_estimator,
+            "realization_aggregators": self.realization_aggregator,
             "realization_filters": self.realization_filter,
         }
         sections = [
@@ -237,7 +240,7 @@ class EnOptContext(BaseModel):
             (
                 "objectives",
                 self.objectives,
-                ("realization_filters", "function_estimators"),
+                ("realization_filters", "realization_aggregators"),
             ),
         ]
         if self.nonlinear_constraints is not None:
@@ -245,7 +248,7 @@ class EnOptContext(BaseModel):
                 (
                     "nonlinear_constraints",
                     self.nonlinear_constraints,
-                    ("realization_filters", "function_estimators"),
+                    ("realization_filters", "realization_aggregators"),
                 )
             )
         for section, config, fields in sections:

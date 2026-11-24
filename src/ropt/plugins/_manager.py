@@ -25,14 +25,14 @@ PluginType = Literal[
     "backend",
     "sampler",
     "realization_filter",
-    "function_estimator",
+    "realization_aggregator",
     "gradient",
 ]
 """The plugin types a method string can select from."""
 
 
 _DEFAULT_PLUGINS: Final = {
-    "function_estimator": "default",
+    "realization_aggregator": "default",
     "backend": "scipy",
     "sampler": "scipy",
     "realization_filter": "default",
@@ -73,18 +73,18 @@ class PluginManager:
         """Initialize the plugin manager."""
         # ruff: disable[import-outside-top-level]
         from ropt.backend import Backend
-        from ropt.function_estimator import FunctionEstimator
-        from ropt.gradient import GradientEstimator
+        from ropt.gradient import GradientCalculator
+        from ropt.realization_aggregator import RealizationAggregator
         from ropt.realization_filter import RealizationFilter
         from ropt.sampler import Sampler
         # ruff: enable[import-outside-top-level]
 
         self._PLUGIN_TYPES: Final = {
-            "function_estimator": FunctionEstimator,
+            "realization_aggregator": RealizationAggregator,
             "backend": Backend,
             "sampler": Sampler,
             "realization_filter": RealizationFilter,
-            "gradient": GradientEstimator,
+            "gradient": GradientCalculator,
         }
 
         self._plugins: dict[PluginType, dict[str, type[Any]]] = {}
@@ -102,8 +102,8 @@ class PluginManager:
 
         from ropt.sampler.scipy import SciPySampler
         from ropt.realization_filter.default import DefaultRealizationFilter
-        from ropt.function_estimator.default import DefaultFunctionEstimator
-        from ropt.gradient.default import DefaultGradientEstimator
+        from ropt.realization_aggregator.default import DefaultRealizationAggregator
+        from ropt.gradient.default import DefaultGradientCalculator
         from ropt.backend.external import ExternalBackend
         from ropt.backend.scipy import SciPyBackend
 
@@ -111,8 +111,10 @@ class PluginManager:
         self._add_plugin("backend", "external", ExternalBackend)
         self._add_plugin("sampler", "scipy", SciPySampler)
         self._add_plugin("realization_filter", "default", DefaultRealizationFilter)
-        self._add_plugin("function_estimator", "default", DefaultFunctionEstimator)
-        self._add_plugin("gradient", "default", DefaultGradientEstimator)
+        self._add_plugin(
+            "realization_aggregator", "default", DefaultRealizationAggregator
+        )
+        self._add_plugin("gradient", "default", DefaultGradientCalculator)
 
         for plugin_type_name in self._PLUGIN_TYPES:
             assert plugin_type_name in self._PLUGIN_TYPES

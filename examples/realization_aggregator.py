@@ -1,6 +1,6 @@
-"""A custom function estimator with `ropt`.
+"""A custom realization aggregator with `ropt`.
 
-A function estimator reduces the objective values of all realizations to the
+A realization aggregator reduces the objective values of all realizations to the
 single value the optimizer works with, together with the matching gradient. This
 example implements `GeometricMean`, which replaces the built-in weighted mean
 with a weighted geometric mean.
@@ -12,9 +12,9 @@ is defined for positive numbers only, which is why this example is tied to the
 Rosenbrock function, a sum of squares that is never negative. See
 [Geometric mean](https://en.wikipedia.org/wiki/Geometric_mean).
 
-The estimator is **registered** with `register_plugin`, which makes it
+The realization aggregator is **registered** with `register_plugin`, which makes it
 available exactly like an installed one: it is selected from the configuration
-by its `"plugin/method"` string. An estimator defined in a script or a
+by its `"plugin/method"` string. A realization aggregator defined in a script or a
 notebook cannot be found through an entry point, and registering is what closes
 that gap.
 """
@@ -26,16 +26,16 @@ from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt import EvaluationFunctionContext, FunctionResults, optimize
-from ropt.config import FunctionEstimatorConfig
-from ropt.function_estimator import FunctionEstimator
+from ropt.config import RealizationAggregatorConfig
 from ropt.plugins import MethodSpec, register_plugin
+from ropt.realization_aggregator import RealizationAggregator
 
 DIM = 5
 UNCERTAINTY = 0.1
 INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 
 
-class GeometricMean(FunctionEstimator):
+class GeometricMean(RealizationAggregator):
     """Reduce the realizations to their weighted geometric mean.
 
     The mean is evaluated as `exp(sum(weights * log(functions)))`, the
@@ -46,11 +46,14 @@ class GeometricMean(FunctionEstimator):
     # The methods this plugin provides, as an installed plugin declares them.
     methods: ClassVar[MethodSpec] = {"geometric"}
 
-    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:
-        """Create the estimator.
+    def __init__(
+        self, realization_aggregator_config: RealizationAggregatorConfig
+    ) -> None:
+        """Create the realization aggregator.
 
         Args:
-            estimator_config: The estimator configuration, unused by this estimator.
+            realization_aggregator_config: The realization aggregator configuration,
+                                           unused by this implementation.
         """
 
     @override
@@ -64,13 +67,13 @@ class GeometricMean(FunctionEstimator):
             ValueError: If the gradients arrive merged.
         """
         # Merged gradients no longer carry the per-realization values the chain
-        # rule in `calculate_gradient` divides by.
+        # rule in `aggregate_gradient` divides by.
         if merge_realizations:
             msg = "The geometric mean does not support merged gradients."
             raise ValueError(msg)
 
     @override
-    def calculate_function(
+    def aggregate_function(
         self,
         functions: NDArray[np.float64],
         weights: NDArray[np.float64],
@@ -87,7 +90,7 @@ class GeometricMean(FunctionEstimator):
         return np.exp(weights @ np.log(functions))
 
     @override
-    def calculate_gradient(
+    def aggregate_gradient(
         self,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
@@ -123,7 +126,7 @@ def report(result: FunctionResults) -> None:
 
 def main() -> None:
     """Run the geometric-mean ensemble optimization and check the result."""
-    register_plugin("function_estimator", "custom", GeometricMean)
+    register_plugin("realization_aggregator", "custom", GeometricMean)
 
     realizations = 10
     config: dict[str, Any] = {
@@ -134,13 +137,13 @@ def main() -> None:
         "realizations": {
             "weights": [1.0] * realizations,
         },
-        # Estimators are configured here and referred to by index by the
+        # Realization aggregators are configured here and referred to by index by the
         # objectives or nonlinear constraints that use them. Passing the instance
-        # itself, `GeometricMean(FunctionEstimatorConfig(method="geometric"))`,
+        # itself, `GeometricMean(RealizationAggregatorConfig(method="geometric"))`,
         # works too and needs no registration.
-        "function_estimator": {"method": "custom/geometric"},
+        "realization_aggregator": {"method": "custom/geometric"},
         "objectives": {
-            "function_estimators": [0],
+            "realization_aggregators": [0],
         },
     }
 

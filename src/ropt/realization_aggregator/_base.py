@@ -1,4 +1,4 @@
-"""Abstract base class for function estimator implementations."""
+"""Abstract base class for realization aggregator implementations."""
 
 from __future__ import annotations
 
@@ -9,19 +9,19 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config import FunctionEstimatorConfig
+    from ropt.config import RealizationAggregatorConfig
     from ropt.plugins import MethodSpec
 
 
-class FunctionEstimator(ABC):
-    """Abstract base class for function estimator implementations.
+class RealizationAggregator(ABC):
+    """Abstract base class for realization aggregator implementations.
 
-    See [Function Estimators](../optimizer_setup/function_estimators.md) for examples
+    See [Realization Aggregators](../optimizer_setup/realization_aggregators.md) for examples
     and further guidance.
     """
 
     methods: ClassVar[MethodSpec]
-    """The estimator methods this class provides.
+    """The aggregation methods this class provides.
 
     Either a set of names, which the registry matches case-insensitively, or a
     predicate for classes that cannot enumerate them. Include `"default"` in the
@@ -29,14 +29,16 @@ class FunctionEstimator(ABC):
     """
 
     @abstractmethod
-    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:
-        """Create a new function estimator instance.
+    def __init__(
+        self, realization_aggregator_config: RealizationAggregatorConfig
+    ) -> None:
+        """Create a new realization aggregator instance.
 
         Store the configuration; keep initialization lightweight.
         Setup that depends on the optimization belongs in `init`.
 
         Args:
-            estimator_config: The estimator configuration.
+            realization_aggregator_config: The realization aggregator configuration.
         """
 
     @abstractmethod
@@ -45,14 +47,14 @@ class FunctionEstimator(ABC):
 
         Called once after configuration is finalized. Use for validation
         (for example compatibility with `merge_realizations`) and precomputation.
-        `merge_realizations` is described under `calculate_gradient`.
+        `merge_realizations` is described under `aggregate_gradient`.
 
         Args:
             merge_realizations: Whether gradients arrive merged across realizations.
         """
 
     @abstractmethod
-    def calculate_function(
+    def aggregate_function(
         self, functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         """Aggregate function values across realizations.
@@ -70,7 +72,7 @@ class FunctionEstimator(ABC):
         """
 
     @abstractmethod
-    def calculate_gradient(
+    def aggregate_gradient(
         self,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
@@ -81,11 +83,11 @@ class FunctionEstimator(ABC):
         When `merge_realizations` is `False` (default), `gradient` has shape
         `(n_realizations, n_variables)` and must be combined using `weights`.
         When `True`, a single pre-merged gradient of shape `(n_variables,)` is
-        passed instead — suitable only for estimators that aggregate by a
-        simple weighted combination (for example the mean). Estimators that need each
-        realization's own gradient (for example standard deviation, via the chain
-        rule) are incompatible with merging and should raise `ValueError` from
-        `init`.
+        passed instead — suitable only for aggregators that combine values by a
+        simple weighted operation (for example the mean). Aggregators that need
+        each realization's own gradient (for example standard deviation, via
+        the chain rule) are incompatible with merging and should raise
+        `ValueError` from `init`.
 
         Args:
             functions: Shape `(n_realizations,)` — the per-realization values.

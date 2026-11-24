@@ -36,13 +36,13 @@ class ObjectiveFunctionsConfig(BaseModel):
     `aggregates.objectives` or their variables.
 
     Attributes:
-        weights:             Weights for the objective functions (default: 1.0).
-        scales:              Scale factors for the objective functions (default: 1.0).
-        offsets:             Offsets for the objective functions (default: 0.0).
-        auto_scale:          Estimate additional scales from the first batch.
-        maximize:            Which objectives to maximize (default: `False`).
-        realization_filters: Realization filter index per objective (default: none).
-        function_estimators: Function estimator index per objective (default: `0`).
+        weights:                 Weights for the objective functions (default: 1.0).
+        scales:                  Scale factors for the objective functions (default: 1.0).
+        offsets:                 Offsets for the objective functions (default: 0.0).
+        auto_scale:              Estimate additional scales from the first batch.
+        maximize:                Which objectives to maximize (default: `False`).
+        realization_filters:     Realization filter index per objective (default: none).
+        realization_aggregators: Realization aggregator index per objective (default: `0`).
     """
 
     weights: Array1D = np.array(1.0)
@@ -51,7 +51,7 @@ class ObjectiveFunctionsConfig(BaseModel):
     auto_scale: bool = False
     maximize: Array1DBool = np.array(0)
     realization_filters: Indices = (None,)
-    function_estimators: Indices = (0,)
+    realization_aggregators: Indices = (0,)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -72,8 +72,8 @@ class ObjectiveFunctionsConfig(BaseModel):
             realization_filters=broadcast_tuple(
                 self.realization_filters, "realization_filters", weights.size
             ),
-            function_estimators=broadcast_tuple(
-                self.function_estimators, "function_estimators", weights.size
+            realization_aggregators=broadcast_tuple(
+                self.realization_aggregators, "realization_aggregators", weights.size
             ),
         )
         return self

@@ -109,7 +109,7 @@ data in [`ResultField`][ropt.results.ResultField] objects. For example, a
     - `metadata`: optional dict of per-realization/perturbation metadata
       arrays.
 - **`estimates`** ([`GradientEstimates`][ropt.results.GradientEstimates]) —
-  the gradient estimated for each realization, which the function estimators
+  the gradient estimated for each realization, which the realization aggregators
   combine into `aggregates`. It is `None` if the realizations are merged before
   estimation (`merge_realizations`), or if no gradient was estimated. A
   realization without an estimate, because it failed, was not evaluated or has

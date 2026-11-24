@@ -53,14 +53,13 @@ They are distinct from objective weights, which balance objectives. You can
 also use **realization filters** to select or reweight realizations for an
 evaluation, for example to focus on poor outcomes.
 
-A **function estimator** combines the per-realization values into the value
-used by the optimizer. The default is a weighted mean; other estimators can
+A **realization aggregator** combines the per-realization values into the value
+used by the optimizer. The default is a weighted mean; other aggregators can
 target quantities such as variability. Filters change which realizations
-contribute, while estimators define how their values are combined.
+contribute, while aggregators define how their values are combined.
 
-See [Ensemble-Based Optimization](../getting_started/ensemble.md),
-[Realization Filters](realization_filters.md), and
-[Function Estimators](function_estimators.md).
+See [Ensemble-Based Optimization](../getting_started/ensemble.md), [Realization
+Filters](realization_filters.md), and [Realization Aggregators](realization_aggregators.md).
 
 ## Which quantities need scaling?
 

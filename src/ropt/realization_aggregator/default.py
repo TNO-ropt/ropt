@@ -1,4 +1,4 @@
-"""Default function estimator plugin with mean and standard deviation methods."""
+"""Default realization aggregator plugin with mean and standard deviation methods."""
 
 from typing import ClassVar, Final, override
 
@@ -6,35 +6,39 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt._utils import zero_failures
-from ropt.config import FunctionEstimatorConfig
+from ropt.config import RealizationAggregatorConfig
 from ropt.exceptions import TooFewRealizations
-from ropt.function_estimator import FunctionEstimator
 from ropt.plugins import MethodSpec
+from ropt.realization_aggregator import RealizationAggregator
 
 _MIN_STDDEV_REALIZATIONS: Final = 2
 _STDDEV_TOLERANCE: Final = 1e-8
 
-DEFAULT_FUNCTION_ESTIMATOR_METHODS = {"default", "mean", "stddev"}
+DEFAULT_REALIZATION_AGGREGATOR_METHODS = {"default", "mean", "stddev"}
 
 
-class DefaultFunctionEstimator(FunctionEstimator):
-    """Default estimator providing `mean` and `stddev` methods.
+class DefaultRealizationAggregator(RealizationAggregator):
+    """Default realization aggregator providing `mean` and `stddev` methods.
 
     The method is selected via the `method` field of
-    [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig].
-    See [Function Estimators](../optimizer_setup/function_estimators.md) for usage.
+    [`RealizationAggregatorConfig`][ropt.config.RealizationAggregatorConfig].
+    See [Realization Aggregators](../optimizer_setup/realization_aggregators.md) for usage.
     """
 
-    methods: ClassVar[MethodSpec] = DEFAULT_FUNCTION_ESTIMATOR_METHODS
+    methods: ClassVar[MethodSpec] = DEFAULT_REALIZATION_AGGREGATOR_METHODS
 
-    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:
-        """Initialize the function estimator.
+    def __init__(
+        self, realization_aggregator_config: RealizationAggregatorConfig
+    ) -> None:
+        """Initialize the realization aggregator.
 
         Args:
-            estimator_config: The function estimator configuration.
+            realization_aggregator_config: The realization aggregator configuration.
         """
-        self._estimator_config = estimator_config
-        _, _, self._method = self._estimator_config.method.lower().rpartition("/")
+        self._realization_aggregator_config = realization_aggregator_config
+        _, _, self._method = (
+            self._realization_aggregator_config.method.lower().rpartition("/")
+        )
         if self._method == "default":
             self._method = "mean"
 
@@ -44,15 +48,15 @@ class DefaultFunctionEstimator(FunctionEstimator):
         self._merge_realizations = merge_realizations
 
     @override
-    def calculate_function(
+    def aggregate_function(
         self,
         functions: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """Estimate the function value as a weighted mean or standard deviation.
+        """Aggregate the function values as a weighted mean or standard deviation.
 
         Returns:
-            The estimated function value for each objective or constraint.
+            The aggregated function value for each objective or constraint.
 
         Raises:
             ValueError: If the configured method is not supported, or `stddev`
@@ -60,29 +64,29 @@ class DefaultFunctionEstimator(FunctionEstimator):
         """
         if self._method == "stddev" and self._merge_realizations:
             msg = (
-                "The stddev estimator does not support merging "
-                "realizations in the gradient."
+                "The stddev realization aggregator does not support merged "
+                "realizations in gradient aggregation."
             )
             raise ValueError(msg)
-        estimator_method = self._method
-        if estimator_method == "mean":
-            return self._calculate_function_mean(functions, weights)
-        if estimator_method == "stddev":
-            return _calculate_function_stddev(functions, weights)
-        msg = f"Function estimator method not supported: {estimator_method}"
+        aggregation_method = self._method
+        if aggregation_method == "mean":
+            return self._aggregate_function_mean(functions, weights)
+        if aggregation_method == "stddev":
+            return _aggregate_function_stddev(functions, weights)
+        msg = f"Realization aggregator method not supported: {aggregation_method}"
         raise ValueError(msg)
 
     @override
-    def calculate_gradient(
+    def aggregate_gradient(
         self,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """Estimate the gradient to match the function the estimator returns.
+        """Aggregate the gradient to match the function aggregation.
 
         Returns:
-            The estimated gradient.
+            The aggregated gradient.
 
         Raises:
             ValueError: If the configured method is not supported, or `stddev`
@@ -90,32 +94,32 @@ class DefaultFunctionEstimator(FunctionEstimator):
         """
         if self._method == "stddev" and self._merge_realizations:
             msg = (
-                "The stddev estimator does not support merging "
-                "realizations in the gradient."
+                "The stddev realization aggregator does not support merged "
+                "realizations in gradient aggregation."
             )
             raise ValueError(msg)
-        estimator_method = self._method
-        if estimator_method == "mean":
-            return self._calculate_gradient_mean(
+        aggregation_method = self._method
+        if aggregation_method == "mean":
+            return self._aggregate_gradient_mean(
                 functions,
                 gradient,
                 weights,
                 merge_realizations=self._merge_realizations,
             )
-        if estimator_method == "stddev":
-            return _calculate_gradient_stddev(functions, gradient, weights)
-        msg = f"Function estimator method not supported: {estimator_method}"
+        if aggregation_method == "stddev":
+            return _aggregate_gradient_stddev(functions, gradient, weights)
+        msg = f"Realization aggregator method not supported: {aggregation_method}"
         raise ValueError(msg)
 
     @staticmethod
-    def _calculate_function_mean(
+    def _aggregate_function_mean(
         functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         functions = _contributing(functions, weights)
         return np.dot(functions, weights)  # type: ignore[no-any-return]
 
     @staticmethod
-    def _calculate_gradient_mean(
+    def _aggregate_gradient_mean(
         _: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
@@ -128,7 +132,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         return np.dot(gradient.T, weights)  # type: ignore[no-any-return]
 
 
-def _calculate_function_stddev(
+def _aggregate_function_stddev(
     functions: NDArray[np.float64], weights: NDArray[np.float64]
 ) -> NDArray[np.float64]:
     if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
@@ -141,7 +145,7 @@ def _calculate_function_stddev(
     return stddev
 
 
-def _calculate_gradient_stddev(
+def _aggregate_gradient_stddev(
     functions: NDArray[np.float64],
     gradient: NDArray[np.float64],
     weights: NDArray[np.float64],

@@ -2,12 +2,12 @@
 
 !!! note
     This page covers the finite-difference methods of the built-in gradient
-    estimator. The default method, which estimates gradients from random
+    calculator. The default method, which estimates gradients from random
     perturbations, is described in [Stochastic Gradients](gradients.md).
 
-A finite-difference gradient changes one variable at a time by a fixed step,
-and divides the change in each function by that step. The built-in gradient
-estimator provides three variants, selected by the `method` field of the
+A finite-difference gradient changes one variable at a time by a fixed step, and
+divides the change in each function by that step. The built-in gradient
+calculator provides three variants, selected by the `method` field of the
 `gradient` section:
 
 | Method     | Points per variable | Derivative of variable $i$                  |
@@ -63,7 +63,7 @@ The points stay within the variable bounds, and `boundary_types` is not used:
 ## Realizations and failures
 
 A gradient is computed for each realization, and the gradients are combined
-with the [function estimators](function_estimators.md), as for stochastic
+with the [realization aggregators](realization_aggregators.md), as for stochastic
 gradients. The gradients of the individual realizations are stored in the
 `estimates` field of [`GradientResults`][ropt.results.GradientResults].
 

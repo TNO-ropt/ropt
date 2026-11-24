@@ -106,9 +106,9 @@ def test_example_realization_filter(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("realization_filter").main()
 
 
-def test_example_function_estimator(tmp_path: Path, monkeypatch: Any) -> None:
+def test_example_realization_aggregator(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    _load_from_file("function_estimator").main()
+    _load_from_file("realization_aggregator").main()
 
 
 def test_example_sampler(tmp_path: Path, monkeypatch: Any) -> None:
