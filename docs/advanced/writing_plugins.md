@@ -330,9 +330,10 @@ class ForwardDifferences(GradientCalculator):
 
     def calculate(
         self, data: GradientData, weights: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+    ) -> NDArray[np.float64]:
         differences = data.perturbed_functions - data.functions[:, np.newaxis, :]
-        return np.swapaxes(differences, 1, 2) / STEP, weights > 0
+        gradients = np.swapaxes(differences, 1, 2) / STEP
+        return np.where(weights[..., np.newaxis] > 0, gradients, np.nan)
 ```
 
 `ropt` calls the methods in this order:
@@ -350,8 +351,14 @@ class ForwardDifferences(GradientCalculator):
    gradient.
    `ropt` adds the realizations whose evaluation at the current point failed.
 4. `calculate`, which returns the gradient of each function in each
-   realization, with a mask that is `True` where a gradient was calculated. The
-   weights are zero for failed realizations.
+   realization. Return `NaN` in every variable component for a gradient that
+   could not be calculated or has zero weight. The weights are zero for failed
+   realizations.
+
+`ropt` excludes a realization's gradient for a function if any component is
+`NaN`, and renormalizes that function's remaining realization weights. If no
+gradients with positive weight remain, that function's aggregated gradient is
+`NaN`.
 
 The variables are in the optimizer's scaled domain.
 [`GradientData`][ropt.gradient.GradientData] holds the evaluated points,
@@ -376,9 +383,9 @@ combines perturbations across realizations, which can reduce the number of
 perturbations needed per realization.
 
 The [`calculate`][ropt.gradient.GradientCalculator.calculate] method then returns
-one gradient per function, of shape `(n_functions, n_variables)`, and `None`
-for the mask. `ropt` does not report per-realization gradient estimates in this
-mode.
+one gradient per function, of shape `(n_functions, n_variables)`, with `NaN`
+for unavailable gradients. `ropt` does not report per-realization gradient
+estimates in this mode.
 
 Registered under the `ropt.plugins.gradient` entry-point group, or with
 [`register_plugin`][ropt.plugins.register_plugin], the calculator is selected

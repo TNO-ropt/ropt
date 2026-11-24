@@ -148,7 +148,7 @@ class GradientCalculator(ABC):
     @abstractmethod
     def calculate(
         self, data: GradientData, weights: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.bool_] | None]:
+    ) -> NDArray[np.float64]:
         """Calculate the gradient of each function in each realization.
 
         The weights of each function are normalized to sum to one, and are zero
@@ -161,10 +161,9 @@ class GradientCalculator(ABC):
 
         Returns:
             The gradients, of shape `(n_realizations, n_functions,
-            n_variables)`, and a mask of shape `(n_realizations, n_functions)`
-            that is `True` where a gradient was calculated. Gradients where the
-            mask is `False` are not used. If
+            n_variables)`. Unavailable gradients and gradients at zero weight
+            contain `NaN` in every component. If
             [`merge_realizations`][ropt.gradient.GradientCalculator.merge_realizations]
-            is `True`, the gradients have shape `(n_functions, n_variables)`
-            and the mask is `None`.
+            is `True`, return shape `(n_functions, n_variables)`, with `NaN`
+            for unavailable gradients.
         """

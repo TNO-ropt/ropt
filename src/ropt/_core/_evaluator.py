@@ -595,13 +595,13 @@ class EnsembleEvaluator:
         weights = self._gradient_weights(
             objective_weights, constraint_weights, failed_realizations
         )
-        realization_gradients, estimated = self._gradient.calculate(data, weights)
+        realization_gradients = self._gradient.calculate(data, weights)
         scaled_estimates = None
         if not self._gradient.merge_realizations:
-            assert estimated is not None
-            realization_gradients = np.where(
-                estimated[..., np.newaxis], realization_gradients, 0.0
-            )
+            estimated = ~np.any(np.isnan(realization_gradients), axis=-1)
+            weights = np.where(estimated, weights, 0.0)
+            weight_sums = weights.sum(axis=0)
+            np.divide(weights, weight_sums, out=weights, where=weight_sums != 0)
             scaled_estimates = self._scaled_estimates(
                 realization_gradients, mask, estimated
             )
@@ -626,7 +626,7 @@ class EnsembleEvaluator:
             None
             if self._gradient.merge_realizations
             else self._scaled_estimates(
-                np.zeros((*data.functions.shape, data.variables.shape[-1])),
+                np.full((*data.functions.shape, data.variables.shape[-1]), np.nan),
                 mask,
                 np.zeros(data.functions.shape, dtype=np.bool_),
             )
@@ -966,6 +966,8 @@ def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments]
     for index, aggregator in enumerate(realization_aggregators):
         mask = np.array([item == index for item in realization_aggregator_indices])
         for idx in np.where(mask)[0]:
+            if not merge_realizations and not np.any(weights[:, idx]):
+                continue
             gradients[idx, ...] = aggregator.aggregate_gradient(
                 functions[:, idx],
                 (

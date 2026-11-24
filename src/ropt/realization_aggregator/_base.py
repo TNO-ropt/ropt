@@ -59,9 +59,10 @@ class RealizationAggregator(ABC):
     ) -> NDArray[np.float64]:
         """Aggregate function values across realizations.
 
-        The values arrive as the evaluator returned them. Scales are applied to
-        the aggregate this method produces, so an implementation does not need
-        to account for them.
+        The values arrive as the evaluator returned them. Values at zero weight
+        may be `NaN` and must not contribute to the aggregate. Scales are applied
+        to the aggregate this method produces, so an implementation does not
+        need to account for them.
 
         Args:
             functions: Shape `(n_realizations,)` — per-realization values.
@@ -88,6 +89,9 @@ class RealizationAggregator(ABC):
         each realization's own gradient (for example standard deviation, via
         the chain rule) are incompatible with merging and should raise
         `ValueError` from `init`.
+
+        Values at zero weight may be `NaN` and must not contribute to the
+        aggregate.
 
         Args:
             functions: Shape `(n_realizations,)` — the per-realization values.

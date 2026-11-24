@@ -87,6 +87,7 @@ class GeometricMean(RealizationAggregator):
         Returns:
             The weighted geometric mean of the values.
         """
+        functions = np.where(weights != 0, functions, 1.0)
         return np.exp(weights @ np.log(functions))
 
     @override
@@ -110,6 +111,8 @@ class GeometricMean(RealizationAggregator):
         Returns:
             The gradient of the weighted geometric mean.
         """
+        functions = np.where(weights != 0, functions, 1.0)
+        gradient = np.where(weights[:, np.newaxis] != 0, gradient, 0.0)
         geometric_mean = np.exp(weights @ np.log(functions))
         return geometric_mean * (gradient.T @ (weights / functions))
 

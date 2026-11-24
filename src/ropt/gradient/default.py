@@ -141,11 +141,11 @@ class DefaultGradientCalculator(GradientCalculator):
     @override
     def calculate(
         self, data: GradientData, weights: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.bool_] | None]:
+    ) -> NDArray[np.float64]:
         """Calculate the gradients with the selected method.
 
         Returns:
-            The gradients and the mask of calculated gradients.
+            The gradients, with `NaN` for unavailable gradients.
         """
         if self._method != "stochastic":
             return _estimate_finite_differences(
@@ -250,12 +250,12 @@ def _estimate_stochastic(
     *,
     merge_realizations: bool,
     svd_threshold: float,
-) -> tuple[NDArray[np.float64], NDArray[np.bool_] | None]:
+) -> NDArray[np.float64]:
     delta_variables = data.perturbed_variables - data.variables
     delta_functions = data.perturbed_functions - np.expand_dims(data.functions, axis=1)
     function_count = delta_functions.shape[-1]
     if merge_realizations:
-        merged = np.stack(
+        return np.stack(
             [
                 _estimate_merged_gradient(
                     delta_variables,
@@ -266,8 +266,6 @@ def _estimate_stochastic(
                 for idx in range(function_count)
             ]
         )
-        return merged, None
-
     estimates = [
         _estimate_gradients(
             delta_variables,
@@ -277,10 +275,7 @@ def _estimate_stochastic(
         )
         for idx in range(function_count)
     ]
-    return (
-        np.stack([estimate[0] for estimate in estimates], axis=1),
-        np.stack([estimate[1] for estimate in estimates], axis=1),
-    )
+    return np.stack(estimates, axis=1)
 
 
 def _estimate_gradients(
@@ -289,11 +284,11 @@ def _estimate_gradients(
     weights: NDArray[np.float64],
     *,
     svd_threshold: float,
-) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+) -> NDArray[np.float64]:
     realizations_mask = np.abs(weights) > 0
     realization_count = realizations_mask.size
-    gradients: NDArray[np.float64] = np.zeros(
-        (realization_count, delta_variables.shape[-1]), dtype=np.float64
+    gradients: NDArray[np.float64] = np.full(
+        (realization_count, delta_variables.shape[-1]), np.nan, dtype=np.float64
     )
     all_successes = np.logical_not(np.isnan(delta_functions))
     estimated_realizations = np.logical_and(
@@ -308,7 +303,7 @@ def _estimate_gradients(
                 delta_functions[idx, success],
                 svd_threshold=svd_threshold,
             )
-    return gradients, estimated_realizations
+    return gradients
 
 
 def _estimate_merged_gradient(
@@ -324,6 +319,8 @@ def _estimate_merged_gradient(
     delta_variables = delta_variables.reshape(-1, delta_variables.shape[-1])
     delta_functions = delta_functions.flatten()
     active_perturbations &= np.logical_not(np.isnan(delta_functions))
+    if not np.any(active_perturbations):
+        return np.full(delta_variables.shape[-1], np.nan, dtype=np.float64)
     return _invert_linear_equations(
         delta_variables[active_perturbations, :],
         delta_functions[active_perturbations],
@@ -426,7 +423,7 @@ def _finite_difference_points(
 
 def _estimate_finite_differences(
     data: GradientData, weights: NDArray[np.float64], *, central: bool
-) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+) -> NDArray[np.float64]:
     targets = _check_finite_difference_points(data, central=central)
     variable_count = data.variables.size
     counts = np.bincount(targets, minlength=variable_count)
@@ -449,7 +446,7 @@ def _estimate_finite_differences(
     gradients = (upper_functions - lower_functions) / steps[..., np.newaxis]
     gradients = np.swapaxes(gradients, 1, 2)
     estimated = (np.abs(weights) > 0) & ~np.any(np.isnan(gradients), axis=-1)
-    return gradients, estimated
+    return np.where(estimated[..., np.newaxis], gradients, np.nan)
 
 
 def _check_finite_difference_points(

@@ -128,6 +128,7 @@ class DefaultRealizationAggregator(RealizationAggregator):
     ) -> NDArray[np.float64]:
         if merge_realizations:
             return gradient
+        gradient = np.where(weights[:, np.newaxis] != 0, gradient, 0.0)
         # Preserve the reduction order with realization-first input.
         return np.dot(gradient.T, weights)  # type: ignore[no-any-return]
 
@@ -155,6 +156,7 @@ def _aggregate_gradient_stddev(
     functions = _contributing(functions, weights)
     if np.any(np.isinf(functions)):
         return np.full(gradient.shape[1:], np.inf, dtype=np.float64)
+    gradient = np.where(weights[:, np.newaxis] != 0, gradient, 0.0)
     norm, mean, stddev = _mean_stddev(functions, weights)
     mean_gradient = np.dot(gradient.T, weights)
     negligible = bool(

@@ -11,6 +11,7 @@ from ropt._evaluation import EvaluationFunctionContext
 from ropt.config import GradientConfig
 from ropt.context import EnOptContext
 from ropt.gradient import GradientCalculator, GradientData
+from ropt.gradient.default import DefaultGradientCalculator
 from ropt.plugins import MethodSpec, register_plugin
 from ropt.results import GradientResults
 
@@ -43,10 +44,25 @@ class ForwardDifferences(GradientCalculator):
     @override
     def calculate(
         self, data: GradientData, weights: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+    ) -> NDArray[np.float64]:
         self.weights = weights
         differences = data.perturbed_functions - data.functions[:, np.newaxis, :]
-        return np.swapaxes(differences, 1, 2) / _STEP, np.ones_like(weights, bool)
+        gradients = np.swapaxes(differences, 1, 2) / _STEP
+        return np.where(weights[..., np.newaxis] != 0, gradients, np.nan)
+
+
+class FixedGradients(ForwardDifferences):
+    def __init__(self, gradient_config: GradientConfig) -> None:
+        super().__init__(gradient_config)
+        self.gradients = np.array(
+            [[[1.0, 2.0, 3.0]], [[np.nan, np.nan, np.nan]]], dtype=np.float64
+        )
+
+    @override
+    def calculate(
+        self, data: GradientData, weights: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        return self.gradients
 
 
 def _linear(variables: NDArray[np.float64], _: EvaluationFunctionContext) -> float:
@@ -124,6 +140,102 @@ def test_gradient_calculator_receives_zero_weight_for_failed_function(
 
     assert estimator.weights is not None
     np.testing.assert_array_equal(estimator.weights, [[1.0], [0.0]])
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        [1.0, 2.0, 3.0],
+        [0.0, 0.0, 0.0],
+        [np.inf, 2.0, 3.0],
+        [np.nan, np.nan, np.nan],
+    ],
+)
+def test_unestimated_gradient_realizations_are_excluded_from_aggregation(
+    evaluator: Any,
+    values: list[float],
+) -> None:
+    calculator = FixedGradients(GradientConfig())
+    calculator.gradients[0, 0] = values
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 3},
+            "realizations": {"weights": [1.0, 1.0]},
+            "gradient": calculator,
+        }
+    )
+
+    gradient = _gradient(context, evaluator([_linear]))
+
+    assert gradient.aggregates is not None
+    np.testing.assert_allclose(gradient.aggregates.objectives, [values])
+    assert gradient.estimates is not None
+    np.testing.assert_allclose(gradient.estimates.objectives, calculator.gradients)
+
+
+def test_unestimated_gradients_are_excluded_per_function(evaluator: Any) -> None:
+    calculator = FixedGradients(GradientConfig())
+    calculator.gradients = np.array(
+        [
+            [[1.0, 2.0, 3.0], [np.nan, np.nan, np.nan]],
+            [[np.nan, np.nan, np.nan], [4.0, 5.0, 6.0]],
+        ]
+    )
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 3},
+            "realizations": {"weights": [1.0, 1.0]},
+            "nonlinear_constraints": {"lower_bounds": -np.inf, "upper_bounds": 0.0},
+            "gradient": calculator,
+        }
+    )
+
+    gradient = _gradient(context, evaluator([_linear], [_linear]))
+
+    assert gradient.aggregates is not None
+    assert gradient.aggregates.constraints is not None
+    np.testing.assert_allclose(gradient.aggregates.objectives, [[1.0, 2.0, 3.0]])
+    np.testing.assert_allclose(gradient.aggregates.constraints, [[4.0, 5.0, 6.0]])
+
+
+@pytest.mark.parametrize("method", ["stochastic", "forward"])
+def test_gradient_calculator_reports_unavailable_gradients_as_nan(method: str) -> None:
+    calculator = DefaultGradientCalculator(GradientConfig(method=method))
+    data = GradientData(
+        variables=np.zeros(2),
+        functions=np.zeros((3, 1)),
+        perturbed_variables=np.repeat(np.eye(2)[np.newaxis], 3, axis=0),
+        perturbed_functions=np.array(
+            [[[1.0], [2.0]], [[np.nan], [np.nan]], [[3.0], [6.0]]]
+        ),
+    )
+
+    gradients = calculator.calculate(data, np.array([[0.5], [0.5], [0.0]]))
+
+    assert isinstance(gradients, np.ndarray)
+    np.testing.assert_allclose(
+        gradients, [[[1.0, 2.0]], [[np.nan, np.nan]], [[np.nan, np.nan]]]
+    )
+
+
+@pytest.mark.parametrize("available", [True, False])
+def test_merged_gradient_calculator_returns_values_or_nan(*, available: bool) -> None:
+    calculator = DefaultGradientCalculator(GradientConfig(merge_realizations=True))
+    data = GradientData(
+        variables=np.zeros(2),
+        functions=np.zeros((1, 1)),
+        perturbed_variables=np.eye(2)[np.newaxis],
+        perturbed_functions=(
+            np.array([[[1.0], [2.0]]]) if available else np.full((1, 2, 1), np.nan)
+        ),
+    )
+
+    gradients = calculator.calculate(data, np.ones((1, 1)))
+
+    assert isinstance(gradients, np.ndarray)
+    np.testing.assert_allclose(
+        gradients, [[1.0, 2.0]] if available else [[np.nan, np.nan]]
+    )
 
 
 def test_stochastic_gradient_svd_threshold_truncates_the_solution(

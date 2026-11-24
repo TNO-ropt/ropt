@@ -185,6 +185,26 @@ def test_realization_aggregators_ignore_an_infinite_value_carrying_no_weight() -
     assert stddev.aggregate_function(functions, weights) == pytest.approx(np.sqrt(2.0))
 
 
+@pytest.mark.parametrize("method", ["mean", "stddev"])
+def test_realization_aggregators_ignore_nan_gradients_at_zero_weight(
+    method: str,
+) -> None:
+    aggregator = _aggregator(method)
+    functions = np.array([1.0, 2.0, np.nan])
+    gradients = np.array([[1.0, 2.0], [3.0, 4.0], [np.nan, np.nan]])
+    weights = np.array([0.5, 0.5, 0.0])
+    expected_function = aggregator.aggregate_function(functions[:2], weights[:2])
+    expected_gradient = aggregator.aggregate_gradient(
+        functions[:2], gradients[:2], weights[:2]
+    )
+
+    function = aggregator.aggregate_function(functions, weights)
+    gradient = aggregator.aggregate_gradient(functions, gradients, weights)
+
+    np.testing.assert_allclose(function, expected_function)
+    np.testing.assert_allclose(gradient, expected_gradient)
+
+
 class CustomRealizationAggregator(RealizationAggregator):
     def __init__(self, _: RealizationAggregatorConfig) -> None:
         pass

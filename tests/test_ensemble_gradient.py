@@ -64,7 +64,7 @@ def test__apply_bounds() -> None:
     assert expected_response_mirror == pytest.approx(response)
 
 
-def test_gradient_estimation_marks_successful_weighted_realizations() -> None:
+def test_gradient_estimation_returns_nan_for_unavailable_realizations() -> None:
     delta_variables = np.array(
         [
             [[1.0], [2.0]],
@@ -75,12 +75,11 @@ def test_gradient_estimation_marks_successful_weighted_realizations() -> None:
     delta_functions = np.array([[1.0, 2.0], [np.nan, np.nan], [3.0, 6.0]])
     weights = np.array([1.0, 1.0, 0.0])
 
-    gradients, estimated_realizations = _estimate_gradients(
+    gradients = _estimate_gradients(
         delta_variables, delta_functions, weights, svd_threshold=0.999
     )
 
-    np.testing.assert_allclose(gradients, [[1.0], [0.0], [0.0]])
-    assert estimated_realizations.tolist() == [True, False, False]
+    np.testing.assert_allclose(gradients, [[1.0], [np.nan], [np.nan]])
 
 
 def test_variable_perturbation_enopt() -> None:
