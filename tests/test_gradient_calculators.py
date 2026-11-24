@@ -120,12 +120,12 @@ def test_gradient_calculator_plugin_estimates_the_masked_variables(
 def test_gradient_calculator_receives_zero_weight_for_failed_function(
     evaluator: Any,
 ) -> None:
-    estimator = ForwardDifferences(GradientConfig())
+    calculator = ForwardDifferences(GradientConfig())
     context = EnOptContext.model_validate(
         {
             "variables": {"variable_count": 3},
             "realizations": {"weights": [1.0, 1.0], "realization_min_success": 1},
-            "gradient": estimator,
+            "gradient": calculator,
         }
     )
 
@@ -138,8 +138,8 @@ def test_gradient_calculator_receives_zero_weight_for_failed_function(
 
     _gradient(context, evaluator([fail_second]))
 
-    assert estimator.weights is not None
-    np.testing.assert_array_equal(estimator.weights, [[1.0], [0.0]])
+    assert calculator.weights is not None
+    np.testing.assert_array_equal(calculator.weights, [[1.0], [0.0]])
 
 
 @pytest.mark.parametrize(
