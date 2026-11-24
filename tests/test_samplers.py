@@ -61,26 +61,20 @@ class MockedSampler(Sampler):
     def init(
         self,
         *,
-        realization_count: int,
-        perturbation_count: int,
         variable_count: int,
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
-        self._realization_count = realization_count
-        self._perturbation_count = perturbation_count
         self._variable_count = variable_count
         self._mask = mask
         self._rng = rng
 
     @override
     def generate_samples(
-        self,
+        self, *, realization_count: int, perturbation_count: int
     ) -> NDArray[np.float64]:
-        assert self._perturbation_count == self._variable_count
+        assert perturbation_count == self._variable_count
         variable_count = self._variable_count
-        realization_count = self._realization_count
-        perturbation_count = self._perturbation_count
 
         samples: NDArray[np.float64]
         if self._mask is None:
@@ -109,8 +103,6 @@ def _init(
     rng: Generator,
 ) -> None:
     sampler.init(
-        realization_count=context.realizations.weights.size,
-        perturbation_count=context.gradient.number_of_perturbations,
         variable_count=context.variables.variable_count,
         mask=mask,
         rng=rng,

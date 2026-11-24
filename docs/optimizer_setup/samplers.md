@@ -73,6 +73,16 @@ kinds, a
 sampler defined in a script or a notebook is made selectable with
 [`register_plugin`][ropt.plugins.register_plugin].
 
+[`init`][ropt.sampler.Sampler.init] sets the variable count, variable mask and
+random number generator. Each call to
+[`generate_samples`][ropt.sampler.Sampler.generate_samples] receives the
+realization and perturbation counts for that draw. These counts may differ
+between calls without reinitializing the sampler.
+
+The SciPy sampler advances its random stream or QMC sequence between draws.
+Calling its `init` again rebuilds the QMC engine for the supplied variables and
+random number generator.
+
 The runnable script is
 [examples/sampler.py](https://github.com/TNO-ropt/ropt/blob/main/examples/sampler.py),
 which perturbs one variable at a time. With one perturbation per variable and a

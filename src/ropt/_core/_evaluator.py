@@ -895,8 +895,6 @@ class EnsembleEvaluator:
                 & np.array([item == index for item in self._context.variables.samplers])
             )
             sampler.init(
-                realization_count=self._context.realizations.weights.size,
-                perturbation_count=self._gradient.perturbation_count,
                 variable_count=self._context.variables.variable_count,
                 mask=mask,
                 rng=rng,

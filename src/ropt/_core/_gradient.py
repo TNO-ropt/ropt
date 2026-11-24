@@ -77,9 +77,15 @@ def _perturb_variables(
             index for index in context.variables.samplers if index is not None
         )
     )
-    samples = samplers[indices[0]].generate_samples()
+    realization_count = context.realizations.weights.size
+    perturbation_count = context.gradient.number_of_perturbations
+    samples = samplers[indices[0]].generate_samples(
+        realization_count=realization_count, perturbation_count=perturbation_count
+    )
     for index in indices[1:]:
-        samples += samplers[index].generate_samples()
+        samples += samplers[index].generate_samples(
+            realization_count=realization_count, perturbation_count=perturbation_count
+        )
     return _apply_bounds(
         variables + context.variables.perturbation_magnitudes * samples,
         context.variables.lower_bounds,
@@ -158,10 +164,6 @@ class _StochasticGradient:
 
     def init(self, context: EnOptContext) -> None:
         self._context = context
-
-    @property
-    def perturbation_count(self) -> int:
-        return self._config.number_of_perturbations
 
     @property
     def merges_realizations(self) -> bool:

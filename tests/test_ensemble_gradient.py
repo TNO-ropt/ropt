@@ -300,8 +300,6 @@ def test_variable_perturbation_enopt() -> None:
     context = EnOptContext.model_validate(config_dict)
     sampler = SciPySampler(SamplerConfig())
     sampler.init(
-        realization_count=context.realizations.weights.size,
-        perturbation_count=context.gradient.number_of_perturbations,
         variable_count=context.variables.variable_count,
         mask=None,
         rng=default_rng(123),

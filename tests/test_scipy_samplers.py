@@ -46,6 +46,34 @@ def test_scipy_samplers_unconstrained(config: Any, method: str, eval_func: Any) 
     assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
+@pytest.mark.parametrize("shared", [False, True])
+@pytest.mark.parametrize("masked", [False, True])
+def test_scipy_sampler_draw_size_can_change(*, shared: bool, masked: bool) -> None:
+    mask = np.array([True, not masked, True])
+    rng = np.random.default_rng(123)
+    sampler = SciPySampler(SamplerConfig(method="norm", shared=shared))
+    sampler.init(
+        variable_count=3,
+        mask=mask if masked else None,
+        rng=np.random.default_rng(123),
+    )
+
+    for realization_count, perturbation_count in [(2, 4), (3, 2)]:
+        expected = rng.standard_normal(
+            (1 if shared else realization_count, perturbation_count, int(mask.sum()))
+        )
+        if shared:
+            expected = np.repeat(expected, realization_count, axis=0)
+        samples = sampler.generate_samples(
+            realization_count=realization_count, perturbation_count=perturbation_count
+        )
+
+        assert samples.shape == (realization_count, perturbation_count, 3)
+        np.testing.assert_array_equal(samples[..., mask], expected)
+        if masked:
+            np.testing.assert_array_equal(samples[..., ~mask], 0)
+
+
 @pytest.mark.parametrize("method", ["sobol", "halton", "lhs"])
 @pytest.mark.parametrize("shared", [False, True])
 @pytest.mark.parametrize("masked", [False, True])
@@ -56,24 +84,28 @@ def test_scipy_qmc_sampler_preserves_points(
     mask = np.array([True, not masked, True])
     sample_dim = int(mask.sum())
     engine = engines[method](sample_dim, seed=np.random.default_rng(123))
-    expected = 2 * engine.random(4 if shared else 8) - 1
-    if shared:
-        expected = np.tile(expected, (2, 1))
 
     sampler = SciPySampler(SamplerConfig(method=method, shared=shared))
     sampler.init(
-        realization_count=2,
-        perturbation_count=4,
         variable_count=3,
         mask=mask if masked else None,
         rng=np.random.default_rng(123),
     )
-    samples = sampler.generate_samples()
+    for realization_count, perturbation_count in [(2, 4), (3, 2)]:
+        count = perturbation_count * (1 if shared else realization_count)
+        expected = 2 * engine.random(count) - 1
+        if shared:
+            expected = np.tile(expected, (realization_count, 1))
+        samples = sampler.generate_samples(
+            realization_count=realization_count, perturbation_count=perturbation_count
+        )
 
-    assert samples.shape == (2, 4, 3)
-    np.testing.assert_array_equal(samples[..., mask].reshape(-1, sample_dim), expected)
-    if masked:
-        np.testing.assert_array_equal(samples[..., ~mask], 0)
+        assert samples.shape == (realization_count, perturbation_count, 3)
+        np.testing.assert_array_equal(
+            samples[..., mask].reshape(-1, sample_dim), expected
+        )
+        if masked:
+            np.testing.assert_array_equal(samples[..., ~mask], 0)
 
 
 @pytest.mark.parametrize("method", ["sobol", "halton", "lhs"])
@@ -82,16 +114,32 @@ def test_scipy_qmc_sampler_restarts_on_init(method: str) -> None:
 
     samples = []
     for _ in range(2):
-        sampler.init(
-            realization_count=1,
-            perturbation_count=4,
-            variable_count=3,
-            mask=None,
-            rng=np.random.default_rng(123),
+        sampler.init(variable_count=3, mask=None, rng=np.random.default_rng(123))
+        samples.append(
+            sampler.generate_samples(realization_count=1, perturbation_count=4)
         )
-        samples.append(sampler.generate_samples())
 
     np.testing.assert_array_equal(samples[1], samples[0])
+
+
+@pytest.mark.parametrize("method", ["sobol", "halton", "lhs"])
+def test_scipy_qmc_sampler_reinitializes_the_dimension(method: str) -> None:
+    config = SamplerConfig(method=method)
+    sampler = SciPySampler(config)
+    sampler.init(variable_count=3, mask=None, rng=np.random.default_rng(123))
+    sampler.generate_samples(realization_count=1, perturbation_count=4)
+
+    mask = np.array([True, False, True, False])
+    samples = []
+    for instance in (sampler, SciPySampler(config)):
+        instance.init(variable_count=4, mask=mask, rng=np.random.default_rng(456))
+        samples.append(
+            instance.generate_samples(realization_count=1, perturbation_count=4)
+        )
+
+    assert samples[0].shape == (1, 4, 4)
+    np.testing.assert_array_equal(samples[0][..., ~mask], 0)
+    np.testing.assert_array_equal(samples[0], samples[1])
 
 
 def test_scipy_indexed_sampler(config: Any, eval_func: Any) -> None:

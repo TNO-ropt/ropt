@@ -94,30 +94,30 @@ class SciPySampler(Sampler):
     def init(
         self,
         *,
-        realization_count: int,
-        perturbation_count: int,
         variable_count: int,
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
-        """Record the sample shape and build the underlying SciPy sampler."""
-        self._realization_count = realization_count
-        self._perturbation_count = perturbation_count
+        """Record the variables to sample and build the underlying SciPy sampler."""
         self._variable_count = variable_count
         self._mask = mask
         self._rng = rng
         self._sampler, self._options = self._init_sampler(self._sampler_config.options)
 
     @override
-    def generate_samples(self) -> NDArray[np.float64]:
+    def generate_samples(
+        self, *, realization_count: int, perturbation_count: int
+    ) -> NDArray[np.float64]:
         """Draw one set of perturbations for every realization.
+
+        Args:
+            realization_count:  The number of realizations in the ensemble.
+            perturbation_count: The number of perturbations per realization.
 
         Returns:
             The perturbations, shape `(realizations, perturbations, variables)`.
         """
         variable_count = self._variable_count
-        realization_count = self._realization_count
-        perturbation_count = self._perturbation_count
 
         sample_dim = variable_count if self._mask is None else self._mask.sum()
 

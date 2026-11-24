@@ -64,53 +64,51 @@ class OneAtATime(Sampler):
     def init(
         self,
         *,
-        realization_count: int,
-        perturbation_count: int,
         variable_count: int,
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
-        """Store the sample shape and check that it suits one-at-a-time steps.
+        """Store the variables to perturb.
+
+        Args:
+            variable_count: The total number of variables.
+            mask:           The variables this sampler handles, if not all.
+            rng:            The random number generator to draw from.
+        """
+        self._mask = np.ones(variable_count, dtype=np.bool_) if mask is None else mask
+        self._variable_count = variable_count
+        self._rng = rng
+
+    def generate_samples(
+        self, *, realization_count: int, perturbation_count: int
+    ) -> NDArray[np.float64]:
+        """Generate one perturbation per variable.
 
         Args:
             realization_count:  The number of realizations.
             perturbation_count: The number of perturbations per realization.
-            variable_count:     The total number of variables.
-            mask:               The variables this sampler handles, if not all.
-            rng:                The random number generator to draw from.
+
+        Returns:
+            Samples of shape `(realizations, perturbations, variables)`.
 
         Raises:
             ValueError: If there is not exactly one perturbation per variable.
         """
-        self._mask = np.ones(variable_count, dtype=np.bool_) if mask is None else mask
         if perturbation_count != self._mask.sum():
             msg = "This sampler needs one perturbation per variable."
             raise ValueError(msg)
-        self._realization_count = realization_count
-        self._perturbation_count = perturbation_count
-        self._variable_count = variable_count
-        self._rng = rng
-
-    def generate_samples(self) -> NDArray[np.float64]:
-        """Generate one perturbation per variable.
-
-        Returns:
-            Samples of shape `(realizations, perturbations, variables)`.
-        """
-        rows = 1 if self._shared else self._realization_count
-        shape = (rows, self._perturbation_count)
+        rows = 1 if self._shared else realization_count
+        shape = (rows, perturbation_count)
         factors = (
             np.ones(shape)
             if self._method == "forward"
             else self._rng.uniform(0.5, 1.5, shape)
         )
-        samples = np.zeros((rows, self._perturbation_count, self._variable_count))
+        samples = np.zeros((rows, perturbation_count, self._variable_count))
         # Variables this sampler does not handle must stay at zero.
-        samples[..., self._mask] = (
-            np.eye(self._perturbation_count) * factors[..., np.newaxis]
-        )
+        samples[..., self._mask] = np.eye(perturbation_count) * factors[..., np.newaxis]
         if self._shared:
-            samples = np.repeat(samples, self._realization_count, axis=0)
+            samples = np.repeat(samples, realization_count, axis=0)
         return samples
 
 

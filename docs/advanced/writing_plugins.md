@@ -82,15 +82,15 @@ class UniformSampler(Sampler):
     def init(
         self,
         *,
-        realization_count: int,
-        perturbation_count: int,
         variable_count: int,
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
         self._rng = rng
 
-    def generate_samples(self) -> NDArray[np.float64]:
+    def generate_samples(
+        self, *, realization_count: int, perturbation_count: int
+    ) -> NDArray[np.float64]:
         ...
 ```
 
