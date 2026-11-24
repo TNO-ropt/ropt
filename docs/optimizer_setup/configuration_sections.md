@@ -151,7 +151,8 @@ variables, including both free and fixed variables.
 The `lower_bounds` and `upper_bounds` fields define the bounds for each
 variable. They are broadcast to match the number of variables and default to
 $-\infty$ and $+\infty$, respectively. Use an infinity to leave a variable
-unbounded on that side.
+unbounded on that side. Each lower bound must be smaller than the corresponding
+upper bound; to keep a variable at a fixed value, use the `mask` field.
 
 The optional `types` field assigns a type to each variable, `"real"` for
 continuous or `"integer"` for discrete. If not provided, all variables default
@@ -171,7 +172,7 @@ These fields configure the perturbations used for gradient estimation; see
 [Stochastic Gradients](gradients.md) and [Samplers](samplers.md):
 
 - `perturbation_magnitudes`: absolute step magnitudes in the configured variable
-  units (default: `0.005`).
+  units, which must be positive (default: `0.005`).
 - `boundary_types`: how perturbations outside the bounds are handled (default:
   `"mirror"`; values of [`BoundaryType`][ropt.enums.BoundaryType]).
 - `samplers`: sampler index per variable (default: `0`).

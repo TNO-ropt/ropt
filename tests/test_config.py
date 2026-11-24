@@ -164,6 +164,22 @@ def test_variable_scales_must_be_positive(scale: float) -> None:
         VariablesConfig.model_validate({"variable_count": 2, "scales": [1.0, scale]})
 
 
+@pytest.mark.parametrize("upper", [0.0, -1.0])
+def test_variable_bounds_must_be_increasing(upper: float) -> None:
+    with pytest.raises(ValueError, match="lower bounds must be smaller"):
+        VariablesConfig.model_validate(
+            {"variable_count": 2, "lower_bounds": 0.0, "upper_bounds": [1.0, upper]}
+        )
+
+
+@pytest.mark.parametrize("magnitude", [0.0, -0.1])
+def test_variable_perturbation_magnitudes_must_be_positive(magnitude: float) -> None:
+    with pytest.raises(ValueError, match="perturbation magnitudes must be positive"):
+        VariablesConfig.model_validate(
+            {"variable_count": 2, "perturbation_magnitudes": [0.1, magnitude]}
+        )
+
+
 def test_linear_constraint_scales_default_to_one() -> None:
     linear_constraints = LinearConstraintsConfig.model_validate(
         {

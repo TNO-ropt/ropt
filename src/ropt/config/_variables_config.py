@@ -92,8 +92,11 @@ class VariablesConfig(BaseModel):
         boundary_types = broadcast_tuple(self.boundary_types, "boundary_types", dim)
         samplers = broadcast_tuple(self.samplers, "samplers", dim)
 
-        if np.any(lower_bounds > upper_bounds):
-            msg = "The lower bounds are larger than the upper bounds."
+        if np.any(lower_bounds >= upper_bounds):
+            msg = "The lower bounds must be smaller than the upper bounds."
+            raise ValueError(msg)
+        if np.any(perturbation_magnitudes <= 0.0):
+            msg = "The perturbation magnitudes must be positive."
             raise ValueError(msg)
 
         update_fields(
