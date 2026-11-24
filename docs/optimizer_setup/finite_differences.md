@@ -80,6 +80,12 @@ apply only to the stochastic method, and setting any of them with a
 finite-difference method raises an error. The samplers and the seed are not
 used.
 
-[Initial gradient results](../running/initial_values.md) passed as `g0` must
-contain finite-difference points, each changing a single variable. Results of a
-stochastic gradient raise a `ValueError` when the gradient is computed.
+[Initial gradient results](../running/initial_values.md) passed as `g0` are
+checked before evaluation. Each point must change one selected variable, with
+the points ordered by variable. `forward` and `backward` require one point per
+selected variable. `central` accepts one point per selected variable, which it
+uses as a one-sided difference, or two, which it uses as a difference between
+the stored points. The check does not enforce perturbation direction or require
+two points to lie on opposite sides of the current point. Reused points are
+used as provided, so `forward` and `backward` results can be reused by each
+other. Passing results of a stochastic gradient raises a `ValueError`.
