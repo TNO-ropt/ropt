@@ -57,8 +57,8 @@ The points stay within the variable bounds, and `boundary_types` is not used:
 - If the step does not fit on both sides of the current point, a central
   difference becomes a forward or backward difference, using one point. That
   point is chosen as for a forward difference.
-- If the distance between the bounds is smaller than the step, the step is
-  reduced to the largest one that stays within the bounds.
+- If the step fits in neither direction from the current point, it is reduced
+  to the larger of the two available distances to the bounds.
 
 ## Realizations and failures
 
