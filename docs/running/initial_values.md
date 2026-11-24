@@ -100,6 +100,11 @@ objectives, the number of nonlinear constraints, whether constraints are present
 at all, and the number of variables. A mismatch raises `ValueError` before
 anything is evaluated.
 
+With a [finite-difference method](../optimizer_setup/finite_differences.md),
+each recorded perturbed point must change a single variable, in the order of
+the new optimization's points. Otherwise, for instance for the points of a
+stochastic gradient, the gradient calculation raises `ValueError`.
+
 The start point is checked as well. The `variables` on `f0` and on `g0` must
 match `x0`, which is also what makes the two results belong together. An
 optimization starting anywhere else raises `ValueError`. A restart meets this by

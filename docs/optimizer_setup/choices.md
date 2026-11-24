@@ -117,9 +117,12 @@ for the field details.
 
 ## How should gradients be estimated?
 
-Gradient-based methods use `ropt`'s stochastic gradient estimates. Gradient-free
-methods do not use these settings. The main choices are:
+Gradient-based methods use gradients estimated by `ropt`, by default with the
+stochastic method. Gradient-free methods do not use these settings. The main
+choices are:
 
+- **Method:** the stochastic method, or forward, backward or central finite
+  differences, which change one variable at a time.
 - **Perturbations:** their size, whether the size is absolute or relative to
   the bounds, and how perturbed values outside the bounds are corrected.
 - **Number of perturbations:** more perturbations can improve the estimate but
@@ -139,6 +142,7 @@ methods do not use these settings. The main choices are:
   `optimizer` section.
 
 See [Stochastic Gradients](gradients.md),
+[Finite-Difference Gradients](finite_differences.md),
 [Samplers](samplers.md), and
 [Gradient-based or gradient-free](optimizer.md#gradient-based-or-gradient-free).
 

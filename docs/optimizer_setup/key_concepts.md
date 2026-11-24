@@ -42,7 +42,8 @@ chosen this way:
   the optimizer runs. The built-in backend wraps [SciPy](https://www.scipy.org);
   other backends add algorithms from external packages.
 - **Gradient estimators** compute the gradient from the evaluated perturbations.
-  The built-in estimator implements the stochastic method.
+  The built-in estimator implements the stochastic method and finite
+  differences.
 - **Samplers** generate the perturbations used to estimate stochastic gradients.
 - **Function estimators** combine the per-realization values into the single
   robust objective, for example a mean, or a mean plus a standard-deviation term.

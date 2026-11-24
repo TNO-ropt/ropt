@@ -134,7 +134,7 @@ separately installed plugins have their own method lists.
 | `sampler` | `scipy/default`, `scipy/norm`, `scipy/truncnorm`, `scipy/uniform`, `scipy/sobol`, `scipy/halton`, `scipy/lhs` | [`SciPySampler`][ropt.sampler.scipy.SciPySampler] | [Selecting a sampler](samplers.md#selecting-a-sampler) |
 | `function_estimator` | `default/default`, `default/mean`, `default/stddev` | [`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator] | [Selecting an estimator](function_estimators.md#selecting-an-estimator) |
 | `realization_filter` | `default/cvar-objective`, `default/cvar-constraint` | [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions], [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions] | [Selecting a filter](realization_filters.md#selecting-a-filter) |
-| `gradient` | `default/default`, `default/stochastic` | [`StochasticGradientOptions`][ropt.gradient.default.StochasticGradientOptions] | [How the gradient is estimated](gradients.md#how-the-gradient-is-estimated) |
+| `gradient` | `default/default`, `default/stochastic`, `default/forward`, `default/backward`, `default/central` | [`StochasticGradientOptions`][ropt.gradient.default.StochasticGradientOptions]; the finite-difference methods have no options | [How the gradient is estimated](gradients.md#how-the-gradient-is-estimated), [Finite-Difference Gradients](finite_differences.md) |
 
 For backends, `scipy/default` selects `scipy/slsqp`; for samplers, it selects
 `scipy/norm`. The estimator `default/default` selects `default/mean`, and the
@@ -389,7 +389,8 @@ listed in [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
 Validated into [`GradientConfig`][ropt.config.GradientConfig].
 
 Selects the gradient estimator and controls how gradients are estimated (see
-also [Stochastic Gradients](gradients.md) for a deeper discussion). Like
+also [Stochastic Gradients](gradients.md) and
+[Finite-Difference Gradients](finite_differences.md) for a deeper discussion). Like
 `backend`, it holds a single component, given as a configuration or as an
 already-constructed [`GradientEstimator`][ropt.gradient.GradientEstimator].
 
@@ -404,6 +405,9 @@ The `gradient` section has five fields:
   `number_of_perturbations`).
 - `merge_realizations`: whether realizations are combined before estimating
   the gradient (default: `False`).
+
+The last three fields apply to the stochastic method. The finite-difference
+methods raise an error if any of them is set.
 
 See [Stochastic Gradients](gradients.md) for how these settings affect the
 estimates and evaluation work.

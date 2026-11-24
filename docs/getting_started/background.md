@@ -40,7 +40,8 @@ process.
 [SciPy](https://www.scipy.org) package. These algorithms work iteratively,
 evaluating the objective function — and usually its gradient — many times
 over the course of the optimization. `ropt` assumes that gradients cannot be
-calculated analytically, and estimates them using stochastic methods.
+calculated analytically, and estimates them using stochastic methods or
+finite differences.
 
 `ropt` sets up and runs the optimization algorithm, combines the individual
 realizations into overall function and gradient values, and keeps track of

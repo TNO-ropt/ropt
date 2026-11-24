@@ -8,9 +8,11 @@ function values evaluated at the current point and at a number of randomly
 perturbed points.
 
 The estimation is done by a **gradient estimator**, a component selected by the
-`method` field of the `gradient` section. The built-in estimator implements the
-stochastic method and is the default. Other estimators can be added as plugins,
-see [Writing a Plugin](../advanced/writing_plugins.md#gradient-estimators).
+`method` field of the `gradient` section. The stochastic method is the default
+method of the built-in estimator, which also provides
+[finite-difference methods](finite_differences.md). Other estimators can be
+added as plugins, see
+[Writing a Plugin](../advanced/writing_plugins.md#gradient-estimators).
 
 This page explains how perturbations, samplers, function estimators, and the
 gradient configuration work together. The runnable script is

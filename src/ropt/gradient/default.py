@@ -1,4 +1,4 @@
-"""Default gradient estimator plugin with the stochastic method."""
+"""Default gradient estimator plugin with the stochastic and finite-difference methods."""
 
 from typing import Annotated, ClassVar, Final, override
 
@@ -17,7 +17,14 @@ from ropt.sampler import Sampler
 _EPSILON: Final = 1e-15
 _MIRROR_REPEAT: Final = 3
 
-DEFAULT_GRADIENT_METHODS = {"default", "stochastic"}
+DEFAULT_GRADIENT_METHODS = {"default", "stochastic", "forward", "backward", "central"}
+
+_STOCHASTIC_FIELDS: Final = (
+    "number_of_perturbations",
+    "perturbation_min_success",
+    "merge_realizations",
+)
+_PATTERN_TOLERANCE: Final = 1e-6
 
 
 class StochasticGradientOptions(BaseModel):
@@ -43,11 +50,14 @@ class StochasticGradientOptions(BaseModel):
 
 
 class DefaultGradientEstimator(GradientEstimator):
-    """Default gradient estimator providing the `stochastic` method.
+    """Default gradient estimator with stochastic and finite-difference methods.
 
     The method is selected via the `method` field of
-    [`GradientConfig`][ropt.config.GradientConfig].
-    See [Stochastic Gradients](../optimizer_setup/gradients.md) for usage.
+    [`GradientConfig`][ropt.config.GradientConfig]: `stochastic`, the default,
+    or the finite-difference methods `forward`, `backward` and `central`. See
+    [Stochastic Gradients](../optimizer_setup/gradients.md) and
+    [Finite-Difference Gradients](../optimizer_setup/finite_differences.md)
+    for usage.
     """
 
     methods: ClassVar[MethodSpec] = DEFAULT_GRADIENT_METHODS
@@ -59,23 +69,30 @@ class DefaultGradientEstimator(GradientEstimator):
             gradient_config: The gradient configuration.
 
         Raises:
-            ValueError: If the method is not supported, or the options are
-                        invalid.
+            ValueError: If the method is not supported, or the options or
+                        settings are invalid for the method.
         """
         self._config = gradient_config
         _, _, method = gradient_config.method.lower().rpartition("/")
-        if method not in {"default", "stochastic"}:
+        if method not in DEFAULT_GRADIENT_METHODS:
             msg = f"Gradient method not supported: {method}"
             raise ValueError(msg)
-        self._options = StochasticGradientOptions.model_validate(
-            gradient_config.options
-        )
+        self._method = "stochastic" if method == "default" else method
+        self._options: StochasticGradientOptions | None = None
+        if self._method == "stochastic":
+            self._options = StochasticGradientOptions.model_validate(
+                gradient_config.options
+            )
+        else:
+            _check_finite_difference_config(gradient_config, self._method)
         self._context: EnOptContext
+        self._mask: NDArray[np.bool_]
 
     @override
     def init(self, context: EnOptContext, *, mask: NDArray[np.bool_]) -> None:
-        """Store the context."""
+        """Store the context and the mask."""
         self._context = context
+        self._mask = mask
 
     @property
     @override
@@ -87,16 +104,20 @@ class DefaultGradientEstimator(GradientEstimator):
     def perturbed_variables(
         self, variables: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Perturb the variables with the samples of the configured samplers.
+        """Return the perturbed points of the selected method.
 
         Returns:
             The perturbed variables.
         """
-        return _perturb_variables(
-            self._context,
-            variables,
-            self._context.sampler,
-            perturbation_count=self._config.number_of_perturbations,
+        if self._method == "stochastic":
+            return _perturb_variables(
+                self._context,
+                variables,
+                self._context.sampler,
+                perturbation_count=self._config.number_of_perturbations,
+            )
+        return _finite_difference_points(
+            self._context, variables, self._mask, self._method
         )
 
     @override
@@ -104,9 +125,14 @@ class DefaultGradientEstimator(GradientEstimator):
         """Mark realizations with too few successful perturbations as failed.
 
         Returns:
-            `True` for each realization with fewer than
-            `perturbation_min_success` successful perturbations.
+            For the stochastic method, `True` for each realization with fewer
+            than `perturbation_min_success` successful perturbations. For the
+            finite-difference methods, `True` for each realization with a
+            failed perturbation.
         """
+        if self._method != "stochastic":
+            # A failed evaluation is NaN in every function, so the first one suffices.
+            return np.any(np.isnan(data.perturbed_functions[..., 0]), axis=-1)
         assert self._config.perturbation_min_success is not None
         return _failed_perturbation_realizations(
             data.perturbed_functions, self._config.perturbation_min_success
@@ -116,43 +142,21 @@ class DefaultGradientEstimator(GradientEstimator):
     def estimate(
         self, data: GradientData, weights: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.bool_] | None]:
-        """Estimate the gradients from the perturbations by least squares.
+        """Estimate the gradients with the selected method.
 
         Returns:
             The gradients and the mask of estimated gradients.
         """
-        delta_variables = data.perturbed_variables - data.variables
-        delta_functions = data.perturbed_functions - np.expand_dims(
-            data.functions, axis=1
-        )
-        function_count = delta_functions.shape[-1]
-        threshold = self._options.svd_threshold
-        if self.merge_realizations:
-            merged = np.stack(
-                [
-                    _estimate_merged_gradient(
-                        delta_variables,
-                        delta_functions[..., idx],
-                        weights[:, idx],
-                        svd_threshold=threshold,
-                    )
-                    for idx in range(function_count)
-                ]
+        if self._method != "stochastic":
+            return _estimate_finite_differences(
+                data, weights, central=self._method == "central"
             )
-            return merged, None
-
-        estimates = [
-            _estimate_gradients(
-                delta_variables,
-                delta_functions[..., idx],
-                weights[:, idx],
-                svd_threshold=threshold,
-            )
-            for idx in range(function_count)
-        ]
-        return (
-            np.stack([estimate[0] for estimate in estimates], axis=1),
-            np.stack([estimate[1] for estimate in estimates], axis=1),
+        assert self._options is not None
+        return _estimate_stochastic(
+            data,
+            weights,
+            merge_realizations=self.merge_realizations,
+            svd_threshold=self._options.svd_threshold,
         )
 
 
@@ -240,6 +244,45 @@ def _perturb_variables(
     )
 
 
+def _estimate_stochastic(
+    data: GradientData,
+    weights: NDArray[np.float64],
+    *,
+    merge_realizations: bool,
+    svd_threshold: float,
+) -> tuple[NDArray[np.float64], NDArray[np.bool_] | None]:
+    delta_variables = data.perturbed_variables - data.variables
+    delta_functions = data.perturbed_functions - np.expand_dims(data.functions, axis=1)
+    function_count = delta_functions.shape[-1]
+    if merge_realizations:
+        merged = np.stack(
+            [
+                _estimate_merged_gradient(
+                    delta_variables,
+                    delta_functions[..., idx],
+                    weights[:, idx],
+                    svd_threshold=svd_threshold,
+                )
+                for idx in range(function_count)
+            ]
+        )
+        return merged, None
+
+    estimates = [
+        _estimate_gradients(
+            delta_variables,
+            delta_functions[..., idx],
+            weights[:, idx],
+            svd_threshold=svd_threshold,
+        )
+        for idx in range(function_count)
+    ]
+    return (
+        np.stack([estimate[0] for estimate in estimates], axis=1),
+        np.stack([estimate[1] for estimate in estimates], axis=1),
+    )
+
+
 def _estimate_gradients(
     delta_variables: NDArray[np.float64],
     delta_functions: NDArray[np.float64],
@@ -295,3 +338,142 @@ def _failed_perturbation_realizations(
     failed_perturbations = np.isnan(perturbed_functions[..., 0])
     success_count = np.count_nonzero(~failed_perturbations, axis=-1)
     return np.array(success_count < perturbation_min_success)
+
+
+def _check_finite_difference_config(
+    gradient_config: GradientConfig, method: str
+) -> None:
+    if gradient_config.options:
+        msg = f"The {method} gradient method has no options"
+        raise ValueError(msg)
+    stochastic_fields = [
+        name for name in _STOCHASTIC_FIELDS if name in gradient_config.model_fields_set
+    ]
+    if stochastic_fields:
+        msg = f"The {method} gradient method does not use: " + ", ".join(
+            stochastic_fields
+        )
+        raise ValueError(msg)
+
+
+def _one_sided_offsets(
+    steps: NDArray[np.float64],
+    room: NDArray[np.float64],
+    other_room: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    offsets = np.empty_like(steps)
+    step_fits_room = steps <= room
+    offsets[step_fits_room] = steps[step_fits_room]
+
+    step_fits_other_room = ~step_fits_room & (steps <= other_room)
+    offsets[step_fits_other_room] = -steps[step_fits_other_room]
+
+    neither_full_step_fits = ~step_fits_room & ~step_fits_other_room
+    use_room = neither_full_step_fits & (room >= other_room)
+    offsets[use_room] = room[use_room]
+
+    use_other_room = neither_full_step_fits & (room < other_room)
+    offsets[use_other_room] = -other_room[use_other_room]
+    return offsets
+
+
+def _central_difference_offsets(
+    steps: NDArray[np.float64],
+    room_up: NDArray[np.float64],
+    room_down: NDArray[np.float64],
+) -> tuple[NDArray[np.intp], NDArray[np.float64]]:
+    paired = (steps <= room_up) & (steps <= room_down)
+    counts = np.ones(steps.size, dtype=np.intp)
+    counts[paired] = 2
+    starts = np.cumsum(counts) - counts
+    targets = np.repeat(np.arange(steps.size, dtype=np.intp), counts)
+    offsets = np.empty(targets.size, dtype=np.float64)
+
+    offsets[starts[paired]] = -steps[paired]
+    offsets[starts[paired] + 1] = steps[paired]
+    single = ~paired
+    offsets[starts[single]] = _one_sided_offsets(
+        steps[single], room_up[single], room_down[single]
+    )
+    return targets, offsets
+
+
+def _finite_difference_points(
+    context: EnOptContext,
+    variables: NDArray[np.float64],
+    mask: NDArray[np.bool_],
+    method: str,
+) -> NDArray[np.float64]:
+    indices = np.flatnonzero(mask)
+    values = variables[indices]
+    steps = context.variables.perturbation_magnitudes[indices]
+    room_up = np.maximum(context.variables.upper_bounds[indices] - values, 0.0)
+    room_down = np.maximum(values - context.variables.lower_bounds[indices], 0.0)
+    if method == "central":
+        positions, offsets = _central_difference_offsets(steps, room_up, room_down)
+        targets = indices[positions]
+    else:
+        targets = indices
+        if method == "backward":
+            offsets = -_one_sided_offsets(steps, room_down, room_up)
+        else:
+            offsets = _one_sided_offsets(steps, room_up, room_down)
+    points = np.repeat(variables[np.newaxis, :], targets.size, axis=0)
+    points[np.arange(targets.size), targets] += offsets
+    realization_count = context.realizations.weights.size
+    return np.repeat(points[np.newaxis, ...], realization_count, axis=0)
+
+
+def _estimate_finite_differences(
+    data: GradientData, weights: NDArray[np.float64], *, central: bool
+) -> tuple[NDArray[np.float64], NDArray[np.bool_]]:
+    targets = _check_finite_difference_points(data, central=central)
+    variable_count = data.variables.size
+    counts = np.bincount(targets, minlength=variable_count)
+    first_rows = np.cumsum(counts) - counts
+    last_rows = first_rows + counts - 1
+    # A pair of points gives a central difference, a single point a one-sided
+    # difference with the current point.
+    pair = (counts > 1)[np.newaxis, :, np.newaxis]
+    lower_points = np.where(
+        pair, data.perturbed_variables[:, first_rows, :], data.variables
+    )
+    lower_functions = np.where(
+        pair,
+        data.perturbed_functions[:, first_rows, :],
+        data.functions[:, np.newaxis, :],
+    )
+    upper_points = data.perturbed_variables[:, last_rows, :]
+    upper_functions = data.perturbed_functions[:, last_rows, :]
+    steps = np.diagonal(upper_points - lower_points, axis1=1, axis2=2)
+    gradients = (upper_functions - lower_functions) / steps[..., np.newaxis]
+    gradients = np.swapaxes(gradients, 1, 2)
+    estimated = (np.abs(weights) > 0) & ~np.any(np.isnan(gradients), axis=-1)
+    return gradients, estimated
+
+
+def _check_finite_difference_points(
+    data: GradientData, *, central: bool
+) -> NDArray[np.intp]:
+    variable_count = data.variables.size
+    offsets = data.perturbed_variables - data.variables
+    row_targets = np.argmax(np.abs(offsets), axis=-1)
+    targets: NDArray[np.intp] = row_targets[0]
+    steps = np.take_along_axis(offsets, row_targets[..., np.newaxis], axis=-1)
+    off_target = targets[:, np.newaxis] != np.arange(variable_count)
+    # Supplied initial points are rescaled, which adds rounding errors that
+    # grow with the variable offsets.
+    tolerance = _PATTERN_TOLERANCE * np.abs(steps)
+    deviations = np.where(off_target, np.abs(offsets), 0.0)
+    counts = np.bincount(targets, minlength=variable_count)
+    allowed_counts = (counts >= 1) & (counts <= (2 if central else 1))
+    if (
+        np.any(row_targets != targets)
+        or np.any(np.diff(targets) < 0)
+        or not np.all(allowed_counts)
+        or np.any(np.abs(steps) < _EPSILON)
+        or np.any(deviations > tolerance)
+    ):
+        msg = "The perturbed points do not have the finite-difference pattern"
+        raise ValueError(msg)
+    return targets

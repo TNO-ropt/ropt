@@ -289,7 +289,8 @@ estimate a gradient, and computes the gradients from the results. `ropt`
 evaluates the points, handles failed evaluations, and combines the gradients of
 the realizations with the function estimators. The built-in
 [`DefaultGradientEstimator`][ropt.gradient.default.DefaultGradientEstimator]
-implements the [stochastic method](../optimizer_setup/gradients.md).
+implements the [stochastic method](../optimizer_setup/gradients.md) and
+[finite differences](../optimizer_setup/finite_differences.md).
 
 An estimator that uses forward differences, with one perturbed point per
 variable:

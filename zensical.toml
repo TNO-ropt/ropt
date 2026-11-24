@@ -50,6 +50,7 @@ nav = [
         { Constraints = "optimizer_setup/constraints.md" },
         { "Choosing an Optimizer" = "optimizer_setup/optimizer.md" },
         { "Stochastic Gradients" = "optimizer_setup/gradients.md" },
+        { "Finite-Difference Gradients" = "optimizer_setup/finite_differences.md" },
         { Samplers = "optimizer_setup/samplers.md" },
         { "Realization Filters" = "optimizer_setup/realization_filters.md" },
         { "Function Estimators" = "optimizer_setup/function_estimators.md" },
