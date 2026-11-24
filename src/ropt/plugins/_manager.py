@@ -27,7 +27,7 @@ PluginType = Literal[
     "realization_filter",
     "function_estimator",
 ]
-"""The plugin areas a method string can select from."""
+"""The plugin types a method string can select from."""
 
 
 _DEFAULT_PLUGINS: Final = {
@@ -108,16 +108,16 @@ class PluginManager:
         self._add_plugin("realization_filter", "default", DefaultRealizationFilter)
         self._add_plugin("function_estimator", "default", DefaultFunctionEstimator)
 
-        for plugin_type in self._PLUGIN_TYPES:
-            assert plugin_type in self._PLUGIN_TYPES
-            area = cast("PluginType", plugin_type)
+        for plugin_type_name in self._PLUGIN_TYPES:
+            assert plugin_type_name in self._PLUGIN_TYPES
+            plugin_type = cast("PluginType", plugin_type_name)
             for name, plugin in self._from_entry_points(plugin_type).items():
                 # Installed plugins share one namespace, so an entry point may
                 # not take a name that a built-in or another package has.
-                if name.lower() in self._plugins.get(area, {}):
+                if name.lower() in self._plugins.get(plugin_type, {}):
                     msg = f"Duplicate plugin name: {name.lower()}"
                     raise ValueError(msg)
-                self._add_plugin(area, name, plugin)
+                self._add_plugin(plugin_type, name, plugin)
         # ruff: enable[unsorted-imports,import-outside-top-level]
 
     def _add_plugin(
@@ -156,7 +156,7 @@ class PluginManager:
         For a plugin defined where an entry point cannot reach it, such as a
         script or a notebook. Registering is otherwise equivalent to installing:
         the plugin is found by the same lookups, under the same rules, and
-        `plugin` must subclass the base class of its area just the same. It must
+        `plugin` must subclass the base class of its plugin type just the same. It must
         declare the methods it provides, as an installed plugin does.
 
         Registering the name of an installed plugin is an error; installed

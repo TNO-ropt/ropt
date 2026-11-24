@@ -20,9 +20,9 @@ imported or registered by hand.
     Write a plugin when the component should be selectable by name — typically
     when you ship it in a package for others to configure.
 
-## The plugin areas
+## The plugin types
 
-There is one plugin area per component type, each with its own entry-point group
+There is one plugin type per component, each with its own entry-point group
 and its own base class:
 
 | Entry-point group | Base class |
@@ -34,7 +34,7 @@ and its own base class:
 
 ## What a plugin must declare
 
-Subclass the base class of the area and add one class attribute:
+Subclass the base class of the plugin type and add one class attribute:
 
 - **`methods`** — the method names the class provides, as a set. The names are
   matched case-insensitively, so they may be written in any case. Include
@@ -57,7 +57,7 @@ Two things are optional:
   be listed. See [`MethodSpec`][ropt.plugins.MethodSpec].
 
 The object is constructed by calling the class with the validated configuration
-object for its area, for example a
+object for its plugin type, for example a
 [`SamplerConfig`][ropt.config.SamplerConfig] for a sampler, carrying the
 `method` string and the `options` given in the configuration.
 
@@ -115,7 +115,7 @@ well at runtime.
 
 ## Registering it
 
-Declare the class under the entry-point group of its area, in the
+Declare the class under the entry-point group of its plugin type, in the
 `pyproject.toml` of the package that contains it:
 
 ```toml

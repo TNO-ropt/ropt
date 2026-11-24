@@ -5,7 +5,7 @@ These are useful for verifying your environment or building dynamic
 configurations.
 
 [`get_plugin_name`][ropt.plugins.get_plugin_name] looks up which plugin
-provides a given method. It takes the plugin area and a method string — the same
+provides a given method. It takes the plugin type and a method string — the same
 `"plugin/method"` or `"method"` strings used in the configuration (see
 [Configuration](../optimizer_setup/configuration.md#method-strings)) — and
 returns the plugin name, or `None` if no plugin supports the method:
@@ -20,7 +20,7 @@ get_plugin_name("backend", "unknown")         # None
 get_plugin_name("sampler", "scipy/default")   # "scipy"
 ```
 
-The area is one of `"backend"`, `"sampler"`, `"realization_filter"` or
+The plugin type is one of `"backend"`, `"sampler"`, `"realization_filter"` or
 `"function_estimator"`.
 
 [`validate_backend_options`][ropt.utils.validate_backend_options] checks

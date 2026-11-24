@@ -2,7 +2,7 @@
 
 A [`PluginManager`][ropt.plugins.PluginManager] finds plugins through their
 entry points and looks them up by method name, returning the class, which is
-called with the configuration object of its area to build the component.
+called with the configuration object of its plugin type to build the component.
 [`get_plugin`][ropt.plugins.get_plugin] and
 [`get_plugin_name`][ropt.plugins.get_plugin_name] do the same lookups against
 one shared manager, created on first use; every optimization resolves against
