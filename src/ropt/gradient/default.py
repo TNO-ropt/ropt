@@ -121,6 +121,19 @@ class DefaultGradientCalculator(GradientCalculator):
         )
 
     @override
+    def validate_perturbed_variables(
+        self,
+        variables: NDArray[np.float64],
+        perturbed_variables: NDArray[np.float64],
+    ) -> None:
+        if self._method != "stochastic":
+            _check_finite_difference_points(
+                variables[self._mask],
+                perturbed_variables[..., self._mask],
+                central=self._method == "central",
+            )
+
+    @override
     def failed_realizations(self, data: GradientData) -> NDArray[np.bool_]:
         """Mark realizations with too few successful perturbations as failed.
 
@@ -424,7 +437,9 @@ def _finite_difference_points(
 def _estimate_finite_differences(
     data: GradientData, weights: NDArray[np.float64], *, central: bool
 ) -> NDArray[np.float64]:
-    targets = _check_finite_difference_points(data, central=central)
+    targets = _check_finite_difference_points(
+        data.variables, data.perturbed_variables, central=central
+    )
     variable_count = data.variables.size
     counts = np.bincount(targets, minlength=variable_count)
     first_rows = np.cumsum(counts) - counts
@@ -450,10 +465,13 @@ def _estimate_finite_differences(
 
 
 def _check_finite_difference_points(
-    data: GradientData, *, central: bool
+    variables: NDArray[np.float64],
+    perturbed_variables: NDArray[np.float64],
+    *,
+    central: bool,
 ) -> NDArray[np.intp]:
-    variable_count = data.variables.size
-    offsets = data.perturbed_variables - data.variables
+    variable_count = variables.size
+    offsets = perturbed_variables - variables
     row_targets = np.argmax(np.abs(offsets), axis=-1)
     targets: NDArray[np.intp] = row_targets[0]
     steps = np.take_along_axis(offsets, row_targets[..., np.newaxis], axis=-1)

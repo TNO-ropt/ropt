@@ -312,8 +312,8 @@ class EnsembleEvaluator:
         mask: NDArray[np.bool_] | None,
         cached_function: FunctionResults,
     ) -> tuple[GradientResults]:
-        metadata = self._signal_start()
         perturbed_variables = self._perturbed_variables(variables)
+        metadata = self._signal_start()
 
         # No functions are computed in this case, instead they must have been
         # computed in a previous run, with the results stored in the
@@ -436,19 +436,20 @@ class EnsembleEvaluator:
         self, variables: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         perturbed_variables = self._gradient.perturbed_variables(variables)
-        if self._initial_values is None:
-            return perturbed_variables
-        return self._initial_values.apply_to_perturbations(
-            variables, perturbed_variables
-        )
+        if self._initial_values is not None:
+            perturbed_variables = self._initial_values.apply_to_perturbations(
+                variables, perturbed_variables
+            )
+        self._gradient.validate_perturbed_variables(variables, perturbed_variables)
+        return perturbed_variables
 
     def _calculate_both(
         self,
         variables: NDArray[np.float64],
         mask: NDArray[np.bool_] | None,
     ) -> tuple[FunctionResults, GradientResults]:
-        metadata = self._signal_start()
         perturbed_variables = self._perturbed_variables(variables)
+        metadata = self._signal_start()
         realizations_to_evaluate = _get_realizations_to_evaluate(self._context)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
             self._context,

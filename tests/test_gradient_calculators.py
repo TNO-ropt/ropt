@@ -481,8 +481,22 @@ def test_finite_difference_checks_initial_gradient_points(
     g0 = _gradient(context(g0_method), evaluator([_linear]), variables=variables)
 
     if error:
+        evaluated: list[None] = []
+
+        def record_evaluation(
+            values: NDArray[np.float64], context: EvaluationFunctionContext
+        ) -> float:
+            evaluated.append(None)
+            return _linear(values, context)
+
         with pytest.raises(ValueError, match="finite-difference pattern"):
-            _gradient(context("central"), evaluator([_linear]), variables, g0)
+            _gradient(
+                context("central"),
+                evaluator([record_evaluation]),
+                variables,
+                g0,
+            )
+        assert not evaluated
         return
     gradient = _gradient(context("central"), evaluator([_linear]), variables, g0)
     assert gradient.aggregates is not None

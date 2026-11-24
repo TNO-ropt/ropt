@@ -346,6 +346,9 @@ class ForwardDifferences(GradientCalculator):
    returns the points to evaluate for each realization. The calculator chooses
    the number of points. Variables outside the mask must keep their value. The
    example does not keep the points within the variable bounds.
+   Before evaluating these points, `ropt` calls
+   `validate_perturbed_variables`. Override this method to reject points that
+   do not match the calculator's method.
 3. `failed_realizations` after the points are evaluated. It returns the
    realizations whose perturbed evaluations do not suffice to calculate a
    gradient.

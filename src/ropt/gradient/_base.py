@@ -130,6 +130,30 @@ class GradientCalculator(ABC):
             calculator chooses `n_perturbations`.
         """
 
+    def validate_perturbed_variables(
+        self,
+        variables: NDArray[np.float64],
+        perturbed_variables: NDArray[np.float64],
+    ) -> None:
+        """Validate the points before they are evaluated.
+
+        `ropt` calls this after generating points and inserting any reusable
+        initial gradient points, but before evaluating them. A calculator can
+        reject supplied points that do not match its method. The default
+        implementation checks the common shape requirements.
+
+        Args:
+            variables:           Shape `(n_variables,)`, the current point.
+            perturbed_variables: Shape `(n_realizations, n_perturbations,
+                                 n_variables)`, the points to evaluate.
+
+        Raises:
+            ValueError: If the point dimensions are incompatible.
+        """
+        if perturbed_variables.shape[-1:] != variables.shape:
+            msg = f"{type(self).__name__} returned points with an invalid shape"
+            raise ValueError(msg)
+
     @abstractmethod
     def failed_realizations(self, data: GradientData) -> NDArray[np.bool_]:
         """Identify the realizations for which no gradient can be calculated.
