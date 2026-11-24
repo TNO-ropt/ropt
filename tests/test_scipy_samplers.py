@@ -76,6 +76,24 @@ def test_scipy_qmc_sampler_preserves_points(
         np.testing.assert_array_equal(samples[..., ~mask], 0)
 
 
+@pytest.mark.parametrize("method", ["sobol", "halton", "lhs"])
+def test_scipy_qmc_sampler_restarts_on_init(method: str) -> None:
+    sampler = SciPySampler(SamplerConfig(method=method))
+
+    samples = []
+    for _ in range(2):
+        sampler.init(
+            realization_count=1,
+            perturbation_count=4,
+            variable_count=3,
+            mask=None,
+            rng=np.random.default_rng(123),
+        )
+        samples.append(sampler.generate_samples())
+
+    np.testing.assert_array_equal(samples[1], samples[0])
+
+
 def test_scipy_indexed_sampler(config: Any, eval_func: Any) -> None:
     # Removing the second variable will fix its value, since it will not be
     # perturbed and its gradient will always be zero.

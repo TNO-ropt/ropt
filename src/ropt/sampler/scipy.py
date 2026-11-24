@@ -106,10 +106,7 @@ class SciPySampler(Sampler):
         self._variable_count = variable_count
         self._mask = mask
         self._rng = rng
-        if self._sampler is None:
-            self._sampler, self._options = self._init_sampler(
-                self._sampler_config.options
-            )
+        self._sampler, self._options = self._init_sampler(self._sampler_config.options)
 
     @override
     def generate_samples(self) -> NDArray[np.float64]:
